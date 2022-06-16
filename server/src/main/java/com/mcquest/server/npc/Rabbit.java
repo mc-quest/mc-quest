@@ -1,8 +1,8 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.DamageSource;
 import com.mcquest.server.character.NonPlayerCharacter;
-import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,14 +24,14 @@ public class Rabbit extends NonPlayerCharacter {
 
     private final Pos spawnPosition;
     private final RabbitMeta.Type type;
-    private final CharacterCollider hitbox;
+    private final CharacterHitbox hitbox;
     private Entity entity;
 
     public Rabbit(Instance instance, Pos spawnPosition, RabbitMeta.Type type) {
         super(DISPLAY_NAME, 1, instance, spawnPosition);
         this.spawnPosition = spawnPosition;
         this.type = type;
-        hitbox = new CharacterCollider(this, instance, spawnPosition, 0.5, 0.5, 0.5);
+        hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.5, 0.5, 0.5);
         setHeight(0.75);
     }
 

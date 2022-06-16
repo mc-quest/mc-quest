@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,13 +18,13 @@ public class GelatinousCube extends NonPlayerCharacter {
             Component.text("Gelatinous Cube", NamedTextColor.RED);
 
     private final Pos spawnPosition;
-    private final CharacterCollider hitbox;
+    private final CharacterHitbox hitbox;
     private Entity entity;
 
     public GelatinousCube(Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 15, instance, spawnPosition);
         this.spawnPosition = spawnPosition;
-        hitbox = new CharacterCollider(this, instance, spawnPosition, 5, 5, 5);
+        hitbox = new CharacterHitbox(this, instance, spawnPosition, 5, 5, 5);
         entity = null;
         setHeight(3.0);
     }

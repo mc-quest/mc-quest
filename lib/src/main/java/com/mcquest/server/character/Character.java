@@ -198,19 +198,4 @@ public class Character implements DamageSource {
     public void setHeight(double height) {
         this.height = height;
     }
-
-    public static class CharacterCollider extends Collider {
-        private final Character character;
-
-        public CharacterCollider(Character character, Instance instance,
-                                 Pos center, double sizeX, double sizeY,
-                                 double sizeZ) {
-            super(instance, center, sizeX, sizeY, sizeZ);
-            this.character = character;
-        }
-
-        public Character getCharacter() {
-            return character;
-        }
-    }
 }

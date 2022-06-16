@@ -236,7 +236,7 @@ public final class PlayerCharacter extends Character {
         return !getNearby(instance, position, radius).isEmpty();
     }
 
-    public static class Hitbox extends CharacterCollider {
+    public static class Hitbox extends CharacterHitbox {
         public Hitbox(PlayerCharacter pc) {
             super(pc, pc.getInstance(), pc.getPosition().add(0.0, 1.0, 0.0),
                     1.0, 2.0, 1.0);

@@ -1,7 +1,7 @@
 package com.mcquest.server.event;
 
-import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.Item;
+import com.mcquest.server.character.PlayerCharacter;
 import net.minestom.server.event.Event;
 
 public class PlayerCharacterRemoveItemEvent implements Event {

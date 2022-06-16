@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacter;
 import net.kyori.adventure.text.Component;
@@ -32,27 +33,19 @@ public class GelatinousCube extends NonPlayerCharacter {
     @Override
     protected void spawn() {
         super.spawn();
-        hitbox.setEnabled(true);
         entity = new Entity(this);
+        CharacterEntityManager.register(entity, this);
         entity.setInstance(getInstance(), getPosition());
+        hitbox.setEnabled(true);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
         hitbox.setEnabled(false);
+        CharacterEntityManager.unregister(entity);
         entity.remove();
         setPosition(spawnPosition);
-    }
-
-    @Override
-    public boolean shouldSpawn() {
-        return true;
-    }
-
-    @Override
-    public boolean shouldDespawn() {
-        return false;
     }
 
     public static class Entity extends EntityCreature {

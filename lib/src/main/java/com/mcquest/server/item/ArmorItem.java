@@ -1,7 +1,7 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
+import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 
@@ -11,53 +11,53 @@ import net.minestom.server.item.Material;
  */
 public class ArmorItem extends Item {
     private final String playerClass;
-    private final ArmorType type;
+    private final Slot slot;
     private final int level;
     private final double protections;
 
     /**
      * Constructs an ArmorItem with the given name, rarity, icon, description,
-     * player class, level, and protections.
+     * player class, slot, level, and protections.
      */
     public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     String description, String playerClass, ArmorType type,
+                     String description, String playerClass, Slot slot,
                      int level, double protections) {
         super(name, rarity, icon, description);
         this.playerClass = playerClass;
-        this.type = type;
+        this.slot = slot;
         this.level = level;
         this.protections = protections;
     }
 
     /**
      * Constructs an ArmorItem with the given name, rarity, icon, description,
-     * PlayerClass, level, and protections.
+     * PlayerClass, slot, level, and protections.
      */
     public ArmorItem(String name, ItemRarity rarity, Material icon,
                      String description, PlayerClass playerClass,
-                     ArmorType type, int level, double protections) {
-        this(name, rarity, icon, description, playerClass.getName(), type,
+                     Slot slot, int level, double protections) {
+        this(name, rarity, icon, description, playerClass.getName(), slot,
                 level, protections);
     }
 
     /**
      * Constructs an ArmorItem with the given name, rarity, icon, player class,
-     * level, and protections. The ArmorItem will have no description.
+     * slot, level, and protections. The ArmorItem will have no description.
      */
     public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     String playerClass, ArmorType type, int level,
+                     String playerClass, Slot slot, int level,
                      double protections) {
-        this(name, rarity, icon, null, playerClass, type, level, protections);
+        this(name, rarity, icon, null, playerClass, slot, level, protections);
     }
 
     /**
      * Constructs an ArmorItem with the given name, rarity, icon, PlayerClass,
-     * level, and protections. The ArmorItem will have no description.
+     * slot, level, and protections. The ArmorItem will have no description.
      */
     public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     PlayerClass playerClass, ArmorType type, int level,
+                     PlayerClass playerClass, Slot slot, int level,
                      double protections) {
-        this(name, rarity, icon, null, playerClass, type, level, protections);
+        this(name, rarity, icon, null, playerClass, slot, level, protections);
     }
 
     /**
@@ -68,10 +68,10 @@ public class ArmorItem extends Item {
     }
 
     /**
-     * Returns the type of this ArmorItem.
+     * Returns the slot this ArmorItem occupies.
      */
-    public final ArmorType getType() {
-        return type;
+    public final Slot getSlot() {
+        return slot;
     }
 
     /**
@@ -102,7 +102,7 @@ public class ArmorItem extends Item {
         // lore.append(ChatColor.GOLD);
         lore.append(playerClass);
         lore.append(" Armor\n");
-        lore.append(type.getText());
+        lore.append(slot.getText());
         lore.append("\nLevel ");
         lore.append(level);
         lore.append('\n');
@@ -117,23 +117,23 @@ public class ArmorItem extends Item {
         // lore.append(ChatColor.GRAY);
         lore.append("Shift-click to equip");
         // return BukkitUtility.createItemStack(icon, rarity.getColor() + name, lore.toString());
-        return null;
+        return super.createItemStack();
     }
 
     /**
-     * An ArmorType describes the equipment slot that an ArmorItem occupies.
+     * A Slot describes the equipment slot that an ArmorItem occupies.
      */
-    public static enum ArmorType {
+    public enum Slot {
         FEET("Feet"), LEGS("Legs"), CHEST("Chest"), HEAD("Head");
 
-        private String text;
+        private final String text;
 
-        private ArmorType(String text) {
+        Slot(String text) {
             this.text = text;
         }
 
         /**
-         * Returns the text that describes this ArmorType.
+         * Returns the text that describes this Slot.
          */
         public String getText() {
             return text;

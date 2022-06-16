@@ -15,3 +15,6 @@ gradle-app.setting
 
 # Minestom extensions
 /extensions/
+
+# World files
+/world/

@@ -15,7 +15,7 @@ public enum ItemRarity {
     private final String text;
     private final NamedTextColor color;
 
-    private ItemRarity(String text, NamedTextColor color) {
+    ItemRarity(String text, NamedTextColor color) {
         this.text = text;
         this.color = color;
     }

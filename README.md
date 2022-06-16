@@ -1,2 +1,2 @@
 # MCQuest Server
-The server for MCQuest.
+The server implementation for MCQuest.

@@ -1,7 +1,10 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.character.CharacterEntityManager;
+import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.DamageSource;
 import com.mcquest.server.character.NonPlayerCharacter;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -14,54 +17,55 @@ import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
 
 public class Wolf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME =
             Component.text("Wolf", NamedTextColor.RED);
+    private static final Sound ATTACK_SOUND =
+            Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.NEUTRAL, 1f, 1f);
 
     private final Pos spawnPosition;
+    private final CharacterHitbox hitbox;
     private Entity entity;
 
     public Wolf(Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 7, instance, spawnPosition);
         this.spawnPosition = spawnPosition;
+        hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.75, 0.75, 0.75);
         setHeight(1.0);
+    }
+
+    @Override
+    public void setPosition(Pos position) {
+        super.setPosition(position);
+        hitbox.setCenter(position.add(0.0, getHeight() / 2.0, 0.0));
     }
 
     @Override
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
+        CharacterEntityManager.register(entity, this);
         entity.setInstance(getInstance(), getPosition());
-    }
-
-    public void doSpawn() {
-        spawn();
+        hitbox.setEnabled(true);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
+        CharacterEntityManager.unregister(entity);
         entity.remove();
         setPosition(spawnPosition);
+        hitbox.setEnabled(false);
     }
 
     @Override
     public void damage(DamageSource source, double amount) {
         super.damage(source, amount);
         entity.damage(DamageType.VOID, 0f);
-    }
-
-    @Override
-    protected boolean shouldSpawn() {
-        return true;
-    }
-
-    @Override
-    protected boolean shouldDespawn() {
-        return false;
     }
 
     public static class Entity extends EntityCreature {
@@ -72,13 +76,14 @@ public class Wolf extends NonPlayerCharacter {
             this.wolf = wolf;
             addAIGroup(new EntityAIGroupBuilder()
                     .addTargetSelector(new ClosestEntityTarget(this, 10, Rabbit.Entity.class))
-                    .addGoalSelector(new MeleeAttackGoal(this, 1.2, Duration.ofSeconds(1)))
+                    .addGoalSelector(new MeleeAttackGoal(this, 1.2, Duration.ofSeconds(2)))
                     .addGoalSelector(new RandomStrollGoal(this, 5))
                     .build());
             eventNode().addListener(EntityAttackEvent.class, event -> {
+                getInstance().playSound(ATTACK_SOUND, position.x(), position.y(), position.z());
                 if (event.getTarget() instanceof Rabbit.Entity rabbitEntity) {
                     Rabbit rabbit = rabbitEntity.getRabbit();
-                    rabbit.damage(wolf, 0.1);
+                    rabbit.damage(wolf, 0.5);
                 }
             });
         }

@@ -1,7 +1,7 @@
 package com.mcquest.server.npc;
 
-import com.mcquest.server.character.DamageSource;
-import com.mcquest.server.character.NonPlayerCharacter;
+import com.mcquest.server.character.*;
+import com.mcquest.server.character.Character;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -16,32 +16,31 @@ import net.minestom.server.instance.Instance;
 import java.time.Duration;
 
 public class NecromancerZombie extends NonPlayerCharacter {
-    private static final Component DISPLAY_NAME = Component.text("Zombie", NamedTextColor.GREEN);
+    private static final Component DISPLAY_NAME = Component.text("Zombie",
+            NamedTextColor.GREEN);
 
-    private final Pos spawnPosition;
+    private final PlayerCharacter summoner;
     private Entity entity;
 
-    public NecromancerZombie(Instance instance, Pos spawnPosition) {
+    public NecromancerZombie(PlayerCharacter summoner, Instance instance,
+                             Pos spawnPosition) {
         super(DISPLAY_NAME, 1, instance, spawnPosition);
-        this.spawnPosition = spawnPosition;
+        this.summoner = summoner;
     }
 
     @Override
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
+        CharacterEntityManager.register(entity, this);
         entity.setInstance(getInstance(), getPosition());
-    }
-
-    public void doSpawn() {
-        spawn();
     }
 
     @Override
     protected void despawn() {
         super.despawn();
+        CharacterEntityManager.unregister(entity);
         entity.remove();
-        setPosition(spawnPosition);
     }
 
     @Override
@@ -51,13 +50,11 @@ public class NecromancerZombie extends NonPlayerCharacter {
     }
 
     @Override
-    protected boolean shouldSpawn() {
-        return true;
-    }
-
-    @Override
-    protected boolean shouldDespawn() {
-        return false;
+    public boolean isFriendly(Character other) {
+        if (other instanceof PlayerCharacter) {
+            return true;
+        }
+        return other.isFriendly(summoner);
     }
 
     public static class Entity extends EntityCreature {
@@ -67,8 +64,10 @@ public class NecromancerZombie extends NonPlayerCharacter {
             super(EntityType.ZOMBIE);
             this.zombie = zombie;
             addAIGroup(new EntityAIGroupBuilder()
-                    .addTargetSelector(new ClosestEntityTarget(this, 20, GelatinousCube.Entity.class))
-                    .addGoalSelector(new MeleeAttackGoal(this, 1.2, Duration.ofSeconds(1)))
+                    .addTargetSelector(new ClosestEntityTarget(this, 20,
+                            GelatinousCube.Entity.class))
+                    .addGoalSelector(new MeleeAttackGoal(this, 1.2,
+                            Duration.ofSeconds(1)))
                     .build());
         }
 

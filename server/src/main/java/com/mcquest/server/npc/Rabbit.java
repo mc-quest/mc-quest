@@ -1,8 +1,7 @@
 package com.mcquest.server.npc;
 
-import com.mcquest.server.character.CharacterHitbox;
-import com.mcquest.server.character.DamageSource;
-import com.mcquest.server.character.NonPlayerCharacter;
+import com.mcquest.server.character.*;
+import com.mcquest.server.character.Character;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -45,19 +44,17 @@ public class Rabbit extends NonPlayerCharacter {
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
+        CharacterEntityManager.register(entity, this);
         entity.setInstance(getInstance(), getPosition());
         hitbox.setEnabled(true);
-    }
-
-    public void doSpawn() {
-        spawn();
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        entity.remove();
         hitbox.setEnabled(false);
+        CharacterEntityManager.unregister(entity);
+        entity.remove();
         setPosition(spawnPosition);
     }
 
@@ -70,13 +67,8 @@ public class Rabbit extends NonPlayerCharacter {
     }
 
     @Override
-    protected boolean shouldSpawn() {
+    public boolean isFriendly(Character other) {
         return true;
-    }
-
-    @Override
-    protected boolean shouldDespawn() {
-        return false;
     }
 
     public static class Entity extends EntityCreature {

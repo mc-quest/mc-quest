@@ -2,6 +2,7 @@ package com.mcquest.server.physics;
 
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -23,12 +24,13 @@ public class Collider {
     private Set<ColliderBucketAddress> occupiedBuckets;
     private Set<Collider> contacts;
 
-    public Collider(Instance instance, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
+    public Collider(@NotNull Instance instance, double minX, double minY,
+                    double minZ, double maxX, double maxY, double maxZ) {
         if (minX > maxX) throw new IllegalArgumentException("minX > maxX");
         if (minY > maxY) throw new IllegalArgumentException("minY > maxY");
         if (minZ > maxZ) throw new IllegalArgumentException("minZ > maxZ");
 
-        this.instance = Objects.requireNonNull(instance);
+        this.instance = instance;
         this.minX = minX;
         this.minY = minY;
         this.minZ = minZ;
@@ -40,7 +42,8 @@ public class Collider {
         contacts = new HashSet<>();
     }
 
-    public Collider(Instance instance, Pos center, double sizeX, double sizeY, double sizeZ) {
+    public Collider(@NotNull Instance instance, @NotNull Pos center,
+                    double sizeX, double sizeY, double sizeZ) {
         this(instance, center.x() - sizeX / 2.0, center.y() - sizeY / 2.0,
                 center.z() - sizeZ / 2.0, center.x() + sizeX / 2.0,
                 center.y() + sizeY / 2.0, center.z() + sizeZ / 2.0);
@@ -50,8 +53,8 @@ public class Collider {
         return instance;
     }
 
-    public final void setInstance(Instance instance) {
-        this.instance = Objects.requireNonNull(instance);
+    public final void setInstance(@NotNull Instance instance) {
+        this.instance = instance;
         handleChange();
     }
 
@@ -75,6 +78,17 @@ public class Collider {
 
     public final double getMinZ() {
         return minZ;
+    }
+
+    public Pos getMin() {
+        return new Pos(minX, minY, minZ);
+    }
+
+    public void setMin(Pos min) {
+        this.minX = min.x();
+        this.minY = min.y();
+        this.minZ = min.z();
+        handleChange();
     }
 
     public final void setMinZ(double minZ) {
@@ -109,12 +123,15 @@ public class Collider {
         handleChange();
     }
 
-    private Pos getMin() {
-        return new Pos(minX, minY, minZ);
+    public Pos getMax() {
+        return new Pos(maxX, maxY, maxZ);
     }
 
-    private Pos getMax() {
-        return new Pos(maxX, maxY, maxZ);
+    public void setMax(Pos max) {
+        this.maxX = max.x();
+        this.maxY = max.y();
+        this.maxZ = max.z();
+        handleChange();
     }
 
     public final double getSizeX() {
@@ -174,8 +191,7 @@ public class Collider {
                 (minZ + maxZ) / 2.0);
     }
 
-    public final void setCenter(Pos center) {
-        Objects.requireNonNull(center);
+    public final void setCenter(@NotNull Pos center) {
         double semiSizeX = getSizeX() / 2.0;
         double semiSizeY = getSizeY() / 2.0;
         double semiSizeZ = getSizeZ() / 2.0;

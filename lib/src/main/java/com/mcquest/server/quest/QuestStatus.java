@@ -15,5 +15,5 @@ public enum QuestStatus {
     /**
      * The PlayerCharacter has completed the Quest.
      */
-    COMPLETED;
+    COMPLETED
 }

@@ -6,6 +6,5 @@ public class Raycast {
     }
 
     public static class Result {
-
     }
 }

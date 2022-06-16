@@ -1,3 +1,10 @@
 {
-  "name": "Adventurer's Cap"
+    "name": "Adventurer's Cap",
+    "rarity": "COMMON",
+    "icon": "minecraft:leather_helmet",
+    "description": null,
+    "playerClass": "Fighter",
+    "slot": "HEAD",
+    "level": 1,
+    "protections": 3
 }

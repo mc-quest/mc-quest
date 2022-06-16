@@ -3,9 +3,8 @@ package com.mcquest.server.character;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.timer.ExecutionType;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -15,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NonPlayerCharacter extends Character {
-    private static Set<NonPlayerCharacter> aliveNpcs = new HashSet<>();
+    private static final Set<NonPlayerCharacter> aliveNpcs = new HashSet<>();
 
     private boolean isSpawned;
 
@@ -85,14 +84,10 @@ public class NonPlayerCharacter extends Character {
     }
 
     protected boolean shouldSpawn() {
-        // return PlayerCharacter.isNearby(getInstance(), getPosition(), 50);
-        // TODO
-        return true;
+        return PlayerCharacter.isNearby(getInstance(), getPosition(), 50.0);
     }
 
     protected boolean shouldDespawn() {
-        // return !PlayerCharacter.isNearby(getInstance(), getPosition(), 60);
-        // TODO
-        return false;
+        return !PlayerCharacter.isNearby(getInstance(), getPosition(), 60.0);
     }
 }

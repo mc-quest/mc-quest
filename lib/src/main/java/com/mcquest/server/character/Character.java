@@ -1,6 +1,5 @@
 package com.mcquest.server.character;
 
-import com.mcquest.server.physics.Collider;
 import com.mcquest.server.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -22,9 +21,9 @@ public class Character implements DamageSource {
     private Instance instance;
     private Pos position;
     private boolean alive;
-    private Hologram nameplate;
-    private Hologram healthBar;
     private double height;
+    Hologram nameplate;
+    Hologram healthBar;
 
     public Character(@NotNull Component displayName, int level,
                      @NotNull Instance instance, @NotNull Pos position) {
@@ -177,7 +176,7 @@ public class Character implements DamageSource {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
-        double newHealth = MathUtility.clamp(health - amount, 0, maxHealth);
+        double newHealth = MathUtility.clamp(health - amount, 0.0, maxHealth);
         setHealth(newHealth);
     }
 
@@ -186,7 +185,7 @@ public class Character implements DamageSource {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
-        double newHealth = MathUtility.clamp(health + amount, 0, maxHealth);
+        double newHealth = MathUtility.clamp(health + amount, 0.0, maxHealth);
         setHealth(newHealth);
     }
 
@@ -197,5 +196,9 @@ public class Character implements DamageSource {
     @MustBeInvokedByOverriders
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    public boolean isFriendly(Character other) {
+        return false;
     }
 }

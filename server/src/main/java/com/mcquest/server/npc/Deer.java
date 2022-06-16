@@ -1,4 +1,4 @@
-package com.mcquest.server.main.npc;
+package com.mcquest.server.npc;
 
 public class Deer {
     // TODO

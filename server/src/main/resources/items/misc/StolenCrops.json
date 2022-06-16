@@ -1,3 +1,6 @@
 {
-  "name": "Stolen Crops"
+    "name": "Stolen Crops",
+    "rarity": "COMMON",
+    "icon": "minecraft:wheat",
+    "description": null
 }

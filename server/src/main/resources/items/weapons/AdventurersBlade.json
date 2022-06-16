@@ -1,0 +1,9 @@
+{
+    "name": "Adventurer's Blade",
+    "rarity": "COMMON",
+    "icon": "minecraft:iron_sword",
+    "description": null,
+    "playerClass": "Fighter",
+    "level": 1,
+    "damage": 3
+}

@@ -1,7 +1,7 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
+import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 

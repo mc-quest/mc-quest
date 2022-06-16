@@ -6,8 +6,7 @@ import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-
-import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An Item represents an MMORPG item.
@@ -15,26 +14,27 @@ import java.util.Objects;
 public class Item {
     private final String name;
     private final ItemRarity rarity;
-    private final Material icon;
+    private final String icon;
     private final String description;
     private transient ItemStack itemStack;
 
     /**
      * Constructs an Item with the given name, rarity, icon, and description.
      */
-    public Item(String name, ItemRarity rarity, Material icon,
-                String description) {
-        this.name = Objects.requireNonNull(name);
-        this.rarity = Objects.requireNonNull(rarity);
-        this.icon = Objects.requireNonNull(icon);
-        this.description = Objects.requireNonNull(description);
+    public Item(@NotNull String name, @NotNull ItemRarity rarity,
+                @NotNull Material icon, @NotNull String description) {
+        this.name = name;
+        this.rarity = rarity;
+        this.icon = icon.namespace().asString();
+        this.description = description;
     }
 
     /**
      * Constructs an Item with the given name, rarity, icon, and no
      * description.
      */
-    public Item(String name, ItemRarity rarity, Material icon) {
+    public Item(@NotNull String name, @NotNull ItemRarity rarity,
+                @NotNull Material icon) {
         this(name, rarity, icon, null);
     }
 
@@ -56,7 +56,7 @@ public class Item {
      * Returns the icon of this Item.
      */
     public final Material getIcon() {
-        return icon;
+        return Material.fromNamespaceId(icon);
     }
 
     /**
@@ -93,7 +93,7 @@ public class Item {
             // TODO
         }
 
-        return ItemStack.builder(Material.AIR)
+        return ItemStack.builder(getIcon())
                 .displayName(getDisplayName())
                 .lore(rarityText) // TODO: add description
                 .build();
@@ -103,10 +103,15 @@ public class Item {
         drop(instance, position, 1);
     }
 
-    public void drop(Instance instance, Pos position, int amount) {
+    public void drop(@NotNull Instance instance, @NotNull Pos position,
+                     int amount) {
         // TODO: Test this.
-        ItemEntity drop = new ItemEntity(itemStack.withAmount(amount));
-        drop.setInstance(Objects.requireNonNull(instance),
-                Objects.requireNonNull(position));
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount < 0");
+        }
+        ItemEntity drop = new ItemEntity(getItemStack().withAmount(amount));
+        drop.setCustomName(getDisplayName());
+        drop.setCustomNameVisible(true);
+        drop.setInstance(instance, position);
     }
 }

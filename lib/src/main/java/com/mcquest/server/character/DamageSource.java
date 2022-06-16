@@ -4,5 +4,5 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 public interface DamageSource {
-    public @NotNull Component getDisplayName();
+    @NotNull Component getDisplayName();
 }

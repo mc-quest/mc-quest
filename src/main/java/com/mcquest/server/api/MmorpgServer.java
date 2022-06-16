@@ -1,5 +1,7 @@
 package com.mcquest.server.api;
 
+import com.mcquest.server.api.character.NonPlayerCharacter;
+import com.mcquest.server.api.ui.InteractionManager;
 import net.minestom.server.MinecraftServer;
 
 public class MmorpgServer {
@@ -11,6 +13,8 @@ public class MmorpgServer {
         this.address = address;
         this.port = port;
         minecraftServer = MinecraftServer.init();
+        InteractionManager.registerListeners();
+        NonPlayerCharacter.startSpawner();
     }
 
     public void start() {

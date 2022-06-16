@@ -11,4 +11,7 @@ gradle-app.setting
 .gradletasknamecache
 
 # IntelliJ
-.idea
+/.idea/
+
+# Minestom extensions
+/extensions/

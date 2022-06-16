@@ -1,2 +1,3 @@
-rootProject.name = 'server'
-
+rootProject.name = 'mc-quest'
+include 'server'
+include 'lib'

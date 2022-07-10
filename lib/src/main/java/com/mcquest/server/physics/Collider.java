@@ -21,8 +21,8 @@ public class Collider {
     private Instance instance;
     private double minX, minY, minZ, maxX, maxY, maxZ;
     private boolean enabled;
-    private Set<ColliderBucketAddress> occupiedBuckets;
-    private Set<Collider> contacts;
+    private final Set<ColliderBucketAddress> occupiedBuckets;
+    private final Set<Collider> contacts;
 
     public Collider(@NotNull Instance instance, double minX, double minY,
                     double minZ, double maxX, double maxY, double maxZ) {
@@ -221,9 +221,10 @@ public class Collider {
             for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
                 removeFromBucket(bucketAddress);
             }
+            occupiedBuckets.clear();
 
-            Set<Collider> oldContacts = contacts;
-            contacts = new HashSet<>();
+            Set<Collider> oldContacts = new HashSet<>(contacts);
+            contacts.clear();
             for (Collider other : oldContacts) {
                 other.contacts.remove(this);
             }
@@ -273,7 +274,7 @@ public class Collider {
             }
         }
 
-        occupiedBuckets = newOccupiedBuckets;
+        occupiedBuckets.retainAll(newOccupiedBuckets);
     }
 
     private void removeFromBucket(ColliderBucketAddress address) {

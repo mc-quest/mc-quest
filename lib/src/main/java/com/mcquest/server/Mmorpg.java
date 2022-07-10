@@ -6,12 +6,11 @@ import com.mcquest.server.ui.InteractionManager;
 
 public class Mmorpg {
     /**
-     * Initializes the MMORPG. You must invoke MinecraftServer.init() before
-     * this method.
+     * Starts the MMORPG.
      */
-    public static void init() {
+    public static void start() {
         InteractionManager.registerListeners();
-        NonPlayerCharacter.startSpawner();
         ChunkUnloader.unloadVacantChunks();
+        NonPlayerCharacter.startSpawner();
     }
 }

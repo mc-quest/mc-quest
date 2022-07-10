@@ -18,13 +18,13 @@ public class Main {
 
     public static void main(String[] args) {
         MinecraftServer server = MinecraftServer.init();
-        Mmorpg.init();
         load();
         Lobby.createLobby();
-        server.start(SERVER_ADDRESS, SERVER_PORT);
         new Rabbit(Instances.ELADRADOR, new Pos(0, 70, 0), RabbitMeta.Type.BLACK).setAlive(true);
         new Wolf(Instances.ELADRADOR, new Pos(5, 70, 5)).setAlive(true);
         new Broodling(Instances.ELADRADOR, new Pos(-5, 70, 5)).setAlive(true);
+        server.start(SERVER_ADDRESS, SERVER_PORT);
+        Mmorpg.start();
     }
 
     private static void load() {

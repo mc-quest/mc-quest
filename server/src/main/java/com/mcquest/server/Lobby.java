@@ -37,8 +37,8 @@ public class Lobby {
         Player player = event.getPlayer();
         PlayerCharacter pc = PlayerCharacter.forPlayer(player);
         if (pc != null) {
-            pc.remove();
             // TODO: save data
+            pc.remove();
         }
     }
 }

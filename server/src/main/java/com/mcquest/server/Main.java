@@ -1,5 +1,6 @@
 package com.mcquest.server;
 
+import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.constants.Instances;
 import com.mcquest.server.load.InstanceLoader;
 import com.mcquest.server.load.ItemLoader;
@@ -20,9 +21,9 @@ public class Main {
         MinecraftServer server = MinecraftServer.init();
         load();
         Lobby.createLobby();
-        new Rabbit(Instances.ELADRADOR, new Pos(0, 70, 0), RabbitMeta.Type.BLACK).setAlive(true);
-        new Wolf(Instances.ELADRADOR, new Pos(5, 70, 5)).setAlive(true);
-        new Broodling(Instances.ELADRADOR, new Pos(-5, 70, 5)).setAlive(true);
+        NonPlayerCharacterSpawner.add(new Rabbit(Instances.ELADRADOR, new Pos(0, 70, 0), RabbitMeta.Type.BLACK));
+        NonPlayerCharacterSpawner.add(new Wolf(Instances.ELADRADOR, new Pos(5, 70, 5)));
+        NonPlayerCharacterSpawner.add(new Broodling(Instances.ELADRADOR, new Pos(-5, 70, 5)));
         server.start(SERVER_ADDRESS, SERVER_PORT);
         Mmorpg.start();
     }

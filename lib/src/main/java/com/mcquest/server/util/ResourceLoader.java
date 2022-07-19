@@ -1,6 +1,7 @@
 package com.mcquest.server.util;
 
 import com.google.gson.Gson;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import java.util.Map;
 public class ResourceLoader {
     private static final Gson gson = new Gson();
 
-    public static InputStream getResourceAsStream(String resourcePath) {
+    public static InputStream getResourceAsStream(@NotNull String resourcePath) {
         return ResourceLoader.class.getClassLoader().getResourceAsStream(resourcePath);
     }
 
@@ -30,7 +31,8 @@ public class ResourceLoader {
      * @param <T>          the type of the object being deserialized
      * @return the deserialized object
      */
-    public static <T> T deserializeJsonResource(String resourcePath, Class<T> classOfT) {
+    public static <T> T deserializeJsonResource(@NotNull String resourcePath,
+                                                @NotNull Class<T> classOfT) {
         InputStream inputStream = getResourceAsStream(resourcePath);
         InputStreamReader reader = new InputStreamReader(inputStream);
         return gson.fromJson(reader, classOfT);
@@ -45,7 +47,8 @@ public class ResourceLoader {
      * @param destinationPath the relative path to where the resources will be
      *                        extracted
      */
-    public static void extractResources(String resourcesPath, String destinationPath) {
+    public static void extractResources(@NotNull String resourcesPath,
+                                        @NotNull String destinationPath) {
         try {
             URI resourcesUri = ResourceLoader.class.getResource("/" + resourcesPath).toURI();
             FileSystem fileSystem = null;
@@ -85,7 +88,7 @@ public class ResourceLoader {
     /**
      * Returns the resources in a directory given by a path.
      */
-    public static List<String> getResources(String resourcesPath) {
+    public static List<String> getResources(@NotNull String resourcesPath) {
         try {
             URI resourcesUri = ResourceLoader.class.getResource("/" + resourcesPath).toURI();
 

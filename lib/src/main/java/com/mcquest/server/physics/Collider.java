@@ -274,7 +274,8 @@ public class Collider {
             }
         }
 
-        occupiedBuckets.retainAll(newOccupiedBuckets);
+        occupiedBuckets.clear();
+        occupiedBuckets.addAll(newOccupiedBuckets);
     }
 
     private void removeFromBucket(ColliderBucketAddress address) {

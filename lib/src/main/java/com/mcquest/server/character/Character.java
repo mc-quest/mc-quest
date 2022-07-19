@@ -20,10 +20,9 @@ public class Character implements DamageSource {
     private double maxHealth;
     private Instance instance;
     private Pos position;
-    private boolean alive;
     private double height;
-    Hologram nameplate;
-    Hologram healthBar;
+    private Hologram nameplate;
+    private Hologram healthBar;
 
     public Character(@NotNull Component displayName, int level,
                      @NotNull Instance instance, @NotNull Pos position) {
@@ -36,13 +35,10 @@ public class Character implements DamageSource {
         this.health = maxHealth;
         this.instance = instance;
         this.position = position;
-        alive = false;
-        nameplate = new Hologram(instance,
-                position.add(0.0, height + 0.25, 0.0), nameplateText());
-        healthBar = new Hologram(instance, position.add(0.0, height, 0.0),
-                healthBarText());
         // Default is humanoid height.
         height = 2.0;
+        nameplate = null;
+        healthBar = null;
     }
 
     /**
@@ -83,7 +79,21 @@ public class Character implements DamageSource {
 
     @MustBeInvokedByOverriders
     public void setInstance(@NotNull Instance instance) {
+        if (instance == this.instance) {
+            return;
+        }
+
+        // Update nameplate and health bar instance.
+        boolean nameplateAndHealthBarVisible = nameplateAndHealthBarVisible();
+        if (nameplateAndHealthBarVisible) {
+            hideNameplateAndHealthBar();
+        }
+
         this.instance = instance;
+
+        if (nameplateAndHealthBarVisible) {
+            showNameplateAndHealthBar();
+        }
     }
 
     public final Pos getPosition() {
@@ -93,8 +103,7 @@ public class Character implements DamageSource {
     @MustBeInvokedByOverriders
     public void setPosition(@NotNull Pos position) {
         this.position = position;
-        nameplate.setPosition(position.add(0.0, height, 0.0));
-        healthBar.setPosition(position.add(0.0, height - 0.25, 0.0));
+        updateNameplateAndHealthBarPosition();
     }
 
     /**
@@ -136,39 +145,7 @@ public class Character implements DamageSource {
     }
 
     public final boolean isAlive() {
-        return alive;
-    }
-
-    @MustBeInvokedByOverriders
-    public void setAlive(boolean alive) {
-        this.alive = alive;
-        // TODO
-    }
-
-    private void updateNameplateText() {
-        nameplate.setText(nameplateText());
-    }
-
-    private void updateHealthBarText() {
-        healthBar.setText(healthBarText());
-    }
-
-    private Component nameplateText() {
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("Lv. " + level, NamedTextColor.GOLD))
-                .append(Component.text("] ", NamedTextColor.GRAY))
-                .append(this.displayName);
-    }
-
-    private Component healthBarText() {
-        int numBars = 20;
-        double ratio = health / maxHealth;
-        int numRedBars = (int) Math.ceil(numBars * ratio);
-        int numGrayBars = numBars - numRedBars;
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("|".repeat(numRedBars), NamedTextColor.RED))
-                .append(Component.text("|".repeat(numGrayBars), NamedTextColor.GRAY))
-                .append(Component.text("]", NamedTextColor.GRAY));
+        return health > 0;
     }
 
     @MustBeInvokedByOverriders
@@ -196,9 +173,71 @@ public class Character implements DamageSource {
     @MustBeInvokedByOverriders
     public void setHeight(double height) {
         this.height = height;
+        updateNameplateAndHealthBarPosition();
     }
 
-    public boolean isFriendly(Character other) {
+    boolean nameplateAndHealthBarVisible() {
+        return healthBar != null;
+    }
+
+    void showNameplateAndHealthBar() {
+        nameplate = new Hologram(instance, nameplatePosition(), nameplateText());
+        healthBar = new Hologram(instance, healthBarPosition(), healthBarText());
+    }
+
+    void hideNameplateAndHealthBar() {
+        nameplate.remove();
+        healthBar.remove();
+        nameplate = null;
+        healthBar = null;
+    }
+
+    public boolean isFriendly(@NotNull Character other) {
         return false;
+    }
+
+    private void updateNameplateAndHealthBarPosition() {
+        if (nameplateAndHealthBarVisible()) {
+            nameplate.setPosition(nameplatePosition());
+            healthBar.setPosition(healthBarPosition());
+        }
+    }
+
+    private Pos nameplatePosition() {
+        return position.add(0.0, height + 0.25, 0.0);
+    }
+
+    private Pos healthBarPosition() {
+        return position.add(0.0, height, 0.0);
+    }
+
+    private void updateNameplateText() {
+        if (nameplateAndHealthBarVisible()) {
+            nameplate.setText(nameplateText());
+        }
+    }
+
+    private void updateHealthBarText() {
+        if (nameplateAndHealthBarVisible()) {
+            healthBar.setText(healthBarText());
+        }
+    }
+
+    private Component nameplateText() {
+        return Component.text("[", NamedTextColor.GRAY)
+                .append(Component.text("Lv. " + level, NamedTextColor.GOLD))
+                .append(Component.text("] ", NamedTextColor.GRAY))
+                .append(this.displayName);
+    }
+
+    private Component healthBarText() {
+        int numBars = 20;
+        double ratio = health / maxHealth;
+        int numRedBars = (int) Math.ceil(numBars * ratio);
+        int numGrayBars = numBars - numRedBars;
+        return Component.text("[", NamedTextColor.GRAY)
+                .append(Component.text("|".repeat(numRedBars), NamedTextColor.RED))
+                .append(Component.text("|".repeat(numGrayBars), NamedTextColor.GRAY))
+                .append(Component.text("]", NamedTextColor.GRAY));
     }
 }

@@ -5,6 +5,7 @@ import com.mcquest.server.character.Character;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
@@ -14,12 +15,17 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.entity.metadata.animal.RabbitMeta;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.timer.SchedulerManager;
+
+import java.time.Duration;
 
 public class Rabbit extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME =
             Component.text("Rabbit", NamedTextColor.GREEN);
     private static final Sound HURT_SOUND =
             Sound.sound(SoundEvent.ENTITY_RABBIT_HURT, Sound.Source.NEUTRAL, 1f, 1f);
+    private static final Sound DEATH_SOUND =
+            Sound.sound(SoundEvent.ENTITY_RABBIT_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
 
     private final Pos spawnPosition;
     private final RabbitMeta.Type type;
@@ -62,8 +68,25 @@ public class Rabbit extends NonPlayerCharacter {
     public void damage(DamageSource source, double amount) {
         super.damage(source, amount);
         Pos position = getPosition();
-        getInstance().playSound(HURT_SOUND, position.x(), position.y(), position.z());
         entity.damage(DamageType.VOID, 0f);
+        if (getHealth() == 0) {
+            die();
+        } else {
+            getInstance().playSound(HURT_SOUND, position.x(), position.y(), position.z());
+        }
+    }
+
+    private void die() {
+        SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
+        Pos position = getPosition();
+        getInstance().playSound(DEATH_SOUND, position.x(), position.y(), position.z());
+        schedulerManager.buildTask(() -> {
+            respawn();
+        }).delay(Duration.ofSeconds(5)).schedule();
+    }
+
+    private void respawn() {
+        setHealth(getMaxHealth());
     }
 
     @Override

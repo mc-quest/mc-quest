@@ -11,7 +11,6 @@ import com.mcquest.server.quest.PlayerCharacterQuestManager;
 import com.mcquest.server.sound.PlayerCharacterMusicManager;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.util.Debug;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -132,6 +131,23 @@ public final class PlayerCharacter extends Character {
 
     public void grantExperiencePoints(double experiencePoints) {
         // TODO
+    }
+
+    @Override
+    public void setHealth(double health) {
+        super.setHealth(health);
+        updatePlayerHealthBar();
+    }
+
+    @Override
+    public void setMaxHealth(double maxHealth) {
+        super.setMaxHealth(maxHealth);
+        updatePlayerHealthBar();
+    }
+
+    private void updatePlayerHealthBar() {
+        float playerHealth = (float) (getHealth() / getMaxHealth() * 20.0);
+        player.setHealth(playerHealth);
     }
 
     @Override

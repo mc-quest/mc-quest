@@ -4,7 +4,6 @@ import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacter;
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.constants.Items;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -29,7 +28,7 @@ public class Broodling extends NonPlayerCharacter {
 
     public Broodling(Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 5, instance, spawnPosition);
-        setHeight(1);
+        setHeight(1.0);
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 1.5, getHeight(), 1.5);
         this.spawnPosition = spawnPosition;
     }
@@ -75,7 +74,7 @@ public class Broodling extends NonPlayerCharacter {
             eventNode().addListener(EntityAttackEvent.class, event -> {
                 if (event.getTarget() instanceof Player player) {
                     PlayerCharacter pc = PlayerCharacter.forPlayer(player);
-                    pc.damage(broodling, 5);
+                    pc.damage(broodling, 0.1);
                 }
             });
         }

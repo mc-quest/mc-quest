@@ -26,6 +26,6 @@ public class PlayerCharacterData {
     }
 
     public static PlayerCharacterData save(PlayerCharacter pc) {
-
+        return new PlayerCharacterData();
     }
 }

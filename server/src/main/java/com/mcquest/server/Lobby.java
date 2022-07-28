@@ -27,7 +27,7 @@ public class Lobby {
         event.setSpawningInstance(Instances.ELADRADOR);
         player.setRespawnPoint(new Pos(0, 70, 0));
         MinecraftServer.getSchedulerManager().buildTask(() -> {
-            PlayerCharacterData data = new PlayerCharacterData();
+            PlayerCharacterData data = PlayerCharacterData.create();
             PlayerCharacter.register(player, data);
             // TODO: Add menu item.
         }).delay(Duration.ofSeconds(3)).schedule();

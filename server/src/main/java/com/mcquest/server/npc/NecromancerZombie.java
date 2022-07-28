@@ -64,11 +64,15 @@ public class NecromancerZombie extends NonPlayerCharacter {
             super(EntityType.ZOMBIE);
             this.zombie = zombie;
             addAIGroup(new EntityAIGroupBuilder()
-                    .addTargetSelector(new ClosestEntityTarget(this, 20,
-                            GelatinousCube.Entity.class))
+                    .addTargetSelector(new ClosestEntityTarget(this, 20, this::shouldTarget))
                     .addGoalSelector(new MeleeAttackGoal(this, 1.2,
                             Duration.ofSeconds(1)))
                     .build());
+        }
+
+        private boolean shouldTarget(net.minestom.server.entity.Entity entity) {
+            Character character = CharacterEntityManager.getCharacter(entity);
+            return character != null && !zombie.isFriendly(character);
         }
 
         @Override

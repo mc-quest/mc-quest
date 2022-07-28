@@ -10,6 +10,8 @@ public class Mmorpg {
 
     public static void init() {
         server = MinecraftServer.init();
+        InteractionManager.registerListeners();
+        ChunkUnloader.unloadVacantChunks();
     }
 
     /**
@@ -19,8 +21,6 @@ public class Mmorpg {
         if (server == null) {
             throw new IllegalStateException("not initialized");
         }
-        InteractionManager.registerListeners();
-        ChunkUnloader.unloadVacantChunks();
         NonPlayerCharacterSpawner.start();
         server.start(address, port);
     }

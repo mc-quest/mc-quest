@@ -22,10 +22,11 @@ public final class PlayerClass {
         return name;
     }
 
-    /**
-     * Returns the Skills of this PlayerClass.
-     */
-    public Skill[] getSkills() {
-        return skills.clone();
+    public Skill getSkill(int index) {
+        return skills[index];
+    }
+
+    public int getSkillCount() {
+        return skills.length;
     }
 }

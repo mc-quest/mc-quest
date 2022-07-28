@@ -37,7 +37,7 @@ public class Rabbit extends NonPlayerCharacter {
         this.spawnPosition = spawnPosition;
         this.type = type;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.5, 0.5, 0.5);
-        setHeight(0.75);
+        setHeight(0.5);
     }
 
     @Override
@@ -66,23 +66,22 @@ public class Rabbit extends NonPlayerCharacter {
 
     @Override
     public void damage(DamageSource source, double amount) {
-        super.damage(source, amount);
         Pos position = getPosition();
+        super.damage(source, amount);
         entity.damage(DamageType.VOID, 0f);
         if (getHealth() == 0) {
-            die();
+            die(position);
         } else {
             getInstance().playSound(HURT_SOUND, position.x(), position.y(), position.z());
         }
     }
 
-    private void die() {
+    private void die(Pos position) {
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
-        Pos position = getPosition();
         getInstance().playSound(DEATH_SOUND, position.x(), position.y(), position.z());
         schedulerManager.buildTask(() -> {
             respawn();
-        }).delay(Duration.ofSeconds(5)).schedule();
+        }).delay(Duration.ofSeconds(30)).schedule();
     }
 
     private void respawn() {

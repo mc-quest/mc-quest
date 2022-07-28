@@ -32,6 +32,7 @@ import java.util.*;
 
 public final class PlayerCharacter extends Character {
     private static final Map<Player, PlayerCharacter> playersMap = new HashMap<>();
+    private static final double[] EXPERIENCE_POINTS_TO_NEXT_LEVEL = {};
 
     private final Player player;
     private final PlayerClass playerClass;
@@ -73,6 +74,7 @@ public final class PlayerCharacter extends Character {
         Instance instance = (Instance) MinecraftServer.getInstanceManager().getInstances().toArray()[1];
         PlayerCharacter pc = new PlayerCharacter(player, instance, player.getPosition());
         playersMap.put(player, pc);
+        CharacterEntityManager.register(player, pc);
         return pc;
     }
 
@@ -125,7 +127,7 @@ public final class PlayerCharacter extends Character {
         return maxMana;
     }
 
-    private double getExperiencePoints() {
+    public double getExperiencePoints() {
         return experiencePoints;
     }
 
@@ -329,6 +331,7 @@ public final class PlayerCharacter extends Character {
     public void remove() {
         hitbox.setEnabled(false);
         playersMap.remove(player);
+        CharacterEntityManager.unregister(player);
     }
 
     public static class Hitbox extends CharacterHitbox {

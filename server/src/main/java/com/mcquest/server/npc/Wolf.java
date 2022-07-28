@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.DamageSource;
@@ -10,11 +11,13 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.entity.metadata.animal.tameable.WolfMeta;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.sound.SoundEvent;
@@ -35,7 +38,7 @@ public class Wolf extends NonPlayerCharacter {
         super(DISPLAY_NAME, 7, instance, spawnPosition);
         this.spawnPosition = spawnPosition;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.75, 0.75, 0.75);
-        setHeight(1.0);
+        setHeight(0.75);
     }
 
     @Override
@@ -75,17 +78,18 @@ public class Wolf extends NonPlayerCharacter {
             super(EntityType.WOLF);
             this.wolf = wolf;
             addAIGroup(new EntityAIGroupBuilder()
-                    .addTargetSelector(new ClosestEntityTarget(this, 10, Rabbit.Entity.class))
+                    .addTargetSelector(new ClosestEntityTarget(this, 10,
+                            entity -> entity instanceof Rabbit.Entity || entity instanceof Player))
                     .addGoalSelector(new MeleeAttackGoal(this, 1.2, Duration.ofSeconds(2)))
                     .addGoalSelector(new RandomStrollGoal(this, 5))
                     .build());
             eventNode().addListener(EntityAttackEvent.class, event -> {
                 getInstance().playSound(ATTACK_SOUND, position.x(), position.y(), position.z());
-                if (event.getTarget() instanceof Rabbit.Entity rabbitEntity) {
-                    Rabbit rabbit = rabbitEntity.getRabbit();
-                    rabbit.damage(wolf, 0.5);
-                }
+                Character target = CharacterEntityManager.getCharacter(event.getTarget());
+                target.damage(wolf, 0.01);
             });
+            WolfMeta meta = (WolfMeta) getEntityMeta();
+            meta.setAngerTime(Integer.MAX_VALUE);
         }
 
         @Override

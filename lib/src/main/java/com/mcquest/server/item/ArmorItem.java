@@ -4,6 +4,7 @@ import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An ArmorItem is an Item that can be equipped by a PlayerCharacter to provide
@@ -89,7 +90,7 @@ public class ArmorItem extends Item {
     }
 
     @Override
-    protected ItemStack createItemStack() {
+    protected @NotNull ItemStack createItemStack() {
         // TODO
         String name = getName();
         ItemRarity rarity = getRarity();

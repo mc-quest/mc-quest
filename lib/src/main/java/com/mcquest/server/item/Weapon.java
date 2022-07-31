@@ -4,6 +4,7 @@ import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
@@ -78,7 +79,7 @@ public class Weapon extends Item {
     }
 
     @Override
-    protected ItemStack createItemStack() {
+    protected @NotNull ItemStack createItemStack() {
         // TODO
         String name = getName();
         ItemRarity rarity = getRarity();
@@ -104,6 +105,6 @@ public class Weapon extends Item {
         // lore.append(ChatColor.GRAY);
         lore.append("Shift-click to equip");
         // return BukkitUtility.createItemStack(icon, rarity.getColor() + name, lore.toString());
-        return null;
+        return super.createItemStack();
     }
 }

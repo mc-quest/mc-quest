@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) {
         Mmorpg.init();
         load();
-        // NonPlayerCharacterSpawner.add(new Wolf(Instances.ELADRADOR, new Pos(0, 70, 0)));
+        NonPlayerCharacterSpawner.add(new Wolf(Instances.ELADRADOR, new Pos(0, 70, 0)));
         Lobby.createLobby();
         Mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
     }

@@ -1,5 +1,6 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.util.HashableItemStack;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minestom.server.item.ItemStack;
@@ -15,6 +16,7 @@ import java.util.Objects;
  */
 public class ItemManager {
     private static final Map<String, Item> itemsByName = new HashMap<>();
+    private static final Map<HashableItemStack, Item> itemsByItemStack = new HashMap<>();
 
     /**
      * Registers an Item with the MMORPG.
@@ -26,8 +28,16 @@ public class ItemManager {
             throw new IllegalArgumentException("Attempted to register an item "
                     + "with a name that is already registered: " + name);
         }
+
+        ItemStack itemStack = item.getItemStack();
+        HashableItemStack itemStackKey = new HashableItemStack(itemStack);
+        if (itemsByItemStack.containsKey(itemStackKey)) {
+            throw new IllegalArgumentException("Attempted to register an item "
+                    + "with an ItemStack that is already registered: " + name);
+        }
+
         itemsByName.put(item.getName(), item);
-        item.getItemStack();
+        itemsByItemStack.put(itemStackKey, item);
     }
 
     /**
@@ -41,12 +51,7 @@ public class ItemManager {
      * Returns the Item with the given ItemStack, or null if none exists.
      */
     public static Item getItem(@NotNull ItemStack itemStack) {
-        Component displayName = itemStack.getDisplayName();
-        if (displayName instanceof TextComponent text) {
-            String name = text.content();
-            return itemsByName.get(name);
-        } else {
-            return null;
-        }
+        HashableItemStack key = new HashableItemStack(itemStack.withAmount(1));
+        return itemsByItemStack.get(key);
     }
 }

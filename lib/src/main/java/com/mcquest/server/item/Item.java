@@ -5,7 +5,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemHideFlag;
-import net.minestom.server.item.ItemMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
@@ -84,9 +83,10 @@ public class Item {
 
     /**
      * Constructs the ItemStack of this Item. This method can be overridden to
-     * add custom properties to the ItemStack.
+     * add custom properties to the ItemStack. The amount of the returned
+     * ItemStack must be exactly 1.
      */
-    protected ItemStack createItemStack() {
+    protected @NotNull ItemStack createItemStack() {
         // TODO
         Component rarityText = Component.text(rarity.getText() + " Item",
                 rarity.getColor());

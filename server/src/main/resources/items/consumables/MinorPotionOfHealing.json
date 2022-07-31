@@ -2,6 +2,6 @@
     "name": "Minor Potion of Healing",
     "rarity": "COMMON",
     "icon": "minecraft:potion",
-    "description": "Restore 10 health",
+    "description": "Restores 10 HP",
     "level": 1
 }

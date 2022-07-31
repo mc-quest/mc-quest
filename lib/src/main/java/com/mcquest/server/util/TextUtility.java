@@ -9,7 +9,8 @@ import java.util.List;
 
 public class TextUtility {
     private static final LegacyComponentSerializer TEXT_SERIALIZER =
-            LegacyComponentSerializer.legacyAmpersand();
+            LegacyComponentSerializer.legacySection();
+    private static final char SECTION_SYMBOL = '\u00A7';
 
     public static TextComponent deserializeText(String text) {
         return TEXT_SERIALIZER.deserialize(text);
@@ -23,18 +24,79 @@ public class TextUtility {
      * Splits the text into lines while preserving text color. If the text is
      * null, null is returned.
      */
-    public static Component[] wordWrap(String text, int lineLength) {
+    public static TextComponent[] wordWrap(String text, int lineLength) {
         if (text == null) {
             return null;
         }
         if (lineLength <= 0) {
-            throw new IllegalArgumentException("Nonpositive line length: " + lineLength);
+            throw new IllegalArgumentException("Non-positive line length: " + lineLength);
         }
         if (text.isEmpty()) {
-            return new Component[0];
+            return new TextComponent[0];
         }
-        List<String> lines = new ArrayList<>();
-        // TODO
-        return lines.toArray(new Component[lines.size()]);
+        List<TextComponent> lines = new ArrayList<>();
+        String[] tokens = text.split(" ");
+        String textStyle = ""; // TODO
+        StringBuilder currentLine = new StringBuilder();
+        int currentLineLength = 0;
+        for (String token : tokens) {
+            int tokenLength = length(token);
+            // Add 1 if a space character is needed.
+            boolean empty = currentLine.isEmpty();
+            if (currentLineLength + (empty ? 0 : 1) + tokenLength <= lineLength) {
+                if (!empty) {
+                    currentLine.append(' ');
+                }
+                currentLine.append(token);
+                currentLineLength += tokenLength;
+            } else {
+                lines.add(deserializeText(currentLine.toString()));
+                currentLine = new StringBuilder();
+
+                // Check if token is too long to fit on one line.
+                while ((tokenLength = length(token)) > lineLength) {
+                    String[] subTokens = split(token, lineLength);
+                    lines.add(deserializeText(subTokens[0]));
+                    token = subTokens[1];
+                }
+
+                currentLine.append(token);
+                currentLineLength = tokenLength;
+            }
+        }
+
+        lines.add(deserializeText(currentLine.toString()));
+        return lines.toArray(new TextComponent[0]);
+    }
+
+    private static String[] split(String token, int length) {
+        int counter = 0;
+        for (int i = 0; i < token.length(); i++) {
+            char ch = token.charAt(i);
+            if (ch == SECTION_SYMBOL) {
+                // Skip next character.
+                i++;
+            } else {
+                counter++;
+                if (counter == length) {
+                    return new String[]{token.substring(0, counter), token.substring(counter)};
+                }
+            }
+        }
+        throw new IllegalArgumentException("length too large");
+    }
+
+    private static int length(String token) {
+        int length = 0;
+        for (int i = 0; i < token.length(); i++) {
+            char ch = token.charAt(i);
+            if (ch == SECTION_SYMBOL) {
+                // Skip next character.
+                i++;
+            } else {
+                length++;
+            }
+        }
+        return length;
     }
 }

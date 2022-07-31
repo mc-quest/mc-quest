@@ -1,23 +1,66 @@
 package com.mcquest.server.ui;
 
+import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.PlayerCharacterRegisterEvent;
+import com.mcquest.server.item.ConsumableItem;
+import com.mcquest.server.item.Item;
+import com.mcquest.server.item.ItemManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.PickupItemEvent;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.inventory.PlayerInventory;
+import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
+@ApiStatus.Internal
 public class InteractionManager {
     public static void registerListeners() {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PickupItemEvent.class, InteractionManager::handlePickupItem);
+        eventHandler.addListener(PlayerCharacterRegisterEvent.class, InteractionManager::handlePlayerCharacterRegister);
+        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, InteractionManager::handleChangeHeldSlot);
     }
 
     private static void handlePickupItem(PickupItemEvent event) {
         if (event.getEntity() instanceof Player player) {
+            PlayerCharacter pc = PlayerCharacter.forPlayer(player);
+            if (pc == null) {
+                return;
+            }
             PlayerInventory inventory = player.getInventory();
-            if (!inventory.addItemStack(event.getItemStack())) {
+            boolean successful = inventory.addItemStack(event.getItemStack());
+            if (!successful) {
                 event.setCancelled(true);
             }
         }
+    }
+
+    private static void handlePlayerCharacterRegister(PlayerCharacterRegisterEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Player player = pc.getPlayer();
+        player.setHeldItemSlot((byte) 4);
+    }
+
+    private static void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacter pc = PlayerCharacter.forPlayer(player);
+        if (pc == null) {
+            return;
+        }
+        event.setCancelled(true);
+        int slot = event.getSlot();
+        PlayerInventory inventory = player.getInventory();
+        ItemStack itemStack = inventory.getItemStack(slot);
+        Item item = ItemManager.getItem(itemStack);
+        if (item instanceof ConsumableItem consumable) {
+            int newAmount = itemStack.amount() - 1;
+            inventory.setItemStack(slot, itemStack.withAmount(newAmount));
+            pc.sendMessage(Component.text("Used ", NamedTextColor.GRAY).append(item.getDisplayName()));
+        }
+        // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
     }
 }

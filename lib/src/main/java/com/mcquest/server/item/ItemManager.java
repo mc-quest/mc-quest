@@ -27,6 +27,7 @@ public class ItemManager {
                     + "with a name that is already registered: " + name);
         }
         itemsByName.put(item.getName(), item);
+        item.getItemStack();
     }
 
     /**

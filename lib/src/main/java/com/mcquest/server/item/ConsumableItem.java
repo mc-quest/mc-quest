@@ -57,6 +57,7 @@ public class ConsumableItem extends Item {
         lore.append("\n\n");
         // lore.append(ChatColor.GRAY);
         lore.append("Shift-click to use");
-        return null;
+
+        return super.createItemStack();
     }
 }

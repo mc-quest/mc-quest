@@ -17,7 +17,6 @@ import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.entity.metadata.animal.tameable.WolfMeta;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.sound.SoundEvent;
@@ -86,10 +85,8 @@ public class Wolf extends NonPlayerCharacter {
             eventNode().addListener(EntityAttackEvent.class, event -> {
                 getInstance().playSound(ATTACK_SOUND, position.x(), position.y(), position.z());
                 Character target = CharacterEntityManager.getCharacter(event.getTarget());
-                target.damage(wolf, 0.01);
+                target.damage(wolf, 5.0);
             });
-            WolfMeta meta = (WolfMeta) getEntityMeta();
-            meta.setAngerTime(Integer.MAX_VALUE);
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /**
  * A Quest represents a series of objectives for a player to complete.
@@ -70,7 +71,7 @@ public final class Quest {
     public void start(PlayerCharacter pc) {
         PlayerCharacterQuestManager pcQuestManager = pc.getQuestManager();
         pcQuestManager.startQuest(this);
-        pc.sendMessage(Component.text("Started " + name));
+        pc.sendMessage(Component.text("Quest started: " + name, NamedTextColor.GOLD));
     }
 
     void init() {

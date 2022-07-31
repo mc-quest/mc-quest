@@ -1,9 +1,13 @@
 package com.mcquest.server;
 
+import com.mcquest.server.character.NonPlayerCharacterSpawner;
+import com.mcquest.server.constants.Instances;
 import com.mcquest.server.load.InstanceLoader;
 import com.mcquest.server.load.ItemLoader;
 import com.mcquest.server.load.PlayerClassLoader;
 import com.mcquest.server.load.QuestLoader;
+import com.mcquest.server.npc.Wolf;
+import net.minestom.server.coordinate.Pos;
 
 public class Main {
     private static final String SERVER_ADDRESS = "0.0.0.0";
@@ -12,6 +16,7 @@ public class Main {
     public static void main(String[] args) {
         Mmorpg.init();
         load();
+        // NonPlayerCharacterSpawner.add(new Wolf(Instances.ELADRADOR, new Pos(0, 70, 0)));
         Lobby.createLobby();
         Mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
     }

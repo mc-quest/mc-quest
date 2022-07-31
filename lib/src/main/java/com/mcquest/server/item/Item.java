@@ -4,6 +4,8 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
+import net.minestom.server.item.ItemHideFlag;
+import net.minestom.server.item.ItemMeta;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
@@ -94,6 +96,9 @@ public class Item {
         }
 
         return ItemStack.builder(getIcon())
+                .meta(builder ->
+                        builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES, ItemHideFlag.HIDE_POTION_EFFECTS)
+                )
                 .displayName(getDisplayName())
                 .lore(rarityText) // TODO: add description
                 .build();

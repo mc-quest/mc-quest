@@ -5,6 +5,8 @@ import com.mcquest.server.event.PlayerCharacterRegisterEvent;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
+import com.mcquest.server.playerclass.PlayerClassManager;
+import com.mcquest.server.playerclass.Skill;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -60,7 +62,10 @@ public class InteractionManager {
             int newAmount = itemStack.amount() - 1;
             inventory.setItemStack(slot, itemStack.withAmount(newAmount));
             pc.sendMessage(Component.text("Used ", NamedTextColor.GRAY).append(item.getDisplayName()));
+            return;
         }
+
+        Skill skill = PlayerClassManager.getSkill(itemStack);
         // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
     }
 }

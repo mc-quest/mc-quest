@@ -7,6 +7,8 @@ public final class PlayerClass {
     private final String name;
     private final Skill[] skills;
 
+    private transient SkillTree skillTree;
+
     /**
      * Constructs a PlayerClass with the given name and Skills.
      */

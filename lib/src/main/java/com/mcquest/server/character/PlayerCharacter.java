@@ -35,6 +35,7 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.SchedulerManager;
+import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,9 @@ public final class PlayerCharacter extends Character {
     private double healthRegenRate;
     private double manaRegenRate;
     private double experiencePoints;
+    private boolean isDisarmed;
+    private Task undisarmTask;
+    private long undisarmTime;
 
     static {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
@@ -79,6 +83,9 @@ public final class PlayerCharacter extends Character {
         setHealth(maxHealth);
         healthRegenRate = 1;
         hitbox.setEnabled(true);
+        isDisarmed = false;
+        undisarmTask = null;
+        undisarmTime = 0;
     }
 
     public static PlayerCharacter register(Player player, PlayerCharacterData data) {
@@ -380,6 +387,27 @@ public final class PlayerCharacter extends Character {
             MinecraftServer.getGlobalEventHandler().call(event);
         }
         return amountRemoved;
+    }
+
+    public boolean isDisarmed() {
+        return isDisarmed;
+    }
+
+    public void disarm(Duration duration) {
+        isDisarmed = true;
+        if (undisarmTask != null) {
+            if (System.currentTimeMillis() + duration.toMillis() > undisarmTime) {
+                undisarmTask.cancel();
+            } else {
+                return;
+            }
+        }
+        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
+        undisarmTime = System.currentTimeMillis() + duration.toMillis();
+        undisarmTask = scheduler.buildTask(() -> {
+            isDisarmed = false;
+            undisarmTask = null;
+        }).delay(duration).schedule();
     }
 
     public void sendMessage(Component message) {

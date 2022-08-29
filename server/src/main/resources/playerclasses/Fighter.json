@@ -1,4 +1,26 @@
 {
     "name": "Fighter",
-    "skill": []
+    "skills": [
+        {
+            "name": "Bash",
+            "mana": 5,
+            "description": "Damage enemies in front of you"
+        }
+    ],
+    "skillTree": {
+        "skills": [
+            {
+                "name": "Bash",
+                "row": 0,
+                "column": 5
+            }
+        ],
+        "links": [
+            {
+                "direction": "VERTICAL",
+                "row": 2,
+                "column": 2
+            }
+        ]
+    }
 }

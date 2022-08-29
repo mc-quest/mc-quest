@@ -1,10 +1,12 @@
 package com.mcquest.server.ui;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.event.PlayerCharacterRegisterEvent;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
+import com.mcquest.server.item.Weapon;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.Skill;
 import net.kyori.adventure.text.Component;
@@ -14,17 +16,19 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
-public class InteractionManager {
+public class InteractionHandler {
     public static void registerListeners() {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PickupItemEvent.class, InteractionManager::handlePickupItem);
-        eventHandler.addListener(PlayerCharacterRegisterEvent.class, InteractionManager::handlePlayerCharacterRegister);
-        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, InteractionManager::handleChangeHeldSlot);
+        eventHandler.addListener(PickupItemEvent.class, InteractionHandler::handlePickupItem);
+        eventHandler.addListener(PlayerCharacterRegisterEvent.class, InteractionHandler::handlePlayerCharacterRegister);
+        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, InteractionHandler::handleChangeHeldSlot);
+        eventHandler.addListener(PlayerHandAnimationEvent.class, InteractionHandler::handleBasicAttack);
     }
 
     private static void handlePickupItem(PickupItemEvent event) {
@@ -67,5 +71,17 @@ public class InteractionManager {
 
         Skill skill = PlayerClassManager.getSkill(itemStack);
         // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
+    }
+
+    private static void handleBasicAttack(PlayerHandAnimationEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacter pc = PlayerCharacter.forPlayer(player);
+        if (pc == null) {
+            return;
+        }
+        if (pc.isDisarmed()) {
+            return;
+        }
+        MinecraftServer.getGlobalEventHandler().call(new PlayerCharacterBasicAttackEvent(pc));
     }
 }

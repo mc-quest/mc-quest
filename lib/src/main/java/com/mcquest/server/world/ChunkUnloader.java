@@ -1,4 +1,4 @@
-package com.mcquest.server.instance;
+package com.mcquest.server.world;
 
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
@@ -9,10 +9,10 @@ import org.jetbrains.annotations.ApiStatus;
 
 public class ChunkUnloader {
     /**
-     * Unloads chunks when they are vacated.
+     * Unloads instance chunks when they are vacated.
      */
     @ApiStatus.Internal
-    public static void unloadVacantChunks() {
+    public void unloadVacantChunks() {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerChunkUnloadEvent.class, event -> {
             Instance instance = event.getPlayer().getInstance();

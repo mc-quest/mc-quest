@@ -11,18 +11,11 @@ import java.util.*;
  * collisions.
  */
 public class Collider {
-    /**
-     * The lengths, widths, and heights of ColliderBucket.
-     */
-    private static final int BUCKET_SIZE = 256;
-
-    private static final Map<ColliderBucketAddress, Set<Collider>> buckets = new HashMap<>();
-
     private Instance instance;
     private double minX, minY, minZ, maxX, maxY, maxZ;
-    private boolean enabled;
     private final Set<ColliderBucketAddress> occupiedBuckets;
     private final Set<Collider> contacts;
+    private PhysicsManager physicsManager;
 
     public Collider(@NotNull Instance instance, double minX, double minY,
                     double minZ, double maxX, double maxY, double maxZ) {
@@ -37,9 +30,9 @@ public class Collider {
         this.maxX = maxX;
         this.maxY = maxY;
         this.maxZ = maxZ;
-        enabled = false;
         occupiedBuckets = new HashSet<>();
         contacts = new HashSet<>();
+        this.physicsManager = null;
     }
 
     public Collider(@NotNull Instance instance, @NotNull Pos center,
@@ -204,40 +197,46 @@ public class Collider {
         handleChange();
     }
 
-    private final boolean isEnabled() {
-        return enabled;
+    public final Set<Collider> getContacts() {
+        return Collections.unmodifiableSet(contacts);
     }
 
-    public final void setEnabled(boolean enabled) {
-        if (this.enabled == enabled) {
-            return;
+    public final boolean isContacting(Collider collider) {
+        return contacts.contains(collider);
+    }
+
+    boolean isEnabled() {
+        return physicsManager != null;
+    }
+
+    void enable(PhysicsManager physicsManager) {
+        this.physicsManager = physicsManager;
+        updateOccupiedBuckets();
+        checkForCollisions();
+    }
+
+    void disable() {
+        for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
+            removeFromBucket(bucketAddress);
         }
-        this.enabled = enabled;
+        occupiedBuckets.clear();
 
-        if (enabled) {
-            updateOccupiedBuckets();
-            checkForCollisions();
-        } else {
-            for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
-                removeFromBucket(bucketAddress);
-            }
-            occupiedBuckets.clear();
-
-            Set<Collider> oldContacts = new HashSet<>(contacts);
-            contacts.clear();
-            for (Collider other : oldContacts) {
-                other.contacts.remove(this);
-            }
-
-            for (Collider other : oldContacts) {
-                this.onCollisionExit(other);
-                other.onCollisionExit(this);
-            }
+        Set<Collider> oldContacts = new HashSet<>(contacts);
+        contacts.clear();
+        for (Collider other : oldContacts) {
+            other.contacts.remove(this);
         }
+
+        for (Collider other : oldContacts) {
+            this.onCollisionExit(other);
+            other.onCollisionExit(this);
+        }
+
+        this.physicsManager = null;
     }
 
     private void handleChange() {
-        if (enabled) {
+        if (physicsManager != null) {
             updateOccupiedBuckets();
             checkForCollisions();
         }
@@ -246,21 +245,21 @@ public class Collider {
     private void updateOccupiedBuckets() {
         // Compute new buckets.
         Set<ColliderBucketAddress> newOccupiedBuckets = new HashSet<>();
-        int minBucketX = (int) Math.floor(minX / BUCKET_SIZE);
-        int minBucketY = (int) Math.floor(minY / BUCKET_SIZE);
-        int minBucketZ = (int) Math.floor(minZ / BUCKET_SIZE);
-        int maxBucketX = (int) Math.floor(maxX / BUCKET_SIZE);
-        int maxBucketY = (int) Math.floor(maxY / BUCKET_SIZE);
-        int maxBucketZ = (int) Math.floor(maxZ / BUCKET_SIZE);
+        int minBucketX = (int) Math.floor(minX / PhysicsManager.BUCKET_SIZE);
+        int minBucketY = (int) Math.floor(minY / PhysicsManager.BUCKET_SIZE);
+        int minBucketZ = (int) Math.floor(minZ / PhysicsManager.BUCKET_SIZE);
+        int maxBucketX = (int) Math.floor(maxX / PhysicsManager.BUCKET_SIZE);
+        int maxBucketY = (int) Math.floor(maxY / PhysicsManager.BUCKET_SIZE);
+        int maxBucketZ = (int) Math.floor(maxZ / PhysicsManager.BUCKET_SIZE);
         for (int x = minBucketX; x <= maxBucketX; x++) {
             for (int y = minBucketY; y <= maxBucketY; y++) {
                 for (int z = minBucketZ; z <= maxBucketZ; z++) {
                     ColliderBucketAddress address = new ColliderBucketAddress(instance, x, y, z);
                     newOccupiedBuckets.add(address);
-                    if (!buckets.containsKey(address)) {
-                        buckets.put(address, new HashSet<>());
+                    if (!physicsManager.colliderBuckets.containsKey(address)) {
+                        physicsManager.colliderBuckets.put(address, new HashSet<>());
                     }
-                    Set<Collider> bucket = buckets.get(address);
+                    Set<Collider> bucket = physicsManager.colliderBuckets.get(address);
                     // Redundant adding is fine.
                     bucket.add(this);
                 }
@@ -279,10 +278,10 @@ public class Collider {
     }
 
     private void removeFromBucket(ColliderBucketAddress address) {
-        Set<Collider> bucket = buckets.get(address);
+        Set<Collider> bucket = physicsManager.colliderBuckets.get(address);
         bucket.remove(this);
         if (bucket.isEmpty()) {
-            buckets.remove(address);
+            physicsManager.colliderBuckets.remove(address);
         }
     }
 
@@ -290,12 +289,12 @@ public class Collider {
         Set<Collider> enteringColliders = new HashSet<>();
         Set<Collider> exitingColliders = new HashSet<>();
         for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
-            Set<Collider> bucket = new HashSet<>(buckets.get(bucketAddress));
+            Set<Collider> bucket = new HashSet<>(physicsManager.colliderBuckets.get(bucketAddress));
             for (Collider other : bucket) {
                 if (this == other) {
                     continue;
                 }
-                boolean collides = this.collidesWith(other);
+                boolean collides = this.overlaps(other);
                 if (contacts.contains(other)) {
                     if (!collides) {
                         exitingColliders.add(other);
@@ -322,15 +321,7 @@ public class Collider {
         }
     }
 
-    public final Set<Collider> getContacts() {
-        return Collections.unmodifiableSet(contacts);
-    }
-
-    public final boolean isContacting(Collider collider) {
-        return contacts.contains(collider);
-    }
-
-    private boolean collidesWith(Collider other) {
+    private boolean overlaps(Collider other) {
         return this.instance == other.instance &&
                 this.minX <= other.maxX && this.minY <= other.maxY &&
                 this.minZ <= other.maxZ && this.maxX >= other.minX &&
@@ -347,55 +338,5 @@ public class Collider {
      * Invoked when this Collider exits a collision with another Collider.
      */
     protected void onCollisionExit(Collider other) {
-    }
-
-    static class ColliderBucketAddress {
-        private final Instance instance;
-        private final int x;
-        private final int y;
-        private final int z;
-
-        ColliderBucketAddress(Instance instance, int x, int y, int z) {
-            this.instance = instance;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        Instance getInstance() {
-            return instance;
-        }
-
-        int getX() {
-            return x;
-        }
-
-        int getY() {
-            return y;
-        }
-
-        int getZ() {
-            return z;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o == this) {
-                return true;
-            }
-
-            if (!(o instanceof ColliderBucketAddress)) {
-                return false;
-            }
-
-            ColliderBucketAddress address = (ColliderBucketAddress) o;
-            return this.instance == address.instance && this.x == address.x
-                    && this.y == address.y && this.z == address.z;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(instance, x, y, z);
-        }
     }
 }

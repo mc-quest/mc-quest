@@ -1,8 +1,10 @@
 package com.mcquest.server.ui;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.event.PlayerCharacterRegisterEvent;
+import com.mcquest.server.feature.Feature;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
@@ -23,15 +25,21 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
 public class InteractionHandler {
-    public static void registerListeners() {
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PickupItemEvent.class, InteractionHandler::handlePickupItem);
-        eventHandler.addListener(PlayerCharacterRegisterEvent.class, InteractionHandler::handlePlayerCharacterRegister);
-        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, InteractionHandler::handleChangeHeldSlot);
-        eventHandler.addListener(PlayerHandAnimationEvent.class, InteractionHandler::handleBasicAttack);
+    private final Mmorpg mmorpg;
+
+    public InteractionHandler(Mmorpg mmorpg) {
+        this.mmorpg = mmorpg;
     }
 
-    private static void handlePickupItem(PickupItemEvent event) {
+    public void registerListeners() {
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
+        eventHandler.addListener(PlayerCharacterRegisterEvent.class, this::handlePlayerCharacterRegister);
+        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+        eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
+    }
+
+    private void handlePickupItem(PickupItemEvent event) {
         if (event.getEntity() instanceof Player player) {
             PlayerCharacter pc = PlayerCharacter.forPlayer(player);
             if (pc == null) {
@@ -45,13 +53,13 @@ public class InteractionHandler {
         }
     }
 
-    private static void handlePlayerCharacterRegister(PlayerCharacterRegisterEvent event) {
+    private void handlePlayerCharacterRegister(PlayerCharacterRegisterEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Player player = pc.getPlayer();
         player.setHeldItemSlot((byte) 4);
     }
 
-    private static void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+    private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = PlayerCharacter.forPlayer(player);
         if (pc == null) {
@@ -61,7 +69,7 @@ public class InteractionHandler {
         int slot = event.getSlot();
         PlayerInventory inventory = player.getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
-        Item item = ItemManager.getItem(itemStack);
+        Item item = mmorpg.getItemManager().getItem(itemStack);
         if (item instanceof ConsumableItem consumable) {
             int newAmount = itemStack.amount() - 1;
             inventory.setItemStack(slot, itemStack.withAmount(newAmount));
@@ -73,7 +81,7 @@ public class InteractionHandler {
         // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
     }
 
-    private static void handleBasicAttack(PlayerHandAnimationEvent event) {
+    private void handleBasicAttack(PlayerHandAnimationEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = PlayerCharacter.forPlayer(player);
         if (pc == null) {

@@ -1,4 +1,4 @@
-package com.mcquest.server.instance;
+package com.mcquest.server.world;
 
 import net.minestom.server.instance.Instance;
 
@@ -11,14 +11,11 @@ import java.util.Map;
  * Instance that a PlayerCharacter can visit should be registered with the
  * InstanceManager.
  */
-public class InstanceManager {
-    private static final Map<String, Instance> instances = new HashMap<>();
+public class WorldManager {
+    private final Map<String, Instance> instances;
 
-    public static void register(String name, Instance instance) {
-        if (instances.containsKey(name)) {
-            throw new IllegalArgumentException("instance already registered");
-        }
-        instances.put(name, instance);
+    public WorldManager() {
+        this.instances = new HashMap<>();
     }
 
     public static Instance getInstance(String name) {

@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.instance.InstanceManager;
+import com.mcquest.server.world.InstanceManager;
 import net.minestom.server.instance.Instance;
 
 public class Instances {

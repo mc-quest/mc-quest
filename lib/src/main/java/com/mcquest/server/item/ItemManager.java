@@ -15,14 +15,21 @@ import java.util.Objects;
  * The ItemManager is used to register and retrieve Items.
  */
 public class ItemManager {
-    private static final Map<String, Item> itemsByName = new HashMap<>();
-    private static final Map<HashableItemStack, Item> itemsByItemStack = new HashMap<>();
+    private final Map<String, Item> itemsByName;
+    private final Map<HashableItemStack, Item> itemsByItemStack;
+
+    public ItemManager(@NotNull Item @NotNull [] items) {
+        itemsByName = new HashMap<>();
+        itemsByItemStack = new HashMap<>();
+        for (Item item : items) {
+            registerItem(item);
+        }
+    }
 
     /**
      * Registers an Item with the MMORPG.
      */
-    public static void registerItem(@NotNull Item item) {
-        Objects.requireNonNull(item);
+    private void registerItem(@NotNull Item item) {
         String name = item.getName();
         if (itemsByName.containsKey(name)) {
             throw new IllegalArgumentException("Attempted to register an item "
@@ -43,14 +50,14 @@ public class ItemManager {
     /**
      * Returns the Item with the given name, or null if none exists.
      */
-    public static Item getItem(@NotNull String name) {
+    public Item getItem(@NotNull String name) {
         return itemsByName.get(name);
     }
 
     /**
      * Returns the Item with the given ItemStack, or null if none exists.
      */
-    public static Item getItem(@NotNull ItemStack itemStack) {
+    public Item getItem(@NotNull ItemStack itemStack) {
         HashableItemStack key = new HashableItemStack(itemStack.withAmount(1));
         return itemsByItemStack.get(key);
     }

@@ -60,6 +60,7 @@ public final class PlayerCharacter extends Character {
     private boolean isDisarmed;
     private Task undisarmTask;
     private long undisarmTime;
+    private ItemManager itemManager;
 
     static {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
@@ -116,7 +117,7 @@ public final class PlayerCharacter extends Character {
     public void setInstance(Instance instance) {
         super.setInstance(instance);
         if (player.getInstance() != instance) {
-            player.setInstance(instance);
+            player.setInstance(instance).join();
         }
         hitbox.setInstance(instance);
     }
@@ -274,7 +275,7 @@ public final class PlayerCharacter extends Character {
 
     public Weapon getWeapon() {
         ItemStack itemStack = player.getInventory().getItemStack(4);
-        return (Weapon) ItemManager.getItem(itemStack);
+        return (Weapon) itemManager.getItem(itemStack);
     }
 
     public ArmorItem getArmor(@NotNull ArmorItem.Slot slot) {
@@ -285,7 +286,7 @@ public final class PlayerCharacter extends Character {
             case HEAD -> 39;
         };
         ItemStack itemStack = player.getInventory().getItemStack(inventorySlot);
-        return (ArmorItem) ItemManager.getItem(itemStack);
+        return (ArmorItem) itemManager.getItem(itemStack);
     }
 
     /**

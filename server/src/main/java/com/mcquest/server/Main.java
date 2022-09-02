@@ -2,11 +2,15 @@ package com.mcquest.server;
 
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.constants.Instances;
+import com.mcquest.server.feature.Feature;
+import com.mcquest.server.item.Item;
 import com.mcquest.server.load.InstanceLoader;
 import com.mcquest.server.load.ItemLoader;
 import com.mcquest.server.load.PlayerClassLoader;
 import com.mcquest.server.load.QuestLoader;
 import com.mcquest.server.npc.Wolf;
+import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.quest.Quest;
 import net.minestom.server.coordinate.Pos;
 
 public class Main {
@@ -14,17 +18,11 @@ public class Main {
     private static final int SERVER_PORT = 25565;
 
     public static void main(String[] args) {
-        Mmorpg.init();
-        load();
-        NonPlayerCharacterSpawner.add(new Wolf(Instances.ELADRADOR, new Pos(0, 70, 0)));
-        Lobby.createLobby();
-        Mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
-    }
-
-    private static void load() {
-        InstanceLoader.loadInstances();
-        PlayerClassLoader.loadPlayerClasses();
-        ItemLoader.loadItems();
-        QuestLoader.loadQuests();
+        Item[] items = {};
+        Quest[] quests = {};
+        PlayerClass[] playerClasses = {};
+        Feature[] features = {};
+        Mmorpg mmorpg = new Mmorpg(items, quests, playerClasses, features);
+        mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
     }
 }

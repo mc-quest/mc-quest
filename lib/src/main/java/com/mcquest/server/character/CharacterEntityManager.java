@@ -10,33 +10,33 @@ import java.util.Map;
  * with Characters.
  */
 public class CharacterEntityManager {
-    private static final Map<Entity, Character> map = new HashMap<>();
+    private final Map<Entity, Character> bindings = new HashMap<>();
 
     /**
      * Associates the given Entity with the given Character.
      */
-    public static void register(Entity entity, Character character) {
-        if (map.containsKey(entity)) {
-            throw new IllegalArgumentException("entity already registered");
+    public void bind(Entity entity, Character character) {
+        if (bindings.containsKey(entity)) {
+            throw new IllegalArgumentException("entity already bound");
         }
-        map.put(entity, character);
+        bindings.put(entity, character);
     }
 
     /**
      * Unassociates the given entity with a previously-associated Character.
      */
-    public static void unregister(Entity entity) {
-        if (!map.containsKey(entity)) {
-            throw new IllegalArgumentException("entity not registered");
+    public void unbind(Entity entity) {
+        if (!bindings.containsKey(entity)) {
+            throw new IllegalArgumentException("entity not bound");
         }
-        map.remove(entity);
+        bindings.remove(entity);
     }
 
     /**
      * Returns the Character associated with the given Entity, or null if none
      * exists.
      */
-    public static Character getCharacter(Entity entity) {
-        return map.get(entity);
+    public Character getCharacter(Entity entity) {
+        return bindings.get(entity);
     }
 }

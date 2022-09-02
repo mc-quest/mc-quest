@@ -2,6 +2,8 @@ package com.mcquest.server;
 
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
+import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
@@ -16,6 +18,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.timer.SchedulerManager;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Mmorpg {
@@ -23,16 +26,19 @@ public class Mmorpg {
     private final ItemManager itemManager;
     private final QuestManager questManager;
     private final PlayerClassManager playerClassManager;
+    private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
     private final Feature[] features;
 
     public Mmorpg(Item[] items, Quest[] quests, PlayerClass[] playerClasses,
-                  Feature[] features, Function<Player, PlayerCharacterData> pcDataRetriever) {
+                  Feature[] features, Function<Player, PlayerCharacterData> pcDataRetriever,
+                  Consumer<PlayerCharacter> pcQuitHandler) {
         itemManager = new ItemManager(items);
         questManager = new QuestManager();
         playerClassManager = new PlayerClassManager();
+        pcManager = new PlayerCharacterManager(this);
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
@@ -60,6 +66,10 @@ public class Mmorpg {
 
     public PlayerClassManager getPlayerClassManager() {
         return playerClassManager;
+    }
+
+    public PlayerCharacterManager getPlayerCharacterManager() {
+        return pcManager;
     }
 
     public NonPlayerCharacterSpawner getNonPlayerCharacterSpawner() {

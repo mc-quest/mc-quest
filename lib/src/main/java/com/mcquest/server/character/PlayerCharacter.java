@@ -1,5 +1,6 @@
 package com.mcquest.server.character;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.event.PlayerCharacterReceiveItemEvent;
 import com.mcquest.server.event.PlayerCharacterRegisterEvent;
@@ -44,8 +45,7 @@ import java.time.Duration;
 import java.util.*;
 
 public final class PlayerCharacter extends Character {
-    private static final Map<Player, PlayerCharacter> playersMap = new HashMap<>();
-
+    private Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
     private final PlayerCharacterQuestManager questManager;
@@ -60,17 +60,10 @@ public final class PlayerCharacter extends Character {
     private boolean isDisarmed;
     private Task undisarmTask;
     private long undisarmTime;
-    private ItemManager itemManager;
 
-    static {
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerMoveEvent.class, PlayerCharacter::synchronizePlayerPosition);
-        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
-        scheduler.buildTask(PlayerCharacter::regenerate).repeat(TaskSchedule.seconds(1)).schedule();
-    }
-
-    private PlayerCharacter(Player player, Instance instance, Pos position, double maxHealth) {
+    private PlayerCharacter(Mmorpg mmorpg, Player player, Instance instance, Pos position, double maxHealth) {
         super(Component.text(player.getUsername(), NamedTextColor.GREEN), 1, instance, position);
+        this.mmorpg = mmorpg;
         this.player = player;
         hitbox = new PlayerCharacter.Hitbox(this);
         setInstance(instance);
@@ -92,25 +85,8 @@ public final class PlayerCharacter extends Character {
     public static PlayerCharacter register(Player player, PlayerCharacterData data) {
         Instance instance = (Instance) MinecraftServer.getInstanceManager().getInstances().toArray()[1];
         PlayerCharacter pc = new PlayerCharacter(player, instance, player.getPosition(), data.getMaxHealth());
-        playersMap.put(player, pc);
-        CharacterEntityManager.register(player, pc);
         MinecraftServer.getGlobalEventHandler().call(new PlayerCharacterRegisterEvent(pc));
         return pc;
-    }
-
-    private static void synchronizePlayerPosition(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacter pc = forPlayer(player);
-        if (pc != null) {
-            pc.setPosition(event.getNewPosition());
-        }
-    }
-
-    private static void regenerate() {
-        for (PlayerCharacter pc : playersMap.values()) {
-            pc.heal(pc, pc.healthRegenRate);
-            pc.addMana(pc.manaRegenRate);
-        }
     }
 
     @Override
@@ -191,6 +167,22 @@ public final class PlayerCharacter extends Character {
         this.maxMana = maxMana;
         updateManaBar();
         updateActionBar();
+    }
+
+    public double getHealthRegenRate() {
+        return healthRegenRate;
+    }
+
+    public void setHealthRegenRate(double healthRegenRate) {
+        this.healthRegenRate = healthRegenRate;
+    }
+
+    public double getManaRegenRate() {
+        return manaRegenRate;
+    }
+
+    public void setManaRegenRate(double manaRegenRate) {
+        this.manaRegenRate = manaRegenRate;
     }
 
     public double getExperiencePoints() {
@@ -457,12 +449,6 @@ public final class PlayerCharacter extends Character {
         passenger.setInvisible(true);
         passenger.setInstance(getInstance());
         player.addPassenger(passenger);
-    }
-
-    public void remove() {
-        hitbox.setEnabled(false);
-        playersMap.remove(player);
-        CharacterEntityManager.unregister(player);
     }
 
     public static class Hitbox extends CharacterHitbox {

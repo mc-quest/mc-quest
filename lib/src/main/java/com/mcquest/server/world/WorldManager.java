@@ -5,20 +5,18 @@ import net.minestom.server.instance.Instance;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * The InstanceManager provides a standard way to register Instances under a
- * name. This enables persistently storing a PlayerCharacter's Instance. Any
- * Instance that a PlayerCharacter can visit should be registered with the
- * InstanceManager.
- */
 public class WorldManager {
-    private final Map<String, Instance> instances;
+    private final Map<String, Instance> worlds;
 
     public WorldManager() {
-        this.instances = new HashMap<>();
+        this.worlds = new HashMap<>();
     }
 
-    public static Instance getInstance(String name) {
-        return instances.get(name);
+    public Instance getWorld(String name) {
+        return worlds.get(name);
+    }
+
+    public Instance registerWorld(String name, Instance instance) {
+
     }
 }

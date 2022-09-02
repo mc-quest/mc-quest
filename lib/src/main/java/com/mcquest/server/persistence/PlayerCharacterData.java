@@ -15,6 +15,9 @@ public class PlayerCharacterData {
     private double maxMana;
     private double experiencePoints;
 
+    private PlayerCharacterData() {
+    }
+
     /**
      * Constructs a new PlayerCharacterData for a new PlayerCharacter.
      */

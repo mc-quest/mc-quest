@@ -83,7 +83,7 @@ public final class PlayerCharacter extends Character {
         setMaxHealth(maxHealth);
         setHealth(maxHealth);
         healthRegenRate = 1;
-        hitbox.setEnabled(true);
+        // hitbox.setEnabled(true);
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
@@ -428,7 +428,7 @@ public final class PlayerCharacter extends Character {
         Set<PlayerCharacter> nearby = new HashSet<>();
         Collider collider = new Collider(instance, position, radius, radius,
                 radius);
-        collider.setEnabled(true);
+        // collider.setEnabled(true);
         Set<Collider> contacts = collider.getContacts();
         double radiusSquared = radius * radius;
         for (Collider contact : contacts) {
@@ -439,7 +439,7 @@ public final class PlayerCharacter extends Character {
                 }
             }
         }
-        collider.setEnabled(false);
+        // collider.setEnabled(false);
         return nearby;
     }
 
@@ -460,7 +460,7 @@ public final class PlayerCharacter extends Character {
     }
 
     public void remove() {
-        hitbox.setEnabled(false);
+        // hitbox.setEnabled(false);
         playersMap.remove(player);
         CharacterEntityManager.unregister(player);
     }

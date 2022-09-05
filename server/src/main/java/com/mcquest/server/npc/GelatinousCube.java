@@ -36,13 +36,13 @@ public class GelatinousCube extends NonPlayerCharacter {
         entity = new Entity(this);
         CharacterEntityManager.register(entity, this);
         entity.setInstance(getInstance(), getPosition());
-        hitbox.setEnabled(true);
+        // hitbox.setEnabled(true);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        hitbox.setEnabled(false);
+        // hitbox.setEnabled(false);
         CharacterEntityManager.unregister(entity);
         entity.remove();
         setPosition(spawnPosition);

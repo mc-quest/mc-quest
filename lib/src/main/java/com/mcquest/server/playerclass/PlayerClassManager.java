@@ -2,6 +2,7 @@ package com.mcquest.server.playerclass;
 
 import com.mcquest.server.util.HashableItemStack;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,13 +11,16 @@ import java.util.Map;
  * The PlayerClassManager is used to register and retrieve PlayerClasses.
  */
 public class PlayerClassManager {
-    private static final Map<String, PlayerClass> playerClassesByName = new HashMap<>();
-    private static final Map<HashableItemStack, Skill> skillsByItemStack = new HashMap<>();
+    private final Map<String, PlayerClass> playerClassesByName;
+    private final Map<HashableItemStack, Skill> skillsByItemStack;
 
-    /**
-     * Registers a PlayerClass with the MMORPG.
-     */
-    public static void registerPlayerClass(PlayerClass playerClass) {
+    @ApiStatus.Internal
+    public PlayerClassManager() {
+        playerClassesByName = new HashMap<>();
+        skillsByItemStack = new HashMap<>();
+    }
+
+    public void registerPlayerClass(PlayerClass playerClass) {
         String name = playerClass.getName();
         if (playerClassesByName.containsKey(name)) {
             throw new IllegalArgumentException(
@@ -32,11 +36,11 @@ public class PlayerClassManager {
     /**
      * Returns the PlayerClass with the given name.
      */
-    public static PlayerClass getPlayerClass(String name) {
+    public PlayerClass getPlayerClass(String name) {
         return playerClassesByName.get(name);
     }
 
-    public static Skill getSkill(ItemStack hotbarItemStack) {
+    public Skill getSkill(ItemStack hotbarItemStack) {
         return skillsByItemStack.get(hotbarItemStack);
     }
 }

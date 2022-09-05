@@ -45,13 +45,13 @@ public class Broodling extends NonPlayerCharacter {
         entity = new Entity(this);
         entity.setInstance(getInstance(), spawnPosition);
         CharacterEntityManager.register(entity, this);
-        hitbox.setEnabled(true);
+        // hitbox.setEnabled(true);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        hitbox.setEnabled(false);
+        // hitbox.setEnabled(false);
         CharacterEntityManager.unregister(entity);
         entity.remove();
         setPosition(spawnPosition);

@@ -11,7 +11,7 @@ public class Test implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        Instance instance = mmorpg.getInstanceManager().getInstance("eladrador");
+        Instance instance = null; // mmorpg.getInstanceManager().getInstance("eladrador");
         Pos spawnPosition = new Pos(0, 70, 0);
         Wolf wolf = new Wolf(physicsManager, instance, spawnPosition);
     }

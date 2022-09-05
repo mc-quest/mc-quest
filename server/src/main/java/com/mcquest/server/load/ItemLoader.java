@@ -9,19 +9,20 @@ public class ItemLoader {
     /**
      * Loads all Items and registers them with the ItemManager.
      */
-    public static void loadItems() {
-        loadItems("items/armor", ArmorItem.class);
-        loadItems("items/consumables", ConsumableItem.class);
-        loadItems("items/misc", Item.class);
-        loadItems("items/weapons", Weapon.class);
+    public void loadItems(ItemManager itemManager) {
+        loadItems("items/armor", ArmorItem.class, itemManager);
+        loadItems("items/consumables", ConsumableItem.class, itemManager);
+        loadItems("items/misc", Item.class, itemManager);
+        loadItems("items/weapons", Weapon.class, itemManager);
     }
 
-    private static void loadItems(String resourcesPath, Class<? extends Item> itemType) {
+    private void loadItems(String resourcesPath, Class<? extends Item> itemType,
+                           ItemManager itemManager) {
         List<String> itemPaths = ResourceLoader.getResources(resourcesPath);
         for (String itemPath : itemPaths) {
             Item item = ResourceLoader.deserializeJsonResource(
                     itemPath, itemType);
-            ItemManager.registerItem(item);
+            itemManager.registerItem(item);
         }
     }
 }

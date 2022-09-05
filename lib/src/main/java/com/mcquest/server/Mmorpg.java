@@ -2,52 +2,64 @@ package com.mcquest.server;
 
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
+import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.feature.Feature;
-import com.mcquest.server.item.Item;
+import com.mcquest.server.feature.FeatureManager;
 import com.mcquest.server.item.ItemManager;
-import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
-import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
-import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
+import com.mcquest.server.instance.InstanceManager;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.timer.SchedulerManager;
 
-import java.util.function.Function;
-
 public class Mmorpg {
-    private final WorldManager worldManager;
+    private boolean isStarted;
+    private final PlayerCharacterManager pcManager;
+    private final InstanceManager instanceManager;
     private final ItemManager itemManager;
     private final QuestManager questManager;
     private final PlayerClassManager playerClassManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
-    private final Feature[] features;
+    private final FeatureManager featureManager;
 
-    public Mmorpg(Item[] items, Quest[] quests, PlayerClass[] playerClasses,
-                  Feature[] features, Function<Player, PlayerCharacterData> pcDataRetriever) {
-        itemManager = new ItemManager(items);
+    public Mmorpg() {
+        isStarted = false;
+        pcManager = new PlayerCharacterManager(this);
+        instanceManager = new InstanceManager();
+        itemManager = new ItemManager();
         questManager = new QuestManager();
         playerClassManager = new PlayerClassManager();
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
-        this.features = features.clone();
+        featureManager = new FeatureManager();
     }
 
     public void start(String address, int port) {
-        if (MinecraftServer.isStarted()) {
-            throw new IllegalStateException("Already started");
-        }
         MinecraftServer server = MinecraftServer.init();
-        for (Feature feature : features) {
+        pcManager.registerEvents();
+        instanceManager.unloadVacantChunks();
+        for (Feature feature : featureManager.getFeatures()) {
             feature.hook(this);
         }
         server.start(address, port);
+        isStarted = true;
+    }
+
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    public PlayerCharacterManager getPlayerCharacterManager() {
+        return pcManager;
+    }
+
+    public InstanceManager getInstanceManager() {
+        return instanceManager;
     }
 
     public ItemManager getItemManager() {

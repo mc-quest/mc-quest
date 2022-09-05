@@ -1,15 +1,12 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.util.HashableItemStack;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.minestom.server.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The ItemManager is used to register and retrieve Items.
@@ -18,18 +15,13 @@ public class ItemManager {
     private final Map<String, Item> itemsByName;
     private final Map<HashableItemStack, Item> itemsByItemStack;
 
-    public ItemManager(@NotNull Item @NotNull [] items) {
+    @ApiStatus.Internal
+    public ItemManager() {
         itemsByName = new HashMap<>();
         itemsByItemStack = new HashMap<>();
-        for (Item item : items) {
-            registerItem(item);
-        }
     }
 
-    /**
-     * Registers an Item with the MMORPG.
-     */
-    private void registerItem(@NotNull Item item) {
+    public void registerItem(@NotNull Item item) {
         String name = item.getName();
         if (itemsByName.containsKey(name)) {
             throw new IllegalArgumentException("Attempted to register an item "

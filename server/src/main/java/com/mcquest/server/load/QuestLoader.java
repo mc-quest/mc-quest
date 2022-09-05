@@ -10,11 +10,11 @@ public class QuestLoader {
     /**
      * Loads all Quests and registers them with the QuestManager.
      */
-    public static void loadQuests() {
+    public static void loadQuests(QuestManager questManager) {
         List<String> questPaths = ResourceLoader.getResources("quests");
         for (String questPath : questPaths) {
             Quest quest = ResourceLoader.deserializeJsonResource(questPath, Quest.class);
-            QuestManager.registerQuest(quest);
+            questManager.registerQuest(quest);
         }
     }
 }

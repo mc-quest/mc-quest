@@ -1,6 +1,5 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -11,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
  * protection.
  */
 public class ArmorItem extends Item {
-    private final String playerClass;
-    private final Slot slot;
+    private final PlayerClass playerClass;
+    private final ArmorSlot slot;
     private final int level;
     private final double protections;
 
@@ -20,9 +19,9 @@ public class ArmorItem extends Item {
      * Constructs an ArmorItem with the given name, rarity, icon, description,
      * player class, slot, level, and protections.
      */
-    public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     String description, String playerClass, Slot slot,
-                     int level, double protections) {
+    ArmorItem(@NotNull String name, @NotNull ItemRarity rarity, @NotNull Material icon,
+              @NotNull String description, @NotNull PlayerClass playerClass,
+              int level, @NotNull ArmorSlot slot, double protections) {
         super(name, rarity, icon, description);
         this.playerClass = playerClass;
         this.slot = slot;
@@ -31,47 +30,16 @@ public class ArmorItem extends Item {
     }
 
     /**
-     * Constructs an ArmorItem with the given name, rarity, icon, description,
-     * PlayerClass, slot, level, and protections.
-     */
-    public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     String description, PlayerClass playerClass,
-                     Slot slot, int level, double protections) {
-        this(name, rarity, icon, description, playerClass.getName(), slot,
-                level, protections);
-    }
-
-    /**
-     * Constructs an ArmorItem with the given name, rarity, icon, player class,
-     * slot, level, and protections. The ArmorItem will have no description.
-     */
-    public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     String playerClass, Slot slot, int level,
-                     double protections) {
-        this(name, rarity, icon, null, playerClass, slot, level, protections);
-    }
-
-    /**
-     * Constructs an ArmorItem with the given name, rarity, icon, PlayerClass,
-     * slot, level, and protections. The ArmorItem will have no description.
-     */
-    public ArmorItem(String name, ItemRarity rarity, Material icon,
-                     PlayerClass playerClass, Slot slot, int level,
-                     double protections) {
-        this(name, rarity, icon, null, playerClass, slot, level, protections);
-    }
-
-    /**
      * Returns the PlayerClass that can equip this ArmorItem.
      */
     public final PlayerClass getPlayerClass() {
-        return PlayerClassManager.getPlayerClass(playerClass);
+        return playerClass;
     }
 
     /**
      * Returns the slot this ArmorItem occupies.
      */
-    public final Slot getSlot() {
+    public final ArmorSlot getSlot() {
         return slot;
     }
 
@@ -90,7 +58,7 @@ public class ArmorItem extends Item {
     }
 
     @Override
-    protected @NotNull ItemStack createItemStack() {
+    @NotNull ItemStack createItemStack() {
         // TODO
         String name = getName();
         ItemRarity rarity = getRarity();
@@ -119,25 +87,5 @@ public class ArmorItem extends Item {
         lore.append("Shift-click to equip");
         // return BukkitUtility.createItemStack(icon, rarity.getColor() + name, lore.toString());
         return super.createItemStack();
-    }
-
-    /**
-     * A Slot describes the equipment slot that an ArmorItem occupies.
-     */
-    public enum Slot {
-        FEET("Feet"), LEGS("Legs"), CHEST("Chest"), HEAD("Head");
-
-        private final String text;
-
-        Slot(String text) {
-            this.text = text;
-        }
-
-        /**
-         * Returns the text that describes this Slot.
-         */
-        public String getText() {
-            return text;
-        }
     }
 }

@@ -2,13 +2,11 @@ package com.mcquest.server.ui;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
-import com.mcquest.server.event.PlayerCharacterRegisterEvent;
-import com.mcquest.server.feature.Feature;
+import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
-import com.mcquest.server.item.ItemManager;
-import com.mcquest.server.item.Weapon;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.Skill;
 import net.kyori.adventure.text.Component;
@@ -21,6 +19,7 @@ import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerHandAnimationEvent;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -34,14 +33,15 @@ public class InteractionHandler {
     public void registerListeners() {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
-        eventHandler.addListener(PlayerCharacterRegisterEvent.class, this::handlePlayerCharacterRegister);
+        eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handlePlayerCharacterLogin);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
         eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
     }
 
     private void handlePickupItem(PickupItemEvent event) {
         if (event.getEntity() instanceof Player player) {
-            PlayerCharacter pc = PlayerCharacter.forPlayer(player);
+            PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+            PlayerCharacter pc = pcManager.getPlayerCharacter(player);
             if (pc == null) {
                 return;
             }
@@ -53,18 +53,19 @@ public class InteractionHandler {
         }
     }
 
-    private void handlePlayerCharacterRegister(PlayerCharacterRegisterEvent event) {
+    private void handlePlayerCharacterLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Player player = pc.getPlayer();
-        player.setHeldItemSlot((byte) 4);
+        // Must delay a tick, or it won't work.
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            player.setHeldItemSlot((byte) 4);
+        }).delay(TaskSchedule.nextTick()).schedule();
     }
 
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
         Player player = event.getPlayer();
-        PlayerCharacter pc = PlayerCharacter.forPlayer(player);
-        if (pc == null) {
-            return;
-        }
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
         event.setCancelled(true);
         int slot = event.getSlot();
         PlayerInventory inventory = player.getInventory();
@@ -77,13 +78,15 @@ public class InteractionHandler {
             return;
         }
 
-        Skill skill = PlayerClassManager.getSkill(itemStack);
+        PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
+        Skill skill = playerClassManager.getSkill(itemStack);
         // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
     }
 
     private void handleBasicAttack(PlayerHandAnimationEvent event) {
         Player player = event.getPlayer();
-        PlayerCharacter pc = PlayerCharacter.forPlayer(player);
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
         if (pc == null) {
             return;
         }

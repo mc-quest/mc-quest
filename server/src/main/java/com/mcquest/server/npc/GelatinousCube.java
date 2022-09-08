@@ -1,8 +1,10 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacter;
+import com.mcquest.server.physics.PhysicsManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.attribute.Attribute;
@@ -18,12 +20,14 @@ public class GelatinousCube extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME =
             Component.text("Gelatinous Cube", NamedTextColor.RED);
 
+    private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final CharacterHitbox hitbox;
     private Entity entity;
 
-    public GelatinousCube(Instance instance, Pos spawnPosition) {
+    public GelatinousCube(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 15, instance, spawnPosition);
+        this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 5, 5, 5);
         entity = null;
@@ -34,16 +38,20 @@ public class GelatinousCube extends NonPlayerCharacter {
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
-        CharacterEntityManager.register(entity, this);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
-        // hitbox.setEnabled(true);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.addCollider(hitbox);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        // hitbox.setEnabled(false);
-        CharacterEntityManager.unregister(entity);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.removeCollider(hitbox);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.unbind(entity);
         entity.remove();
         setPosition(spawnPosition);
     }

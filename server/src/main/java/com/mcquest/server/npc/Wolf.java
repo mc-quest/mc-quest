@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.CharacterHitbox;
@@ -21,6 +22,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.sound.SoundEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
@@ -30,21 +32,21 @@ public class Wolf extends NonPlayerCharacter {
     private static final Sound ATTACK_SOUND =
             Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.NEUTRAL, 1f, 1f);
 
-    private final PhysicsManager physicsManager;
+    private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final CharacterHitbox hitbox;
     private Entity entity;
 
-    public Wolf(PhysicsManager physicsManager, Instance instance, Pos spawnPosition) {
+    public Wolf(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 7, instance, spawnPosition);
-        this.physicsManager = physicsManager;
+        this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.75, 0.75, 0.75);
         setHeight(0.75);
     }
 
     @Override
-    public void setPosition(Pos position) {
+    public void setPosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(position.add(0.0, getHeight() / 2.0, 0.0));
     }
@@ -53,18 +55,22 @@ public class Wolf extends NonPlayerCharacter {
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
-        CharacterEntityManager.register(entity, this);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        CharacterEntityManager.unregister(entity);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.unbind(entity);
         entity.remove();
-        setPosition(spawnPosition);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.removeCollider(hitbox);
+        setPosition(spawnPosition);
     }
 
     @Override
@@ -87,7 +93,8 @@ public class Wolf extends NonPlayerCharacter {
                     .build());
             eventNode().addListener(EntityAttackEvent.class, event -> {
                 getInstance().playSound(ATTACK_SOUND, position.x(), position.y(), position.z());
-                Character target = CharacterEntityManager.getCharacter(event.getTarget());
+                CharacterEntityManager characterEntityManager = wolf.mmorpg.getCharacterEntityManager();
+                Character target = characterEntityManager.getCharacter(event.getTarget());
                 target.damage(wolf, 5.0);
             });
         }

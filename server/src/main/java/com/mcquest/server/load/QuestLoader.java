@@ -7,9 +7,6 @@ import com.mcquest.server.util.ResourceLoader;
 import java.util.List;
 
 public class QuestLoader {
-    /**
-     * Loads all Quests and registers them with the QuestManager.
-     */
     public static void loadQuests(QuestManager questManager) {
         List<String> questPaths = ResourceLoader.getResources("quests");
         for (String questPath : questPaths) {

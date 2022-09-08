@@ -17,26 +17,18 @@ public class Item {
     private final ItemRarity rarity;
     private final String icon;
     private final String description;
-    private transient ItemStack itemStack;
+    private final ItemStack itemStack;
 
     /**
      * Constructs an Item with the given name, rarity, icon, and description.
      */
-    public Item(@NotNull String name, @NotNull ItemRarity rarity,
-                @NotNull Material icon, @NotNull String description) {
+    Item(@NotNull String name, @NotNull ItemRarity rarity,
+         @NotNull Material icon, @NotNull String description) {
         this.name = name;
         this.rarity = rarity;
         this.icon = icon.namespace().asString();
         this.description = description;
-    }
-
-    /**
-     * Constructs an Item with the given name, rarity, icon, and no
-     * description.
-     */
-    public Item(@NotNull String name, @NotNull ItemRarity rarity,
-                @NotNull Material icon) {
-        this(name, rarity, icon, null);
+        this.itemStack = createItemStack();
     }
 
     /**
@@ -71,9 +63,6 @@ public class Item {
      * Returns the ItemStack of this Item.
      */
     public final ItemStack getItemStack() {
-        if (itemStack == null) {
-            itemStack = createItemStack();
-        }
         return itemStack;
     }
 
@@ -86,10 +75,8 @@ public class Item {
      * add custom properties to the ItemStack. The amount of the returned
      * ItemStack must be exactly 1.
      */
-    protected @NotNull ItemStack createItemStack() {
-        // TODO
-        Component rarityText = Component.text(rarity.getText() + " Item",
-                rarity.getColor());
+    @NotNull ItemStack createItemStack() {
+        Component rarityText = Component.text(rarity.getText() + " Item", rarity.getColor());
 
         if (description != null) {
             // TODO

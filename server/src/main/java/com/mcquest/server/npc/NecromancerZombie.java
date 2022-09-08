@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
 import net.kyori.adventure.text.Component;
@@ -19,12 +20,14 @@ public class NecromancerZombie extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Zombie",
             NamedTextColor.GREEN);
 
+    private final Mmorpg mmorpg;
     private final PlayerCharacter summoner;
     private Entity entity;
 
-    public NecromancerZombie(PlayerCharacter summoner, Instance instance,
-                             Pos spawnPosition) {
+    public NecromancerZombie(Mmorpg mmorpg, PlayerCharacter summoner,
+                             Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 1, instance, spawnPosition);
+        this.mmorpg = mmorpg;
         this.summoner = summoner;
     }
 
@@ -32,14 +35,16 @@ public class NecromancerZombie extends NonPlayerCharacter {
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
-        CharacterEntityManager.register(entity, this);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        CharacterEntityManager.unregister(entity);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.unbind(entity);
         entity.remove();
     }
 
@@ -71,7 +76,8 @@ public class NecromancerZombie extends NonPlayerCharacter {
         }
 
         private boolean shouldTarget(net.minestom.server.entity.Entity entity) {
-            Character character = CharacterEntityManager.getCharacter(entity);
+            CharacterEntityManager characterEntityManager = zombie.mmorpg.getCharacterEntityManager();
+            Character character = characterEntityManager.getCharacter(entity);
             return character != null && !zombie.isFriendly(character);
         }
 

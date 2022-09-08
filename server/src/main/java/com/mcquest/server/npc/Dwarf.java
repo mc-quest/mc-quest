@@ -1,5 +1,6 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.NonPlayerCharacter;
 import com.mcquest.server.util.ResourceLoader;
@@ -23,6 +24,7 @@ public class Dwarf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
     private static final Model MODEL;
 
+    private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private Entity entity;
 
@@ -31,12 +33,13 @@ public class Dwarf extends NonPlayerCharacter {
         try {
             MODEL = reader.read(ResourceLoader.getResourceAsStream("models/dwarf.bbmodel"));
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
-    public Dwarf(Instance instance, Pos spawnPosition) {
+    public Dwarf(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
         super(DISPLAY_NAME, 25, instance, spawnPosition);
+        this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
     }
 
@@ -44,7 +47,8 @@ public class Dwarf extends NonPlayerCharacter {
     public void spawn() {
         super.spawn();
         entity = new Entity(this);
-        CharacterEntityManager.register(entity, this);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
         MinecraftServer.getGlobalEventHandler().addListener(PlayerBlockInteractEvent.class, event -> {
             System.out.println(MODEL.animations().get("walk"));
@@ -55,7 +59,8 @@ public class Dwarf extends NonPlayerCharacter {
     @Override
     public void despawn() {
         super.despawn();
-        CharacterEntityManager.unregister(entity);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.unbind(entity);
         entity.remove();
         setPosition(spawnPosition);
     }

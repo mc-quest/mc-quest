@@ -1,7 +1,9 @@
 package com.mcquest.server.npc;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
+import com.mcquest.server.physics.PhysicsManager;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,13 +29,15 @@ public class Rabbit extends NonPlayerCharacter {
     private static final Sound DEATH_SOUND =
             Sound.sound(SoundEvent.ENTITY_RABBIT_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
 
+    private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final RabbitMeta.Type type;
     private final CharacterHitbox hitbox;
     private Entity entity;
 
-    public Rabbit(Instance instance, Pos spawnPosition, RabbitMeta.Type type) {
+    public Rabbit(Mmorpg mmorpg, Instance instance, Pos spawnPosition, RabbitMeta.Type type) {
         super(DISPLAY_NAME, 1, instance, spawnPosition);
+        this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.type = type;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.5, 0.5, 0.5);
@@ -50,16 +54,20 @@ public class Rabbit extends NonPlayerCharacter {
     protected void spawn() {
         super.spawn();
         entity = new Entity(this);
-        CharacterEntityManager.register(entity, this);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
-        // hitbox.setEnabled(true);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.addCollider(hitbox);
     }
 
     @Override
     protected void despawn() {
         super.despawn();
-        // hitbox.setEnabled(false);
-        CharacterEntityManager.unregister(entity);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.removeCollider(hitbox);
+        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        characterEntityManager.unbind(entity);
         entity.remove();
         setPosition(spawnPosition);
     }

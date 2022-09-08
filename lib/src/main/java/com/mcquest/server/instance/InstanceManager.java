@@ -17,6 +17,8 @@ public class InstanceManager {
     @ApiStatus.Internal
     public InstanceManager() {
         this.instances = new HashMap<>();
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.addListener(PlayerChunkUnloadEvent.class, this::unloadVacantChunk);
     }
 
     public InstanceContainer createInstanceContainer(String name) {
@@ -32,17 +34,22 @@ public class InstanceManager {
         return instances.get(name);
     }
 
-    @ApiStatus.Internal
-    public void unloadVacantChunks() {
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerChunkUnloadEvent.class, event -> {
-            Instance instance = event.getPlayer().getInstance();
-            int chunkX = event.getChunkX();
-            int chunkZ = event.getChunkZ();
-            Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
-            if (chunk != null && chunk.getViewers().isEmpty()) {
-                instance.unloadChunk(chunkX, chunkZ);
+    public String nameOf(Instance instance) {
+        for (Map.Entry<String, Instance> i : instances.entrySet()) {
+            if (i.getValue() == instance) {
+                return i.getKey();
             }
-        });
+        }
+        return null;
+    }
+
+    private void unloadVacantChunk(PlayerChunkUnloadEvent event) {
+        Instance instance = event.getPlayer().getInstance();
+        int chunkX = event.getChunkX();
+        int chunkZ = event.getChunkZ();
+        Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());
+        if (chunk != null && chunk.getViewers().isEmpty()) {
+            instance.unloadChunk(chunkX, chunkZ);
+        }
     }
 }

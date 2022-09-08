@@ -2,7 +2,6 @@ package com.mcquest.server.load;
 
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.util.ResourceLoader;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
 

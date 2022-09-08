@@ -6,13 +6,12 @@ package com.mcquest.server.playerclass;
 public final class PlayerClass {
     private final String name;
     private final Skill[] skills;
-
-    private transient SkillTree skillTree;
+    private SkillTree skillTree;
 
     /**
      * Constructs a PlayerClass with the given name and Skills.
      */
-    public PlayerClass(String name, Skill[] skills) {
+    PlayerClass(String name, Skill[] skills) {
         this.name = name;
         this.skills = skills.clone();
     }

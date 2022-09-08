@@ -3,10 +3,15 @@ package com.mcquest.server;
 import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.ItemManager;
-import com.mcquest.server.load.InstanceLoader;
-import com.mcquest.server.load.ItemLoader;
-import com.mcquest.server.load.QuestLoader;
+import com.mcquest.server.item.ItemRarity;
+import com.mcquest.server.item.Weapon;
 import com.mcquest.server.persistence.PlayerCharacterData;
+import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.playerclass.PlayerClassManager;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.AnvilLoader;
+import net.minestom.server.instance.InstanceContainer;
+import net.minestom.server.item.Material;
 
 public class Main {
     private static final String SERVER_ADDRESS = "0.0.0.0";
@@ -14,15 +19,22 @@ public class Main {
 
     public static void main(String[] args) {
         Mmorpg mmorpg = new Mmorpg();
-        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
-        pcManager.setDataProvider(player -> new PlayerCharacterData());
-        ItemLoader itemLoader = new ItemLoader();
-        itemLoader.loadItems(mmorpg.getItemManager());
-        QuestLoader questLoader = new QuestLoader();
-        questLoader.loadQuests(mmorpg.getQuestManager());
+
+        PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
+        PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter").build();
+
+        ItemManager itemManager = mmorpg.getItemManager();
+        Weapon weapon = itemManager.createWeapon("Weapon", ItemRarity.COMMON,
+                Material.IRON_SWORD, null, fighter, 1, 5);
+
         InstanceManager instanceManager = mmorpg.getInstanceManager();
-        InstanceLoader instanceLoader = new InstanceLoader();
-        instanceLoader.loadInstances(instanceManager);
+        InstanceContainer eladrador = instanceManager.createInstanceContainer("Eladrador");
+        eladrador.setChunkLoader(new AnvilLoader("world/eladrador"));
+
+        Pos position = new Pos(0, 70, 0);
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        pcManager.setDataProvider(player ->
+                PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
         mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
     }
 }

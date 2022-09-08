@@ -2,6 +2,7 @@ package com.mcquest.server.item;
 
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A ConsumableItem is an Item that can be consumed by a PlayerCharacter to
@@ -14,19 +15,10 @@ public class ConsumableItem extends Item {
      * Constructs a ConsumableItem with the given name, rarity, icon,
      * description, and level.
      */
-    public ConsumableItem(String name, ItemRarity rarity, Material icon,
-                          String description, int level) {
+    ConsumableItem(@NotNull String name, @NotNull ItemRarity rarity,
+                   @NotNull Material icon, @NotNull String description, int level) {
         super(name, rarity, icon, description);
         this.level = level;
-    }
-
-    /**
-     * Constructs a ConsumableItem with the given name, rarity, icon,
-     * description, and level. The ConsumableItem will have no description.
-     */
-    public ConsumableItem(String name, ItemRarity rarity, Material icon,
-                          int level) {
-        this(name, rarity, icon, null, level);
     }
 
     /**

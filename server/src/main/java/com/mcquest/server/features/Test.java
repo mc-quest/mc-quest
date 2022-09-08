@@ -13,6 +13,6 @@ public class Test implements Feature {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         Instance instance = null; // mmorpg.getInstanceManager().getInstance("eladrador");
         Pos spawnPosition = new Pos(0, 70, 0);
-        Wolf wolf = new Wolf(physicsManager, instance, spawnPosition);
+        Wolf wolf = new Wolf(mmorpg, instance, spawnPosition);
     }
 }

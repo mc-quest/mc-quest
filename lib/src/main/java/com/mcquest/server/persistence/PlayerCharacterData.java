@@ -1,5 +1,6 @@
 package com.mcquest.server.persistence;
 
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.playerclass.PlayerClass;
@@ -9,18 +10,27 @@ import net.minestom.server.instance.Instance;
 
 public class PlayerCharacterData {
     private String playerClass;
+    private String instance;
+    private Pos position;
+    private Pos respawnPosition;
     private double health;
     private double maxHealth;
     private double mana;
     private double maxMana;
     private double experiencePoints;
 
+    private PlayerCharacterData() {
+    }
+
     /**
      * Constructs a new PlayerCharacterData for a new PlayerCharacter.
      */
-    public static PlayerCharacterData create(PlayerClass playerClass, Instance instance, Pos position, Weapon weapon) {
+    public static PlayerCharacterData create(Mmorpg mmorpg, PlayerClass playerClass,
+                                             Instance instance, Pos position, Weapon weapon) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClass = playerClass.getName();
+        data.instance = mmorpg.getInstanceManager().nameOf(instance);
+        data.position = position;
         data.health = 1;
         data.maxHealth = 1;
         data.mana = 1;
@@ -40,8 +50,20 @@ public class PlayerCharacterData {
         return data;
     }
 
-    public PlayerClass getPlayerClass() {
-        return PlayerClassManager.getPlayerClass(playerClass);
+    public String getPlayerClass() {
+        return playerClass;
+    }
+
+    public String getInstance() {
+        return instance;
+    }
+
+    public Pos getPosition() {
+        return position;
+    }
+
+    public Pos getRespawnPosition() {
+        return respawnPosition;
     }
 
     public double getHealth() {

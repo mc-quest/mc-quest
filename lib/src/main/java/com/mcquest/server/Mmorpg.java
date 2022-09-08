@@ -10,17 +10,19 @@ import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.instance.InstanceManager;
+import com.mcquest.server.ui.InteractionHandler;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.timer.SchedulerManager;
 
 public class Mmorpg {
     private boolean isStarted;
-    private final PlayerCharacterManager pcManager;
-    private final InstanceManager instanceManager;
+    private final MinecraftServer server;
+    private final PlayerClassManager playerClassManager;
     private final ItemManager itemManager;
     private final QuestManager questManager;
-    private final PlayerClassManager playerClassManager;
+    private final InstanceManager instanceManager;
+    private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
@@ -28,21 +30,21 @@ public class Mmorpg {
 
     public Mmorpg() {
         isStarted = false;
-        pcManager = new PlayerCharacterManager(this);
-        instanceManager = new InstanceManager();
+        server = MinecraftServer.init();
+        playerClassManager = new PlayerClassManager();
         itemManager = new ItemManager();
         questManager = new QuestManager();
-        playerClassManager = new PlayerClassManager();
+        instanceManager = new InstanceManager();
+        pcManager = new PlayerCharacterManager(this);
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         featureManager = new FeatureManager();
+        InteractionHandler interactionHandler = new InteractionHandler(this);
+        interactionHandler.registerListeners();
     }
 
     public void start(String address, int port) {
-        MinecraftServer server = MinecraftServer.init();
-        pcManager.registerEvents();
-        instanceManager.unloadVacantChunks();
         for (Feature feature : featureManager.getFeatures()) {
             feature.hook(this);
         }
@@ -54,12 +56,8 @@ public class Mmorpg {
         return isStarted;
     }
 
-    public PlayerCharacterManager getPlayerCharacterManager() {
-        return pcManager;
-    }
-
-    public InstanceManager getInstanceManager() {
-        return instanceManager;
+    public PlayerClassManager getPlayerClassManager() {
+        return playerClassManager;
     }
 
     public ItemManager getItemManager() {
@@ -70,8 +68,12 @@ public class Mmorpg {
         return questManager;
     }
 
-    public PlayerClassManager getPlayerClassManager() {
-        return playerClassManager;
+    public InstanceManager getInstanceManager() {
+        return instanceManager;
+    }
+
+    public PlayerCharacterManager getPlayerCharacterManager() {
+        return pcManager;
     }
 
     public NonPlayerCharacterSpawner getNonPlayerCharacterSpawner() {

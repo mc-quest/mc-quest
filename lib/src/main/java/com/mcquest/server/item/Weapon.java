@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * enemies.
  */
 public class Weapon extends Item {
-    private final String playerClass;
+    private final PlayerClass playerClass;
     private final int level;
     private final double damage;
 
@@ -19,33 +19,12 @@ public class Weapon extends Item {
      * Constructs a Weapon with the given name, rarity, icon, description,
      * player class, level, and damage.
      */
-    public Weapon(String name, ItemRarity rarity, Material icon,
-                  String description, String playerClass, int level,
-                  double damage) {
+    Weapon(String name, ItemRarity rarity, Material icon, String description,
+           PlayerClass playerClass, int level, double damage) {
         super(name, rarity, icon, description);
         this.playerClass = playerClass;
         this.level = level;
         this.damage = damage;
-    }
-
-    /**
-     * Constructs a Weapon with the given name, rarity, icon, description,
-     * PlayerClass, level, and damage.
-     */
-    public Weapon(String name, ItemRarity rarity, Material icon,
-                  String description, PlayerClass playerClass, int level,
-                  double damage) {
-        this(name, rarity, icon, description, playerClass.getName(), level,
-                damage);
-    }
-
-    /**
-     * Constructs a Weapon with the given name, rarity, icon, player class,
-     * level, and damage. The Weapon will have no description.
-     */
-    public Weapon(String name, ItemRarity rarity, Material icon,
-                  String playerClass, int level, double damage) {
-        this(name, rarity, icon, null, playerClass, level, damage);
     }
 
     /**
@@ -61,7 +40,7 @@ public class Weapon extends Item {
      * Returns the PlayerClass that can equip this Weapon.
      */
     public final PlayerClass getPlayerClass() {
-        return PlayerClassManager.getPlayerClass(playerClass);
+        return playerClass;
     }
 
     /**

@@ -20,11 +20,14 @@ public class PlayerClassManager {
         skillsByItemStack = new HashMap<>();
     }
 
-    public void registerPlayerClass(PlayerClass playerClass) {
+    public PlayerClassBuilder playerClassBuilder(String name) {
+        return new PlayerClassBuilder(this, name);
+    }
+
+    void registerPlayerClass(PlayerClass playerClass) {
         String name = playerClass.getName();
         if (playerClassesByName.containsKey(name)) {
-            throw new IllegalArgumentException(
-                    "Attempted to register a player class with a name that is already registered: " + name);
+            throw new IllegalArgumentException("Name already in use: " + name);
         }
         for (int i = 0; i < playerClass.getSkillCount(); i++) {
             Skill skill = playerClass.getSkill(i);

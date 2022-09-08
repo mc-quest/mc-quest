@@ -4,17 +4,14 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.event.PlayerCharacterReceiveItemEvent;
 import com.mcquest.server.event.PlayerCharacterRemoveItemEvent;
-import com.mcquest.server.item.ArmorItem;
-import com.mcquest.server.item.ArmorSlot;
-import com.mcquest.server.item.Item;
-import com.mcquest.server.item.Weapon;
+import com.mcquest.server.item.*;
+import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.PlayerCharacterQuestManager;
 import com.mcquest.server.sound.PlayerCharacterMusicManager;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.util.Debug;
 import com.mcquest.server.util.MathUtility;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -59,7 +56,7 @@ public final class PlayerCharacter extends Character {
     private Task undisarmTask;
     private long undisarmTime;
 
-    PlayerCharacter(Mmorpg mmorpg, Player player, PlayerCharacterData data) {
+    PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
         super(Component.text(player.getUsername(), NamedTextColor.GREEN),
                 levelForExperiencePoints(data.getExperiencePoints()),
                 mmorpg.getInstanceManager().getInstance(data.getInstance()), data.getPosition());
@@ -73,13 +70,27 @@ public final class PlayerCharacter extends Character {
         musicManager = new PlayerCharacterMusicManager(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
+        this.maxMana = data.getMaxMana();
+        this.mana = data.getMana();
         healthRegenRate = 1;
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
-        Debug.showCollider(hitbox);
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
+        PersistentItem[] persistentItems = data.getItems();
+        ItemManager itemManager = mmorpg.getItemManager();
+        PlayerInventory inventory = player.getInventory();
+        for (int i = 0; i < persistentItems.length; i++) {
+            PersistentItem persistentItem = persistentItems[i];
+            if (persistentItem != null) {
+                String itemName = persistentItem.getName();
+                int itemAmount = persistentItem.getAmount();
+                Item item = itemManager.getItem(itemName);
+                ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
+                inventory.setItemStack(i, itemStack);
+            }
+        }
     }
 
     @Override
@@ -92,7 +103,7 @@ public final class PlayerCharacter extends Character {
     }
 
     @Override
-    public void setPosition(Pos position) {
+    public void setPosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(hitboxCenter());
         if (player.getPosition().distanceSquared(position) >= 5.0) {

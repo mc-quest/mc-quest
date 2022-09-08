@@ -5,9 +5,11 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class TextUtility {
+    public static final int STANDARD_LINE_LENGTH = 18;
     private static final LegacyComponentSerializer TEXT_SERIALIZER =
             LegacyComponentSerializer.legacySection();
     private static final char SECTION_SYMBOL = '\u00A7';
@@ -20,11 +22,15 @@ public class TextUtility {
         return TEXT_SERIALIZER.serialize(text);
     }
 
+    public static List<TextComponent> wordWrap(String text) {
+        return wordWrap(text, STANDARD_LINE_LENGTH);
+    }
+
     /**
      * Splits the text into lines while preserving text color. If the text is
      * null, null is returned.
      */
-    public static TextComponent[] wordWrap(String text, int lineLength) {
+    public static List<TextComponent> wordWrap(String text, int lineLength) {
         if (text == null) {
             return null;
         }
@@ -32,7 +38,7 @@ public class TextUtility {
             throw new IllegalArgumentException("Non-positive line length: " + lineLength);
         }
         if (text.isEmpty()) {
-            return new TextComponent[0];
+            return Collections.emptyList();
         }
         List<TextComponent> lines = new ArrayList<>();
         String[] tokens = text.split(" ");
@@ -66,7 +72,7 @@ public class TextUtility {
         }
 
         lines.add(deserializeText(currentLine.toString()));
-        return lines.toArray(new TextComponent[0]);
+        return lines;
     }
 
     private static String[] split(String token, int length) {

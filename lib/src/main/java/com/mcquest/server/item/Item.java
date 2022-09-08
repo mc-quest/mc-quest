@@ -1,6 +1,9 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
@@ -8,6 +11,9 @@ import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An Item represents an MMORPG item.
@@ -67,7 +73,8 @@ public class Item {
     }
 
     public final Component getDisplayName() {
-        return Component.text(name, rarity.getColor());
+        return Component.text(name, rarity.getColor())
+                .decoration(TextDecoration.ITALIC, false);
     }
 
     /**
@@ -76,10 +83,17 @@ public class Item {
      * ItemStack must be exactly 1.
      */
     @NotNull ItemStack createItemStack() {
-        Component rarityText = Component.text(rarity.getText() + " Item", rarity.getColor());
-
+        List<Component> lore = new ArrayList<>();
+        Component rarityText = Component.text(rarity.getText() + " Item", rarity.getColor())
+                .decoration(TextDecoration.ITALIC, false);
+        lore.add(rarityText);
         if (description != null) {
-            // TODO
+            lore.add(Component.empty());
+            List<TextComponent> descriptionText = TextUtility.wordWrap(description);
+            for (int i = 0; i < descriptionText.size(); i++) {
+                descriptionText.set(i, descriptionText.get(i).decoration(TextDecoration.ITALIC, false));
+            }
+            lore.addAll(descriptionText);
         }
 
         return ItemStack.builder(getIcon())
@@ -87,7 +101,7 @@ public class Item {
                         builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES, ItemHideFlag.HIDE_POTION_EFFECTS)
                 )
                 .displayName(getDisplayName())
-                .lore(rarityText) // TODO: add description
+                .lore(lore)
                 .build();
     }
 

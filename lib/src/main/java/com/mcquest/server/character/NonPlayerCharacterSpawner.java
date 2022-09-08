@@ -10,16 +10,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NonPlayerCharacterSpawner {
-    private static final Set<NonPlayerCharacter> spawningNpcs = new HashSet<>();
+    private final Set<NonPlayerCharacter> spawningNpcs;
 
-    @ApiStatus.Internal
-    public static void start() {
+    public NonPlayerCharacterSpawner() {
+        spawningNpcs = new HashSet<>();
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
-        schedulerManager.buildTask(NonPlayerCharacterSpawner::tick)
+        schedulerManager.buildTask(this::tick)
                 .repeat(TaskSchedule.nextTick()).schedule();
     }
 
-    private static void tick() {
+    private void tick() {
         Set<NonPlayerCharacter> toSpawn = new HashSet<>();
         Set<NonPlayerCharacter> toDespawn = new HashSet<>();
 
@@ -43,14 +43,14 @@ public class NonPlayerCharacterSpawner {
         }
     }
 
-    public static void add(@NotNull NonPlayerCharacter npc) {
+    public void add(@NotNull NonPlayerCharacter npc) {
         if (spawningNpcs.contains(npc)) {
             throw new IllegalArgumentException("npc already added");
         }
         spawningNpcs.add(npc);
     }
 
-    public static void remove(@NotNull NonPlayerCharacter npc) {
+    public void remove(@NotNull NonPlayerCharacter npc) {
         if (!spawningNpcs.contains(npc)) {
             throw new IllegalArgumentException("npc not previously added");
         }

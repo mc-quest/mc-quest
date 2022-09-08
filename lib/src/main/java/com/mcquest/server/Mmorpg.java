@@ -88,6 +88,10 @@ public class Mmorpg {
         return physicsManager;
     }
 
+    public FeatureManager getFeatureManager() {
+        return featureManager;
+    }
+
     public GlobalEventHandler getGlobalEventHandler() {
         return MinecraftServer.getGlobalEventHandler();
     }

@@ -18,6 +18,7 @@ public class PlayerCharacterData {
     private double mana;
     private double maxMana;
     private double experiencePoints;
+    private PersistentItem[] items;
 
     private PlayerCharacterData() {
     }
@@ -31,11 +32,14 @@ public class PlayerCharacterData {
         data.playerClass = playerClass.getName();
         data.instance = mmorpg.getInstanceManager().nameOf(instance);
         data.position = position;
+        data.respawnPosition = position;
         data.health = 1;
         data.maxHealth = 1;
         data.mana = 1;
         data.maxMana = 1;
         data.experiencePoints = 0;
+        data.items = new PersistentItem[46];
+        data.items[4] = new PersistentItem(weapon.getName(), 1);
         return data;
     }
 
@@ -84,5 +88,9 @@ public class PlayerCharacterData {
 
     public double getExperiencePoints() {
         return experiencePoints;
+    }
+
+    public PersistentItem[] getItems() {
+        return items;
     }
 }

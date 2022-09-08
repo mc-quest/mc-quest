@@ -1,6 +1,8 @@
 package com.mcquest.server;
 
 import com.mcquest.server.character.PlayerCharacterManager;
+import com.mcquest.server.feature.FeatureManager;
+import com.mcquest.server.features.TestFeature;
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.ItemManager;
 import com.mcquest.server.item.ItemRarity;
@@ -25,7 +27,7 @@ public class Main {
 
         ItemManager itemManager = mmorpg.getItemManager();
         Weapon weapon = itemManager.createWeapon("Weapon", ItemRarity.COMMON,
-                Material.IRON_SWORD, null, fighter, 1, 5);
+                Material.IRON_SWORD, "Description here test test test.", fighter, 1, 5);
 
         InstanceManager instanceManager = mmorpg.getInstanceManager();
         InstanceContainer eladrador = instanceManager.createInstanceContainer("Eladrador");
@@ -35,6 +37,10 @@ public class Main {
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
         pcManager.setDataProvider(player ->
                 PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
+
+        FeatureManager featureManager = mmorpg.getFeatureManager();
+        featureManager.addFeature(new TestFeature());
+
         mmorpg.start(SERVER_ADDRESS, SERVER_PORT);
     }
 }

@@ -2,14 +2,19 @@ package com.mcquest.server.character;
 
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public class NonPlayerCharacter extends Character {
     private boolean isSpawned;
 
-    public NonPlayerCharacter(Component displayName, int level,
-                              Instance instance, Pos position) {
+    public NonPlayerCharacter(@NotNull Component displayName, int level,
+                              @NotNull Instance instance, @NotNull Pos position) {
         super(displayName, level, instance, position);
         isSpawned = false;
     }
@@ -40,10 +45,22 @@ public class NonPlayerCharacter extends Character {
     }
 
     protected boolean shouldSpawn() {
-        return PlayerCharacter.isNearby(getInstance(), getPosition(), 50.0);
+        return playerNearby(50.0);
     }
 
     protected boolean shouldDespawn() {
-        return !PlayerCharacter.isNearby(getInstance(), getPosition(), 60.0);
+        return !playerNearby(60.0);
+    }
+
+    private boolean playerNearby(double range) {
+        Instance instance = getInstance();
+        Pos position = getPosition();
+        Collection<Entity> nearbyEntities = instance.getNearbyEntities(position, range);
+        for (Entity entity : nearbyEntities) {
+            if (entity instanceof Player) {
+                return true;
+            }
+        }
+        return false;
     }
 }

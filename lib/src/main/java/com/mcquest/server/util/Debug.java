@@ -38,6 +38,8 @@ public class Debug {
 
     public static void showCollider(Collider collider) {
         shownColliders.add(collider);
+        // Initial render.
+        drawCollider(collider);
     }
 
     public static void hideCollider(Collider collider) {

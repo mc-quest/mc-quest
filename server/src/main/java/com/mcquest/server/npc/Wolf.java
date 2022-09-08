@@ -22,6 +22,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.entity.EntityAttackEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.timer.SchedulerManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -30,7 +31,9 @@ public class Wolf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME =
             Component.text("Wolf", NamedTextColor.RED);
     private static final Sound ATTACK_SOUND =
-            Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.NEUTRAL, 1f, 1f);
+            Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.HOSTILE, 1f, 1f);
+    private static final Sound DEATH_SOUND =
+            Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 1f, 1f);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -70,6 +73,14 @@ public class Wolf extends NonPlayerCharacter {
         entity.remove();
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.removeCollider(hitbox);
+        if (!isAlive()) {
+            Instance instance = getInstance();
+            Pos position = getPosition();
+            SchedulerManager schedulerManager = mmorpg.getSchedulerManager();
+            schedulerManager.buildTask(() -> setHealth(getMaxHealth()))
+                    .delay(Duration.ofSeconds(5)).schedule();
+            instance.playSound(DEATH_SOUND, position);
+        }
         setPosition(spawnPosition);
     }
 
@@ -86,13 +97,13 @@ public class Wolf extends NonPlayerCharacter {
             super(EntityType.WOLF);
             this.wolf = wolf;
             addAIGroup(new EntityAIGroupBuilder()
-                    .addTargetSelector(new ClosestEntityTarget(this, 10,
+                    .addTargetSelector(new ClosestEntityTarget(this, 5,
                             entity -> entity instanceof Rabbit.Entity || entity instanceof Player))
-                    .addGoalSelector(new MeleeAttackGoal(this, 1.2, Duration.ofSeconds(2)))
+                    .addGoalSelector(new MeleeAttackGoal(this, 0.8, Duration.ofSeconds(2)))
                     .addGoalSelector(new RandomStrollGoal(this, 5))
                     .build());
             eventNode().addListener(EntityAttackEvent.class, event -> {
-                getInstance().playSound(ATTACK_SOUND, position.x(), position.y(), position.z());
+                getInstance().playSound(ATTACK_SOUND, position);
                 CharacterEntityManager characterEntityManager = wolf.mmorpg.getCharacterEntityManager();
                 Character target = characterEntityManager.getCharacter(event.getTarget());
                 target.damage(wolf, 5.0);

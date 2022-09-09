@@ -27,7 +27,7 @@ public class TestFeature implements Feature {
         Pos spawnPosition = new Pos(0, 70, 0);
         Wolf wolf = new Wolf(mmorpg, instance, spawnPosition);
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        npcSpawner.add(wolf);
+        // npcSpawner.add(wolf);
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterBasicAttackEvent.class, this::basicAttack);
     }
 

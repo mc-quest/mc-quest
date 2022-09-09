@@ -245,12 +245,12 @@ public class Collider {
     private void updateOccupiedBuckets() {
         // Compute new buckets.
         Set<ColliderBucketAddress> newOccupiedBuckets = new HashSet<>();
-        int minBucketX = (int) Math.floor(minX / PhysicsManager.BUCKET_SIZE);
-        int minBucketY = (int) Math.floor(minY / PhysicsManager.BUCKET_SIZE);
-        int minBucketZ = (int) Math.floor(minZ / PhysicsManager.BUCKET_SIZE);
-        int maxBucketX = (int) Math.floor(maxX / PhysicsManager.BUCKET_SIZE);
-        int maxBucketY = (int) Math.floor(maxY / PhysicsManager.BUCKET_SIZE);
-        int maxBucketZ = (int) Math.floor(maxZ / PhysicsManager.BUCKET_SIZE);
+        int minBucketX = (int) Math.floor(minX / PhysicsManager.COLLIDER_BUCKET_SIZE);
+        int minBucketY = (int) Math.floor(minY / PhysicsManager.COLLIDER_BUCKET_SIZE);
+        int minBucketZ = (int) Math.floor(minZ / PhysicsManager.COLLIDER_BUCKET_SIZE);
+        int maxBucketX = (int) Math.floor(maxX / PhysicsManager.COLLIDER_BUCKET_SIZE);
+        int maxBucketY = (int) Math.floor(maxY / PhysicsManager.COLLIDER_BUCKET_SIZE);
+        int maxBucketZ = (int) Math.floor(maxZ / PhysicsManager.COLLIDER_BUCKET_SIZE);
         for (int x = minBucketX; x <= maxBucketX; x++) {
             for (int y = minBucketY; y <= maxBucketY; y++) {
                 for (int z = minBucketZ; z <= maxBucketZ; z++) {

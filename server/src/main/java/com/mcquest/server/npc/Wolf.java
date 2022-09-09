@@ -31,9 +31,11 @@ public class Wolf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME =
             Component.text("Wolf", NamedTextColor.RED);
     private static final Sound ATTACK_SOUND =
-            Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.HOSTILE, 1f, 1f);
+            Sound.sound(SoundEvent.ENTITY_WOLF_GROWL, Sound.Source.HOSTILE, 1f, 0.9f);
+    private static final Sound HURT_SOUND =
+            Sound.sound(SoundEvent.ENTITY_WOLF_HURT, Sound.Source.HOSTILE, 1f, 0.9f);
     private static final Sound DEATH_SOUND =
-            Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 1f, 1f);
+            Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 1f, 0.9f);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -70,10 +72,12 @@ public class Wolf extends NonPlayerCharacter {
         super.despawn();
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.unbind(entity);
-        entity.remove();
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.removeCollider(hitbox);
-        if (!isAlive()) {
+        if (isAlive()) {
+            entity.remove();
+        } else {
+            entity.kill();
             Instance instance = getInstance();
             Pos position = getPosition();
             SchedulerManager schedulerManager = mmorpg.getSchedulerManager();
@@ -88,6 +92,10 @@ public class Wolf extends NonPlayerCharacter {
     public void damage(DamageSource source, double amount) {
         super.damage(source, amount);
         entity.damage(DamageType.VOID, 0f);
+        Instance instance = getInstance();
+        if (isAlive()) {
+            instance.playSound(HURT_SOUND);
+        }
     }
 
     public static class Entity extends EntityCreature {

@@ -18,7 +18,7 @@ public final class Quest {
         this.id = id;
         this.name = name;
         this.level = level;
-        this.objectives = objectives.clone();
+        this.objectives = objectives;
     }
 
     public int getId() {

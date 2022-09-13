@@ -9,7 +9,7 @@ import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.PlayerCharacterQuestManager;
-import com.mcquest.server.sound.PlayerCharacterMusicManager;
+import com.mcquest.server.music.PlayerCharacterMusicPlayer;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.MathUtility;
@@ -44,7 +44,7 @@ public final class PlayerCharacter extends Character {
     private final Player player;
     private final PlayerClass playerClass;
     private final PlayerCharacterQuestManager questManager;
-    private final PlayerCharacterMusicManager musicManager;
+    private final PlayerCharacterMusicPlayer musicManager;
     private final Hitbox hitbox;
     private Pos respawnPosition;
     private double mana;
@@ -67,7 +67,7 @@ public final class PlayerCharacter extends Character {
         // hidePlayerNameplate();
         playerClass = null;
         questManager = new PlayerCharacterQuestManager();
-        musicManager = new PlayerCharacterMusicManager(this);
+        musicManager = new PlayerCharacterMusicPlayer(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         this.maxMana = data.getMaxMana();
@@ -128,7 +128,7 @@ public final class PlayerCharacter extends Character {
         return playerClass;
     }
 
-    public PlayerCharacterMusicManager getMusicManager() {
+    public PlayerCharacterMusicPlayer getMusicManager() {
         return musicManager;
     }
 
@@ -415,41 +415,16 @@ public final class PlayerCharacter extends Character {
         player.sendMessage(message);
     }
 
+    public void playSound(Sound sound) {
+        player.playSound(sound);
+    }
+
     @Override
     public boolean isFriendly(Character other) {
         if (other instanceof PlayerCharacter) {
             return true;
         }
         return other.isFriendly(this);
-    }
-
-    public static Set<PlayerCharacter> getNearby(Instance instance,
-                                                 Pos position, double radius) {
-        Set<PlayerCharacter> nearby = new HashSet<>();
-        Collider collider = new Collider(instance, position, radius, radius,
-                radius);
-        // collider.setEnabled(true);
-        Set<Collider> contacts = collider.getContacts();
-        double radiusSquared = radius * radius;
-        for (Collider contact : contacts) {
-            if (contact instanceof PlayerCharacter.Hitbox hitbox) {
-                PlayerCharacter pc = hitbox.getCharacter();
-                if (pc.getPosition().distanceSquared(position) <= radiusSquared) {
-                    nearby.add(pc);
-                }
-            }
-        }
-        // collider.setEnabled(false);
-        return nearby;
-    }
-
-    /**
-     * Returns true if there is a PlayerCharacter within the given radius of
-     * the given position in the given instance. Returns false otherwise.
-     */
-    public static boolean isNearby(Instance instance, Pos position,
-                                   double radius) {
-        return !getNearby(instance, position, radius).isEmpty();
     }
 
     private void hidePlayerNameplate() {

@@ -3,6 +3,7 @@ package com.mcquest.server.character;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.persistence.PlayerCharacterData;
+import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -39,6 +40,10 @@ public class PlayerCharacterManager {
 
     public void setDataProvider(Function<Player, PlayerCharacterData> dataProvider) {
         this.dataProvider = dataProvider;
+    }
+
+    public void getNearbyPlayerCharacters(Instance instance, Pos position) {
+        // TODO
     }
 
     private void handlePlayerLogin(PlayerLoginEvent event) {

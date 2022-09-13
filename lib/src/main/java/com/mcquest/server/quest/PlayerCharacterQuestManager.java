@@ -1,42 +1,63 @@
 package com.mcquest.server.quest;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@ApiStatus.Internal
 public class PlayerCharacterQuestManager {
-    private final Map<Quest, int[]> data;
     private final Set<Quest> completedQuests;
+    private final Set<Quest> inProgressQuests;
+    private final Map<QuestObjective, Integer> objectiveProgress;
 
     public PlayerCharacterQuestManager() {
-        data = new HashMap<>();
-        // TODO: populate completed quests.
+        // TODO: populate these
         completedQuests = new HashSet<>();
+        inProgressQuests = new HashSet<>();
+        objectiveProgress = new HashMap<>();
     }
 
-    QuestStatus getQuestStatus(Quest quest) {
-        if (data.containsKey(quest)) {
-            return QuestStatus.IN_PROGRESS;
-        }
+    public QuestStatus getStatus(Quest quest) {
         if (completedQuests.contains(quest)) {
             return QuestStatus.COMPLETED;
+        }
+        if (inProgressQuests.contains(quest)) {
+            return QuestStatus.IN_PROGRESS;
         }
         return QuestStatus.NOT_STARTED;
     }
 
-    void startQuest(Quest quest) {
-        data.put(quest, new int[quest.getObjectiveCount()]);
+    public void startQuest(Quest quest) {
+        if (inProgressQuests.contains(quest) || completedQuests.contains(quest)) {
+            throw new IllegalArgumentException();
+        }
+        inProgressQuests.add(quest);
+        for (int i = 0; i < quest.getObjectiveCount(); i++) {
+            QuestObjective objective = quest.getObjective(i);
+            objectiveProgress.put(objective, 0);
+        }
     }
 
-    int getObjectiveProgress(QuestObjective objective) {
-        return data.get(objective.getQuest())[objective.getIndex()];
+    public int getProgress(QuestObjective objective) {
+        if (completedQuests.contains(objective)) {
+            return objective.getGoal();
+        }
+        if (!inProgressQuests.contains(objective)) {
+            return 0;
+        }
+        return objectiveProgress.get(objective);
     }
 
-    void setObjectiveProgress(QuestObjective objective, int progress) {
-        data.get(objective.getQuest())[objective.getIndex()] = progress;
+    public void setProgress(QuestObjective objective, int progress) {
+        if (progress < 0 || progress > objective.getGoal()) {
+            throw new IllegalArgumentException();
+        }
+        if (!objectiveProgress.containsKey(objective)) {
+            throw new IllegalArgumentException();
+        }
+
+        if (progress == objective.getGoal()) {
+            // Check for quest completion.
+        }
     }
 }

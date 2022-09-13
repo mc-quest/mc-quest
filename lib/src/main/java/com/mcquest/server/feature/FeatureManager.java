@@ -11,7 +11,7 @@ public class FeatureManager {
 
     @ApiStatus.Internal
     public FeatureManager() {
-        features = new HashMap();
+        features = new HashMap<>();
     }
 
     public void addFeature(Feature feature) {

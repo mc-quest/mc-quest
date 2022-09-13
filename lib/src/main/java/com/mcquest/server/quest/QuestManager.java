@@ -10,34 +10,33 @@ import java.util.Map;
  * The QuestManager is used to register and retrieve Quests.
  */
 public class QuestManager {
-    private final Map<String, Quest> quests;
+    private final Map<Integer, Quest> questsById;
 
     public QuestManager() {
-        quests = new HashMap<>();
+        questsById = new HashMap<>();
     }
 
-    /**
-     * Registers a Quest with the MMORPG.
-     */
-    public void registerQuest(@NotNull Quest quest) {
-        String name = quest.getName();
-        if (quests.containsKey(name)) {
-            throw new IllegalArgumentException("Attempted to register a quest "
-                    + "with a name that is already registered: " + name);
+    void registerQuest(@NotNull Quest quest) {
+        int id = quest.getId();
+        if (questsById.containsKey(id)) {
+            throw new IllegalArgumentException("ID of " + quest.getName() + " is already in use");
         }
-        quest.init();
-        quests.put(quest.getName(), quest);
+        questsById.put(id, quest);
     }
 
     /**
-     * Returns the registered Quest with the given name, or null if none
+     * Returns the registered Quest with the given ID, or null if none
      * exists.
      */
-    public Quest getQuest(@NotNull String name) {
-        return quests.get(name);
+    public Quest getQuest(int id) {
+        return questsById.get(id);
     }
 
     public Collection<Quest> getQuests() {
-        return quests.values();
+        return questsById.values();
+    }
+
+    public QuestBuilder questBuilder(int id, String name, int level) {
+        return new QuestBuilder(this, id, name, level);
     }
 }

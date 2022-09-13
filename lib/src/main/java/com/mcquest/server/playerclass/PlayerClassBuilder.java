@@ -14,9 +14,8 @@ public class PlayerClassBuilder {
         this.skills = new ArrayList<>();
     }
 
-    public PlayerClassBuilder skill() {
-        // TODO
-        Skill skill = null;
+    public PlayerClassBuilder skill(String name, int level, String description) {
+        Skill skill = new Skill(name, level, description);
         skills.add(skill);
         return this;
     }

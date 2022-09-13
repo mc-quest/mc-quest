@@ -1,14 +1,13 @@
 package com.mcquest.server.quest;
 
-import com.mcquest.server.character.PlayerCharacter;
-
 public final class QuestObjective {
+    private final int index;
     private final String description;
     private final int goal;
-    transient int index;
-    transient Quest quest;
+    Quest quest;
 
-    public QuestObjective(String description, int goal) {
+    QuestObjective(int index, String description, int goal) {
+        this.index = index;
         this.description = description;
         this.goal = goal;
     }
@@ -27,16 +26,5 @@ public final class QuestObjective {
 
     public Quest getQuest() {
         return quest;
-    }
-
-    public int getProgress(PlayerCharacter pc) {
-        PlayerCharacterQuestManager pcQuestManager = pc.getQuestManager();
-        return pcQuestManager.getObjectiveProgress(this);
-    }
-
-    public void setProgress(PlayerCharacter pc, int progress) {
-        PlayerCharacterQuestManager pcQuestManager = pc.getQuestManager();
-        // TODO: What if player hasn't started quest?
-        pcQuestManager.setObjectiveProgress(this, progress);
     }
 }

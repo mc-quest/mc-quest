@@ -56,7 +56,7 @@ public class Rabbit extends NonPlayerCharacter {
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
-        entity.setInstance(getInstance(), getPosition());
+        entity.setInstance(getInstance(), getPosition()).join();
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
     }

@@ -1,16 +1,16 @@
 package com.mcquest.server.persistence;
 
 public class PersistentItem {
-    private final String name;
+    private final int itemId;
     private final int amount;
 
-    public PersistentItem(String name, int amount) {
-        this.name = name;
+    public PersistentItem(int itemId, int amount) {
+        this.itemId = itemId;
         this.amount = amount;
     }
 
-    public String getName() {
-        return name;
+    public int getItemId() {
+        return itemId;
     }
 
     public int getAmount() {

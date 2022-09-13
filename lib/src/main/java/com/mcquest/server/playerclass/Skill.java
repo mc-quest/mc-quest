@@ -8,15 +8,11 @@ public class Skill {
     private final String name;
     private final int level;
     private final String description;
-    private final int skillTreeRow;
-    private final int skillTreeColumn;
 
-    public Skill(String name, int level, String description, int skillTreeRow, int skillTreeColumn) {
+    Skill(String name, int level, String description) {
         this.name = name;
         this.level = level;
         this.description = description;
-        this.skillTreeRow = skillTreeRow;
-        this.skillTreeColumn = skillTreeColumn;
     }
 
     public String getName() {
@@ -29,14 +25,6 @@ public class Skill {
 
     public String getDescription() {
         return description;
-    }
-
-    public int getSkillTreeRow() {
-        return skillTreeRow;
-    }
-
-    public int getSkillTreeColumn() {
-        return skillTreeColumn;
     }
 
     @ApiStatus.Internal

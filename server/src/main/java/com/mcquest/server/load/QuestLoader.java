@@ -10,8 +10,6 @@ public class QuestLoader {
     public static void loadQuests(QuestManager questManager) {
         List<String> questPaths = ResourceLoader.getResources("quests");
         for (String questPath : questPaths) {
-            Quest quest = ResourceLoader.deserializeJsonResource(questPath, Quest.class);
-            questManager.registerQuest(quest);
         }
     }
 }

@@ -15,14 +15,11 @@ public class ArmorItem extends Item {
     private final int level;
     private final double protections;
 
-    /**
-     * Constructs an ArmorItem with the given name, rarity, icon, description,
-     * player class, slot, level, and protections.
-     */
-    ArmorItem(@NotNull String name, @NotNull ItemRarity rarity, @NotNull Material icon,
-              @NotNull String description, @NotNull PlayerClass playerClass,
-              int level, @NotNull ArmorSlot slot, double protections) {
-        super(name, rarity, icon, description);
+    ArmorItem(int id, @NotNull String name, @NotNull ItemRarity rarity,
+              @NotNull Material icon, @NotNull String description,
+              @NotNull PlayerClass playerClass, int level,
+              @NotNull ArmorSlot slot, double protections) {
+        super(id, name, rarity, icon, description);
         this.playerClass = playerClass;
         this.slot = slot;
         this.level = level;

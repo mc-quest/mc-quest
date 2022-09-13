@@ -1,7 +1,7 @@
 package com.mcquest.server.playerclass;
 
-import com.mcquest.server.util.HashableItemStack;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -11,13 +11,13 @@ import java.util.Map;
  * The PlayerClassManager is used to register and retrieve PlayerClasses.
  */
 public class PlayerClassManager {
+    static final Tag<String> PLAYER_CLASS_TAG = Tag.String("id");
+
     private final Map<String, PlayerClass> playerClassesByName;
-    private final Map<HashableItemStack, Skill> skillsByItemStack;
 
     @ApiStatus.Internal
     public PlayerClassManager() {
         playerClassesByName = new HashMap<>();
-        skillsByItemStack = new HashMap<>();
     }
 
     public PlayerClassBuilder playerClassBuilder(String name) {
@@ -44,6 +44,12 @@ public class PlayerClassManager {
     }
 
     public Skill getSkill(ItemStack hotbarItemStack) {
-        return skillsByItemStack.get(hotbarItemStack);
+        if (!hotbarItemStack.hasTag(PLAYER_CLASS_TAG)) {
+            return null;
+        }
+        String playerClassName = hotbarItemStack.getTag(PLAYER_CLASS_TAG);
+        return null;
+//        PlayerClass playerClass = getPlayerClass(playerClassName);
+//        return skillsByItemStack.get(hotbarItemStack);
     }
 }

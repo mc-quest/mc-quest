@@ -73,8 +73,7 @@ public class PhysicsManager {
             }
         }
 
-        RaycastHitComparator comparator = new RaycastHitComparator(origin);
-        Collections.sort(hits, comparator);
+        Collections.sort(hits, new RaycastHitComparator(origin));
 
         return hits;
     }

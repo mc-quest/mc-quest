@@ -12,7 +12,7 @@ public class TextUtility {
     public static final int STANDARD_LINE_LENGTH = 18;
     private static final LegacyComponentSerializer TEXT_SERIALIZER =
             LegacyComponentSerializer.legacySection();
-    private static final char SECTION_SYMBOL = '\u00A7';
+    private static final char COLOR_SYMBOL = '\u00A7';
 
     public static TextComponent deserializeText(String text) {
         return TEXT_SERIALIZER.deserialize(text);
@@ -79,7 +79,7 @@ public class TextUtility {
         int counter = 0;
         for (int i = 0; i < token.length(); i++) {
             char ch = token.charAt(i);
-            if (ch == SECTION_SYMBOL) {
+            if (ch == COLOR_SYMBOL) {
                 // Skip next character.
                 i++;
             } else {
@@ -96,7 +96,7 @@ public class TextUtility {
         int length = 0;
         for (int i = 0; i < token.length(); i++) {
             char ch = token.charAt(i);
-            if (ch == SECTION_SYMBOL) {
+            if (ch == COLOR_SYMBOL) {
                 // Skip next character.
                 i++;
             } else {

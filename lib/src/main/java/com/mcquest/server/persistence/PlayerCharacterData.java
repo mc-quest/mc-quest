@@ -39,7 +39,7 @@ public class PlayerCharacterData {
         data.maxMana = 1;
         data.experiencePoints = 0;
         data.items = new PersistentItem[46];
-        data.items[4] = new PersistentItem(weapon.getName(), 1);
+        data.items[4] = new PersistentItem(weapon.getId(), 1);
         return data;
     }
 

@@ -84,9 +84,9 @@ public final class PlayerCharacter extends Character {
         for (int i = 0; i < persistentItems.length; i++) {
             PersistentItem persistentItem = persistentItems[i];
             if (persistentItem != null) {
-                String itemName = persistentItem.getName();
+                int itemId = persistentItem.getItemId();
                 int itemAmount = persistentItem.getAmount();
-                Item item = itemManager.getItem(itemName);
+                Item item = itemManager.getItem(itemId);
                 ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
                 inventory.setItemStack(i, itemStack);
             }

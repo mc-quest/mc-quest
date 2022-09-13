@@ -3,22 +3,26 @@ package com.mcquest.server.quest;
 import com.mcquest.server.character.PlayerCharacter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A Quest represents a series of objectives for a player to complete.
  */
 public final class Quest {
+    private final int id;
     private final String name;
     private final int level;
     private final QuestObjective[] objectives;
 
-    /**
-     * Constructs a Quest with the given name, level, and Objectives.
-     */
-    public Quest(String name, int level, QuestObjective[] objectives) {
+    Quest(int id, @NotNull String name, int level, @NotNull QuestObjective @NotNull [] objectives) {
+        this.id = id;
         this.name = name;
         this.level = level;
         this.objectives = objectives.clone();
+    }
+
+    public int getId() {
+        return id;
     }
 
     /**
@@ -47,38 +51,5 @@ public final class Quest {
      */
     public int getObjectiveCount() {
         return objectives.length;
-    }
-
-    /**
-     * Returns the status of this Quest for the given PlayerCharacter.
-     */
-    public QuestStatus getStatus(PlayerCharacter pc) {
-        PlayerCharacterQuestManager pcQuestManager = pc.getQuestManager();
-        return pcQuestManager.getQuestStatus(this);
-    }
-
-    /**
-     * Returns true if the PlayerCharacter's status in this Quest matches the
-     * given status, false otherwise.
-     */
-    public boolean compareStatus(PlayerCharacter pc, QuestStatus status) {
-        return getStatus(pc) == status;
-    }
-
-    /**
-     * Starts this quest for the given PlayerCharacter.
-     */
-    public void start(PlayerCharacter pc) {
-        PlayerCharacterQuestManager pcQuestManager = pc.getQuestManager();
-        pcQuestManager.startQuest(this);
-        pc.sendMessage(Component.text("Quest started: " + name, NamedTextColor.GOLD));
-    }
-
-    void init() {
-        for (int i = 0; i < objectives.length; i++) {
-            QuestObjective objective = objectives[i];
-            objective.index = i;
-            objective.quest = this;
-        }
     }
 }

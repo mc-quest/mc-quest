@@ -11,13 +11,9 @@ import org.jetbrains.annotations.NotNull;
 public class ConsumableItem extends Item {
     private final int level;
 
-    /**
-     * Constructs a ConsumableItem with the given name, rarity, icon,
-     * description, and level.
-     */
-    ConsumableItem(@NotNull String name, @NotNull ItemRarity rarity,
+    ConsumableItem(int id, @NotNull String name, @NotNull ItemRarity rarity,
                    @NotNull Material icon, @NotNull String description, int level) {
-        super(name, rarity, icon, description);
+        super(id, name, rarity, icon, description);
         this.level = level;
     }
 

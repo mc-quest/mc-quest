@@ -26,8 +26,9 @@ public class Main {
         PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter").build();
 
         ItemManager itemManager = mmorpg.getItemManager();
-        Weapon weapon = itemManager.createWeapon("Weapon", ItemRarity.COMMON,
-                Material.IRON_SWORD, "Description here test test test.", fighter, 1, 5);
+        Weapon weapon = itemManager.createWeapon(1, "Weapon", ItemRarity.COMMON,
+                Material.IRON_SWORD, "Description here §1test test test.",
+                fighter, 1, 5);
 
         InstanceManager instanceManager = mmorpg.getInstanceManager();
         InstanceContainer eladrador = instanceManager.createInstanceContainer("Eladrador");
@@ -35,8 +36,7 @@ public class Main {
 
         Pos position = new Pos(0, 70, 0);
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
-        pcManager.setDataProvider(player ->
-                PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
+        pcManager.setDataProvider(player -> PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
 
         FeatureManager featureManager = mmorpg.getFeatureManager();
         featureManager.addFeature(new TestFeature());

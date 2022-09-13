@@ -49,7 +49,7 @@ public class Dwarf extends NonPlayerCharacter {
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
-        entity.setInstance(getInstance(), getPosition());
+        entity.setInstance(getInstance(), getPosition()).join();
         MinecraftServer.getGlobalEventHandler().addListener(PlayerBlockInteractEvent.class, event -> {
             System.out.println(MODEL.animations().get("walk"));
             entity.animationController().queue(MODEL.animations().get("walk"));

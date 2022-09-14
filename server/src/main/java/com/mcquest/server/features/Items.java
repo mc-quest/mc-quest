@@ -15,9 +15,6 @@ public class Items implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         ItemManager itemManager = mmorpg.getItemManager();
-        adventurersBlade = (Weapon) itemManager.getItem("Adventurer's Blade");
-        adventurersCap = (ArmorItem) itemManager.getItem("Adventurer's Cap");
-        minorPotionOfHealing = (ConsumableItem) itemManager.getItem("Minor Potion of Healing");
     }
 
     public Weapon adventurersBlade() {

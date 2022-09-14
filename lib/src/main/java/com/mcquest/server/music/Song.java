@@ -1,29 +1,31 @@
 package com.mcquest.server.music;
 
+import java.time.Duration;
+
 public class Song {
     private final int id;
-    private final double duration;
-    private final Note[] notes;
+    private final Duration duration;
+    private final Tone[] tones;
 
-    Song(int id, double duration, Note[] notes) {
+    Song(int id, Duration duration, Tone[] tones) {
         this.id = id;
         this.duration = duration;
-        this.notes = notes;
+        this.tones = tones;
     }
 
     public int getId() {
         return id;
     }
 
-    public double getDuration() {
+    public Duration getDuration() {
         return duration;
     }
 
-    public int getNoteCount() {
-        return notes.length;
+    public int getToneCount() {
+        return tones.length;
     }
 
-    public Note getNote(int index) {
-        return notes[index];
+    public Tone getTone(int index) {
+        return tones[index];
     }
 }

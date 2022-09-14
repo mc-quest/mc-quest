@@ -3,10 +3,12 @@ package com.mcquest.server.persistence;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.Weapon;
+import com.mcquest.server.music.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.instance.Instance;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerCharacterData {
     private String playerClass;
@@ -19,6 +21,7 @@ public class PlayerCharacterData {
     private double maxMana;
     private double experiencePoints;
     private PersistentItem[] items;
+    private Integer songId;
 
     private PlayerCharacterData() {
     }
@@ -40,6 +43,7 @@ public class PlayerCharacterData {
         data.experiencePoints = 0;
         data.items = new PersistentItem[46];
         data.items[4] = new PersistentItem(weapon.getId(), 1);
+        data.songId = null;
         return data;
     }
 
@@ -51,6 +55,8 @@ public class PlayerCharacterData {
         data.mana = pc.getMana();
         data.maxMana = pc.getMaxMana();
         data.experiencePoints = pc.getExperiencePoints();
+        Song song = pc.getMusicPlayer().getSong();
+        data.songId = song == null ? null : song.getId();
         return data;
     }
 
@@ -92,5 +98,9 @@ public class PlayerCharacterData {
 
     public PersistentItem[] getItems() {
         return items;
+    }
+
+    public @Nullable Integer getSongId() {
+        return songId;
     }
 }

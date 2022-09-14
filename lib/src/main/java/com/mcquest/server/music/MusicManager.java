@@ -1,5 +1,6 @@
 package com.mcquest.server.music;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public class MusicManager {
         songsById.put(id, song);
     }
 
-    public SongBuilder songBuilder(int id, double duration) {
+    public SongBuilder songBuilder(int id, Duration duration) {
         return new SongBuilder(this, id, duration);
     }
 }

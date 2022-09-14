@@ -6,6 +6,7 @@ import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.feature.FeatureManager;
 import com.mcquest.server.item.ItemManager;
+import com.mcquest.server.music.MusicManager;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.quest.QuestManager;
@@ -27,6 +28,7 @@ public class Mmorpg {
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
     private final FeatureManager featureManager;
+    private final MusicManager musicManager;
 
     public Mmorpg() {
         isStarted = false;
@@ -39,6 +41,7 @@ public class Mmorpg {
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
+        musicManager = new MusicManager();
         featureManager = new FeatureManager();
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
@@ -86,6 +89,10 @@ public class Mmorpg {
 
     public PhysicsManager getPhysicsManager() {
         return physicsManager;
+    }
+
+    public MusicManager getMusicManager() {
+        return musicManager;
     }
 
     public FeatureManager getFeatureManager() {

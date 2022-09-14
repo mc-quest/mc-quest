@@ -5,13 +5,13 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
 
-public class Note {
+public class Tone {
     private final Duration time;
     private final Sound sound;
 
-    Note(Duration time, SoundEvent timbre, float volume, float pitch) {
+    Tone(Duration time, SoundEvent timbre, float volume, float pitch) {
         this.time = time;
-        this.sound = Sound.sound(timbre, Sound.Source.MUSIC, volume, pitch);
+        this.sound = Sound.sound(timbre, Sound.Source.MASTER, volume, pitch);
     }
 
     public Duration getTime() {

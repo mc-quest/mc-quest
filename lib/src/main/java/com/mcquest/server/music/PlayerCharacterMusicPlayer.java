@@ -9,15 +9,15 @@ import org.jetbrains.annotations.Nullable;
 public class PlayerCharacterMusicPlayer {
     private final PlayerCharacter pc;
     private Song song;
-    private Task[] playNoteTasks;
+    private Task[] playToneTasks;
 
     public PlayerCharacterMusicPlayer(PlayerCharacter pc) {
         this.pc = pc;
-        this.song = null; // TODO
-        this.playNoteTasks = null;
+        this.song = null;
+        this.playToneTasks = null;
     }
 
-    public Song getSong() {
+    public @Nullable Song getSong() {
         return song;
     }
 
@@ -35,35 +35,38 @@ public class PlayerCharacterMusicPlayer {
     }
 
     private void stopSong() {
-        for (Task playNoteTask : playNoteTasks) {
-            playNoteTask.cancel();
+        for (Task playToneTask : playToneTasks) {
+            playToneTask.cancel();
         }
+        playToneTasks = null;
     }
 
     private void playSong() {
-        playNoteTasks = new Task[song.getNoteCount()];
+        int toneCount = song.getToneCount();
+        playToneTasks = new Task[toneCount];
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
-        for (int i = 0; i < song.getNoteCount(); i++) {
-            Note note = song.getNote(i);
-            playNoteTasks[i] = schedulerManager
-                    .buildTask(new PlayNoteTask(pc, note))
-                    .delay(note.getTime())
+        for (int i = 0; i < toneCount; i++) {
+            Tone tone = song.getTone(i);
+            playToneTasks[i] = schedulerManager
+                    .buildTask(new PlayToneTask(pc, tone))
+                    .delay(tone.getTime())
                     .schedule();
         }
+        schedulerManager.buildTask(this::playSong).delay(song.getDuration()).schedule();
     }
 
-    private static class PlayNoteTask implements Runnable {
+    private static class PlayToneTask implements Runnable {
         private final PlayerCharacter pc;
-        private final Note note;
+        private final Tone tone;
 
-        private PlayNoteTask(PlayerCharacter pc, Note note) {
+        private PlayToneTask(PlayerCharacter pc, Tone tone) {
             this.pc = pc;
-            this.note = note;
+            this.tone = tone;
         }
 
         @Override
         public void run() {
-            pc.playSound(note.getSound());
+            pc.playSound(tone.getSound());
         }
     }
 }

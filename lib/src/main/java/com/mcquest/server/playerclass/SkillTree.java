@@ -14,12 +14,7 @@ public class SkillTree {
     }
 
     private Skill skillAt(int row, int column) {
-        for (int i = 0; i < playerClass.getSkillCount(); i++) {
-            Skill skill = playerClass.getSkill(i);
-            if (skill.getSkillTreeRow() == row && skill.getSkillTreeColumn() == column) {
-                return skill;
-            }
-        }
+        // TODO
         return null;
     }
 }

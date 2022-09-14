@@ -5,8 +5,9 @@ import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.event.PlayerCharacterReceiveItemEvent;
 import com.mcquest.server.event.PlayerCharacterRemoveItemEvent;
 import com.mcquest.server.item.*;
+import com.mcquest.server.music.MusicManager;
+import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
-import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.PlayerCharacterQuestManager;
 import com.mcquest.server.music.PlayerCharacterMusicPlayer;
@@ -37,14 +38,13 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.*;
 
 public final class PlayerCharacter extends Character {
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
     private final PlayerCharacterQuestManager questManager;
-    private final PlayerCharacterMusicPlayer musicManager;
+    private final PlayerCharacterMusicPlayer musicPlayer;
     private final Hitbox hitbox;
     private Pos respawnPosition;
     private double mana;
@@ -67,7 +67,13 @@ public final class PlayerCharacter extends Character {
         // hidePlayerNameplate();
         playerClass = null;
         questManager = new PlayerCharacterQuestManager();
-        musicManager = new PlayerCharacterMusicPlayer(this);
+        MusicManager musicManager = mmorpg.getMusicManager();
+        musicPlayer = new PlayerCharacterMusicPlayer(this);
+        Integer songId = data.getSongId();
+        if (songId != null) {
+            Song song = musicManager.getSong(songId);
+            musicPlayer.setSong(song);
+        }
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         this.maxMana = data.getMaxMana();
@@ -128,8 +134,8 @@ public final class PlayerCharacter extends Character {
         return playerClass;
     }
 
-    public PlayerCharacterMusicPlayer getMusicManager() {
-        return musicManager;
+    public PlayerCharacterMusicPlayer getMusicPlayer() {
+        return musicPlayer;
     }
 
     public double getMana() {

@@ -9,22 +9,23 @@ import java.util.List;
 public class SongBuilder {
     private final MusicManager musicManager;
     private final int id;
-    private final double duration;
-    private final List<Note> notes;
+    private final Duration duration;
+    private final List<Tone> tones;
 
-    SongBuilder(MusicManager musicManager, int id, double duration) {
+    SongBuilder(MusicManager musicManager, int id, Duration duration) {
         this.musicManager = musicManager;
         this.id = id;
         this.duration = duration;
-        this.notes = new ArrayList<>();
+        this.tones = new ArrayList<>();
     }
 
-    public void note(Duration time, SoundEvent timbre, float volume, float pitch) {
-        notes.add(new Note(time, timbre, volume, pitch));
+    public SongBuilder tone(Duration time, SoundEvent timbre, float volume, float pitch) {
+        tones.add(new Tone(time, timbre, volume, pitch));
+        return this;
     }
 
     public Song build() {
-        Song song = new Song(id, duration, notes.toArray(new Note[0]));
+        Song song = new Song(id, duration, tones.toArray(new Tone[0]));
         musicManager.register(song);
         return song;
     }

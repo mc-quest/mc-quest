@@ -6,15 +6,17 @@ import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+
 public class PlayerCharacterMusicPlayer {
     private final PlayerCharacter pc;
     private Song song;
-    private Task[] playToneTasks;
+    private Task[] playTasks;
 
     public PlayerCharacterMusicPlayer(PlayerCharacter pc) {
         this.pc = pc;
         this.song = null;
-        this.playToneTasks = null;
+        this.playTasks = null;
     }
 
     public @Nullable Song getSong() {
@@ -35,38 +37,47 @@ public class PlayerCharacterMusicPlayer {
     }
 
     private void stopSong() {
-        for (Task playToneTask : playToneTasks) {
-            playToneTask.cancel();
+        for (Task playTask : playTasks) {
+            playTask.cancel();
         }
-        playToneTasks = null;
+        playTasks = null;
     }
 
     private void playSong() {
-        int toneCount = song.getToneCount();
-        playToneTasks = new Task[toneCount];
+        int noteCount = song.getNoteCount();
+        double bpm = song.getBeatsPerMinute();
+        playTasks = new Task[noteCount + 1];
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
-        for (int i = 0; i < toneCount; i++) {
-            Tone tone = song.getTone(i);
-            playToneTasks[i] = schedulerManager
-                    .buildTask(new PlayToneTask(pc, tone))
-                    .delay(tone.getTime())
+        for (int i = 0; i < noteCount; i++) {
+            Note note = song.getNote(i);
+            playTasks[i] = schedulerManager
+                    .buildTask(new PlayNoteTask(pc, note))
+                    .delay(beatsToDuration(note.getTime(), bpm))
                     .schedule();
         }
-        schedulerManager.buildTask(this::playSong).delay(song.getDuration()).schedule();
+        playTasks[noteCount] = schedulerManager
+                .buildTask(this::playSong)
+                .delay(beatsToDuration(song.getDuration(), bpm))
+                .schedule();
     }
 
-    private static class PlayToneTask implements Runnable {
-        private final PlayerCharacter pc;
-        private final Tone tone;
+    private static Duration beatsToDuration(double beats, double beatsPerMinute) {
+        long millis = (long) (beats / beatsPerMinute * 60.0 * 1000.0);
+        return Duration.ofMillis(millis);
+    }
 
-        private PlayToneTask(PlayerCharacter pc, Tone tone) {
+    private static class PlayNoteTask implements Runnable {
+        private final PlayerCharacter pc;
+        private final Note note;
+
+        private PlayNoteTask(PlayerCharacter pc, Note note) {
             this.pc = pc;
-            this.tone = tone;
+            this.note = note;
         }
 
         @Override
         public void run() {
-            pc.playSound(tone.getSound());
+            pc.playSound(note.getSound());
         }
     }
 }

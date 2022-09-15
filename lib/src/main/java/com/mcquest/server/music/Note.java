@@ -3,18 +3,16 @@ package com.mcquest.server.music;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.sound.SoundEvent;
 
-import java.time.Duration;
-
-public class Tone {
-    private final Duration time;
+public class Note {
+    private final double time;
     private final Sound sound;
 
-    Tone(Duration time, SoundEvent timbre, float volume, float pitch) {
+    Note(double time, SoundEvent instrument, float volume, Pitch pitch) {
         this.time = time;
-        this.sound = Sound.sound(timbre, Sound.Source.MASTER, volume, pitch);
+        this.sound = Sound.sound(instrument, Sound.Source.MASTER, volume, pitch.getValue());
     }
 
-    public Duration getTime() {
+    public double getTime() {
         return time;
     }
 

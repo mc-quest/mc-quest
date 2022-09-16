@@ -11,7 +11,8 @@ public class WeaponBuilder extends ItemBuilder {
     final double damage;
     final List<PlayerClass> playerClasses;
 
-    WeaponBuilder(ItemManager itemManager, int id, String name, ItemRarity rarity, Material icon, int level, double damage) {
+    WeaponBuilder(ItemManager itemManager, int id, String name, ItemRarity rarity,
+                  Material icon, int level, double damage) {
         super(itemManager, id, name, rarity, icon);
         this.level = level;
         this.damage = damage;

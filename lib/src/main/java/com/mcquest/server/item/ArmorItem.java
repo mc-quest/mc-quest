@@ -10,47 +10,45 @@ import org.jetbrains.annotations.NotNull;
  * protection.
  */
 public class ArmorItem extends Item {
-    private final PlayerClass playerClass;
-    private final ArmorSlot slot;
+    private final PlayerClass[] playerClasses;
     private final int level;
+    private final ArmorSlot slot;
     private final double protections;
 
-    ArmorItem(int id, @NotNull String name, @NotNull ItemRarity rarity,
-              @NotNull Material icon, @NotNull String description,
-              @NotNull PlayerClass playerClass, int level,
-              @NotNull ArmorSlot slot, double protections) {
-        super(id, name, rarity, icon, description);
-        this.playerClass = playerClass;
-        this.slot = slot;
-        this.level = level;
-        this.protections = protections;
+    ArmorItem(ArmorItemBuilder builder) {
+        super(builder);
+        this.playerClasses = builder.playerClasses.toArray(new PlayerClass[0]);
+        this.slot = builder.slot;
+        this.level = builder.level;
+        this.protections = builder.protections;
     }
 
-    /**
-     * Returns the PlayerClass that can equip this ArmorItem.
-     */
-    public final PlayerClass getPlayerClass() {
-        return playerClass;
+    public int getPlayerClassCount() {
+        return playerClasses.length;
+    }
+
+    public PlayerClass getPlayerClass(int index) {
+        return playerClasses[index];
     }
 
     /**
      * Returns the slot this ArmorItem occupies.
      */
-    public final ArmorSlot getSlot() {
+    public ArmorSlot getSlot() {
         return slot;
     }
 
     /**
      * Returns the minimum level required to equip this ArmorItem.
      */
-    public final int getLevel() {
+    public int getLevel() {
         return level;
     }
 
     /**
      * Returns how many protections this ArmorItem provides.
      */
-    public final double getProtections() {
+    public double getProtections() {
         return protections;
     }
 
@@ -66,7 +64,7 @@ public class ArmorItem extends Item {
         lore.append(rarity.getText());
         lore.append(" Item\n");
         // lore.append(ChatColor.GOLD);
-        lore.append(playerClass);
+        // lore.append(playerClass);
         lore.append(" Armor\n");
         lore.append(slot.getText());
         lore.append("\nLevel ");

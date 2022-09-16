@@ -1,6 +1,5 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -12,7 +11,6 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -45,39 +43,39 @@ public class Item {
     /**
      * Returns the name of this Item.
      */
-    public final String getName() {
+    public String getName() {
         return name;
     }
 
     /**
      * Returns the rarity of this Item.
      */
-    public final ItemRarity getRarity() {
+    public ItemRarity getRarity() {
         return rarity;
     }
 
     /**
      * Returns the icon of this Item.
      */
-    public final Material getIcon() {
+    public Material getIcon() {
         return icon;
     }
 
     /**
      * Returns the description of this Item.
      */
-    public final String getDescription() {
+    public String getDescription() {
         return description;
     }
 
     /**
      * Returns the ItemStack of this Item.
      */
-    public final ItemStack getItemStack() {
+    public ItemStack getItemStack() {
         return itemStack;
     }
 
-    public final Component getDisplayName() {
+    public Component getDisplayName() {
         return Component.text(name, rarity.getColor())
                 .decoration(TextDecoration.ITALIC, false);
     }

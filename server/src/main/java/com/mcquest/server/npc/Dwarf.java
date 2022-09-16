@@ -1,8 +1,11 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.server.Mmorpg;
+import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterEntityManager;
+import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacter;
+import com.mcquest.server.physics.Collider;
 import com.mcquest.server.util.ResourceLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -34,12 +37,13 @@ public class Dwarf extends NonPlayerCharacter {
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
+    private final Collider hitbox;
     private Entity entity;
 
     static {
         ModelReader reader = BBModelReader.blockbench();
         try {
-            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/redstone_monstrosity.bbmodel"));
+            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/TestObject.bbmodel"));
             Collection<Model> models = List.of(MODEL);
             File file = new File("resource-pack.zip");
             file.createNewFile();
@@ -58,6 +62,7 @@ public class Dwarf extends NonPlayerCharacter {
         super(DISPLAY_NAME, 25, instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
+        this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
     }
 
     @Override
@@ -67,6 +72,7 @@ public class Dwarf extends NonPlayerCharacter {
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition()).join();
+        mmorpg.getPhysicsManager().addCollider(hitbox);
     }
 
     @Override
@@ -76,6 +82,18 @@ public class Dwarf extends NonPlayerCharacter {
         characterEntityManager.unbind(entity);
         entity.remove();
         setPosition(spawnPosition);
+        mmorpg.getPhysicsManager().removeCollider(hitbox);
+    }
+
+    @Override
+    public void setPosition(Pos position) {
+        super.setPosition(position);
+        hitbox.setCenter(position.add(0.0, getHeight() / 2.0, 0.0));
+    }
+
+    @Override
+    public boolean isFriendly(Character character) {
+        return false;
     }
 
     public static class Entity extends ModelEntity {
@@ -112,7 +130,7 @@ public class Dwarf extends NonPlayerCharacter {
                 return;
             }
             this.animation = animation;
-            playAnimation(animation);
+            // playAnimation(animation);
         }
     }
 }

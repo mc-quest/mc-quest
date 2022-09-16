@@ -41,29 +41,26 @@ public class ItemManager {
         return itemsById.get(id);
     }
 
-    public Item createItem(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                           @NotNull Material icon, @NotNull String description) {
-        Item item = new Item(id, name, rarity, icon, description);
-        registerItem(item);
-        return item;
+    public ItemBuilder itemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
+                                   @NotNull Material icon) {
+        return new ItemBuilder(this, id, name, rarity, icon);
     }
 
-    public Weapon createWeapon(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                               @NotNull Material icon, @NotNull String description,
-                               @NotNull PlayerClass playerClass, int level, double damage) {
-        Weapon weapon = new Weapon(id, name, rarity, icon, description, playerClass, level, damage);
-        registerItem(weapon);
-        return weapon;
+    public WeaponBuilder weaponBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
+                                       @NotNull Material icon, int level, double damage) {
+        return new WeaponBuilder(this, id, name, rarity, icon, level, damage);
     }
 
-    public ArmorItem createArmorItem(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                     @NotNull Material icon, @NotNull String description,
-                                     @NotNull PlayerClass playerClass, int level,
-                                     @NotNull ArmorSlot slot, double protections) {
-        ArmorItem armorItem = new ArmorItem(id, name, rarity, icon, description, playerClass,
-                level, slot, protections);
-        registerItem(armorItem);
-        return armorItem;
+    public ArmorItemBuilder armorItemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
+                                             @NotNull Material icon, int level,
+                                             @NotNull ArmorSlot slot, double protections) {
+        return new ArmorItemBuilder(this, id, name, rarity, icon, level, slot, protections);
+    }
+
+    public ConsumableItemBuilder consumableItemBuilder(int id, @NotNull String name,
+                                                       @NotNull ItemRarity rarity,
+                                                       @NotNull Material icon, int level) {
+        return new ConsumableItemBuilder(this, id, name, rarity, icon, level);
     }
 
     void registerItem(@NotNull Item item) {

@@ -1,14 +1,9 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
@@ -37,14 +32,14 @@ public class Weapon extends Item {
     /**
      * Returns the minimum level required to equip this Weapon.
      */
-    public final int getLevel() {
+    public int getLevel() {
         return level;
     }
 
     /**
      * Returns how much damage this Weapon inflicts.
      */
-    public final double getDamage() {
+    public double getDamage() {
         return damage;
     }
 

@@ -28,9 +28,8 @@ public class Main {
         PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter").build();
 
         ItemManager itemManager = mmorpg.getItemManager();
-        Weapon weapon = itemManager.createWeapon(1, "Weapon", ItemRarity.COMMON,
-                Material.IRON_SWORD, "Description here §1test test test.",
-                fighter, 1, 5);
+        Weapon weapon = itemManager.weaponBuilder(1, "Weapon", ItemRarity.COMMON,
+                Material.IRON_SWORD, 1, 5).playerClass(fighter).build();
 
         InstanceManager instanceManager = mmorpg.getInstanceManager();
         InstanceContainer eladrador = instanceManager.createInstanceContainer("Eladrador");

@@ -6,19 +6,27 @@ import com.mcquest.server.character.NonPlayerCharacter;
 import com.mcquest.server.util.ResourceLoader;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
-import net.minestom.server.event.player.PlayerBlockInteractEvent;
+import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.instance.Instance;
+import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.metadata.Metadata;
+import team.unnamed.creative.metadata.PackMeta;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 import team.unnamed.hephaestus.reader.ModelReader;
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
+import team.unnamed.hephaestus.writer.ModelWriter;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.zip.ZipOutputStream;
 
 public class Dwarf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
@@ -31,7 +39,16 @@ public class Dwarf extends NonPlayerCharacter {
     static {
         ModelReader reader = BBModelReader.blockbench();
         try {
-            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/dwarf.bbmodel"));
+            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/redstone_monstrosity.bbmodel"));
+            Collection<Model> models = List.of(MODEL);
+            File file = new File("resource-pack.zip");
+            file.createNewFile();
+            try (FileTree tree = FileTree.zip(new ZipOutputStream(new FileOutputStream(file)))) {
+                tree.write(Metadata.builder()
+                        .add(PackMeta.of(9, "Description!"))
+                        .build());
+                ModelWriter.resource("mynamespace").write(tree, models);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -50,10 +67,6 @@ public class Dwarf extends NonPlayerCharacter {
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition()).join();
-        MinecraftServer.getGlobalEventHandler().addListener(PlayerBlockInteractEvent.class, event -> {
-            System.out.println(MODEL.animations().get("walk"));
-            entity.animationController().queue(MODEL.animations().get("walk"));
-        });
     }
 
     @Override
@@ -70,17 +83,36 @@ public class Dwarf extends NonPlayerCharacter {
 
         public Entity(Dwarf dwarf) {
             super(EntityType.ARMOR_STAND, MODEL);
+            ArmorStandMeta meta = (ArmorStandMeta) getEntityMeta();
+            meta.setSmall(true);
+            meta.setMarker(false);
             this.dwarf = dwarf;
+            setNoGravity(false);
             addAIGroup(new EntityAIGroupBuilder()
-                    .addGoalSelector(new RandomStrollGoal(this, 5))
+                    .addGoalSelector(new RandomStrollGoal(this, 20))
                     .build());
         }
 
         @Override
         public void tick(long time) {
             super.tick(time);
-            dwarf.setPosition(getPosition());
             this.tickAnimations();
+            if (dwarf.getPosition().equals(position)) {
+                setAnimation("idle");
+            } else {
+                setAnimation("walk");
+            }
+            dwarf.setPosition(getPosition());
+        }
+
+        private String animation = "idle";
+
+        private void setAnimation(String animation) {
+            if (this.animation.equals(animation)) {
+                return;
+            }
+            this.animation = animation;
+            playAnimation(animation);
         }
     }
 }

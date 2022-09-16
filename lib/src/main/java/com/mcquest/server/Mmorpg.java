@@ -11,6 +11,7 @@ import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.instance.InstanceManager;
+import com.mcquest.server.resource.ResourceManager;
 import com.mcquest.server.ui.InteractionHandler;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
@@ -27,8 +28,9 @@ public class Mmorpg {
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
-    private final FeatureManager featureManager;
     private final MusicManager musicManager;
+    private final ResourceManager resourceManager;
+    private final FeatureManager featureManager;
 
     public Mmorpg() {
         isStarted = false;
@@ -42,6 +44,7 @@ public class Mmorpg {
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         musicManager = new MusicManager();
+        this.resourceManager = new ResourceManager();
         featureManager = new FeatureManager();
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
@@ -93,6 +96,10 @@ public class Mmorpg {
 
     public MusicManager getMusicManager() {
         return musicManager;
+    }
+
+    public ResourceManager getResourceManager() {
+        return resourceManager;
     }
 
     public FeatureManager getFeatureManager() {

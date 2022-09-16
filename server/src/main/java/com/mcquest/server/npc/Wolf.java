@@ -7,6 +7,7 @@ import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.DamageSource;
 import com.mcquest.server.character.NonPlayerCharacter;
 import com.mcquest.server.physics.PhysicsManager;
+import com.mcquest.server.util.Debug;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -48,6 +49,7 @@ public class Wolf extends NonPlayerCharacter {
         this.spawnPosition = spawnPosition;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.75, 0.75, 0.75);
         setHeight(0.75);
+        Debug.showCollider(hitbox);
     }
 
     @Override
@@ -114,7 +116,7 @@ public class Wolf extends NonPlayerCharacter {
                 getInstance().playSound(ATTACK_SOUND, position);
                 CharacterEntityManager characterEntityManager = wolf.mmorpg.getCharacterEntityManager();
                 Character target = characterEntityManager.getCharacter(event.getTarget());
-                target.damage(wolf, 5.0);
+                target.damage(wolf, 0.1);
             });
         }
 

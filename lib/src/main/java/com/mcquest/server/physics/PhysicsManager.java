@@ -39,10 +39,10 @@ public class PhysicsManager {
         if (!direction.isNormalized()) {
             direction = direction.normalize();
         }
+
         Pos end = origin.add(direction.mul(maxDistance));
         Pos min = MathUtility.min(origin, end);
         Pos max = MathUtility.max(origin, end);
-        List<Collider> nearbyColliders = new ArrayList<>();
 
         int bucketMinX = (int) (min.x() / COLLIDER_BUCKET_SIZE);
         int bucketMinY = (int) (min.y() / COLLIDER_BUCKET_SIZE);
@@ -51,6 +51,8 @@ public class PhysicsManager {
         int bucketMaxX = (int) (max.x() / COLLIDER_BUCKET_SIZE);
         int bucketMaxY = (int) (max.y() / COLLIDER_BUCKET_SIZE);
         int bucketMaxZ = (int) (max.z() / COLLIDER_BUCKET_SIZE);
+
+        Set<Collider> nearbyColliders = new HashSet<>();
 
         for (int x = bucketMinX; x <= bucketMaxX; x++) {
             for (int y = bucketMinY; y <= bucketMaxY; y++) {
@@ -79,8 +81,94 @@ public class PhysicsManager {
     }
 
     private Pos rayColliderIntersection(Pos origin, Vec direction, double maxDistance, Collider collider) {
-        // TODO
-        return null;
+        double originX = origin.x();
+        double originY = origin.y();
+        double originZ = origin.z();
+
+        double directionX = direction.x();
+        double directionY = direction.y();
+        double directionZ = direction.z();
+
+        double divX = 1.0 / directionX;
+        double divY = 1.0 / directionY;
+        double divZ = 1.0 / directionZ;
+
+        double colliderMinX = collider.getMinX();
+        double colliderMinY = collider.getMinY();
+        double colliderMinZ = collider.getMinZ();
+        double colliderMaxX = collider.getMaxX();
+        double colliderMaxY = collider.getMaxY();
+        double colliderMaxZ = collider.getMaxZ();
+
+        double tMin;
+        double tMax;
+
+        // Intersections with x planes:
+        if (directionX >= 0.0) {
+            tMin = (colliderMinX - originX) * divX;
+            tMax = (colliderMaxX - originX) * divX;
+        } else {
+            tMin = (colliderMaxX - originX) * divX;
+            tMax = (colliderMinX - originX) * divX;
+        }
+
+        // Intersections with y planes:
+        double tyMin;
+        double tyMax;
+        if (directionY >= 0.0) {
+            tyMin = (colliderMinY - originY) * divY;
+            tyMax = (colliderMaxY - originY) * divY;
+        } else {
+            tyMin = (colliderMaxY - originY) * divY;
+            tyMax = (colliderMinY - originY) * divY;
+        }
+        if ((tMin > tyMax) || (tMax < tyMin)) {
+            return null;
+        }
+        if (tyMin > tMin) {
+            tMin = tyMin;
+        }
+        if (tyMax < tMax) {
+            tMax = tyMax;
+        }
+
+        // Intersections with z planes:
+        double tzMin;
+        double tzMax;
+        if (directionZ >= 0.0) {
+            tzMin = (colliderMinZ - originZ) * divZ;
+            tzMax = (colliderMaxZ - originZ) * divZ;
+        } else {
+            tzMin = (colliderMaxZ - originZ) * divZ;
+            tzMax = (colliderMinZ - originZ) * divZ;
+        }
+        if ((tMin > tzMax) || (tMax < tzMin)) {
+            return null;
+        }
+        if (tzMin > tMin) {
+            tMin = tzMin;
+        }
+        if (tzMax < tMax) {
+            tMax = tzMax;
+        }
+
+        // Intersections are behind the origin:
+        if (tMax < 0.0) return null;
+
+        // Intersections are too far away:
+        if (tMin > maxDistance) {
+            return null;
+        }
+
+        // Find the closest intersection:
+        double t;
+        if (tMin < 0.0) {
+            t = tMax;
+        } else {
+            t = tMin;
+        }
+
+        return origin.add(direction.mul(t));
     }
 
     private static final class RaycastHitComparator implements Comparator<RaycastHit> {

@@ -6,33 +6,32 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
  * enemies.
  */
 public class Weapon extends Item {
-    private final PlayerClass playerClass;
+    private final PlayerClass[] playerClasses;
     private final int level;
     private final double damage;
 
-    /**
-     * Constructs a Weapon with the given name, rarity, icon, description,
-     * player class, level, and damage.
-     */
-    Weapon(int id, @NotNull String name, @NotNull ItemRarity rarity,
-           @NotNull Material icon, @NotNull String description,
-           @NotNull PlayerClass playerClass, int level, double damage) {
-        super(id, name, rarity, icon, description);
-        this.playerClass = playerClass;
-        this.level = level;
-        this.damage = damage;
+    Weapon(WeaponBuilder builder) {
+        super(builder);
+        this.playerClasses = builder.playerClasses.toArray(new PlayerClass[0]);
+        this.level = builder.level;
+        this.damage = builder.damage;
     }
 
-    /**
-     * Returns the PlayerClass that can equip this Weapon.
-     */
-    public final PlayerClass getPlayerClass() {
-        return playerClass;
+    public int getPlayerClassCount() {
+        return playerClasses.length;
+    }
+
+    public PlayerClass getPlayerClass(int index) {
+        return playerClasses[index];
     }
 
     /**
@@ -61,7 +60,7 @@ public class Weapon extends Item {
         lore.append(rarity.getText());
         lore.append(" Item\n");
         // lore.append(ChatColor.GOLD);
-        lore.append(playerClass);
+        // lore.append(playerClass);
         lore.append(" Weapon\nLevel ");
         lore.append(level);
         lore.append('\n');

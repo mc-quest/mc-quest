@@ -1,5 +1,6 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -28,13 +29,12 @@ public class Item {
     private final String description;
     private final ItemStack itemStack;
 
-    Item(int id, @NotNull String name, @NotNull ItemRarity rarity,
-         @NotNull Material icon, @NotNull String description) {
-        this.id = id;
-        this.name = name;
-        this.rarity = rarity;
-        this.icon = icon;
-        this.description = description;
+    Item(ItemBuilder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.rarity = builder.rarity;
+        this.icon = builder.icon;
+        this.description = builder.description;
         this.itemStack = createItemStack().withTag(ItemManager.ID_TAG, id);
     }
 

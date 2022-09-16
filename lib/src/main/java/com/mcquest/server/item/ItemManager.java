@@ -66,7 +66,7 @@ public class ItemManager {
         return armorItem;
     }
 
-    private void registerItem(@NotNull Item item) {
+    void registerItem(@NotNull Item item) {
         int id = item.getId();
         if (itemsById.containsKey(id)) {
             throw new IllegalArgumentException("ID of " + item.getName() + " is already in use");

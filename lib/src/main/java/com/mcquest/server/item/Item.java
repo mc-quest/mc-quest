@@ -24,7 +24,7 @@ public class Item {
     private final int id;
     private final String name;
     private final ItemRarity rarity;
-    private final String icon;
+    private final Material icon;
     private final String description;
     private final ItemStack itemStack;
 
@@ -33,7 +33,7 @@ public class Item {
         this.id = id;
         this.name = name;
         this.rarity = rarity;
-        this.icon = icon.namespace().asString();
+        this.icon = icon;
         this.description = description;
         this.itemStack = createItemStack().withTag(ItemManager.ID_TAG, id);
     }
@@ -60,7 +60,7 @@ public class Item {
      * Returns the icon of this Item.
      */
     public final Material getIcon() {
-        return Material.fromNamespaceId(icon);
+        return icon;
     }
 
     /**

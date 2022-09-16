@@ -1,5 +1,6 @@
 package com.mcquest.server.physics;
 
+import com.mcquest.server.util.Debug;
 import com.mcquest.server.util.MathUtility;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -44,13 +45,13 @@ public class PhysicsManager {
         Pos min = MathUtility.min(origin, end);
         Pos max = MathUtility.max(origin, end);
 
-        int bucketMinX = (int) (min.x() / COLLIDER_BUCKET_SIZE);
-        int bucketMinY = (int) (min.y() / COLLIDER_BUCKET_SIZE);
-        int bucketMinZ = (int) (min.z() / COLLIDER_BUCKET_SIZE);
+        int bucketMinX = (int) Math.floor(min.x() / COLLIDER_BUCKET_SIZE);
+        int bucketMinY = (int) Math.floor(min.y() / COLLIDER_BUCKET_SIZE);
+        int bucketMinZ = (int) Math.floor(min.z() / COLLIDER_BUCKET_SIZE);
 
-        int bucketMaxX = (int) (max.x() / COLLIDER_BUCKET_SIZE);
-        int bucketMaxY = (int) (max.y() / COLLIDER_BUCKET_SIZE);
-        int bucketMaxZ = (int) (max.z() / COLLIDER_BUCKET_SIZE);
+        int bucketMaxX = (int) Math.floor(max.x() / COLLIDER_BUCKET_SIZE);
+        int bucketMaxY = (int) Math.floor(max.y() / COLLIDER_BUCKET_SIZE);
+        int bucketMaxZ = (int) Math.floor(max.z() / COLLIDER_BUCKET_SIZE);
 
         Set<Collider> nearbyColliders = new HashSet<>();
 

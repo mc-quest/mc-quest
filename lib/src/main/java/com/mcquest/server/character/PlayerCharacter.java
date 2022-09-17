@@ -123,7 +123,19 @@ public final class PlayerCharacter extends Character {
     }
 
     public Vec getLookDirection() {
-        return player.getPosition().direction();
+        return getPosition().direction();
+    }
+
+    public Pos getEyePosition() {
+        Pos position = getPosition();
+        return position.withY(position.y() + 1.6);
+    }
+
+    public Pos getHandPosition() {
+        Pos position = getPosition();
+        Vec lookDirection = position.direction();
+        return position.withY(position.y() + 1.0)
+                .add(lookDirection.rotateAroundY(-Math.PI / 4.0).mul(0.5));
     }
 
     public Player getPlayer() {

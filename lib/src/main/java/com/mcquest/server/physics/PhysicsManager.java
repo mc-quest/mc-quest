@@ -8,6 +8,7 @@ import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class PhysicsManager {
     /**
@@ -36,7 +37,8 @@ public class PhysicsManager {
         collider.disable();
     }
 
-    public List<RaycastHit> raycast(Instance instance, Pos origin, Vec direction, double maxDistance) {
+    public List<RaycastHit> raycastAll(Instance instance, Pos origin, Vec direction,
+                                       double maxDistance, Predicate<Collider> filter) {
         if (!direction.isNormalized()) {
             direction = direction.normalize();
         }
@@ -61,7 +63,11 @@ public class PhysicsManager {
                     ColliderBucketAddress bucketAddress = new ColliderBucketAddress(instance, x, y, z);
                     Set<Collider> bucket = colliderBuckets.get(bucketAddress);
                     if (bucket != null) {
-                        nearbyColliders.addAll(bucket);
+                        for (Collider collider : bucket) {
+                            if (filter.test(collider)) {
+                                nearbyColliders.add(collider);
+                            }
+                        }
                     }
                 }
             }
@@ -76,9 +82,26 @@ public class PhysicsManager {
             }
         }
 
-        Collections.sort(hits, new RaycastHitComparator(origin));
-
         return hits;
+    }
+
+    public RaycastHit raycast(Instance instance, Pos origin, Vec direction,
+                              double maxDistance, Predicate<Collider> filter) {
+        List<RaycastHit> hits = raycastAll(instance, origin, direction, maxDistance, filter);
+        if (hits.isEmpty()) {
+            return null;
+        }
+        RaycastHit closestHit = hits.get(0);
+        double minDistanceSquared = closestHit.getPosition().distanceSquared(origin);
+        for (int i = 1; i < hits.size(); i++) {
+            RaycastHit currentHit = hits.get(i);
+            double currentDistanceSquared = currentHit.getPosition().distanceSquared(origin);
+            if (currentDistanceSquared < minDistanceSquared) {
+                closestHit = currentHit;
+                minDistanceSquared = currentDistanceSquared;
+            }
+        }
+        return closestHit;
     }
 
     private Pos rayColliderIntersection(Pos origin, Vec direction, double maxDistance, Collider collider) {
@@ -170,19 +193,5 @@ public class PhysicsManager {
         }
 
         return origin.add(direction.mul(t));
-    }
-
-    private static final class RaycastHitComparator implements Comparator<RaycastHit> {
-        private final Pos origin;
-
-        private RaycastHitComparator(Pos origin) {
-            this.origin = origin;
-        }
-
-        @Override
-        public int compare(RaycastHit hit1, RaycastHit hit2) {
-            return Double.compare(hit1.getPosition().distanceSquared(origin),
-                    hit2.getPosition().distanceSquared(origin));
-        }
     }
 }

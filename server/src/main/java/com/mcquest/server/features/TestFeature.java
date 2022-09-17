@@ -19,7 +19,6 @@ import net.minestom.server.instance.Instance;
 import net.minestom.server.particle.Particle;
 
 import java.time.Duration;
-import java.util.List;
 
 public class TestFeature implements Feature {
     private Mmorpg mmorpg;
@@ -29,9 +28,11 @@ public class TestFeature implements Feature {
         this.mmorpg = mmorpg;
         Instance instance = mmorpg.getInstanceManager().getInstance("Eladrador");
         Pos spawnPosition = new Pos(0, 70, 0);
-        Wolf wolf = new Wolf(mmorpg, instance, spawnPosition);
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        npcSpawner.add(wolf);
+        for (int i = 0; i < 10; i++) {
+            Wolf wolf = new Wolf(mmorpg, instance, spawnPosition.withX(spawnPosition.x() + 0.5 * i));
+            npcSpawner.add(wolf);
+        }
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterBasicAttackEvent.class, this::basicAttack);
     }
 
@@ -44,16 +45,13 @@ public class TestFeature implements Feature {
         pc.disarm(Duration.ofMillis(500));
         double distance = 5.0;
         Pos rayStart = position.withY(position.y() + 1.5);
-        List<RaycastHit> hits = physicsManager.raycast(instance, rayStart, direction, distance);
-        for (RaycastHit hit : hits) {
-            Collider collider = hit.getCollider();
-            if (collider instanceof CharacterHitbox hitbox) {
-                Character character = hitbox.getCharacter();
-                if (!character.isFriendly(pc)) {
-                    character.damage(pc, 0.1);
-                }
-            }
+        RaycastHit hit = physicsManager.raycast(instance, rayStart, direction, distance, collider ->
+                collider instanceof CharacterHitbox hitbox && !hitbox.getCharacter().isFriendly(pc));
+        if (hit != null) {
+            CharacterHitbox hitbox = (CharacterHitbox) hit.getCollider();
+            Character character = hitbox.getCharacter();
+            character.damage(pc, 0.5);
         }
-        ParticleEffects.line(instance, rayStart, direction, distance, Particle.CRIT, 4.0);
+        ParticleEffects.line(instance, pc.getEyePosition(), direction, distance, Particle.CRIT, 4.0);
     }
 }

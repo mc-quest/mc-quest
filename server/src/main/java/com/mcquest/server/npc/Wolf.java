@@ -7,7 +7,6 @@ import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.DamageSource;
 import com.mcquest.server.character.NonPlayerCharacter;
 import com.mcquest.server.physics.PhysicsManager;
-import com.mcquest.server.util.Debug;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,7 +48,6 @@ public class Wolf extends NonPlayerCharacter {
         this.spawnPosition = spawnPosition;
         hitbox = new CharacterHitbox(this, instance, spawnPosition, 0.75, 0.75, 0.75);
         setHeight(0.75);
-        Debug.showCollider(hitbox);
     }
 
     @Override
@@ -64,7 +62,7 @@ public class Wolf extends NonPlayerCharacter {
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
-        entity.setInstance(getInstance(), getPosition()).join();
+        entity.setInstance(getInstance(), spawnPosition).join();
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
     }
@@ -87,13 +85,14 @@ public class Wolf extends NonPlayerCharacter {
                     .delay(Duration.ofSeconds(5)).schedule();
             instance.playSound(DEATH_SOUND, position);
         }
+        entity = null;
         setPosition(spawnPosition);
     }
 
     @Override
     public void damage(DamageSource source, double amount) {
-        super.damage(source, amount);
         entity.damage(DamageType.VOID, 0f);
+        super.damage(source, amount);
         Instance instance = getInstance();
         if (isAlive()) {
             instance.playSound(HURT_SOUND);

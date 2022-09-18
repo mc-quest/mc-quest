@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QuestBuilder {
-    private final QuestManager questManager;
-    private final int id;
-    private final String name;
-    private final int level;
-    private final List<QuestObjective> objectives;
+    final QuestManager questManager;
+    final int id;
+    final String name;
+    final int level;
+    final List<QuestObjective> objectives;
 
-    public QuestBuilder(QuestManager questManager, int id, String name, int level) {
+    QuestBuilder(QuestManager questManager, int id, String name, int level) {
         this.questManager = questManager;
         this.id = id;
         this.name = name;
@@ -24,7 +24,7 @@ public class QuestBuilder {
     }
 
     public Quest build() {
-        Quest quest = new Quest(id, name, level, objectives.toArray(new QuestObjective[0]));
+        Quest quest = new Quest(this);
         for (QuestObjective objective : objectives) {
             objective.quest = quest;
         }

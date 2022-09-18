@@ -43,7 +43,7 @@ public class Dwarf extends NonPlayerCharacter {
     static {
         ModelReader reader = BBModelReader.blockbench();
         try {
-            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/TestObject.bbmodel"));
+            MODEL = reader.read(ResourceLoader.getResourceAsStream("models/WolfSpider.bbmodel"));
             Collection<Model> models = List.of(MODEL);
             File file = new File("resource-pack.zip");
             file.createNewFile();
@@ -81,6 +81,9 @@ public class Dwarf extends NonPlayerCharacter {
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.unbind(entity);
         entity.remove();
+        if (!isAlive()) {
+            mmorpg.getItemManager().getItem(1).drop(getInstance(), getPosition());
+        }
         setPosition(spawnPosition);
         mmorpg.getPhysicsManager().removeCollider(hitbox);
     }
@@ -109,6 +112,7 @@ public class Dwarf extends NonPlayerCharacter {
             addAIGroup(new EntityAIGroupBuilder()
                     .addGoalSelector(new RandomStrollGoal(this, 20))
                     .build());
+            getNavigator().getPathingEntity().setAvian(true);
         }
 
         @Override

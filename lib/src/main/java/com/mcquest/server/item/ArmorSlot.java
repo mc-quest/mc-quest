@@ -10,7 +10,7 @@ public enum ArmorSlot {
     }
 
     /**
-     * Returns the text that describes this Slot.
+     * Returns the text that describes this ArmorSlot.
      */
     public String getText() {
         return text;

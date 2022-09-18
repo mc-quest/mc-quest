@@ -19,7 +19,12 @@ public class WeaponBuilder extends ItemBuilder {
         this.playerClasses = new ArrayList<>();
     }
 
-    public WeaponBuilder playerClass(PlayerClass playerClass) {
+    @Override
+    public WeaponBuilder description(String description) {
+        return (WeaponBuilder) super.description(description);
+    }
+
+    public WeaponBuilder addPlayerClass(PlayerClass playerClass) {
         playerClasses.add(playerClass);
         return this;
     }

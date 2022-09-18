@@ -14,11 +14,11 @@ public final class Quest {
     private final int level;
     private final QuestObjective[] objectives;
 
-    Quest(int id, @NotNull String name, int level, @NotNull QuestObjective @NotNull [] objectives) {
-        this.id = id;
-        this.name = name;
-        this.level = level;
-        this.objectives = objectives;
+    Quest(QuestBuilder builder) {
+        this.id = builder.id;
+        this.name = builder.name;
+        this.level = builder.level;
+        this.objectives = builder.objectives.toArray(new QuestObjective[0]);
     }
 
     public int getId() {

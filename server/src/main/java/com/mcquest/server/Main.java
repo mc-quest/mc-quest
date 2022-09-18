@@ -27,9 +27,13 @@ public class Main {
         PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
         PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter").build();
 
+        PlayerClass mage = playerClassManager.playerClassBuilder("Mage").build();
+
         ItemManager itemManager = mmorpg.getItemManager();
-        Weapon weapon = itemManager.weaponBuilder(1, "Weapon", ItemRarity.COMMON,
-                Material.IRON_SWORD, 1, 5).playerClass(fighter).build();
+        Weapon weapon = itemManager.weaponBuilder(1, "Weapon", ItemRarity.EPIC,
+                Material.IRON_SWORD, 1, 5).addPlayerClass(fighter)
+                .addPlayerClass(mage)
+                .description("This is a very long description for a very boring item.").build();
 
         InstanceManager instanceManager = mmorpg.getInstanceManager();
         InstanceContainer eladrador = instanceManager.createInstanceContainer("Eladrador");
@@ -38,9 +42,6 @@ public class Main {
         Pos position = new Pos(0, 70, 0);
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
         pcManager.setDataProvider(player -> PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
-
-        NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        npcSpawner.add(new Dwarf(mmorpg, eladrador, position));
 
         FeatureManager featureManager = mmorpg.getFeatureManager();
         featureManager.addFeature(new TestFeature());

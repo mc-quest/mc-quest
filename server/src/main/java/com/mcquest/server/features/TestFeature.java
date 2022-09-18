@@ -7,11 +7,10 @@ import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.feature.Feature;
+import com.mcquest.server.npc.Dwarf;
 import com.mcquest.server.npc.Wolf;
-import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
-import com.mcquest.server.util.Debug;
 import com.mcquest.server.util.ParticleEffects;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -29,10 +28,7 @@ public class TestFeature implements Feature {
         Instance instance = mmorpg.getInstanceManager().getInstance("Eladrador");
         Pos spawnPosition = new Pos(0, 70, 0);
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        for (int i = 0; i < 10; i++) {
-            Wolf wolf = new Wolf(mmorpg, instance, spawnPosition.withX(spawnPosition.x() + 0.5 * i));
-            npcSpawner.add(wolf);
-        }
+        npcSpawner.add(new Dwarf(mmorpg, instance, spawnPosition));
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterBasicAttackEvent.class, this::basicAttack);
     }
 

@@ -1,14 +1,12 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.util.TextUtility;
+import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
-import net.minestom.server.item.ItemHideFlag;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
@@ -16,16 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * An Item represents an MMORPG item.
- */
 public class Item {
     private final int id;
     private final String name;
     private final ItemRarity rarity;
     private final Material icon;
     private final String description;
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
 
     Item(ItemBuilder builder) {
         this.id = builder.id;
@@ -33,7 +28,6 @@ public class Item {
         this.rarity = builder.rarity;
         this.icon = builder.icon;
         this.description = builder.description;
-        this.itemStack = createItemStack().withTag(ItemManager.ID_TAG, id);
     }
 
     public int getId() {
@@ -72,40 +66,31 @@ public class Item {
      * Returns the ItemStack of this Item.
      */
     public ItemStack getItemStack() {
+        // Lazy initialize because createItemStack() relies on subclass fields.
+        if (itemStack == null) {
+            itemStack = createItemStack();
+        }
         return itemStack;
     }
 
-    public Component getDisplayName() {
+    public TextComponent getDisplayName() {
         return Component.text(name, rarity.getColor())
                 .decoration(TextDecoration.ITALIC, false);
     }
 
-    /**
-     * Constructs the ItemStack of this Item. This method can be overridden to
-     * add custom properties to the ItemStack. The amount of the returned
-     * ItemStack must be exactly 1.
-     */
-    @NotNull ItemStack createItemStack() {
+    private ItemStack createItemStack() {
+        return ItemStackUtility.createItemStack(icon, getDisplayName(), getItemStackLore())
+                .withTag(ItemManager.ID_TAG, id);
+    }
+
+    List<Component> getItemStackLore() {
         List<Component> lore = new ArrayList<>();
-        Component rarityText = Component.text(rarity.getText() + " Item", rarity.getColor())
-                .decoration(TextDecoration.ITALIC, false);
-        lore.add(rarityText);
+        lore.add(ItemUtility.rarityText(rarity, "Item"));
         if (description != null) {
             lore.add(Component.empty());
-            List<TextComponent> descriptionText = TextUtility.wordWrap(description);
-            for (int i = 0; i < descriptionText.size(); i++) {
-                descriptionText.set(i, descriptionText.get(i).color(NamedTextColor.WHITE).decoration(TextDecoration.ITALIC, false)).color(NamedTextColor.WHITE);
-            }
-            lore.addAll(descriptionText);
+            lore.addAll(ItemUtility.descriptionText(description));
         }
-
-        return ItemStack.builder(getIcon())
-                .meta(builder ->
-                        builder.hideFlag(ItemHideFlag.HIDE_ATTRIBUTES, ItemHideFlag.HIDE_POTION_EFFECTS)
-                )
-                .displayName(getDisplayName())
-                .lore(lore)
-                .build();
+        return lore;
     }
 
     public void drop(Instance instance, Pos position) {

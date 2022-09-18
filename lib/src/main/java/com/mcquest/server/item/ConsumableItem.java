@@ -1,8 +1,12 @@
 package com.mcquest.server.item;
 
+import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A ConsumableItem is an Item that can be consumed by a PlayerCharacter to
@@ -24,27 +28,18 @@ public class ConsumableItem extends Item {
     }
 
     @Override
-    protected ItemStack createItemStack() {
-        String name = getName();
+    List<Component> getItemStackLore() {
         ItemRarity rarity = getRarity();
-        Material icon = getIcon();
         String description = getDescription();
-        StringBuilder lore = new StringBuilder();
-        // lore.append(ChatColor.GRAY);
-        lore.append(rarity.getText());
-        lore.append(" Item\n");
-        // lore.append(ChatColor.GOLD);
-        lore.append("Consumable\nLevel ");
-        lore.append(level);
+        List<Component> lore = new ArrayList<>();
+        lore.add(ItemUtility.rarityText(rarity, "Consumable"));
+        lore.add(ItemUtility.levelText(level));
         if (description != null) {
-            lore.append("\n\n");
-            // lore.append(ChatColor.WHITE);
-            lore.append(description);
+            lore.add(Component.empty());
+            lore.addAll(ItemUtility.descriptionText(description));
         }
-        lore.append("\n\n");
-        // lore.append(ChatColor.GRAY);
-        lore.append("Shift-click to use");
-
-        return super.createItemStack();
+        lore.add(Component.empty());
+        lore.add(ItemUtility.consumeText());
+        return lore;
     }
 }

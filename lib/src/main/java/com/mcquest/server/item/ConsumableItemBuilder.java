@@ -11,6 +11,11 @@ public class ConsumableItemBuilder extends ItemBuilder {
         this.level = level;
     }
 
+    @Override
+    public ConsumableItemBuilder description(String description) {
+        return (ConsumableItemBuilder) super.description(description);
+    }
+
     public ConsumableItem build() {
         ConsumableItem consumableItem = new ConsumableItem(this);
         itemManager.registerItem(consumableItem);

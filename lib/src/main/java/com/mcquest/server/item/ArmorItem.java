@@ -1,9 +1,14 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.playerclass.PlayerClass;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An ArmorItem is an Item that can be equipped by a PlayerCharacter to provide
@@ -53,34 +58,20 @@ public class ArmorItem extends Item {
     }
 
     @Override
-    @NotNull ItemStack createItemStack() {
-        // TODO
-        String name = getName();
+    List<Component> getItemStackLore() {
         ItemRarity rarity = getRarity();
-        Material icon = getIcon();
         String description = getDescription();
-        StringBuilder lore = new StringBuilder();
-        // lore.append(ChatColor.GRAY);
-        lore.append(rarity.getText());
-        lore.append(" Item\n");
-        // lore.append(ChatColor.GOLD);
-        // lore.append(playerClass);
-        lore.append(" Armor\n");
-        lore.append(slot.getText());
-        lore.append("\nLevel ");
-        lore.append(level);
-        lore.append('\n');
-        lore.append((int) Math.round(protections));
-        lore.append(" Protections");
+        List<Component> lore = new ArrayList<>();
+        lore.add(ItemUtility.rarityText(rarity, "Armor"));
+        lore.add(ItemUtility.playerClassText(playerClasses));
+        lore.add(ItemUtility.levelText(level));
+        lore.add(ItemUtility.statText("Protections", protections));
         if (description != null) {
-            lore.append("\n\n");
-            // lore.append(ChatColor.WHITE);
-            lore.append(description);
+            lore.add(Component.empty());
+            lore.addAll(ItemUtility.descriptionText(description));
         }
-        lore.append("\n\n");
-        // lore.append(ChatColor.GRAY);
-        lore.append("Shift-click to equip");
-        // return BukkitUtility.createItemStack(icon, rarity.getColor() + name, lore.toString());
-        return super.createItemStack();
+        lore.add(Component.empty());
+        lore.add(ItemUtility.equipText());
+        return lore;
     }
 }

@@ -21,6 +21,11 @@ public class ArmorItemBuilder extends ItemBuilder {
         this.playerClasses = new ArrayList<>();
     }
 
+    @Override
+    public ArmorItemBuilder description(String description) {
+        return (ArmorItemBuilder) super.description(description);
+    }
+
     public ArmorItemBuilder playerClass(PlayerClass playerClass) {
         playerClasses.add(playerClass);
         return this;

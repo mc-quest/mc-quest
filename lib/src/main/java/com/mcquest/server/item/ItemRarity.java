@@ -9,7 +9,7 @@ public enum ItemRarity {
     COMMON("Common", NamedTextColor.GRAY),
     UNCOMMON("Uncommon", NamedTextColor.GREEN),
     RARE("Rare", NamedTextColor.BLUE),
-    EPIC("Epic", NamedTextColor.LIGHT_PURPLE),
+    EPIC("Epic", NamedTextColor.DARK_PURPLE),
     LEGENDARY("Legendary", NamedTextColor.GOLD);
 
     private final String text;

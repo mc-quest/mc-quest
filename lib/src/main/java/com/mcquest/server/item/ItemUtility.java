@@ -31,7 +31,7 @@ class ItemUtility {
     }
 
     static TextComponent statText(String statName, double stat) {
-        return Component.text(((int) Math.round(stat)) + " " + statName, NamedTextColor.GRAY);
+        return Component.text(((int) Math.round(stat)) + " " + statName, NamedTextColor.YELLOW);
     }
 
     static TextComponent equipText() {
@@ -40,7 +40,7 @@ class ItemUtility {
     }
 
     static TextComponent consumeText() {
-        return Component.text("Shift-click to consume",
+        return Component.text("Shift-click to use",
                 NamedTextColor.GRAY, TextDecoration.ITALIC);
     }
 }

@@ -65,6 +65,7 @@ public class ArmorItem extends Item {
         lore.add(ItemUtility.rarityText(rarity, "Armor"));
         lore.add(ItemUtility.playerClassText(playerClasses));
         lore.add(ItemUtility.levelText(level));
+        lore.add(Component.empty());
         lore.add(ItemUtility.statText("Protections", protections));
         if (description != null) {
             lore.add(Component.empty());

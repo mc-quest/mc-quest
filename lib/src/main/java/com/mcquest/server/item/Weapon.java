@@ -52,6 +52,7 @@ public class Weapon extends Item {
         lore.add(ItemUtility.rarityText(rarity, "Weapon"));
         lore.add(ItemUtility.playerClassText(playerClasses));
         lore.add(ItemUtility.levelText(level));
+        lore.add(Component.empty());
         lore.add(ItemUtility.statText("Damage", damage));
         if (description != null) {
             lore.add(Component.empty());

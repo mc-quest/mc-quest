@@ -9,13 +9,13 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
+import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 public class PlayerCharacterManager {
@@ -42,8 +42,11 @@ public class PlayerCharacterManager {
         this.dataProvider = dataProvider;
     }
 
-    public void getNearbyPlayerCharacters(Instance instance, Pos position) {
-        // TODO
+    public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double range) {
+        List<Player> result = new ArrayList<>();
+        instance.getEntityTracker().nearbyEntities(position, range,
+                EntityTracker.Target.PLAYERS, result::add);
+        return result.stream().map(player -> getPlayerCharacter(player)).toList();
     }
 
     private void handlePlayerLogin(PlayerLoginEvent event) {
@@ -55,7 +58,8 @@ public class PlayerCharacterManager {
         Instance instance = mmorpg.getInstanceManager().getInstance(data.getInstance());
         event.setSpawningInstance(instance);
         player.setRespawnPoint(data.getPosition());
-        player.setGameMode(GameMode.ADVENTURE);
+        player.setGameMode(GameMode.CREATIVE);
+        player.setResourcePack(mmorpg.getResourceManager().getResourcePack());
         PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
         pcs.put(player, pc);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();

@@ -28,7 +28,9 @@ public class TestFeature implements Feature {
         Instance instance = mmorpg.getInstanceManager().getInstance("Eladrador");
         Pos spawnPosition = new Pos(0, 70, 0);
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        npcSpawner.add(new Dwarf(mmorpg, instance, spawnPosition));
+        for (int i = 0; i < 10; i++) {
+            npcSpawner.add(new Dwarf(mmorpg, instance, spawnPosition));
+        }
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterBasicAttackEvent.class, this::basicAttack);
     }
 

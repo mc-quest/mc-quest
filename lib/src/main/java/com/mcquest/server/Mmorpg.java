@@ -50,10 +50,11 @@ public class Mmorpg {
         interactionHandler.registerListeners();
     }
 
-    public void start(String address, int port) {
+    public void start(String address, int port, int resourcePackServerPort) {
         for (Feature feature : featureManager.getFeatures()) {
             feature.hook(this);
         }
+        resourceManager.startResourcePackServer(address, resourcePackServerPort);
         server.start(address, port);
         isStarted = true;
     }

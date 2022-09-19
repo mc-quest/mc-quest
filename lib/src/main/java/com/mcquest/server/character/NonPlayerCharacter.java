@@ -4,11 +4,14 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
+import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class NonPlayerCharacter extends Character {
     private boolean isSpawned;
@@ -55,12 +58,9 @@ public class NonPlayerCharacter extends Character {
     private boolean playerNearby(double range) {
         Instance instance = getInstance();
         Pos position = getPosition();
-        Collection<Entity> nearbyEntities = instance.getNearbyEntities(position, range);
-        for (Entity entity : nearbyEntities) {
-            if (entity instanceof Player) {
-                return true;
-            }
-        }
-        return false;
+        List<Player> nearbyPlayers = new ArrayList<>();
+        instance.getEntityTracker().nearbyEntities(position, range,
+                EntityTracker.Target.PLAYERS, nearbyPlayers::add);
+        return !nearbyPlayers.isEmpty();
     }
 }

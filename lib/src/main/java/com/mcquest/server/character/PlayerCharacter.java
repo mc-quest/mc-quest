@@ -34,12 +34,24 @@ import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.Arrays;
 
 public final class PlayerCharacter extends Character {
+    private static final double[] EXPERIENCE_POINTS_PER_LEVEL = {
+            250, 655, 1265, 2085, 3240, 4125, 4785, 5865, 7275,
+            8205, 9365, 10715, 12085, 13455, 14810, 16135, 17415, 18635, 9775,
+            20825, 22295, 23745, 25170, 26550, 27885, 30140, 32480, 34910, 37425,
+            40675, 44100, 47705, 51490, 55460, 59625, 63985, 68545, 73305, 78280,
+            83460, 88860, 94485, 100330, 106405, 112715, 119265, 129995, 139665, 154075,
+            194030, 212870, 225770, 240255, 255180, 272795, 291495, 311490, 332165, 353410
+    };
+    private static final double MAX_EXPERIENCE_POINTS = Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
+
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
@@ -97,6 +109,14 @@ public final class PlayerCharacter extends Character {
                 inventory.setItemStack(i, itemStack);
             }
         }
+        initUi();
+    }
+
+    private void initUi() {
+        updateActionBar();
+        // Updating action bar must be delayed to work properly.
+        MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
+                .delay(TaskSchedule.nextTick()).schedule();
     }
 
     @Override
@@ -208,7 +228,12 @@ public final class PlayerCharacter extends Character {
     }
 
     private static int levelForExperiencePoints(double experiencePoints) {
-        return 1; // TODO
+        int level = 1;
+        while (experiencePoints >= 0) {
+            experiencePoints -= EXPERIENCE_POINTS_PER_LEVEL[level - 1];
+            level++;
+        }
+        return level - 1;
     }
 
     public double getExperiencePoints() {
@@ -216,12 +241,59 @@ public final class PlayerCharacter extends Character {
     }
 
     public void grantExperiencePoints(double experiencePoints) {
+        sendMessage(Component.text("+" + (int) Math.round(experiencePoints) + " XP",
+                NamedTextColor.GREEN));
+        this.experiencePoints = MathUtility.clamp(this.experiencePoints + experiencePoints,
+                0, MAX_EXPERIENCE_POINTS);
+        checkForLevelUp();
         updateExperienceBar();
         updateActionBar();
     }
 
-    private void updateExperienceBar() {
+    private void checkForLevelUp() {
+        int level = levelForExperiencePoints(experiencePoints);
+        if (level != getLevel()) {
+            levelUp();
+        }
+    }
+
+    private void levelUp() {
+        int newLevel = getLevel() + 1;
+        super.setLevel(newLevel);
+        sendMessage(Component.text("Level increased to " + newLevel, NamedTextColor.GREEN));
+        grantSkillPoint();
+    }
+
+    @Override
+    public void setLevel(int level) {
+        // Don't set PlayerCharacter level explicitly.
+        throw new UnsupportedOperationException();
+    }
+
+    private void grantSkillPoint() {
         // TODO
+    }
+
+    private void updateExperienceBar() {
+        int level = getLevel();
+        if (player.getLevel() != level) {
+            player.setLevel(level);
+        }
+        double progress = experiencePointsThisLevel() / EXPERIENCE_POINTS_PER_LEVEL[level - 1];
+        player.setExp((float) progress);
+    }
+
+    private double experiencePointsThisLevel() {
+        int level = getLevel();
+        int maxLevel = EXPERIENCE_POINTS_PER_LEVEL.length + 1;
+        if (level == maxLevel) {
+            return 0;
+        }
+        double experiencePointsThisLevel = experiencePoints;
+        for (int i = 0; i < level - 1; i++) {
+            experiencePointsThisLevel -= EXPERIENCE_POINTS_PER_LEVEL[i];
+        }
+        return experiencePointsThisLevel;
     }
 
     @Override

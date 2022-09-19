@@ -5,7 +5,7 @@ import com.mcquest.server.character.PlayerCharacter;
 public class SkillTree {
     private final PlayerClass playerClass;
 
-    public SkillTree(PlayerClass playerClass) {
+    SkillTree(PlayerClass playerClass, SkillTreeBuilder builder) {
         this.playerClass = playerClass;
     }
 

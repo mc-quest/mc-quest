@@ -1,6 +1,5 @@
 package com.mcquest.server.physics;
 
-import com.mcquest.server.util.Debug;
 import com.mcquest.server.util.MathUtility;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;

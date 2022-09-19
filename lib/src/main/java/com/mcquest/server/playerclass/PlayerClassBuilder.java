@@ -2,11 +2,13 @@ package com.mcquest.server.playerclass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class PlayerClassBuilder {
-    private final PlayerClassManager playerClassManager;
-    private final String name;
-    private final List<Skill> skills;
+    final PlayerClassManager playerClassManager;
+    final String name;
+    final List<Skill> skills;
+    Consumer<SkillTreeBuilder> skillTreeBuilderConsumer;
 
     PlayerClassBuilder(PlayerClassManager playerClassmanager, String name) {
         this.playerClassManager = playerClassmanager;
@@ -20,8 +22,13 @@ public class PlayerClassBuilder {
         return this;
     }
 
+    public PlayerClassBuilder skillTree(Consumer<SkillTreeBuilder> consumer) {
+        this.skillTreeBuilderConsumer = consumer;
+        return this;
+    }
+
     public PlayerClass build() {
-        PlayerClass playerClass = new PlayerClass(name, skills.toArray(new Skill[0]));
+        PlayerClass playerClass = new PlayerClass(this);
         playerClassManager.registerPlayerClass(playerClass);
         return playerClass;
     }

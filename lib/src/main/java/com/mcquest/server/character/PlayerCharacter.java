@@ -401,9 +401,9 @@ public final class PlayerCharacter extends Character {
             }
         }
         if (received > 0) {
-            Component message = Component.text("Received ", NamedTextColor.GREEN);
+            Component message = Component.text("Received ", NamedTextColor.GRAY);
             if (received != 1) {
-                message = message.append(Component.text(received + " ", NamedTextColor.GREEN));
+                message = message.append(Component.text(received + " ", NamedTextColor.GRAY));
             }
             message = message.append((item.getDisplayName()));
             sendMessage(message);

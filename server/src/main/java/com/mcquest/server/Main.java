@@ -24,8 +24,12 @@ public class Main {
         Mmorpg mmorpg = new Mmorpg();
 
         PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
-        PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter").build();
+        PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter")
+                .skill("Bash", 1, "Damages enemies in front of you")
+                .skillTree(builder -> {
 
+                })
+                .build();
         PlayerClass mage = playerClassManager.playerClassBuilder("Mage").build();
 
         ItemManager itemManager = mmorpg.getItemManager();

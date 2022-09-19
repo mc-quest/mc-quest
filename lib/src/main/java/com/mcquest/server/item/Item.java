@@ -3,7 +3,6 @@ package com.mcquest.server.item;
 import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.instance.Instance;
@@ -74,8 +73,7 @@ public class Item {
     }
 
     public TextComponent getDisplayName() {
-        return Component.text(name, rarity.getColor())
-                .decoration(TextDecoration.ITALIC, false);
+        return Component.text(name, rarity.getColor());
     }
 
     private ItemStack createItemStack() {

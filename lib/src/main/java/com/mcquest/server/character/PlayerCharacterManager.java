@@ -1,12 +1,16 @@
 package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
+import com.mcquest.server.event.PlayerCharacterClickMenuLogoutEvent;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
+import com.mcquest.server.event.PlayerCharacterLogoutEvent;
 import com.mcquest.server.persistence.PlayerCharacterData;
+import com.mcquest.server.ui.PlayerCharacterLogoutType;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.instance.EntityTracker;
@@ -16,12 +20,14 @@ import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PlayerCharacterManager {
     private Mmorpg mmorpg;
     private final Map<Player, PlayerCharacter> pcs;
     private Function<Player, PlayerCharacterData> dataProvider;
+    private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler;
 
     @ApiStatus.Internal
     public PlayerCharacterManager(Mmorpg mmorpg) {
@@ -29,6 +35,8 @@ public class PlayerCharacterManager {
         pcs = new HashMap<>();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
+        eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
+        eventHandler.addListener(PlayerCharacterClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::synchronizePlayerPosition);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
@@ -40,6 +48,10 @@ public class PlayerCharacterManager {
 
     public void setDataProvider(Function<Player, PlayerCharacterData> dataProvider) {
         this.dataProvider = dataProvider;
+    }
+
+    public void setLogoutHandler(BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
+        this.logoutHandler = logoutHandler;
     }
 
     public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double range) {
@@ -66,6 +78,27 @@ public class PlayerCharacterManager {
         characterEntityManager.bind(player, pc);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new PlayerCharacterLoginEvent(pc));
+    }
+
+    private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacter pc = getPlayerCharacter(player);
+        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.DISCONNECT);
+    }
+
+    private void handlePlayerCharacterMenuLogout(PlayerCharacterClickMenuLogoutEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.MENU_LOGOUT);
+    }
+
+    private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
+        if (logoutHandler == null) {
+            throw new IllegalStateException("You need to specify a player character logout handler");
+        }
+        logoutHandler.accept(pc, logoutType);
+        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
+        PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
+        eventHandler.call(event);
     }
 
     @ApiStatus.Internal

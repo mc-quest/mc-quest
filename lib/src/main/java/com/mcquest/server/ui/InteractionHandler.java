@@ -3,22 +3,25 @@ package com.mcquest.server.ui;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
-import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
-import com.mcquest.server.event.PlayerCharacterConsumeItemEvent;
-import com.mcquest.server.event.PlayerCharacterLoginEvent;
+import com.mcquest.server.event.*;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
+import com.mcquest.server.physics.Collider;
+import com.mcquest.server.physics.PhysicsManager;
+import com.mcquest.server.physics.RaycastHit;
 import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.playerclass.Skill;
 import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.PickupItemEvent;
-import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
-import net.minestom.server.event.player.PlayerHandAnimationEvent;
+import net.minestom.server.event.player.*;
+import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
@@ -31,6 +34,7 @@ import java.util.List;
 
 @ApiStatus.Internal
 public class InteractionHandler {
+    private static final double MAX_INTERACTION_DISTANCE = 5.0;
     private static final int WEAPON_SLOT = 4;
     private static final int MENU_SLOT = 8;
     private static final int MENU_SKILL_TREE_SLOT = 2;
@@ -61,6 +65,8 @@ public class InteractionHandler {
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
         eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
+        eventHandler.addListener(PlayerEntityInteractEvent.class, this::handleInteract);
+        eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
     }
 
     private void handlePlayerCharacterLogin(PlayerCharacterLoginEvent event) {
@@ -96,7 +102,7 @@ public class InteractionHandler {
                     openQuestLog(pc);
                     break;
                 case MENU_LOGOUT_SLOT:
-                    logout(pc);
+                    handleLogoutClick(pc);
                     break;
                 default:
                     break;
@@ -107,15 +113,21 @@ public class InteractionHandler {
     }
 
     private void openSkillTree(PlayerCharacter pc) {
-        // TODO
+        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
+        eventHandler.call(new PlayerCharacterOpenSkillTreeEvent(pc));
+        // TODO: actually open menu
     }
 
     private void openQuestLog(PlayerCharacter pc) {
-        // TODO
+        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
+        eventHandler.call(new PlayerCharacterOpenQuestLogEvent(pc));
+        // TODO: actually open
     }
 
-    private void logout(PlayerCharacter pc) {
-        pc.sendMessage(Component.text("Logout not yet implemented", NamedTextColor.RED));
+    private void handleLogoutClick(PlayerCharacter pc) {
+        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
+        // PlayerClassManager listens to this event.
+        eventHandler.call(new PlayerCharacterClickMenuLogoutEvent(pc));
     }
 
     private void handlePickupItem(PickupItemEvent event) {
@@ -139,6 +151,10 @@ public class InteractionHandler {
         PlayerCharacter pc = pcManager.getPlayerCharacter(player);
         event.setCancelled(true);
         int slot = event.getSlot();
+        if (slot == MENU_SLOT) {
+            openMenu(pc);
+            return;
+        }
         PlayerInventory inventory = player.getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
         Item item = mmorpg.getItemManager().getItem(itemStack);
@@ -153,7 +169,9 @@ public class InteractionHandler {
 
         PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
         Skill skill = playerClassManager.getSkill(itemStack);
-        // TODO: Check for skills/consumables (might want to do skill checking in playerclass package)
+        if (skill != null) {
+            // TODO: Use skill.
+        }
     }
 
     private void handleBasicAttack(PlayerHandAnimationEvent event) {
@@ -168,5 +186,37 @@ public class InteractionHandler {
         }
         MinecraftServer.getGlobalEventHandler()
                 .call(new PlayerCharacterBasicAttackEvent(pc, pc.getWeapon()));
+    }
+
+    private void handleInteract(PlayerEntityInteractEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
+        handleInteract(pc);
+    }
+
+    private void handleInteract(PlayerUseItemEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
+        handleInteract(pc);
+    }
+
+    private void handleInteract(PlayerCharacter pc) {
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        Instance instance = pc.getInstance();
+        Pos origin = pc.getEyePosition();
+        Vec direction = pc.getLookDirection();
+        RaycastHit hit = physicsManager.raycast(instance, origin, direction,
+                MAX_INTERACTION_DISTANCE, this::isInteractionCollider);
+        if (hit != null) {
+            PlayerCharacterInteractionCollider collider =
+                    (PlayerCharacterInteractionCollider) hit.getCollider();
+            collider.interact(pc);
+        }
+    }
+
+    private boolean isInteractionCollider(Collider collider) {
+        return collider instanceof PlayerCharacterInteractionCollider;
     }
 }

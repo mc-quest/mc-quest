@@ -12,7 +12,9 @@ public final class PlayerClass {
         this.name = builder.name;
         this.skills = builder.skills.toArray(new Skill[0]);
         SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder(this);
-        builder.skillTreeBuilderConsumer.accept(skillTreeBuilder);
+        if (builder.skillTreeBuilderConsumer != null) {
+            builder.skillTreeBuilderConsumer.accept(skillTreeBuilder);
+        }
         this.skillTree = skillTreeBuilder.build();
     }
 

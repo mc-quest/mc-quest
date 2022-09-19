@@ -8,7 +8,6 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.npc.Dwarf;
-import com.mcquest.server.npc.Wolf;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
 import com.mcquest.server.util.ParticleEffects;

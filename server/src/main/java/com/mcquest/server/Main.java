@@ -8,8 +8,10 @@ import com.mcquest.server.item.*;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
+import com.mcquest.server.ui.PlayerCharacterLogoutType;
 import com.mcquest.server.util.ResourceLoader;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.Material;
@@ -45,6 +47,9 @@ public class Main {
         Pos position = new Pos(0, 70, 0);
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
         pcManager.setDataProvider(player -> PlayerCharacterData.create(mmorpg, fighter, eladrador, position, weapon));
+        pcManager.setLogoutHandler((pc, logoutType) -> {
+            System.out.println("Logging out");
+        });
 
         FeatureManager featureManager = mmorpg.getFeatureManager();
         featureManager.addFeature(new TestFeature());

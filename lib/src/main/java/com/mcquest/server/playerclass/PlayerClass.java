@@ -4,23 +4,26 @@ package com.mcquest.server.playerclass;
  * A PlayerClass represents the specialization of a PlayerCharacter.
  */
 public final class PlayerClass {
+    private final int id;
     private final String name;
     private final Skill[] skills;
-    private final SkillTree skillTree;
+    private final SkillTreeDecoration[] skillTreeDecorations;
 
     PlayerClass(PlayerClassBuilder builder) {
-        this.name = builder.name;
-        this.skills = builder.skills.toArray(new Skill[0]);
-        SkillTreeBuilder skillTreeBuilder = new SkillTreeBuilder(this);
-        if (builder.skillTreeBuilderConsumer != null) {
-            builder.skillTreeBuilderConsumer.accept(skillTreeBuilder);
+        id = builder.id;
+        name = builder.name;
+        skills = builder.skills.toArray(new Skill[0]);
+        for (Skill skill : skills) {
+            skill.playerClass = this;
         }
-        this.skillTree = skillTreeBuilder.build();
+        skillTreeDecorations = builder.skillTreeDecorations
+                .toArray(new SkillTreeDecoration[0]);
     }
 
-    /**
-     * Returns the name of this PlayerClass.
-     */
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -31,5 +34,13 @@ public final class PlayerClass {
 
     public int getSkillCount() {
         return skills.length;
+    }
+
+    public SkillTreeDecoration getSkillTreeDecoration(int index) {
+        return skillTreeDecorations[index];
+    }
+
+    public int getSkillTreeDecorationCount() {
+        return skillTreeDecorations.length;
     }
 }

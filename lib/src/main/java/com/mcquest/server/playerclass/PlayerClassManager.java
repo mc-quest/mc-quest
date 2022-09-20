@@ -11,43 +11,44 @@ import java.util.Map;
  * The PlayerClassManager is used to register and retrieve PlayerClasses.
  */
 public class PlayerClassManager {
-    static final Tag<String> PLAYER_CLASS_TAG = Tag.String("id");
+    static final Tag<Integer> PLAYER_CLASS_ID_TAG = Tag.Integer("player_class_id");
+    static final Tag<Integer> SKILL_ID_TAG = Tag.Integer("skill_id");
 
-    private final Map<String, PlayerClass> playerClassesByName;
+    private final Map<Integer, PlayerClass> playerClassesById;
 
     @ApiStatus.Internal
     public PlayerClassManager() {
-        playerClassesByName = new HashMap<>();
+        playerClassesById = new HashMap<>();
     }
 
-    public PlayerClassBuilder playerClassBuilder(String name) {
-        return new PlayerClassBuilder(this, name);
+    public PlayerClassBuilder playerClassBuilder(int id, String name) {
+        return new PlayerClassBuilder(this, id, name);
     }
 
     void registerPlayerClass(PlayerClass playerClass) {
         String name = playerClass.getName();
-        if (playerClassesByName.containsKey(name)) {
+        if (playerClassesById.containsKey(name)) {
             throw new IllegalArgumentException("Name already in use: " + name);
         }
         for (int i = 0; i < playerClass.getSkillCount(); i++) {
             Skill skill = playerClass.getSkill(i);
             ItemStack hotbarItemStack = skill.getHotbarItemStack();
         }
-        playerClassesByName.put(playerClass.getName(), playerClass);
+        playerClassesById.put(playerClass.getId(), playerClass);
     }
 
     /**
      * Returns the PlayerClass with the given name.
      */
-    public PlayerClass getPlayerClass(String name) {
-        return playerClassesByName.get(name);
+    public PlayerClass getPlayerClass(int id) {
+        return playerClassesById.get(id);
     }
 
     public Skill getSkill(ItemStack hotbarItemStack) {
-        if (!hotbarItemStack.hasTag(PLAYER_CLASS_TAG)) {
+        if (!hotbarItemStack.hasTag(PLAYER_CLASS_ID_TAG)) {
             return null;
         }
-        String playerClassName = hotbarItemStack.getTag(PLAYER_CLASS_TAG);
+        int playerClassId = hotbarItemStack.getTag(PLAYER_CLASS_ID_TAG);
         return null;
 //        PlayerClass playerClass = getPlayerClass(playerClassName);
 //        return skillsByItemStack.get(hotbarItemStack);

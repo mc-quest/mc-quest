@@ -1,29 +1,35 @@
 package com.mcquest.server.playerclass;
 
+import net.minestom.server.item.Material;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class PlayerClassBuilder {
     final PlayerClassManager playerClassManager;
+    final int id;
     final String name;
     final List<Skill> skills;
-    Consumer<SkillTreeBuilder> skillTreeBuilderConsumer;
+    final List<SkillTreeDecoration> skillTreeDecorations;
 
-    PlayerClassBuilder(PlayerClassManager playerClassmanager, String name) {
+    PlayerClassBuilder(PlayerClassManager playerClassmanager, int id, String name) {
         this.playerClassManager = playerClassmanager;
+        this.id = id;
         this.name = name;
         this.skills = new ArrayList<>();
+        this.skillTreeDecorations = new ArrayList<>();
     }
 
-    public PlayerClassBuilder skill(String name, int level, String description) {
-        Skill skill = new Skill(name, level, description);
+    public PlayerClassBuilder skill(int id, String name, int level, Material icon,
+                                    String description, int skillTreeRow, int skillTreeColumn) {
+        Skill skill = new Skill(id, name, level, icon, description, skillTreeRow, skillTreeColumn);
         skills.add(skill);
         return this;
     }
 
-    public PlayerClassBuilder skillTree(Consumer<SkillTreeBuilder> consumer) {
-        this.skillTreeBuilderConsumer = consumer;
+    public PlayerClassBuilder skillTreeDecoration(Material icon, int row, int column) {
+        SkillTreeDecoration decoration = new SkillTreeDecoration(icon, row, column);
+        skillTreeDecorations.add(decoration);
         return this;
     }
 

@@ -1,26 +1,35 @@
 {
+    "id": 1,
     "name": "Fighter",
     "skills": [
         {
+            "id": 1,
             "name": "Bash",
+            "icon": "",
             "mana": 5,
-            "description": "Damage enemies in front of you"
+            "description": "Damage enemies in front of you",
+            "prerequisites": [],
+            "skillTreeRow": 0,
+            "skillTreeColumn": 4
+        },
+        {
+            "id": 2,
+            "name": "Self Heal",
+            "icon": "",
+            "mana": 5,
+            "description": "Heal yourself",
+            "prerequisites": [
+                1
+            ],
+            "skillTreeRow": 0,
+            "skillTreeColumn": 4
         }
     ],
-    "skillTree": {
-        "skills": [
-            {
-                "name": "Bash",
-                "row": 0,
-                "column": 5
-            }
-        ],
-        "links": [
-            {
-                "direction": "VERTICAL",
-                "row": 2,
-                "column": 2
-            }
-        ]
-    }
+    "skillTreeDecorations": [
+        {
+            "icon": "minecraft:dirt_block",
+            "row": 0,
+            "column": 0
+        }
+    ]
 }

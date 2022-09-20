@@ -1,20 +1,23 @@
 package com.mcquest.server;
 
 import com.mcquest.server.character.PlayerCharacterManager;
+import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.feature.FeatureManager;
 import com.mcquest.server.features.TestFeature;
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.*;
+import com.mcquest.server.music.MusicManager;
+import com.mcquest.server.music.Pitch;
+import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
-import com.mcquest.server.ui.PlayerCharacterLogoutType;
 import com.mcquest.server.util.ResourceLoader;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Player;
 import net.minestom.server.instance.AnvilLoader;
 import net.minestom.server.instance.InstanceContainer;
 import net.minestom.server.item.Material;
+import net.minestom.server.sound.SoundEvent;
 
 public class Main {
     private static final String SERVER_ADDRESS = "0.0.0.0";
@@ -26,13 +29,11 @@ public class Main {
         Mmorpg mmorpg = new Mmorpg();
 
         PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
-        PlayerClass fighter = playerClassManager.playerClassBuilder("Fighter")
-                .skill("Bash", 1, "Damages enemies in front of you")
-                .skillTree(builder -> {
-
-                })
+        PlayerClass fighter = playerClassManager.playerClassBuilder(1, "Fighter")
+                .skill(1, "Bash", 1, Material.SHIELD, "Damage enemies in front of you", 0, 4)
+                .skillTreeDecoration(Material.DIAMOND, 0, 0)
                 .build();
-        PlayerClass mage = playerClassManager.playerClassBuilder("Mage").build();
+        PlayerClass mage = playerClassManager.playerClassBuilder(2, "Mage").build();
 
         ItemManager itemManager = mmorpg.getItemManager();
         Weapon weapon = itemManager.weaponBuilder(1, "Weapon", ItemRarity.LEGENDARY,

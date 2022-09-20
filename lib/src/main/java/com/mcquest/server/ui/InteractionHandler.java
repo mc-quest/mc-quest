@@ -115,7 +115,7 @@ public class InteractionHandler {
     private void openSkillTree(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new PlayerCharacterOpenSkillTreeEvent(pc));
-        // TODO: actually open menu
+        SkillTreeMenu.open(pc);
     }
 
     private void openQuestLog(PlayerCharacter pc) {

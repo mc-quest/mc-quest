@@ -10,7 +10,7 @@ import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerCharacterData {
-    private String playerClass;
+    private int playerClassId;
     private String instance;
     private Pos position;
     private Pos respawnPosition;
@@ -31,7 +31,7 @@ public class PlayerCharacterData {
     public static PlayerCharacterData create(Mmorpg mmorpg, PlayerClass playerClass,
                                              Instance instance, Pos position, Weapon weapon) {
         PlayerCharacterData data = new PlayerCharacterData();
-        data.playerClass = playerClass.getName();
+        data.playerClassId = playerClass.getId();
         data.instance = mmorpg.getInstanceManager().nameOf(instance);
         data.position = position;
         data.respawnPosition = position;
@@ -48,7 +48,7 @@ public class PlayerCharacterData {
 
     public static PlayerCharacterData save(PlayerCharacter pc) {
         PlayerCharacterData data = new PlayerCharacterData();
-        data.playerClass = pc.getPlayerClass().getName();
+        data.playerClassId = pc.getPlayerClass().getId();
         data.health = pc.getHealth();
         data.maxHealth = pc.getMaxHealth();
         data.mana = pc.getMana();
@@ -59,8 +59,8 @@ public class PlayerCharacterData {
         return data;
     }
 
-    public String getPlayerClass() {
-        return playerClass;
+    public int getPlayerClassId() {
+        return playerClassId;
     }
 
     public String getInstance() {

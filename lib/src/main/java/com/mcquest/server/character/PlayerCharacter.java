@@ -77,7 +77,7 @@ public final class PlayerCharacter extends Character {
         hitbox = new PlayerCharacter.Hitbox(this);
         respawnPosition = data.getRespawnPosition();
         // hidePlayerNameplate();
-        playerClass = null;
+        playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
         questManager = new PlayerCharacterQuestManager();
         MusicManager musicManager = mmorpg.getMusicManager();
         musicPlayer = new PlayerCharacterMusicPlayer(this);

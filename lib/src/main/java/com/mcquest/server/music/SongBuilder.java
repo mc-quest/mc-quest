@@ -36,6 +36,10 @@ public class SongBuilder {
     }
 
     public SongBuilder note(double time, Pitch pitch) {
+        return note(time, this.instrument, this.volume, pitch);
+    }
+
+    public SongBuilder note(double time, @NotNull SoundEvent instrument, float volume, Pitch pitch) {
         if (instrument == null) {
             throw new IllegalStateException("You need to specify an instrument");
         }

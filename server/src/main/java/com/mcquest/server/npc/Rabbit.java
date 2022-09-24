@@ -87,9 +87,8 @@ public class Rabbit extends NonPlayerCharacter {
     private void die(Pos position) {
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
         getInstance().playSound(DEATH_SOUND, position.x(), position.y(), position.z());
-        schedulerManager.buildTask(() -> {
-            respawn();
-        }).delay(Duration.ofSeconds(30)).schedule();
+        schedulerManager.buildTask(this::respawn)
+                .delay(Duration.ofSeconds(30)).schedule();
     }
 
     private void respawn() {

@@ -2,10 +2,6 @@ package com.mcquest.server.item;
 
 import com.mcquest.server.playerclass.PlayerClass;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;

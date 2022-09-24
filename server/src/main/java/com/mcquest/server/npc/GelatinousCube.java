@@ -77,7 +77,7 @@ public class GelatinousCube extends NonPlayerCharacter {
             gelatinousCube.setPosition(getPosition());
             if (System.currentTimeMillis() >= nextJumpTime) {
                 getNavigator().jump(4.5f);
-                nextJumpTime += 1000l;
+                nextJumpTime += 1000L;
             }
         }
     }

@@ -197,14 +197,6 @@ public class Collider {
         handleChange();
     }
 
-    public final Set<Collider> getContacts() {
-        return Collections.unmodifiableSet(contacts);
-    }
-
-    public final boolean isContacting(Collider collider) {
-        return contacts.contains(collider);
-    }
-
     boolean isEnabled() {
         return physicsManager != null;
     }

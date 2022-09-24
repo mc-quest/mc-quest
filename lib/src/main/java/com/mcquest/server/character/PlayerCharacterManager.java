@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class PlayerCharacterManager {
-    private Mmorpg mmorpg;
+    private final Mmorpg mmorpg;
     private final Map<Player, PlayerCharacter> pcs;
     private Function<Player, PlayerCharacterData> dataProvider;
     private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler;
@@ -55,10 +55,10 @@ public class PlayerCharacterManager {
     }
 
     public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double range) {
-        List<Player> result = new ArrayList<>();
+        List<Player> nearbyPlayers = new ArrayList<>();
         instance.getEntityTracker().nearbyEntities(position, range,
-                EntityTracker.Target.PLAYERS, result::add);
-        return result.stream().map(player -> getPlayerCharacter(player)).toList();
+                EntityTracker.Target.PLAYERS, nearbyPlayers::add);
+        return nearbyPlayers.stream().map(this::getPlayerCharacter).toList();
     }
 
     private void handlePlayerLogin(PlayerLoginEvent event) {

@@ -39,10 +39,11 @@ public class PlayerCharacterQuestManager {
     }
 
     public int getProgress(QuestObjective objective) {
-        if (completedQuests.contains(objective)) {
+        Quest quest = objective.getQuest();
+        if (completedQuests.contains(quest)) {
             return objective.getGoal();
         }
-        if (!inProgressQuests.contains(objective)) {
+        if (!inProgressQuests.contains(quest)) {
             return 0;
         }
         return objectiveProgress.get(objective);
@@ -53,11 +54,11 @@ public class PlayerCharacterQuestManager {
             throw new IllegalArgumentException();
         }
         if (!objectiveProgress.containsKey(objective)) {
-            throw new IllegalArgumentException();
+            return;
         }
 
         if (progress == objective.getGoal()) {
-            // Check for quest completion.
+            // TODO: Check for quest completion.
         }
     }
 }

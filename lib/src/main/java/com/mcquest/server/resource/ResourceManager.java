@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResourceManager {
-    private List<Model> models;
+    private final List<Model> models;
     private net.minestom.server.resourcepack.ResourcePack resourcePack;
 
     public ResourceManager() {

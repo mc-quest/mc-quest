@@ -28,9 +28,9 @@ public class PlayerClassManager {
     }
 
     void registerPlayerClass(PlayerClass playerClass) {
-        String name = playerClass.getName();
-        if (playerClassesById.containsKey(name)) {
-            throw new IllegalArgumentException("Name already in use: " + name);
+        int id = playerClass.getId();
+        if (playerClassesById.containsKey(id)) {
+            throw new IllegalArgumentException("ID already in use: " + id);
         }
         for (Skill skill : playerClass.getSkills()) {
             ItemStack hotbarItemStack = skill.getHotbarItemStack();
@@ -54,8 +54,8 @@ public class PlayerClassManager {
             return null;
         }
         int playerClassId = hotbarItemStack.getTag(PLAYER_CLASS_ID_TAG);
-        return null;
-//        PlayerClass playerClass = getPlayerClass(playerClassName);
-//        return skillsByItemStack.get(hotbarItemStack);
+        int skillId = hotbarItemStack.getTag(SKILL_ID_TAG);
+        PlayerClass playerClass = getPlayerClass(playerClassId);
+        return playerClass.getSkill(skillId);
     }
 }

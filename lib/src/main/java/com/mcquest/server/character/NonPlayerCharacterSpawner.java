@@ -3,7 +3,6 @@ package com.mcquest.server.character;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;

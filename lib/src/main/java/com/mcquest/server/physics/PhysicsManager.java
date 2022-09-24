@@ -179,9 +179,7 @@ public class PhysicsManager {
         if (tMax < 0.0) return null;
 
         // Intersections are too far away:
-        if (tMin > maxDistance) {
-            return null;
-        }
+        if (tMin > maxDistance) return null;
 
         // Find the closest intersection:
         double t;

@@ -27,6 +27,7 @@ public class FeatureManager {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T extends Feature> T getFeature(Class<T> featureClass) {
         return (T) features.get(featureClass);
     }

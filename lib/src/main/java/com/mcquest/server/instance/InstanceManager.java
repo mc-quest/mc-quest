@@ -44,7 +44,7 @@ public class InstanceManager {
     }
 
     private void unloadVacantChunk(PlayerChunkUnloadEvent event) {
-        Instance instance = event.getPlayer().getInstance();
+        Instance instance = event.getInstance();
         int chunkX = event.getChunkX();
         int chunkZ = event.getChunkZ();
         Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());

@@ -1,10 +1,5 @@
 package com.mcquest.server.quest;
 
-import com.mcquest.server.character.PlayerCharacter;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.jetbrains.annotations.NotNull;
-
 /**
  * A Quest represents a series of objectives for a player to complete.
  */

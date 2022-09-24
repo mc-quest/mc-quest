@@ -19,8 +19,7 @@ class SkillTreeMenu {
         PlayerClass playerClass = pc.getPlayerClass();
         Player player = pc.getPlayer();
         Inventory inventory = new Inventory(InventoryType.CHEST_6_ROW, "Skill Tree");
-        for (int i = 0; i < playerClass.getSkillCount(); i++) {
-            Skill skill = playerClass.getSkill(i);
+        for (Skill skill : playerClass.getSkills()) {
             ItemStack itemStack = ItemStackUtility.createItemStack(Material.SHIELD, Component.text("Bash", NamedTextColor.GREEN), TextUtility.wordWrap(skill.getDescription()));
             inventory.setItemStack(9 * skill.getSkillTreeRow() + skill.getSkillTreeColumn(), itemStack);
         }

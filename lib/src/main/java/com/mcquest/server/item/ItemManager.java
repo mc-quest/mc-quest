@@ -1,6 +1,5 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
@@ -47,8 +46,8 @@ public class ItemManager {
     }
 
     public WeaponBuilder weaponBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                       @NotNull Material icon, int level, double damage) {
-        return new WeaponBuilder(this, id, name, rarity, icon, level, damage);
+                                       @NotNull Material icon, int level) {
+        return new WeaponBuilder(this, id, name, rarity, icon, level);
     }
 
     public ArmorItemBuilder armorItemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,

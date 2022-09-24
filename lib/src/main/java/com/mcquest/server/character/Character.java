@@ -24,7 +24,7 @@ public class Character implements DamageSource {
     private Hologram nameplate;
     private Hologram healthBar;
 
-    public Character(@NotNull Component displayName, int level,
+    Character(@NotNull Component displayName, int level,
                      @NotNull Instance instance, @NotNull Pos position) {
         if (level < 1) {
             throw new IllegalArgumentException();

@@ -5,9 +5,10 @@
         {
             "id": 1,
             "name": "Bash",
-            "icon": "",
-            "mana": 5,
+            "level": 1,
+            "icon": "minecraft:shield",
             "description": "Damage enemies in front of you",
+            "manaCost": 5,
             "prerequisites": [],
             "skillTreeRow": 0,
             "skillTreeColumn": 4
@@ -15,8 +16,9 @@
         {
             "id": 2,
             "name": "Self Heal",
-            "icon": "",
-            "mana": 5,
+            "level": 2,
+            "icon": "minecraft:emerald",
+            "manaCost": 5,
             "description": "Heal yourself",
             "prerequisites": [
                 1

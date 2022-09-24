@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerCharacterData {
     private int playerClassId;
-    private String instance;
+    private int instanceId;
     private Pos position;
     private Pos respawnPosition;
     private double health;
@@ -32,7 +32,7 @@ public class PlayerCharacterData {
                                              Instance instance, Pos position, Weapon weapon) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClassId = playerClass.getId();
-        data.instance = mmorpg.getInstanceManager().nameOf(instance);
+        data.instanceId = mmorpg.getInstanceManager().idOf(instance);
         data.position = position;
         data.respawnPosition = position;
         data.health = 1;
@@ -63,8 +63,8 @@ public class PlayerCharacterData {
         return playerClassId;
     }
 
-    public String getInstance() {
-        return instance;
+    public int getInstanceId() {
+        return instanceId;
     }
 
     public Pos getPosition() {

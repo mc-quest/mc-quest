@@ -5,6 +5,7 @@ import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.constants.Instances;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.npc.Dwarf;
@@ -24,7 +25,7 @@ public class TestFeature implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-        Instance instance = mmorpg.getInstanceManager().getInstance("Eladrador");
+        Instance instance = mmorpg.getInstanceManager().getInstance(Instances.ELADRADOR);
         Pos spawnPosition = new Pos(0, 70, 0);
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
         for (int i = 0; i < 10; i++) {

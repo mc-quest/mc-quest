@@ -4,7 +4,7 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.physics.Collider;
-import com.mcquest.server.util.ResourceLoader;
+import com.mcquest.server.util.ResourceUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -37,7 +37,7 @@ public class Dwarf extends NonPlayerCharacter {
         if (model == null) {
             ModelReader reader = BBModelReader.blockbench();
             try {
-                model = reader.read(ResourceLoader.getResourceAsStream("models/baby_wolf_spider.bbmodel"));
+                model = reader.read(ResourceUtility.getResourceAsStream("models/baby_wolf_spider.bbmodel"));
                 mmorpg.getResourceManager().addModel(model);
             } catch (IOException e) {
                 throw new RuntimeException(e);

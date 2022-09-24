@@ -71,7 +71,7 @@ public final class PlayerCharacter extends Character {
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
         super(Component.text(player.getUsername(), NamedTextColor.GREEN),
                 levelForExperiencePoints(data.getExperiencePoints()),
-                mmorpg.getInstanceManager().getInstance(data.getInstance()), data.getPosition());
+                mmorpg.getInstanceManager().getInstance(data.getInstanceId()), data.getPosition());
         this.mmorpg = mmorpg;
         this.player = player;
         hitbox = new PlayerCharacter.Hitbox(this);

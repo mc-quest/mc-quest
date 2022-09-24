@@ -26,7 +26,7 @@ public class ArmorItemBuilder extends ItemBuilder {
         return (ArmorItemBuilder) super.description(description);
     }
 
-    public ArmorItemBuilder playerClass(PlayerClass playerClass) {
+    public ArmorItemBuilder addPlayerClass(PlayerClass playerClass) {
         playerClasses.add(playerClass);
         return this;
     }

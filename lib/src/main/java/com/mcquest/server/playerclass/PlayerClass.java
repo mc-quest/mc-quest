@@ -1,20 +1,26 @@
 package com.mcquest.server.playerclass;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A PlayerClass represents the specialization of a PlayerCharacter.
  */
 public final class PlayerClass {
     private final int id;
     private final String name;
-    private final Skill[] skills;
+    private final Map<Integer, Skill> skillsById;
     private final SkillTreeDecoration[] skillTreeDecorations;
 
     PlayerClass(PlayerClassBuilder builder) {
         id = builder.id;
         name = builder.name;
-        skills = builder.skills.toArray(new Skill[0]);
-        for (Skill skill : skills) {
+        skillsById = new HashMap<>();
+        for (Skill skill : builder.skills) {
             skill.playerClass = this;
+            skillsById.put(skill.getId(), skill);
         }
         skillTreeDecorations = builder.skillTreeDecorations
                 .toArray(new SkillTreeDecoration[0]);
@@ -28,12 +34,12 @@ public final class PlayerClass {
         return name;
     }
 
-    public Skill getSkill(int index) {
-        return skills[index];
+    public Skill getSkill(int id) {
+        return skillsById.get(id);
     }
 
-    public int getSkillCount() {
-        return skills.length;
+    public Collection<Skill> getSkills() {
+        return Collections.unmodifiableCollection(skillsById.values());
     }
 
     public SkillTreeDecoration getSkillTreeDecoration(int index) {

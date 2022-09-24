@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InstanceManager {
-    private final Map<String, Instance> instances;
+    private final Map<Integer, InstanceContainer> instances;
 
     @ApiStatus.Internal
     public InstanceManager() {
@@ -21,23 +21,23 @@ public class InstanceManager {
         eventHandler.addListener(PlayerChunkUnloadEvent.class, this::unloadVacantChunk);
     }
 
-    public InstanceContainer createInstanceContainer(String name) {
-        if (instances.containsKey(name)) {
-            throw new IllegalArgumentException("name already used: " + name);
+    public InstanceContainer createInstance(int id) {
+        if (instances.containsKey(id)) {
+            throw new IllegalArgumentException("id already used: " + id);
         }
         InstanceContainer instance = MinecraftServer.getInstanceManager().createInstanceContainer();
-        instances.put(name, instance);
+        instances.put(id, instance);
         return instance;
     }
 
-    public Instance getInstance(String name) {
-        return instances.get(name);
+    public InstanceContainer getInstance(int id) {
+        return instances.get(id);
     }
 
-    public String nameOf(Instance instance) {
-        for (Map.Entry<String, Instance> i : instances.entrySet()) {
-            if (i.getValue() == instance) {
-                return i.getKey();
+    public Integer idOf(Instance instance) {
+        for (Map.Entry<Integer, InstanceContainer> entry : instances.entrySet()) {
+            if (entry.getValue() == instance) {
+                return entry.getKey();
             }
         }
         return null;

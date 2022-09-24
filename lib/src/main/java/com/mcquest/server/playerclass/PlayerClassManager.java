@@ -4,6 +4,8 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +32,7 @@ public class PlayerClassManager {
         if (playerClassesById.containsKey(name)) {
             throw new IllegalArgumentException("Name already in use: " + name);
         }
-        for (int i = 0; i < playerClass.getSkillCount(); i++) {
-            Skill skill = playerClass.getSkill(i);
+        for (Skill skill : playerClass.getSkills()) {
             ItemStack hotbarItemStack = skill.getHotbarItemStack();
         }
         playerClassesById.put(playerClass.getId(), playerClass);
@@ -42,6 +43,10 @@ public class PlayerClassManager {
      */
     public PlayerClass getPlayerClass(int id) {
         return playerClassesById.get(id);
+    }
+
+    public Collection<PlayerClass> getPlayerClasses() {
+        return Collections.unmodifiableCollection(playerClassesById.values());
     }
 
     public Skill getSkill(ItemStack hotbarItemStack) {

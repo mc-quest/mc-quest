@@ -13,13 +13,13 @@ import java.util.List;
 public class Weapon extends Item {
     private final PlayerClass[] playerClasses;
     private final int level;
-    private final double damage;
+    private final double physicalDamage;
 
     Weapon(WeaponBuilder builder) {
         super(builder);
         this.playerClasses = builder.playerClasses.toArray(new PlayerClass[0]);
         this.level = builder.level;
-        this.damage = builder.damage;
+        this.physicalDamage = builder.physicalDamage;
     }
 
     public int getPlayerClassCount() {
@@ -37,11 +37,8 @@ public class Weapon extends Item {
         return level;
     }
 
-    /**
-     * Returns how much damage this Weapon inflicts.
-     */
-    public double getDamage() {
-        return damage;
+    public double getPhysicalDamage() {
+        return physicalDamage;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class Weapon extends Item {
         lore.add(ItemUtility.playerClassText(playerClasses));
         lore.add(ItemUtility.levelText(level));
         lore.add(Component.empty());
-        lore.add(ItemUtility.statText("Damage", damage));
+        lore.add(ItemUtility.statText("Physical Damage", physicalDamage));
         if (description != null) {
             lore.add(Component.empty());
             lore.addAll(ItemUtility.descriptionText(description));

@@ -3,6 +3,7 @@ package com.mcquest.server.quest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class QuestManager {
     }
 
     public Collection<Quest> getQuests() {
-        return questsById.values();
+        return Collections.unmodifiableCollection(questsById.values());
     }
 
     public QuestBuilder questBuilder(int id, String name, int level) {

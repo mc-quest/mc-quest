@@ -20,9 +20,20 @@ public class PlayerClassBuilder {
         this.skillTreeDecorations = new ArrayList<>();
     }
 
-    public PlayerClassBuilder skill(int id, String name, int level, Material icon,
-                                    String description, int skillTreeRow, int skillTreeColumn) {
-        Skill skill = new Skill(id, name, level, icon, description, skillTreeRow, skillTreeColumn);
+    public PlayerClassBuilder activeSkill(int id, String name, int level, Material icon,
+                                          String description, double manaCost,
+                                          int skillTreeRow, int skillTreeColumn) {
+        ActiveSkill skill = new ActiveSkill(id, name, level, icon, description,
+                skillTreeRow, skillTreeColumn, manaCost);
+        skills.add(skill);
+        return this;
+    }
+
+    public PlayerClassBuilder passiveSkill(int id, String name, int level, Material icon,
+                                           String description, int skillTreeRow,
+                                           int skillTreeColumn) {
+        PassiveSkill skill = new PassiveSkill(id, name, level, icon, description,
+                skillTreeRow, skillTreeColumn);
         skills.add(skill);
         return this;
     }

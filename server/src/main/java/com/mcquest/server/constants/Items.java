@@ -1,5 +1,5 @@
 package com.mcquest.server.constants;
 
 public class Items {
-    public static final int MINOR_POTION_OF_HEALING = 1;
+    public static final int ADVENTURERS_SWORD = 1;
 }

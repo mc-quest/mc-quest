@@ -1,0 +1,16 @@
+{
+    "id": 1,
+    "duration": 32,
+    "beatsPerMinute": 100,
+    "notes": [
+        {
+            "instrument": "minecraft:block.note_block.harp",
+            "time": 1,
+            "pitch": "A_1"
+        },
+        {
+            "time": 2,
+            "pitch": "A_1"
+        }
+    ]
+}

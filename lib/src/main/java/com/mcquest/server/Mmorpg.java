@@ -23,13 +23,13 @@ public class Mmorpg {
     private final PlayerClassManager playerClassManager;
     private final ItemManager itemManager;
     private final QuestManager questManager;
+    private final MusicManager musicManager;
     private final InstanceManager instanceManager;
+    private final ResourceManager resourceManager;
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
-    private final MusicManager musicManager;
-    private final ResourceManager resourceManager;
     private final FeatureManager featureManager;
 
     public Mmorpg() {
@@ -38,13 +38,13 @@ public class Mmorpg {
         playerClassManager = new PlayerClassManager();
         itemManager = new ItemManager();
         questManager = new QuestManager();
+        musicManager = new MusicManager();
         instanceManager = new InstanceManager();
+        resourceManager = new ResourceManager();
         pcManager = new PlayerCharacterManager(this);
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
-        musicManager = new MusicManager();
-        this.resourceManager = new ResourceManager();
         featureManager = new FeatureManager();
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
@@ -75,8 +75,16 @@ public class Mmorpg {
         return questManager;
     }
 
+    public MusicManager getMusicManager() {
+        return musicManager;
+    }
+
     public InstanceManager getInstanceManager() {
         return instanceManager;
+    }
+
+    public ResourceManager getResourceManager() {
+        return resourceManager;
     }
 
     public PlayerCharacterManager getPlayerCharacterManager() {
@@ -93,14 +101,6 @@ public class Mmorpg {
 
     public PhysicsManager getPhysicsManager() {
         return physicsManager;
-    }
-
-    public MusicManager getMusicManager() {
-        return musicManager;
-    }
-
-    public ResourceManager getResourceManager() {
-        return resourceManager;
     }
 
     public FeatureManager getFeatureManager() {

@@ -1,0 +1,9 @@
+{
+    "id": 1,
+    "name": "Adventurer's Sword",
+    "rarity": "COMMON",
+    "icon": "minecraft:iron_sword",
+    "playerClassIds": [1],
+    "level": 1,
+    "physicalDamage": 3
+}

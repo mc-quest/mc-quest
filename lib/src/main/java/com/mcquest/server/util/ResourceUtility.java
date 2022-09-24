@@ -1,11 +1,15 @@
 package com.mcquest.server.util;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
@@ -15,11 +19,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class ResourceLoader {
-    private static final Gson gson = new Gson();
+public class ResourceUtility {
+    private static final Gson GSON = new Gson();
 
     public static InputStream getResourceAsStream(@NotNull String resourcePath) {
-        return ResourceLoader.class.getClassLoader().getResourceAsStream(resourcePath);
+        return ResourceUtility.class.getClassLoader().getResourceAsStream(resourcePath);
+    }
+
+    public static JsonElement getResourceAsJson(@NotNull String resourcePath) {
+        InputStream stream = getResourceAsStream(resourcePath);
+        Reader reader = new InputStreamReader(stream);
+        return JsonParser.parseReader(reader);
     }
 
     /**
@@ -35,7 +45,7 @@ public class ResourceLoader {
                                                 @NotNull Class<T> classOfT) {
         InputStream inputStream = getResourceAsStream(resourcePath);
         InputStreamReader reader = new InputStreamReader(inputStream);
-        return gson.fromJson(reader, classOfT);
+        return GSON.fromJson(reader, classOfT);
     }
 
     /**
@@ -50,7 +60,7 @@ public class ResourceLoader {
     public static void extractResources(@NotNull String resourcesPath,
                                         @NotNull String destinationPath) {
         try {
-            URI resourcesUri = ResourceLoader.class.getResource("/" + resourcesPath).toURI();
+            URI resourcesUri = ResourceUtility.class.getResource("/" + resourcesPath).toURI();
             FileSystem fileSystem = null;
 
             // Only create a new FileSystem if running from a jar.
@@ -90,7 +100,7 @@ public class ResourceLoader {
      */
     public static List<String> getResources(@NotNull String resourcesPath) {
         try {
-            URI resourcesUri = ResourceLoader.class.getResource("/" + resourcesPath).toURI();
+            URI resourcesUri = ResourceUtility.class.getResource("/" + resourcesPath).toURI();
 
             // Only create a new FileSystem if running from a jar.
             FileSystem fileSystem = null;

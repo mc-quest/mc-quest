@@ -21,6 +21,12 @@ public class FeatureManager {
         features.put(feature.getClass(), feature);
     }
 
+    public void addFeatures(Feature... features) {
+        for (Feature feature : features) {
+            addFeature(feature);
+        }
+    }
+
     public <T extends Feature> T getFeature(Class<T> featureClass) {
         return (T) features.get(featureClass);
     }

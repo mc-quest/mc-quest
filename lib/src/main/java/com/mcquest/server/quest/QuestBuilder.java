@@ -18,8 +18,8 @@ public class QuestBuilder {
         this.objectives = new ArrayList<>();
     }
 
-    public QuestBuilder objective(String description, int objective) {
-        objectives.add(new QuestObjective(objectives.size(), description, objective));
+    public QuestBuilder objective(String description, int goal) {
+        objectives.add(new QuestObjective(objectives.size(), description, goal));
         return this;
     }
 

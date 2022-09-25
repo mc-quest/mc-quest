@@ -1,20 +1,33 @@
 package com.mcquest.server.quest;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.PlayerCharacterStartQuestEvent;
+import net.kyori.adventure.text.Component;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.GlobalEventHandler;
 
-public class PlayerCharacterQuestManager {
+import java.util.*;
+
+public class PlayerCharacterQuestTracker {
+    private final PlayerCharacter pc;
     private final Set<Quest> completedQuests;
     private final Set<Quest> inProgressQuests;
     private final Map<QuestObjective, Integer> objectiveProgress;
 
-    public PlayerCharacterQuestManager() {
+    public PlayerCharacterQuestTracker(PlayerCharacter pc) {
+        this.pc = pc;
         // TODO: populate these
         completedQuests = new HashSet<>();
         inProgressQuests = new HashSet<>();
         objectiveProgress = new HashMap<>();
+    }
+
+    public Set<Quest> getInProgressQuests() {
+        return Collections.unmodifiableSet(inProgressQuests);
+    }
+
+    public Set<Quest> getCompletedQuests() {
+        return Collections.unmodifiableSet(completedQuests);
     }
 
     public QuestStatus getStatus(Quest quest) {
@@ -27,15 +40,22 @@ public class PlayerCharacterQuestManager {
         return QuestStatus.NOT_STARTED;
     }
 
+    public boolean compareStatus(Quest quest, QuestStatus status) {
+        return getStatus(quest) == status;
+    }
+
     public void startQuest(Quest quest) {
         if (inProgressQuests.contains(quest) || completedQuests.contains(quest)) {
-            throw new IllegalArgumentException();
+            return;
         }
         inProgressQuests.add(quest);
         for (int i = 0; i < quest.getObjectiveCount(); i++) {
             QuestObjective objective = quest.getObjective(i);
             objectiveProgress.put(objective, 0);
         }
+        pc.sendMessage(Component.text("Quest started: " + quest.getName()));
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.call(new PlayerCharacterStartQuestEvent(pc, quest));
     }
 
     public int getProgress(QuestObjective objective) {

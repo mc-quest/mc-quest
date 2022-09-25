@@ -26,11 +26,11 @@ public class Mmorpg {
     private final MusicManager musicManager;
     private final InstanceManager instanceManager;
     private final ResourceManager resourceManager;
+    private final FeatureManager featureManager;
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
-    private final FeatureManager featureManager;
 
     public Mmorpg() {
         isStarted = false;
@@ -41,11 +41,11 @@ public class Mmorpg {
         musicManager = new MusicManager();
         instanceManager = new InstanceManager();
         resourceManager = new ResourceManager();
+        featureManager = new FeatureManager();
         pcManager = new PlayerCharacterManager(this);
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
-        featureManager = new FeatureManager();
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }
@@ -87,6 +87,10 @@ public class Mmorpg {
         return resourceManager;
     }
 
+    public FeatureManager getFeatureManager() {
+        return featureManager;
+    }
+
     public PlayerCharacterManager getPlayerCharacterManager() {
         return pcManager;
     }
@@ -101,10 +105,6 @@ public class Mmorpg {
 
     public PhysicsManager getPhysicsManager() {
         return physicsManager;
-    }
-
-    public FeatureManager getFeatureManager() {
-        return featureManager;
     }
 
     public GlobalEventHandler getGlobalEventHandler() {

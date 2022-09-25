@@ -3,15 +3,17 @@ package com.mcquest.server.features;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
-import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.Instances;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.feature.Feature;
-import com.mcquest.server.npc.Dwarf;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
+import com.mcquest.server.ui.InteractionSequence;
+import com.mcquest.server.ui.PlayerCharacterInteractionCollider;
+import com.mcquest.server.util.Debug;
 import com.mcquest.server.util.ParticleEffects;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.instance.Instance;
@@ -24,14 +26,20 @@ public class TestFeature implements Feature {
 
     @Override
     public void hook(Mmorpg mmorpg) {
-        this.mmorpg = mmorpg;
-        Instance instance = mmorpg.getInstanceManager().getInstance(Instances.ELADRADOR);
-        Pos spawnPosition = new Pos(0, 70, 0);
-        NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        for (int i = 0; i < 10; i++) {
-            npcSpawner.add(new Dwarf(mmorpg, instance, spawnPosition));
-        }
-        mmorpg.getGlobalEventHandler().addListener(PlayerCharacterBasicAttackEvent.class, this::basicAttack);
+        Instance eladrador = mmorpg.getInstanceManager().getInstance(Instances.ELADRADOR);
+        InteractionSequence interactionSequence = InteractionSequence.builder()
+                .interaction(pc -> pc.sendMessage(Component.text("Message 1")))
+                .interaction(pc -> pc.sendMessage(Component.text("Message 2")))
+                .interaction(pc -> {
+                    pc.getPlayer().setAllowFlying(true);
+                    pc.getPlayer().setFlyingSpeed(0.5f);
+                })
+                .build();
+        PlayerCharacterInteractionCollider collider = new PlayerCharacterInteractionCollider(
+                eladrador, new Pos(0, 70, 0), 10, 10, 10,
+                pc -> interactionSequence.advance(pc));
+        mmorpg.getPhysicsManager().addCollider(collider);
+        Debug.showCollider(collider);
     }
 
     private void basicAttack(PlayerCharacterBasicAttackEvent event) {

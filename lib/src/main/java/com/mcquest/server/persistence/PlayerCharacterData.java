@@ -21,6 +21,7 @@ public class PlayerCharacterData {
     private double experiencePoints;
     private PersistentItem[] items;
     private Integer songId;
+    private boolean canMount;
 
     private PlayerCharacterData() {
     }
@@ -43,6 +44,7 @@ public class PlayerCharacterData {
         data.items = new PersistentItem[46];
         data.items[4] = new PersistentItem(weapon.getId(), 1);
         data.songId = null;
+        data.canMount = true;
         return data;
     }
 
@@ -56,6 +58,7 @@ public class PlayerCharacterData {
         data.experiencePoints = pc.getExperiencePoints();
         Song song = pc.getMusicPlayer().getSong();
         data.songId = song == null ? null : song.getId();
+        data.canMount = pc.canMount();
         return data;
     }
 
@@ -101,5 +104,9 @@ public class PlayerCharacterData {
 
     public @Nullable Integer getSongId() {
         return songId;
+    }
+
+    public boolean canMount() {
+        return canMount;
     }
 }

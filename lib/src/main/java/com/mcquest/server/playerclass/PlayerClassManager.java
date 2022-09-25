@@ -50,12 +50,16 @@ public class PlayerClassManager {
     }
 
     public Skill getSkill(ItemStack hotbarItemStack) {
-        if (!hotbarItemStack.hasTag(PLAYER_CLASS_ID_TAG)) {
+        if (!hotbarItemStack.hasTag(PLAYER_CLASS_ID_TAG) ||
+                !hotbarItemStack.hasTag(SKILL_ID_TAG)) {
             return null;
         }
         int playerClassId = hotbarItemStack.getTag(PLAYER_CLASS_ID_TAG);
-        int skillId = hotbarItemStack.getTag(SKILL_ID_TAG);
         PlayerClass playerClass = getPlayerClass(playerClassId);
+        if (playerClass == null) {
+            return null;
+        }
+        int skillId = hotbarItemStack.getTag(SKILL_ID_TAG);
         return playerClass.getSkill(skillId);
     }
 }

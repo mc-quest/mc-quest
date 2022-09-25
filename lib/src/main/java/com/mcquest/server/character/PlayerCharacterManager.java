@@ -95,6 +95,7 @@ public class PlayerCharacterManager {
         if (logoutHandler == null) {
             throw new IllegalStateException("You need to specify a player character logout handler");
         }
+        pc.remove();
         logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);

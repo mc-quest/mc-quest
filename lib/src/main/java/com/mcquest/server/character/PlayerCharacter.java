@@ -9,7 +9,7 @@ import com.mcquest.server.music.MusicManager;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.physics.PhysicsManager;
-import com.mcquest.server.quest.PlayerCharacterQuestManager;
+import com.mcquest.server.quest.PlayerCharacterQuestTracker;
 import com.mcquest.server.music.PlayerCharacterMusicPlayer;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
@@ -55,7 +55,7 @@ public final class PlayerCharacter extends Character {
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
-    private final PlayerCharacterQuestManager questManager;
+    private final PlayerCharacterQuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final Hitbox hitbox;
     private Pos respawnPosition;
@@ -64,9 +64,11 @@ public final class PlayerCharacter extends Character {
     private double healthRegenRate;
     private double manaRegenRate;
     private double experiencePoints;
+    private boolean canMount;
     private boolean isDisarmed;
     private Task undisarmTask;
     private long undisarmTime;
+    private boolean removed;
 
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
         super(Component.text(player.getUsername(), NamedTextColor.GREEN),
@@ -78,7 +80,7 @@ public final class PlayerCharacter extends Character {
         respawnPosition = data.getRespawnPosition();
         // hidePlayerNameplate();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
-        questManager = new PlayerCharacterQuestManager();
+        questTracker = new PlayerCharacterQuestTracker(this);
         MusicManager musicManager = mmorpg.getMusicManager();
         musicPlayer = new PlayerCharacterMusicPlayer(this);
         Integer songId = data.getSongId();
@@ -88,8 +90,8 @@ public final class PlayerCharacter extends Character {
         }
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
-        this.maxMana = data.getMaxMana();
-        this.mana = data.getMana();
+        maxMana = data.getMaxMana();
+        mana = data.getMana();
         healthRegenRate = 1;
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
@@ -110,11 +112,13 @@ public final class PlayerCharacter extends Character {
             }
         }
         initUi();
+        canMount = data.canMount();
+        removed = false;
     }
 
     private void initUi() {
         updateActionBar();
-        // Updating action bar must be delayed to work properly.
+        // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
     }
@@ -132,9 +136,6 @@ public final class PlayerCharacter extends Character {
     public void setPosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(hitboxCenter());
-        if (player.getPosition().distanceSquared(position) >= 5.0) {
-            player.teleport(position);
-        }
         updateActionBar();
     }
 
@@ -359,8 +360,8 @@ public final class PlayerCharacter extends Character {
     }
 
     @ApiStatus.Internal
-    public PlayerCharacterQuestManager getQuestManager() {
-        return questManager;
+    public PlayerCharacterQuestTracker getQuestTracker() {
+        return questTracker;
     }
 
     public Weapon getWeapon() {
@@ -480,6 +481,14 @@ public final class PlayerCharacter extends Character {
         return amountRemoved;
     }
 
+    public boolean canMount() {
+        return canMount;
+    }
+
+    public void setCanMount(boolean canMount) {
+        this.canMount = canMount;
+    }
+
     public boolean isDisarmed() {
         return isDisarmed;
     }
@@ -522,6 +531,14 @@ public final class PlayerCharacter extends Character {
         passenger.setInvisible(true);
         passenger.setInstance(getInstance());
         player.addPassenger(passenger);
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    void remove() {
+        removed = true;
     }
 
     public static class Hitbox extends CharacterHitbox {

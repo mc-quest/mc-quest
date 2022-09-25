@@ -2,5 +2,42 @@
     "id": 1,
     "name": "Tutorial",
     "level": 1,
-    "objectives": []
+    "objectives": [
+        {
+            "description": "Open the menu",
+            "goal": 1
+        },
+        {
+            "description": "Open your skill tree",
+            "goal": 1
+        },
+        {
+            "description": "Unlock a skill",
+            "goal": 1
+        },
+        {
+            "description": "Add skill to hotbar",
+            "goal": 1
+        },
+        {
+            "description": "Use a skill",
+            "goal": 1
+        },
+        {
+            "description": "Open the map",
+            "goal": 1
+        },
+        {
+            "description": "Go to the training grounds",
+            "goal": 1
+        },
+        {
+            "description": "Training dummy slain",
+            "goal": 3
+        },
+        {
+            "description": "Speak with mayor of Melcher",
+            "goal": 1
+        }
+    ]
 }

@@ -67,15 +67,15 @@ public class InteractionHandler {
         eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
         eventHandler.addListener(PlayerEntityInteractEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
+        eventHandler.addListener(PlayerBlockInteractEvent.class, this::handleBlockInteract);
     }
 
     private void handlePlayerCharacterLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Player player = pc.getPlayer();
         // Must delay a tick, or it won't work.
-        mmorpg.getSchedulerManager().buildTask(() -> {
-            player.setHeldItemSlot((byte) 4);
-        }).delay(TaskSchedule.nextTick()).schedule();
+        mmorpg.getSchedulerManager().buildTask(() -> player.setHeldItemSlot((byte) 4)).
+                delay(TaskSchedule.nextTick()).schedule();
         PlayerInventory inventory = player.getInventory();
         inventory.setItemStack(MENU_SLOT, OPEN_MENU);
         inventory.addInventoryCondition((p, slot, clickType, inventoryConditionResult) -> {
@@ -95,21 +95,15 @@ public class InteractionHandler {
         menu.setItemStack(MENU_LOGOUT_SLOT, LOGOUT);
         menu.addInventoryCondition((player, slot, clickType, inventoryConditionResult) -> {
             switch (slot) {
-                case MENU_SKILL_TREE_SLOT:
-                    openSkillTree(pc);
-                    break;
-                case MENU_QUEST_LOG_SLOT:
-                    openQuestLog(pc);
-                    break;
-                case MENU_LOGOUT_SLOT:
-                    handleLogoutClick(pc);
-                    break;
-                default:
-                    break;
+                case MENU_SKILL_TREE_SLOT -> openSkillTree(pc);
+                case MENU_QUEST_LOG_SLOT -> openQuestLog(pc);
+                case MENU_LOGOUT_SLOT -> handleLogoutClick(pc);
             }
             inventoryConditionResult.setCancel(true);
         });
         pc.getPlayer().openInventory(menu);
+        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
+        eventHandler.call(new PlayerCharacterOpenMenuEvent(pc));
     }
 
     private void openSkillTree(PlayerCharacter pc) {
@@ -214,6 +208,11 @@ public class InteractionHandler {
                     (PlayerCharacterInteractionCollider) hit.getCollider();
             collider.interact(pc);
         }
+    }
+
+    private void handleBlockInteract(PlayerBlockInteractEvent event) {
+        // Prevent doors, trapdoors, etc. from being opened or closed.
+        event.setBlockingItemUse(true);
     }
 
     private boolean isInteractionCollider(Collider collider) {

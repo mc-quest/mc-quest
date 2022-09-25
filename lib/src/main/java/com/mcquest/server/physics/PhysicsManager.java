@@ -112,9 +112,9 @@ public class PhysicsManager {
         double directionY = direction.y();
         double directionZ = direction.z();
 
-        double divX = 1.0 / directionX;
-        double divY = 1.0 / directionY;
-        double divZ = 1.0 / directionZ;
+        double divX = directionX == 0.0 ? Double.MAX_VALUE : 1.0 / directionX;
+        double divY = directionY == 0.0 ? Double.MAX_VALUE : 1.0 / directionY;
+        double divZ = directionZ == 0.0 ? Double.MAX_VALUE : 1.0 / directionZ;
 
         double colliderMinX = collider.getMinX();
         double colliderMinY = collider.getMinY();
@@ -176,10 +176,14 @@ public class PhysicsManager {
         }
 
         // Intersections are behind the origin:
-        if (tMax < 0.0) return null;
+        if (tMax < 0.0) {
+            return null;
+        }
 
         // Intersections are too far away:
-        if (tMin > maxDistance) return null;
+        if (tMin > maxDistance) {
+            return null;
+        }
 
         // Find the closest intersection:
         double t;

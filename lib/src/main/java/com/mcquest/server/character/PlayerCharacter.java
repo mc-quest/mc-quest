@@ -8,11 +8,14 @@ import com.mcquest.server.item.*;
 import com.mcquest.server.music.MusicManager;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
+import com.mcquest.server.persistence.PersistentQuestObjectiveData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.PlayerCharacterQuestTracker;
 import com.mcquest.server.music.PlayerCharacterMusicPlayer;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.quest.Quest;
+import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.util.MathUtility;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -39,7 +42,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
-import java.util.Arrays;
+import java.util.*;
 
 public final class PlayerCharacter extends Character {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = {
@@ -76,51 +79,83 @@ public final class PlayerCharacter extends Character {
                 mmorpg.getInstanceManager().getInstance(data.getInstanceId()), data.getPosition());
         this.mmorpg = mmorpg;
         this.player = player;
-        hitbox = new PlayerCharacter.Hitbox(this);
         respawnPosition = data.getRespawnPosition();
-        // hidePlayerNameplate();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
-        questTracker = new PlayerCharacterQuestTracker(this);
-        MusicManager musicManager = mmorpg.getMusicManager();
-        musicPlayer = new PlayerCharacterMusicPlayer(this);
-        Integer songId = data.getSongId();
-        if (songId != null) {
-            Song song = musicManager.getSong(songId);
-            musicPlayer.setSong(song);
-        }
+        questTracker = initQuestTracker(data);
+        musicPlayer = initMusic(data);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
         mana = data.getMana();
         healthRegenRate = 1;
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        physicsManager.addCollider(hitbox);
+        hitbox = initHitbox();
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
-        PersistentItem[] persistentItems = data.getItems();
-        ItemManager itemManager = mmorpg.getItemManager();
-        PlayerInventory inventory = player.getInventory();
-        for (int i = 0; i < persistentItems.length; i++) {
-            PersistentItem persistentItem = persistentItems[i];
-            if (persistentItem != null) {
-                int itemId = persistentItem.getItemId();
-                int itemAmount = persistentItem.getAmount();
-                Item item = itemManager.getItem(itemId);
-                ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
-                inventory.setItemStack(i, itemStack);
-            }
-        }
+        initInventory(data);
         initUi();
         canMount = data.canMount();
         removed = false;
     }
 
+    private PlayerCharacterQuestTracker initQuestTracker(PlayerCharacterData data) {
+        QuestManager questManager = mmorpg.getQuestManager();
+
+        Map<Quest, int[]> objectiveProgress = new HashMap<>();
+        PersistentQuestObjectiveData[] objectiveData = data.getQuestObjectiveData();
+        for (PersistentQuestObjectiveData questData : objectiveData) {
+            Quest quest = questManager.getQuest(questData.getQuestId());
+            objectiveProgress.put(quest, questData.getObjectiveProgress());
+        }
+
+        Set<Quest> completedQuests = new HashSet<>();
+        int[] completedQuestIds = data.getCompletedQuestIds();
+        for (int id : completedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            completedQuests.add(quest);
+        }
+
+        return new PlayerCharacterQuestTracker(this, objectiveProgress, completedQuests);
+    }
+
+    private void initInventory(PlayerCharacterData data) {
+        ItemManager itemManager = mmorpg.getItemManager();
+        PersistentItem[] persistentItems = data.getItems();
+        PlayerInventory inventory = player.getInventory();
+        for (PersistentItem persistentItem : persistentItems) {
+            int itemId = persistentItem.getItemId();
+            int itemAmount = persistentItem.getAmount();
+            int slot = persistentItem.getInventorySlot();
+            Item item = itemManager.getItem(itemId);
+            ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
+            inventory.setItemStack(slot, itemStack);
+        }
+    }
+
     private void initUi() {
+        // hidePlayerNameplate();
         updateActionBar();
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
+    }
+
+    private PlayerCharacterMusicPlayer initMusic(PlayerCharacterData data) {
+        MusicManager musicManager = mmorpg.getMusicManager();
+        PlayerCharacterMusicPlayer musicPlayer = new PlayerCharacterMusicPlayer(this);
+        Integer songId = data.getSongId();
+        if (songId != null) {
+            Song song = musicManager.getSong(songId);
+            musicPlayer.setSong(song);
+        }
+        return musicPlayer;
+    }
+
+    private Hitbox initHitbox() {
+        Hitbox hitbox = new PlayerCharacter.Hitbox(this);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.addCollider(hitbox);
+        return hitbox;
     }
 
     @Override

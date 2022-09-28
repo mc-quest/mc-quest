@@ -26,6 +26,7 @@ public class TestFeature implements Feature {
 
     @Override
     public void hook(Mmorpg mmorpg) {
+        this.mmorpg = mmorpg;
         Instance eladrador = mmorpg.getInstanceManager().getInstance(Instances.ELADRADOR);
         InteractionSequence interactionSequence = InteractionSequence.builder()
                 .interaction(pc -> pc.sendMessage(Component.text("Message 1")))

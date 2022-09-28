@@ -3,26 +3,21 @@ package com.mcquest.server.util;
 import net.minestom.server.coordinate.Pos;
 
 public class MathUtility {
-    /**
-     * Returns value clamped between min and max.
-     */
+    public static int clamp(int value, int min, int max) {
+        if (value < min) return min;
+        if (value > max) return max;
+        return value;
+    }
+
     public static double clamp(double value, double min, double max) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
+        if (value < min) return min;
+        if (value > max) return max;
         return value;
     }
 
     public static float clamp(float value, float min, float max) {
-        if (value < min) {
-            return min;
-        }
-        if (value > max) {
-            return max;
-        }
+        if (value < min) return min;
+        if (value > max) return max;
         return value;
     }
 

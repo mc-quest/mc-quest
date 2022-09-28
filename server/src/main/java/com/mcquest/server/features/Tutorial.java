@@ -13,6 +13,7 @@ import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
+import com.mcquest.server.quest.QuestStatus;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.instance.Instance;
@@ -30,6 +31,7 @@ public class Tutorial implements Feature {
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         tutorial = questManager.getQuest(Quests.TUTORIAL);
+        eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
         eventHandler.addListener(PlayerCharacterOpenMenuEvent.class, this::handleOpenMenu);
         eventHandler.addListener(PlayerCharacterOpenSkillTreeEvent.class, this::handleOpenSkillTree);
         eventHandler.addListener(PlayerCharacterUpgradeSkillEvent.class, this::handleSkillUpgrade);
@@ -53,30 +55,74 @@ public class Tutorial implements Feature {
         }
     }
 
+    private void handleLogin(PlayerCharacterLoginEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.start(pc);
+        tutorial.getObjective(0).setAccessible(pc, true);
+    }
+
     private void handleOpenMenu(PlayerCharacterOpenMenuEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(0).complete(pc);
+        tutorial.getObjective(1).setAccessible(pc, true);
     }
 
     private void handleOpenSkillTree(PlayerCharacterOpenSkillTreeEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(1).complete(pc);
+        tutorial.getObjective(2).setAccessible(pc, true);
     }
 
     private void handleSkillUpgrade(PlayerCharacterUpgradeSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(2).complete(pc);
+        tutorial.getObjective(3).setAccessible(pc, true);
     }
 
     private void handleAddSkillToHotbar(PlayerCharacterAddSkillToHotbarEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(3).complete(pc);
+        tutorial.getObjective(4).setAccessible(pc, true);
     }
 
     private void handleUseSkill(PlayerCharacterUseSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(4).complete(pc);
+        tutorial.getObjective(5).setAccessible(pc, true);
     }
 
     private void handleOpenMap(PlayerCharacterOpenMapEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(5).complete(pc);
+        tutorial.getObjective(6).setAccessible(pc, true);
     }
 
     private void handleEnterTrainingGrounds(PlayerCharacter pc) {
+        if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+            return;
+        }
+        tutorial.getObjective(6).complete(pc);
+        tutorial.getObjective(7).setAccessible(pc, true);
     }
 }

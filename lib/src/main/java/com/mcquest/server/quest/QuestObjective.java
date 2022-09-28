@@ -1,5 +1,7 @@
 package com.mcquest.server.quest;
 
+import com.mcquest.server.character.PlayerCharacter;
+
 public final class QuestObjective {
     private final int index;
     private final String description;
@@ -26,5 +28,29 @@ public final class QuestObjective {
 
     public Quest getQuest() {
         return quest;
+    }
+
+    public boolean isAccessible(PlayerCharacter pc) {
+        return pc.getQuestTracker().isAccessible(this);
+    }
+
+    public void setAccessible(PlayerCharacter pc, boolean accessible) {
+        pc.getQuestTracker().setAccessible(this, accessible);
+    }
+
+    public int getProgress(PlayerCharacter pc) {
+        return pc.getQuestTracker().getProgress(this);
+    }
+
+    public void setProgress(PlayerCharacter pc, int progress) {
+        pc.getQuestTracker().setProgress(this, progress);
+    }
+
+    public void addProgress(PlayerCharacter pc, int progress) {
+        pc.getQuestTracker().addProgress(this, progress);
+    }
+
+    public void complete(PlayerCharacter pc) {
+        pc.getQuestTracker().complete(this);
     }
 }

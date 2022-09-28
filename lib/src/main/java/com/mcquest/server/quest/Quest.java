@@ -1,5 +1,7 @@
 package com.mcquest.server.quest;
 
+import com.mcquest.server.character.PlayerCharacter;
+
 /**
  * A Quest represents a series of objectives for a player to complete.
  */
@@ -46,5 +48,17 @@ public final class Quest {
      */
     public int getObjectiveCount() {
         return objectives.length;
+    }
+
+    public QuestStatus getStatus(PlayerCharacter pc) {
+        return pc.getQuestTracker().getStatus(this);
+    }
+
+    public boolean compareStatus(PlayerCharacter pc, QuestStatus status) {
+        return pc.getQuestTracker().compareStatus(this, status);
+    }
+
+    public void start(PlayerCharacter pc) {
+        pc.getQuestTracker().startQuest(this);
     }
 }

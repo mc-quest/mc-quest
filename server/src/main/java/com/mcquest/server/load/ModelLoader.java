@@ -13,7 +13,6 @@ public class ModelLoader {
         List<String> paths = ResourceUtility.getResources("models");
         for (String path : paths) {
             Model model = ResourceUtility.readModel(path);
-            System.out.println(model.name());
             resourceManager.registerModel(model);
         }
     }

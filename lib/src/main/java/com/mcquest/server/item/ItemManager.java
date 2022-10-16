@@ -46,14 +46,14 @@ public class ItemManager {
     }
 
     public WeaponBuilder weaponBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                       @NotNull Material icon, int level) {
-        return new WeaponBuilder(this, id, name, rarity, icon, level);
+                                       @NotNull Material icon, int level, WeaponType type) {
+        return new WeaponBuilder(this, id, name, rarity, icon, level, type);
     }
 
     public ArmorItemBuilder armorItemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                             @NotNull Material icon, int level,
+                                             @NotNull Material icon, int level, ArmorType type,
                                              @NotNull ArmorSlot slot, double protections) {
-        return new ArmorItemBuilder(this, id, name, rarity, icon, level, slot, protections);
+        return new ArmorItemBuilder(this, id, name, rarity, icon, level, type, slot, protections);
     }
 
     public ConsumableItemBuilder consumableItemBuilder(int id, @NotNull String name,

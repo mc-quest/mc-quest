@@ -11,23 +11,19 @@ import java.util.List;
  * enemies.
  */
 public class Weapon extends Item {
-    private final PlayerClass[] playerClasses;
     private final int level;
+    private WeaponType type;
     private final double physicalDamage;
 
     Weapon(WeaponBuilder builder) {
         super(builder);
-        this.playerClasses = builder.playerClasses.toArray(new PlayerClass[0]);
         this.level = builder.level;
+        this.type = builder.type;
         this.physicalDamage = builder.physicalDamage;
     }
 
-    public int getPlayerClassCount() {
-        return playerClasses.length;
-    }
-
-    public PlayerClass getPlayerClass(int index) {
-        return playerClasses[index];
+    public WeaponType getType() {
+        return type;
     }
 
     /**
@@ -46,8 +42,7 @@ public class Weapon extends Item {
         ItemRarity rarity = getRarity();
         String description = getDescription();
         List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.rarityText(rarity, "Weapon"));
-        lore.add(ItemUtility.playerClassText(playerClasses));
+        lore.add(ItemUtility.rarityText(rarity, type.getText()));
         lore.add(ItemUtility.levelText(level));
         lore.add(Component.empty());
         lore.add(ItemUtility.statText("Physical Damage", physicalDamage));

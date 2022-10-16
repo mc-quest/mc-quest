@@ -1,12 +1,8 @@
 package com.mcquest.server.load;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.item.*;
-import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.util.ResourceUtility;
 import net.minestom.server.item.Material;
 
@@ -39,7 +35,6 @@ public class ItemLoader {
 
     private static void loadWeapons(Mmorpg mmorpg) {
         ItemManager itemManager = mmorpg.getItemManager();
-        PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
         List<String> paths = ResourceUtility.getResources("items/weapons");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
@@ -48,14 +43,10 @@ public class ItemLoader {
             ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
             Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
             int level = object.get("level").getAsInt();
-            WeaponBuilder builder = itemManager.weaponBuilder(id, name, rarity, icon, level);
+            WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
+            WeaponBuilder builder = itemManager.weaponBuilder(id, name, rarity, icon, level, type);
             if (object.has("description")) {
                 builder.description(object.get("description").getAsString());
-            }
-            JsonArray playerClassIds = object.get("playerClassIds").getAsJsonArray();
-            for (JsonElement playerClassId : playerClassIds) {
-                PlayerClass playerClass = playerClassManager.getPlayerClass(playerClassId.getAsInt());
-                builder.addPlayerClass(playerClass);
             }
             if (object.has("physicalDamage")) {
                 double physicalDamage = object.get("physicalDamage").getAsDouble();
@@ -67,7 +58,6 @@ public class ItemLoader {
 
     private static void loadArmor(Mmorpg mmorpg) {
         ItemManager itemManager = mmorpg.getItemManager();
-        PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
         List<String> paths = ResourceUtility.getResources("items/armor");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
@@ -76,17 +66,13 @@ public class ItemLoader {
             ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
             Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
             int level = object.get("level").getAsInt();
+            ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
             ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
             double protections = object.get("protections").getAsDouble();
             ArmorItemBuilder builder = itemManager.armorItemBuilder(id,
-                    name, rarity, icon, level, slot, protections);
+                    name, rarity, icon, level, type, slot, protections);
             if (object.has("description")) {
                 builder.description(object.get("description").getAsString());
-            }
-            JsonArray playerClassIds = object.get("playerClassIds").getAsJsonArray();
-            for (JsonElement playerClassId : playerClassIds) {
-                PlayerClass playerClass = playerClassManager.getPlayerClass(playerClassId.getAsInt());
-                builder.addPlayerClass(playerClass);
             }
             builder.build();
         }

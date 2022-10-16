@@ -3,9 +3,7 @@
     "name": "Adventurer's Sword",
     "rarity": "COMMON",
     "icon": "minecraft:iron_sword",
-    "playerClassIds": [
-        1
-    ],
     "level": 1,
+    "type": "SWORD",
     "physicalDamage": 3
 }

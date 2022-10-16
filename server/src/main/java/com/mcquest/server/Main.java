@@ -15,6 +15,7 @@ public class Main {
         MusicLoader.loadMusic(mmorpg);
         InstanceLoader.loadInstances(mmorpg);
         PlayerCharacterSessionHandler.handle(mmorpg);
+        ModelLoader.loadModels(mmorpg);
         FeatureLoader.loadFeatures(mmorpg);
         mmorpg.start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);
     }

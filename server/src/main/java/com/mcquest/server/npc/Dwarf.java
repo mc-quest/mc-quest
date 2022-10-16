@@ -3,8 +3,8 @@ package com.mcquest.server.npc;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
+import com.mcquest.server.constants.Models;
 import com.mcquest.server.physics.Collider;
-import com.mcquest.server.util.ResourceUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -14,16 +14,11 @@ import net.minestom.server.instance.Instance;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.minestom.BoneEntity;
 import team.unnamed.hephaestus.minestom.ModelEntity;
-import team.unnamed.hephaestus.reader.ModelReader;
-import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
-
-import java.io.IOException;
 
 public class Dwarf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
 
-    private static Model model;
-
+    private Model model;
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final Collider hitbox;
@@ -34,15 +29,7 @@ public class Dwarf extends NonPlayerCharacter {
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
-        if (model == null) {
-            ModelReader reader = BBModelReader.blockbench();
-            try {
-                model = reader.read(ResourceUtility.getResourceAsStream("models/baby_wolf_spider.bbmodel"));
-                mmorpg.getResourceManager().addModel(model);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        model = mmorpg.getResourceManager().getModel(Models.DWARF);
     }
 
     @Override
@@ -90,7 +77,7 @@ public class Dwarf extends NonPlayerCharacter {
         private final Dwarf dwarf;
 
         public Entity(Dwarf dwarf) {
-            super(EntityType.ARMOR_STAND, model);
+            super(EntityType.ARMOR_STAND, dwarf.model);
             ArmorStandMeta meta = (ArmorStandMeta) getEntityMeta();
             meta.setSmall(true);
             meta.setMarker(false);

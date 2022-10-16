@@ -8,7 +8,6 @@ public class FeatureLoader {
     public static void loadFeatures(Mmorpg mmorpg) {
         FeatureManager featureManager = mmorpg.getFeatureManager();
         featureManager.addFeatures(
-                new InstanceChunkLoaders(),
                 new TestFeature(),
                 new FighterPlayerClass(),
                 new MagePlayerClass(),

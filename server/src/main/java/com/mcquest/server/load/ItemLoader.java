@@ -10,14 +10,14 @@ import java.util.List;
 
 public class ItemLoader {
     public static void loadItems(Mmorpg mmorpg) {
-        loadBaseItems(mmorpg);
-        loadWeapons(mmorpg);
-        loadArmor(mmorpg);
-        loadConsumables(mmorpg);
+        ItemManager itemManager = mmorpg.getItemManager();
+        loadBaseItems(itemManager);
+        loadWeapons(itemManager);
+        loadArmor(itemManager);
+        loadConsumables(itemManager);
     }
 
-    private static void loadBaseItems(Mmorpg mmorpg) {
-        ItemManager itemManager = mmorpg.getItemManager();
+    private static void loadBaseItems(ItemManager itemManager) {
         List<String> paths = ResourceUtility.getResources("items/items");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
@@ -33,8 +33,7 @@ public class ItemLoader {
         }
     }
 
-    private static void loadWeapons(Mmorpg mmorpg) {
-        ItemManager itemManager = mmorpg.getItemManager();
+    private static void loadWeapons(ItemManager itemManager) {
         List<String> paths = ResourceUtility.getResources("items/weapons");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
@@ -56,8 +55,7 @@ public class ItemLoader {
         }
     }
 
-    private static void loadArmor(Mmorpg mmorpg) {
-        ItemManager itemManager = mmorpg.getItemManager();
+    private static void loadArmor(ItemManager itemManager) {
         List<String> paths = ResourceUtility.getResources("items/armor");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
@@ -78,8 +76,7 @@ public class ItemLoader {
         }
     }
 
-    private static void loadConsumables(Mmorpg mmorpg) {
-        ItemManager itemManager = mmorpg.getItemManager();
+    private static void loadConsumables(ItemManager itemManager) {
         List<String> paths = ResourceUtility.getResources("items/consumables");
         for (String path : paths) {
             JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();

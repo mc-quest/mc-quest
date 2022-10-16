@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
+import team.unnamed.hephaestus.Model;
+import team.unnamed.hephaestus.reader.ModelReader;
+import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +32,15 @@ public class ResourceUtility {
         InputStream stream = getResourceAsStream(resourcePath);
         Reader reader = new InputStreamReader(stream);
         return JsonParser.parseReader(reader);
+    }
+
+    public static Model readModel(String path) {
+        try {
+            ModelReader reader = BBModelReader.blockbench();
+            return reader.read(getResourceAsStream(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

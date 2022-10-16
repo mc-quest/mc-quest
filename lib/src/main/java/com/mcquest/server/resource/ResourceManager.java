@@ -9,19 +9,23 @@ import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.writer.ModelWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ResourceManager {
-    private final List<Model> models;
+    private final Map<String, Model> models;
     private net.minestom.server.resourcepack.ResourcePack resourcePack;
 
     public ResourceManager() {
-        models = new ArrayList<>();
+        models = new HashMap<>();
     }
 
-    public void addModel(Model model) {
-        models.add(model);
+    public void registerModel(Model model) {
+        models.put(model.name(), model);
+    }
+
+    public Model getModel(String name) {
+        return models.get(name);
     }
 
     @ApiStatus.Internal
@@ -30,7 +34,7 @@ public class ResourceManager {
             tree.write(Metadata.builder()
                     .add(PackMeta.of(9, "MCQuest resource pack"))
                     .build());
-            ModelWriter.resource("mcquest").write(tree, models);
+            ModelWriter.resource("mcquest").write(tree, models.values());
         });
         ResourcePackServer server;
         try {
@@ -46,6 +50,7 @@ public class ResourceManager {
         server.start();
     }
 
+    @ApiStatus.Internal
     public net.minestom.server.resourcepack.ResourcePack getResourcePack() {
         return resourcePack;
     }

@@ -160,12 +160,6 @@ public class InteractionHandler {
             eventHandler.call(new PlayerCharacterConsumeItemEvent(pc, consumableItem));
             return;
         }
-
-        PlayerClassManager playerClassManager = mmorpg.getPlayerClassManager();
-        Skill skill = playerClassManager.getSkill(itemStack);
-        if (skill != null) {
-            // TODO: Use skill.
-        }
     }
 
     private void handleBasicAttack(PlayerHandAnimationEvent event) {

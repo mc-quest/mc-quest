@@ -10,6 +10,7 @@ import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.persistence.PersistentQuestObjectiveData;
 import com.mcquest.server.physics.PhysicsManager;
+import com.mcquest.server.playerclass.PlayerCharacterSkillManager;
 import com.mcquest.server.quest.PlayerCharacterQuestTracker;
 import com.mcquest.server.music.PlayerCharacterMusicPlayer;
 import com.mcquest.server.persistence.PlayerCharacterData;
@@ -58,6 +59,7 @@ public final class PlayerCharacter extends Character {
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
+    private final PlayerCharacterSkillManager skillManager;
     private final PlayerCharacterQuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final Hitbox hitbox;
@@ -81,6 +83,7 @@ public final class PlayerCharacter extends Character {
         this.player = player;
         respawnPosition = data.getRespawnPosition();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
+        skillManager = new PlayerCharacterSkillManager(this);
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
         setMaxHealth(data.getMaxHealth());
@@ -394,7 +397,10 @@ public final class PlayerCharacter extends Character {
         player.playSound(Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f));
     }
 
-    @ApiStatus.Internal
+    public PlayerCharacterSkillManager getSkillManager() {
+        return skillManager;
+    }
+
     public PlayerCharacterQuestTracker getQuestTracker() {
         return questTracker;
     }

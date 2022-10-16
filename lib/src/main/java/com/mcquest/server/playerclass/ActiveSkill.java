@@ -1,6 +1,9 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.character.PlayerCharacter;
 import net.minestom.server.item.Material;
+
+import java.time.Duration;
 
 public class ActiveSkill extends Skill {
     private final double manaCost;
@@ -13,5 +16,9 @@ public class ActiveSkill extends Skill {
 
     public double getManaCost() {
         return manaCost;
+    }
+
+    public Duration getCooldown(PlayerCharacter pc) {
+        return pc.getSkillManager().getCooldown(this);
     }
 }

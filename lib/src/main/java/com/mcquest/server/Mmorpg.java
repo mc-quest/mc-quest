@@ -35,7 +35,7 @@ public class Mmorpg {
     public Mmorpg() {
         isStarted = false;
         server = MinecraftServer.init();
-        playerClassManager = new PlayerClassManager();
+        playerClassManager = new PlayerClassManager(this);
         itemManager = new ItemManager();
         questManager = new QuestManager();
         musicManager = new MusicManager();

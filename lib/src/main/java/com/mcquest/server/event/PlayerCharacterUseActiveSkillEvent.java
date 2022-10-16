@@ -1,14 +1,14 @@
 package com.mcquest.server.event;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.playerclass.Skill;
+import com.mcquest.server.playerclass.ActiveSkill;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterUseSkillEvent implements Event {
+public class PlayerCharacterUseActiveSkillEvent implements Event {
     private final PlayerCharacter pc;
-    private final Skill skill;
+    private final ActiveSkill skill;
 
-    public PlayerCharacterUseSkillEvent(PlayerCharacter pc, Skill skill) {
+    public PlayerCharacterUseActiveSkillEvent(PlayerCharacter pc, ActiveSkill skill) {
         this.pc = pc;
         this.skill = skill;
     }
@@ -17,7 +17,7 @@ public class PlayerCharacterUseSkillEvent implements Event {
         return pc;
     }
 
-    public Skill getSkill() {
+    public ActiveSkill getSkill() {
         return skill;
     }
 }

@@ -13,7 +13,7 @@ import java.util.Map;
  * The ItemManager is used to register and retrieve Items.
  */
 public class ItemManager {
-    static final Tag<Integer> ID_TAG = Tag.Integer("id");
+    static final Tag<Integer> ID_TAG = Tag.Integer("item_id");
 
     private final Map<Integer, Item> itemsById;
 

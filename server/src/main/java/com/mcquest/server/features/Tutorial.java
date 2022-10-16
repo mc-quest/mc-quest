@@ -36,7 +36,7 @@ public class Tutorial implements Feature {
         eventHandler.addListener(PlayerCharacterOpenSkillTreeEvent.class, this::handleOpenSkillTree);
         eventHandler.addListener(PlayerCharacterUpgradeSkillEvent.class, this::handleSkillUpgrade);
         eventHandler.addListener(PlayerCharacterAddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
-        eventHandler.addListener(PlayerCharacterUseSkillEvent.class, this::handleUseSkill);
+        eventHandler.addListener(PlayerCharacterUseActiveSkillEvent.class, this::handleUseSkill);
         eventHandler.addListener(PlayerCharacterOpenMapEvent.class, this::handleOpenMap);
         Instance eladrador = instanceManager.getInstance(Instances.ELADRADOR);
         Collider trainingGroundsBounds = new Collider(eladrador, 0, 0, 0, 0, 0, 0) {
@@ -100,7 +100,7 @@ public class Tutorial implements Feature {
         tutorial.getObjective(4).setAccessible(pc, true);
     }
 
-    private void handleUseSkill(PlayerCharacterUseSkillEvent event) {
+    private void handleUseSkill(PlayerCharacterUseActiveSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;

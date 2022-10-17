@@ -34,7 +34,7 @@ public class Tutorial implements Feature {
         eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
         eventHandler.addListener(PlayerCharacterOpenMenuEvent.class, this::handleOpenMenu);
         eventHandler.addListener(PlayerCharacterOpenSkillTreeEvent.class, this::handleOpenSkillTree);
-        eventHandler.addListener(PlayerCharacterUpgradeSkillEvent.class, this::handleSkillUpgrade);
+        eventHandler.addListener(PlayerCharacterUnlockSkillEvent.class, this::handleSkillUpgrade);
         eventHandler.addListener(PlayerCharacterAddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
         eventHandler.addListener(PlayerCharacterUseActiveSkillEvent.class, this::handleUseSkill);
         eventHandler.addListener(PlayerCharacterOpenMapEvent.class, this::handleOpenMap);
@@ -82,7 +82,7 @@ public class Tutorial implements Feature {
         tutorial.getObjective(2).setAccessible(pc, true);
     }
 
-    private void handleSkillUpgrade(PlayerCharacterUpgradeSkillEvent event) {
+    private void handleSkillUpgrade(PlayerCharacterUnlockSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (tutorial.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;

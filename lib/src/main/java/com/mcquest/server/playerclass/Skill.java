@@ -1,5 +1,6 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.character.PlayerCharacter;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
@@ -61,5 +62,9 @@ public class Skill {
     public ItemStack getHotbarItemStack() {
         // TODO
         return ItemStack.of(Material.DIAMOND);
+    }
+
+    public boolean isUnlocked(PlayerCharacter pc) {
+        return pc.getSkillManager().isUnlocked(this);
     }
 }

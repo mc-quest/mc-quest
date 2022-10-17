@@ -4,15 +4,13 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.playerclass.Skill;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterUpgradeSkillEvent implements Event {
+public class PlayerCharacterUnlockSkillEvent implements Event {
     private final PlayerCharacter pc;
     private final Skill skill;
-    private final int upgradeLevel;
 
-    public PlayerCharacterUpgradeSkillEvent(PlayerCharacter pc, Skill skill, int upgradeLevel) {
+    public PlayerCharacterUnlockSkillEvent(PlayerCharacter pc, Skill skill) {
         this.pc = pc;
         this.skill = skill;
-        this.upgradeLevel = upgradeLevel;
     }
 
     public PlayerCharacter getPlayerCharacter() {
@@ -21,9 +19,5 @@ public class PlayerCharacterUpgradeSkillEvent implements Event {
 
     public Skill getSkill() {
         return skill;
-    }
-
-    public int getUpgradeLevel() {
-        return upgradeLevel;
     }
 }

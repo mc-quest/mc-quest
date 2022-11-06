@@ -3,7 +3,6 @@ package com.mcquest.server.features;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.PlayerClasses;
-import com.mcquest.server.constants.FighterSkills;
 import com.mcquest.server.event.PlayerCharacterUseActiveSkillEvent;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.playerclass.Skill;
@@ -21,18 +20,10 @@ public class FighterPlayerClass implements Feature {
 
     private void handleUseSkill(PlayerCharacterUseActiveSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (pc.getPlayerClass().getId() != PlayerClasses.FIGHTER) {
+        if (pc.getPlayerClass() != PlayerClasses.FIGHTER) {
             return;
         }
         Skill skill = event.getSkill();
-        switch (skill.getId()) {
-            case FighterSkills.BASH:
-                useBash(pc);
-                break;
-            case FighterSkills.SELF_HEAL:
-                useSelfHeal(pc);
-                break;
-        }
     }
 
     private void useBash(PlayerCharacter pc) {

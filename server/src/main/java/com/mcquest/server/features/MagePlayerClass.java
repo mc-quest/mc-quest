@@ -21,7 +21,7 @@ public class MagePlayerClass implements Feature {
 
     private void handleUseSkill(PlayerCharacterUseActiveSkillEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (pc.getPlayerClass().getId() != PlayerClasses.MAGE) {
+        if (pc.getPlayerClass() != PlayerClasses.MAGE) {
             return;
         }
         Skill skill = event.getSkill();

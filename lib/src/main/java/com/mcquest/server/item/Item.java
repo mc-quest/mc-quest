@@ -21,49 +21,34 @@ public class Item {
     private final String description;
     private ItemStack itemStack;
 
-    Item(ItemBuilder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-        this.rarity = builder.rarity;
-        this.icon = builder.icon;
-        this.description = builder.description;
+    Item(Builder builder) {
+        id = builder.id;
+        name = builder.name;
+        rarity = builder.rarity;
+        icon = builder.icon;
+        description = builder.description;
     }
 
     public int getId() {
         return id;
     }
 
-    /**
-     * Returns the name of this Item.
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Returns the rarity of this Item.
-     */
     public ItemRarity getRarity() {
         return rarity;
     }
 
-    /**
-     * Returns the icon of this Item.
-     */
     public Material getIcon() {
         return icon;
     }
 
-    /**
-     * Returns the description of this Item.
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Returns the ItemStack of this Item.
-     */
     public ItemStack getItemStack() {
         // Lazy initialize because createItemStack() relies on subclass fields.
         if (itemStack == null) {
@@ -103,5 +88,34 @@ public class Item {
         drop.setCustomName(getDisplayName());
         drop.setCustomNameVisible(true);
         drop.setInstance(instance, position);
+    }
+
+    public static Builder builder(int id, String name, ItemRarity rarity, Material icon) {
+        return new Builder(id, name, rarity, icon);
+    }
+
+    public static class Builder {
+        final int id;
+        final String name;
+        final ItemRarity rarity;
+        final Material icon;
+        String description;
+
+        Builder(int id, String name, ItemRarity rarity, Material icon) {
+            this.id = id;
+            this.name = name;
+            this.rarity = rarity;
+            this.icon = icon;
+            this.description = null;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Item build() {
+            return new Item(this);
+        }
     }
 }

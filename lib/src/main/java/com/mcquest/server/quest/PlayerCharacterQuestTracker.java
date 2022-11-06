@@ -102,6 +102,10 @@ public class PlayerCharacterQuestTracker {
         setProgress(objective, getProgress(objective) + progress);
     }
 
+    public boolean isComplete(QuestObjective objective) {
+        return getProgress(objective) == objective.getGoal();
+    }
+
     public void complete(QuestObjective objective) {
         setProgress(objective, objective.getGoal());
     }
@@ -131,10 +135,19 @@ public class PlayerCharacterQuestTracker {
         eventHandler.call(new PlayerCharacterCompleteQuestEvent(pc, quest));
     }
 
+    /**
+     * Returns whether the objective is accessible to the player character. An
+     * objective is accessible if it has been made accessible and the quest has
+     * not yet been completed.
+     */
     public boolean isAccessible(QuestObjective objective) {
         Quest quest = objective.getQuest();
         int index = objective.getIndex();
-        return objectiveProgress.get(quest)[index] != -1;
+        int[] progress = objectiveProgress.get(quest);
+        if (progress == null) {
+            return false;
+        }
+        return progress[index] != -1;
     }
 
     public void setAccessible(QuestObjective objective, boolean accessible) {

@@ -25,13 +25,16 @@ import java.util.function.Function;
 
 public class PlayerCharacterManager {
     private final Mmorpg mmorpg;
+    private final Function<Player, PlayerCharacterData> dataProvider;
+    private final BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler;
     private final Map<Player, PlayerCharacter> pcs;
-    private Function<Player, PlayerCharacterData> dataProvider;
-    private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler;
 
     @ApiStatus.Internal
-    public PlayerCharacterManager(Mmorpg mmorpg) {
+    public PlayerCharacterManager(Mmorpg mmorpg, Function<Player, PlayerCharacterData> dataProvider,
+                                  BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
         this.mmorpg = mmorpg;
+        this.dataProvider = dataProvider;
+        this.logoutHandler = logoutHandler;
         pcs = new HashMap<>();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
@@ -46,14 +49,6 @@ public class PlayerCharacterManager {
         return pcs.get(player);
     }
 
-    public void setDataProvider(Function<Player, PlayerCharacterData> dataProvider) {
-        this.dataProvider = dataProvider;
-    }
-
-    public void setLogoutHandler(BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
-        this.logoutHandler = logoutHandler;
-    }
-
     public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double range) {
         List<Player> nearbyPlayers = new ArrayList<>();
         instance.getEntityTracker().nearbyEntities(position, range,
@@ -62,9 +57,6 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerLogin(PlayerLoginEvent event) {
-        if (dataProvider == null) {
-            throw new IllegalStateException("You need to specify a player character data provider");
-        }
         Player player = event.getPlayer();
         PlayerCharacterData data = dataProvider.apply(player);
         Instance instance = mmorpg.getInstanceManager().getInstance(data.getInstanceId());
@@ -92,9 +84,6 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
-        if (logoutHandler == null) {
-            throw new IllegalStateException("You need to specify a player character logout handler");
-        }
         pc.remove();
         logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
@@ -112,9 +101,7 @@ public class PlayerCharacterManager {
     private void synchronizePlayerPosition(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
-        if (pc != null) {
-            pc.setPosition(event.getNewPosition());
-        }
+        pc.setPosition(event.getNewPosition());
     }
 
     private void regeneratePlayerCharacters() {

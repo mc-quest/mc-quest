@@ -1,6 +1,9 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.event.Event;
+import com.mcquest.server.event.PlayerCharacterUseConsumableItemEvent;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.item.Material;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,15 +14,14 @@ import java.util.List;
  */
 public class ConsumableItem extends Item {
     private final int level;
+    private final Event<PlayerCharacterUseConsumableItemEvent> onConsume;
 
-    ConsumableItem(ConsumableItemBuilder builder) {
+    ConsumableItem(Builder builder) {
         super(builder);
-        this.level = builder.level;
+        level = builder.level;
+        onConsume = new Event<>();
     }
 
-    /**
-     * Returns the minimum level required to use this ConsumableItem.
-     */
     public int getLevel() {
         return level;
     }
@@ -38,5 +40,33 @@ public class ConsumableItem extends Item {
         lore.add(Component.empty());
         lore.add(ItemUtility.consumeText());
         return lore;
+    }
+
+    public Event<PlayerCharacterUseConsumableItemEvent> onConsume() {
+        return onConsume;
+    }
+
+    public static Builder builder(int id, String name, ItemRarity rarity,
+                                  Material icon, int level) {
+        return new Builder(id, name, rarity, icon, level);
+    }
+
+    public static class Builder extends Item.Builder {
+        final int level;
+
+        Builder(int id, String name, ItemRarity rarity, Material icon, int level) {
+            super(id, name, rarity, icon);
+            this.level = level;
+        }
+
+        @Override
+        public Builder description(String description) {
+            return (Builder) super.description(description);
+        }
+
+        @Override
+        public ConsumableItem build() {
+            return new ConsumableItem(this);
+        }
     }
 }

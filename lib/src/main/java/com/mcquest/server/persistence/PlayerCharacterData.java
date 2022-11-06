@@ -1,12 +1,11 @@
 package com.mcquest.server.persistence;
 
-import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerCharacterData {
@@ -31,11 +30,11 @@ public class PlayerCharacterData {
     /**
      * Constructs a new PlayerCharacterData for a new PlayerCharacter.
      */
-    public static PlayerCharacterData create(Mmorpg mmorpg, PlayerClass playerClass,
-                                             Instance instance, Pos position, Weapon weapon) {
+    public static PlayerCharacterData create(PlayerClass playerClass, Instance instance,
+                                             Pos position, Weapon weapon) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClassId = playerClass.getId();
-        data.instanceId = mmorpg.getInstanceManager().idOf(instance);
+        data.instanceId = instance.getId();
         data.position = position;
         data.respawnPosition = position;
         data.health = 1;
@@ -43,7 +42,7 @@ public class PlayerCharacterData {
         data.mana = 1;
         data.maxMana = 1;
         data.experiencePoints = 0;
-        data.items = new PersistentItem[]{new PersistentItem(weapon.getId(), 1, 4)};
+        data.items = new PersistentItem[]{new PersistentItem(weapon.getId(), 1, 8)};
         data.questObjectiveData = new PersistentQuestObjectiveData[0];
         data.completedQuestIds = new int[0];
         data.songId = null;

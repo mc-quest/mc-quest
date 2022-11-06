@@ -3,7 +3,6 @@ package com.mcquest.server.npc;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
-import com.mcquest.server.constants.Models;
 import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -29,7 +28,6 @@ public class Dwarf extends NonPlayerCharacter {
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
-        model = mmorpg.getResourceManager().getModel(Models.DWARF);
     }
 
     @Override

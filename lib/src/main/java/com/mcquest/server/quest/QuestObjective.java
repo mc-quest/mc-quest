@@ -1,17 +1,24 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.Event;
+import com.mcquest.server.event.QuestObjectiveChangeAccessibilityEvent;
+import com.mcquest.server.event.QuestObjectiveChangeProgressEvent;
 
 public final class QuestObjective {
     private final int index;
     private final String description;
     private final int goal;
+    private final Event<QuestObjectiveChangeProgressEvent> onChangeProgress;
+    private final Event<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility;
     Quest quest;
 
     QuestObjective(int index, String description, int goal) {
         this.index = index;
         this.description = description;
         this.goal = goal;
+        this.onChangeProgress = new Event<>();
+        this.onChangeAccessibility = new Event<>();
     }
 
     public String getDescription() {
@@ -24,6 +31,14 @@ public final class QuestObjective {
 
     public int getIndex() {
         return index;
+    }
+
+    public Event<QuestObjectiveChangeProgressEvent> onChangeProgress() {
+        return onChangeProgress;
+    }
+
+    public Event<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility() {
+        return onChangeAccessibility;
     }
 
     public Quest getQuest() {
@@ -48,6 +63,10 @@ public final class QuestObjective {
 
     public void addProgress(PlayerCharacter pc, int progress) {
         pc.getQuestTracker().addProgress(this, progress);
+    }
+
+    public boolean isComplete(PlayerCharacter pc) {
+        return pc.getQuestTracker().isComplete(this);
     }
 
     public void complete(PlayerCharacter pc) {

@@ -1,7 +1,5 @@
 package com.mcquest.server.quest;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,14 +11,17 @@ import java.util.Map;
 public class QuestManager {
     private final Map<Integer, Quest> questsById;
 
-    public QuestManager() {
+    public QuestManager(Quest[] quests) {
         questsById = new HashMap<>();
+        for (Quest quest : quests) {
+            registerQuest(quest);
+        }
     }
 
-    void registerQuest(@NotNull Quest quest) {
+    private void registerQuest(Quest quest) {
         int id = quest.getId();
         if (questsById.containsKey(id)) {
-            throw new IllegalArgumentException("ID of " + quest.getName() + " is already in use");
+            throw new IllegalArgumentException("ID already in use: " + id);
         }
         questsById.put(id, quest);
     }
@@ -35,9 +36,5 @@ public class QuestManager {
 
     public Collection<Quest> getQuests() {
         return Collections.unmodifiableCollection(questsById.values());
-    }
-
-    public QuestBuilder questBuilder(int id, String name, int level) {
-        return new QuestBuilder(this, id, name, level);
     }
 }

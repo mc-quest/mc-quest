@@ -4,7 +4,6 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceContainer;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -12,39 +11,33 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InstanceManager {
-    private final Map<Integer, InstanceContainer> instances;
+    private final Map<Integer, InstanceContainer> instancesById;
 
     @ApiStatus.Internal
-    public InstanceManager() {
-        this.instances = new HashMap<>();
+    public InstanceManager(Instance[] instances) {
+        instancesById = new HashMap<>();
+        for (Instance instance : instances) {
+            registerInstance(instance);
+        }
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerChunkUnloadEvent.class, this::unloadVacantChunk);
     }
 
-    public InstanceContainer createInstance(int id) {
-        if (instances.containsKey(id)) {
+    private void registerInstance(Instance instance) {
+        int id = instance.getId();
+        if (instancesById.containsKey(id)) {
             throw new IllegalArgumentException("id already used: " + id);
         }
-        InstanceContainer instance = MinecraftServer.getInstanceManager().createInstanceContainer();
-        instances.put(id, instance);
-        return instance;
+        instancesById.put(id, instance);
+        MinecraftServer.getInstanceManager().registerInstance(instance);
     }
 
     public InstanceContainer getInstance(int id) {
-        return instances.get(id);
-    }
-
-    public Integer idOf(Instance instance) {
-        for (Map.Entry<Integer, InstanceContainer> entry : instances.entrySet()) {
-            if (entry.getValue() == instance) {
-                return entry.getKey();
-            }
-        }
-        return null;
+        return instancesById.get(id);
     }
 
     private void unloadVacantChunk(PlayerChunkUnloadEvent event) {
-        Instance instance = event.getInstance();
+        Instance instance = (Instance) event.getInstance();
         int chunkX = event.getChunkX();
         int chunkZ = event.getChunkZ();
         Chunk chunk = instance.getChunk(event.getChunkX(), event.getChunkZ());

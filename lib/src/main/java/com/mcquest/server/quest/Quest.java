@@ -1,6 +1,12 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.Event;
+import com.mcquest.server.event.PlayerCharacterCompleteQuestEvent;
+import com.mcquest.server.event.PlayerCharacterStartQuestEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Quest represents a series of objectives for a player to complete.
@@ -10,42 +16,34 @@ public final class Quest {
     private final String name;
     private final int level;
     private final QuestObjective[] objectives;
+    private final Event<PlayerCharacterStartQuestEvent> onStart;
+    private final Event<PlayerCharacterCompleteQuestEvent> onComplete;
 
-    Quest(QuestBuilder builder) {
-        this.id = builder.id;
-        this.name = builder.name;
-        this.level = builder.level;
-        this.objectives = builder.objectives.toArray(new QuestObjective[0]);
+    Quest(Builder builder) {
+        id = builder.id;
+        name = builder.name;
+        level = builder.level;
+        objectives = builder.objectives.toArray(new QuestObjective[0]);
+        onStart = new Event<>();
+        onComplete = new Event<>();
     }
 
     public int getId() {
         return id;
     }
 
-    /**
-     * Returns the name of this Quest.
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Returns the level of this Quest.
-     */
     public int getLevel() {
         return level;
     }
 
-    /**
-     * Returns the QuestObjective with the given index in this Quest.
-     */
     public QuestObjective getObjective(int index) {
         return objectives[index];
     }
 
-    /**
-     * Returns the number of objectives in this Quest.
-     */
     public int getObjectiveCount() {
         return objectives.length;
     }
@@ -60,5 +58,44 @@ public final class Quest {
 
     public void start(PlayerCharacter pc) {
         pc.getQuestTracker().startQuest(this);
+    }
+
+    public Event<PlayerCharacterStartQuestEvent> onStart() {
+        return onStart;
+    }
+
+    public Event<PlayerCharacterCompleteQuestEvent> onComplete() {
+        return onComplete;
+    }
+
+    public static Builder builder(int id, String name, int level) {
+        return new Builder(id, name, level);
+    }
+
+    public static class Builder {
+        final int id;
+        final String name;
+        final int level;
+        final List<QuestObjective> objectives;
+
+        private Builder(int id, String name, int level) {
+            this.id = id;
+            this.name = name;
+            this.level = level;
+            this.objectives = new ArrayList<>();
+        }
+
+        public Builder objective(String description, int goal) {
+            objectives.add(new QuestObjective(objectives.size(), description, goal));
+            return this;
+        }
+
+        public Quest build() {
+            Quest quest = new Quest(this);
+            for (QuestObjective objective : objectives) {
+                objective.quest = quest;
+            }
+            return quest;
+        }
     }
 }

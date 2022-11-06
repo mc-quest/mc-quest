@@ -39,7 +39,6 @@ import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -406,7 +405,7 @@ public final class PlayerCharacter extends Character {
     }
 
     public Weapon getWeapon() {
-        ItemStack itemStack = player.getInventory().getItemStack(4);
+        ItemStack itemStack = player.getInventory().getItemStack(8);
         return (Weapon) mmorpg.getItemManager().getItem(itemStack);
     }
 

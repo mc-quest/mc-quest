@@ -26,15 +26,26 @@ public class PlayerClassManager {
     static final Tag<Integer> PLAYER_CLASS_ID_TAG = Tag.Integer("player_class_id");
     static final Tag<Integer> SKILL_ID_TAG = Tag.Integer("skill_id");
 
-    private Mmorpg mmorpg;
+    private final Mmorpg mmorpg;
     private final Map<Integer, PlayerClass> playerClassesById;
 
     @ApiStatus.Internal
-    public PlayerClassManager(Mmorpg mmorpg) {
+    public PlayerClassManager(Mmorpg mmorpg, PlayerClass[] playerClasses) {
         this.mmorpg = mmorpg;
         playerClassesById = new HashMap<>();
+        for (PlayerClass playerClass : playerClasses) {
+            registerPlayerClass(playerClass);
+        }
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+    }
+
+    private void registerPlayerClass(PlayerClass playerClass) {
+        int id = playerClass.getId();
+        if (playerClassesById.containsKey(id)) {
+            throw new IllegalArgumentException("ID already in use: " + id);
+        }
+        playerClassesById.put(playerClass.getId(), playerClass);
     }
 
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
@@ -69,21 +80,6 @@ public class PlayerClassManager {
         pc.removeMana(manaCost);
         PlayerCharacterUseActiveSkillEvent event = new PlayerCharacterUseActiveSkillEvent(pc, skill);
         mmorpg.getGlobalEventHandler().call(event);
-    }
-
-    public PlayerClassBuilder playerClassBuilder(int id, String name) {
-        return new PlayerClassBuilder(this, id, name);
-    }
-
-    void registerPlayerClass(PlayerClass playerClass) {
-        int id = playerClass.getId();
-        if (playerClassesById.containsKey(id)) {
-            throw new IllegalArgumentException("ID already in use: " + id);
-        }
-        for (Skill skill : playerClass.getSkills()) {
-            ItemStack hotbarItemStack = skill.getHotbarItemStack();
-        }
-        playerClassesById.put(playerClass.getId(), playerClass);
     }
 
     /**

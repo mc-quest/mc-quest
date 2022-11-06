@@ -1,7 +1,6 @@
 package com.mcquest.server.item;
 
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -9,17 +8,25 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * The ItemManager is used to register and retrieve Items.
- */
 public class ItemManager {
     static final Tag<Integer> ID_TAG = Tag.Integer("item_id");
 
     private final Map<Integer, Item> itemsById;
 
     @ApiStatus.Internal
-    public ItemManager() {
+    public ItemManager(Item[] items) {
         itemsById = new HashMap<>();
+        for (Item item : items) {
+            registerItem(item);
+        }
+    }
+
+    private void registerItem(Item item) {
+        int id = item.getId();
+        if (itemsById.containsKey(id)) {
+            throw new IllegalArgumentException("ID already in use: " + id);
+        }
+        itemsById.put(id, item);
     }
 
     /**
@@ -38,35 +45,5 @@ public class ItemManager {
         }
         int id = itemStack.getTag(ID_TAG);
         return itemsById.get(id);
-    }
-
-    public ItemBuilder itemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                   @NotNull Material icon) {
-        return new ItemBuilder(this, id, name, rarity, icon);
-    }
-
-    public WeaponBuilder weaponBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                       @NotNull Material icon, int level, WeaponType type) {
-        return new WeaponBuilder(this, id, name, rarity, icon, level, type);
-    }
-
-    public ArmorItemBuilder armorItemBuilder(int id, @NotNull String name, @NotNull ItemRarity rarity,
-                                             @NotNull Material icon, int level, ArmorType type,
-                                             @NotNull ArmorSlot slot, double protections) {
-        return new ArmorItemBuilder(this, id, name, rarity, icon, level, type, slot, protections);
-    }
-
-    public ConsumableItemBuilder consumableItemBuilder(int id, @NotNull String name,
-                                                       @NotNull ItemRarity rarity,
-                                                       @NotNull Material icon, int level) {
-        return new ConsumableItemBuilder(this, id, name, rarity, icon, level);
-    }
-
-    void registerItem(@NotNull Item item) {
-        int id = item.getId();
-        if (itemsById.containsKey(id)) {
-            throw new IllegalArgumentException("ID of " + item.getName() + " is already in use");
-        }
-        itemsById.put(id, item);
     }
 }

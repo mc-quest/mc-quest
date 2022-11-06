@@ -1,5 +1,13 @@
 package com.mcquest.server.constants;
 
+import com.mcquest.server.util.ResourceUtility;
+import team.unnamed.hephaestus.Model;
+
 public class Models {
-    public static final String DWARF = "";
+    public static final Model WOLF_SPIDER = loadModel("WolfSpider");
+
+    private static Model loadModel(String fileName) {
+        String path = "models/" + fileName + ".bbmodel";
+        return ResourceUtility.readModel(path);
+    }
 }

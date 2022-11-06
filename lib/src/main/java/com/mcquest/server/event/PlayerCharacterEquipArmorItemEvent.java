@@ -2,8 +2,9 @@ package com.mcquest.server.event;
 
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.ArmorItem;
+import net.minestom.server.event.Event;
 
-public class PlayerCharacterEquipArmorItemEvent {
+public class PlayerCharacterEquipArmorItemEvent implements Event {
     private final PlayerCharacter pc;
     private final ArmorItem item;
 

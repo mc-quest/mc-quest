@@ -1,6 +1,6 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.Event;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.PlayerCharacterUseConsumableItemEvent;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.item.Material;
@@ -14,12 +14,12 @@ import java.util.List;
  */
 public class ConsumableItem extends Item {
     private final int level;
-    private final Event<PlayerCharacterUseConsumableItemEvent> onConsume;
+    private final EventEmitter<PlayerCharacterUseConsumableItemEvent> onConsume;
 
     ConsumableItem(Builder builder) {
         super(builder);
         level = builder.level;
-        onConsume = new Event<>();
+        onConsume = new EventEmitter<>();
     }
 
     public int getLevel() {
@@ -42,7 +42,7 @@ public class ConsumableItem extends Item {
         return lore;
     }
 
-    public Event<PlayerCharacterUseConsumableItemEvent> onConsume() {
+    public EventEmitter<PlayerCharacterUseConsumableItemEvent> onConsume() {
         return onConsume;
     }
 

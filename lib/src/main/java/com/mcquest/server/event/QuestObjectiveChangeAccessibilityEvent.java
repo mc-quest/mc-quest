@@ -7,10 +7,13 @@ import net.minestom.server.event.Event;
 public class QuestObjectiveChangeAccessibilityEvent implements Event {
     private final PlayerCharacter pc;
     private final QuestObjective objective;
+    private final boolean accessible;
 
-    public QuestObjectiveChangeAccessibilityEvent(PlayerCharacter pc, QuestObjective objective) {
+    public QuestObjectiveChangeAccessibilityEvent(PlayerCharacter pc, QuestObjective objective,
+                                                  boolean accessible) {
         this.pc = pc;
         this.objective = objective;
+        this.accessible = accessible;
     }
 
     public PlayerCharacter getPlayerCharacter() {
@@ -19,5 +22,9 @@ public class QuestObjectiveChangeAccessibilityEvent implements Event {
 
     public QuestObjective getObjective() {
         return objective;
+    }
+
+    public boolean isAccessible() {
+        return accessible;
     }
 }

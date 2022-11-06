@@ -16,8 +16,8 @@ public class ArmorItem extends Item {
     private final ArmorType type;
     private final ArmorSlot slot;
     private final double protections;
-    private final Event<PlayerCharacterEquipArmorItemEvent> onEquip;
-    private final Event<PlayerCharacterUnequipArmorItemEvent> onUnequip;
+    private final EventEmitter<PlayerCharacterEquipArmorItemEvent> onEquip;
+    private final EventEmitter<PlayerCharacterUnequipArmorItemEvent> onUnequip;
 
     ArmorItem(Builder builder) {
         super(builder);
@@ -25,8 +25,8 @@ public class ArmorItem extends Item {
         type = builder.type;
         slot = builder.slot;
         protections = builder.protections;
-        onEquip = new Event<>();
-        onUnequip = new Event<>();
+        onEquip = new EventEmitter<>();
+        onUnequip = new EventEmitter<>();
     }
 
     public ArmorType getType() {
@@ -63,11 +63,11 @@ public class ArmorItem extends Item {
         return lore;
     }
 
-    public Event<PlayerCharacterEquipArmorItemEvent> onEquip() {
+    public EventEmitter<PlayerCharacterEquipArmorItemEvent> onEquip() {
         return onEquip;
     }
 
-    public Event<PlayerCharacterUnequipArmorItemEvent> onUnequip() {
+    public EventEmitter<PlayerCharacterUnequipArmorItemEvent> onUnequip() {
         return onUnequip;
     }
 

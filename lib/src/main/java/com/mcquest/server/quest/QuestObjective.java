@@ -1,7 +1,7 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.Event;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.QuestObjectiveChangeAccessibilityEvent;
 import com.mcquest.server.event.QuestObjectiveChangeProgressEvent;
 
@@ -9,16 +9,16 @@ public final class QuestObjective {
     private final int index;
     private final String description;
     private final int goal;
-    private final Event<QuestObjectiveChangeProgressEvent> onChangeProgress;
-    private final Event<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility;
+    private final EventEmitter<QuestObjectiveChangeProgressEvent> onChangeProgress;
+    private final EventEmitter<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility;
     Quest quest;
 
     QuestObjective(int index, String description, int goal) {
         this.index = index;
         this.description = description;
         this.goal = goal;
-        this.onChangeProgress = new Event<>();
-        this.onChangeAccessibility = new Event<>();
+        this.onChangeProgress = new EventEmitter<>();
+        this.onChangeAccessibility = new EventEmitter<>();
     }
 
     public String getDescription() {
@@ -33,11 +33,11 @@ public final class QuestObjective {
         return index;
     }
 
-    public Event<QuestObjectiveChangeProgressEvent> onChangeProgress() {
+    public EventEmitter<QuestObjectiveChangeProgressEvent> onChangeProgress() {
         return onChangeProgress;
     }
 
-    public Event<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility() {
+    public EventEmitter<QuestObjectiveChangeAccessibilityEvent> onChangeAccessibility() {
         return onChangeAccessibility;
     }
 

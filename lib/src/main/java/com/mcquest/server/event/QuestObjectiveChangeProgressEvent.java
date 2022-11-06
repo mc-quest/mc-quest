@@ -2,8 +2,9 @@ package com.mcquest.server.event;
 
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.quest.QuestObjective;
+import net.minestom.server.event.Event;
 
-public class QuestObjectiveChangeProgressEvent {
+public class QuestObjectiveChangeProgressEvent implements Event {
     private final PlayerCharacter pc;
     private final QuestObjective objective;
     private final int formerProgress;

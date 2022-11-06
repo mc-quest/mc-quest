@@ -1,6 +1,6 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.Event;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
 import com.mcquest.server.event.PlayerCharacterEquipWeaponEvent;
 import com.mcquest.server.event.PlayerCharacterUnequipWeaponEvent;
@@ -18,18 +18,18 @@ public class Weapon extends Item {
     private final int level;
     private final WeaponType type;
     private final double physicalDamage;
-    private final Event<PlayerCharacterEquipWeaponEvent> onEquip;
-    private final Event<PlayerCharacterUnequipWeaponEvent> onUnequip;
-    private final Event<PlayerCharacterBasicAttackEvent> onBasicAttack;
+    private final EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip;
+    private final EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip;
+    private final EventEmitter<PlayerCharacterBasicAttackEvent> onBasicAttack;
 
     Weapon(Builder builder) {
         super(builder);
         level = builder.level;
         type = builder.type;
         physicalDamage = builder.physicalDamage;
-        onEquip = new Event<>();
-        onUnequip = new Event<>();
-        onBasicAttack = new Event<>();
+        onEquip = new EventEmitter<>();
+        onUnequip = new EventEmitter<>();
+        onBasicAttack = new EventEmitter<>();
     }
 
     public WeaponType getType() {
@@ -67,15 +67,15 @@ public class Weapon extends Item {
         return lore;
     }
 
-    public Event<PlayerCharacterEquipWeaponEvent> onEquip() {
+    public EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip() {
         return onEquip;
     }
 
-    public Event<PlayerCharacterUnequipWeaponEvent> onUnequip() {
+    public EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip() {
         return onUnequip;
     }
 
-    public Event<PlayerCharacterBasicAttackEvent> onBasicAttack() {
+    public EventEmitter<PlayerCharacterBasicAttackEvent> onBasicAttack() {
         return onBasicAttack;
     }
 

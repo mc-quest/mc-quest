@@ -1,7 +1,7 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.Event;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.PlayerCharacterCompleteQuestEvent;
 import com.mcquest.server.event.PlayerCharacterStartQuestEvent;
 
@@ -16,16 +16,16 @@ public final class Quest {
     private final String name;
     private final int level;
     private final QuestObjective[] objectives;
-    private final Event<PlayerCharacterStartQuestEvent> onStart;
-    private final Event<PlayerCharacterCompleteQuestEvent> onComplete;
+    private final EventEmitter<PlayerCharacterStartQuestEvent> onStart;
+    private final EventEmitter<PlayerCharacterCompleteQuestEvent> onComplete;
 
     Quest(Builder builder) {
         id = builder.id;
         name = builder.name;
         level = builder.level;
         objectives = builder.objectives.toArray(new QuestObjective[0]);
-        onStart = new Event<>();
-        onComplete = new Event<>();
+        onStart = new EventEmitter<>();
+        onComplete = new EventEmitter<>();
     }
 
     public int getId() {
@@ -60,11 +60,11 @@ public final class Quest {
         pc.getQuestTracker().startQuest(this);
     }
 
-    public Event<PlayerCharacterStartQuestEvent> onStart() {
+    public EventEmitter<PlayerCharacterStartQuestEvent> onStart() {
         return onStart;
     }
 
-    public Event<PlayerCharacterCompleteQuestEvent> onComplete() {
+    public EventEmitter<PlayerCharacterCompleteQuestEvent> onComplete() {
         return onComplete;
     }
 

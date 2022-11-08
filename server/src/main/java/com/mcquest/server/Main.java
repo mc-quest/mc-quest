@@ -19,6 +19,7 @@ public class Main {
                 .instances(Instances.ELADRADOR)
                 .models(Models.WOLF_SPIDER)
                 .music(Music.DUNGEON)
+                .maps(Maps.MELCHER)
                 .features(Features.FIGHTER_PLAYER_CLASS, Features.MAGE_PLAYER_CLASS, Features.TUTORIAL_QUEST)
                 .playerCharacterDataProvider(database::getPlayerCharacterData)
                 .playerCharacterLogoutHandler(database::savePlayerCharacterData)

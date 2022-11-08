@@ -1,5 +1,7 @@
 package com.mcquest.server;
 
+import com.mcquest.server.cartography.AreaMap;
+import com.mcquest.server.cartography.MapManager;
 import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
@@ -35,6 +37,7 @@ public class Mmorpg {
     private final ItemManager itemManager;
     private final QuestManager questManager;
     private final MusicManager musicManager;
+    private final MapManager mapManager;
     private final InstanceManager instanceManager;
     private final ResourceManager resourceManager;
     private final PlayerCharacterManager pcManager;
@@ -49,6 +52,7 @@ public class Mmorpg {
         itemManager = new ItemManager(builder.items);
         questManager = new QuestManager(builder.quests);
         musicManager = new MusicManager(builder.music);
+        mapManager = new MapManager(builder.maps);
         instanceManager = new InstanceManager(builder.instances);
         resourceManager = new ResourceManager(builder.models);
         pcManager = new PlayerCharacterManager(this,
@@ -83,6 +87,10 @@ public class Mmorpg {
 
     public MusicManager getMusicManager() {
         return musicManager;
+    }
+
+    public MapManager getMapManager() {
+        return mapManager;
     }
 
     public InstanceManager getInstanceManager() {
@@ -126,9 +134,10 @@ public class Mmorpg {
         private PlayerClass[] playerClasses;
         private Item[] items;
         private Quest[] quests;
+        private Song[] music;
+        private AreaMap[] maps;
         private Instance[] instances;
         private Model[] models;
-        private Song[] music;
         private Feature[] features;
         private Function<Player, PlayerCharacterData> pcDataProvider;
         private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> pcLogoutHandler;
@@ -138,9 +147,10 @@ public class Mmorpg {
             playerClasses = new PlayerClass[0];
             items = new Item[0];
             quests = new Quest[0];
+            music = new Song[0];
+            maps = new AreaMap[0];
             instances = new Instance[0];
             models = new Model[0];
-            music = new Song[0];
             features = new Feature[0];
             pcDataProvider = null;
             pcLogoutHandler = null;
@@ -161,6 +171,16 @@ public class Mmorpg {
             return this;
         }
 
+        public Builder music(Song... music) {
+            this.music = music.clone();
+            return this;
+        }
+
+        public Builder maps(AreaMap... maps) {
+            this.maps = maps.clone();
+            return this;
+        }
+
         public Builder instances(Instance... instances) {
             this.instances = instances.clone();
             return this;
@@ -168,11 +188,6 @@ public class Mmorpg {
 
         public Builder models(Model... models) {
             this.models = models.clone();
-            return this;
-        }
-
-        public Builder music(Song... music) {
-            this.music = music.clone();
             return this;
         }
 

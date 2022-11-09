@@ -1,6 +1,8 @@
 package com.mcquest.server.constants;
 
+import com.mcquest.server.playerclass.ActiveSkill;
+
 public class FighterSkills {
-    public static final int BASH = 1;
-    public static final int SELF_HEAL = 2;
+    public static final ActiveSkill BASH = (ActiveSkill) PlayerClasses.FIGHTER.getSkill(1);
+    public static final ActiveSkill SELF_HEAL = (ActiveSkill) PlayerClasses.FIGHTER.getSkill(2);
 }

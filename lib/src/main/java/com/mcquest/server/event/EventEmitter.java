@@ -19,11 +19,15 @@ public class EventEmitter<E extends Event> {
         }
     }
 
-    public void subscribe(Consumer<E> callback) {
+    public Subscription<E> subscribe(Consumer<E> callback) {
         callbacks.add(callback);
+        return new Subscription<>(this, callback);
     }
 
-    public void unsubscribe(Consumer<E> callback) {
+    /**
+     * Called internally by Subscription.
+     */
+    void unsubscribe(Consumer<E> callback) {
         callbacks.remove(callback);
     }
 }

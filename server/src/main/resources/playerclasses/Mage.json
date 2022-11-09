@@ -1,6 +1,18 @@
 {
     "id": 2,
     "name": "Mage",
-    "skills": [],
+    "skills": [
+        {
+            "id": 1,
+            "name": "Fireball",
+            "level": 1,
+            "icon": "minecraft:magma_cream",
+            "description": "TODO",
+            "manaCost": 5,
+            "prerequisites": [],
+            "skillTreeRow": 0,
+            "skillTreeColumn": 4
+        }
+    ],
     "skillTreeDecorations": []
 }

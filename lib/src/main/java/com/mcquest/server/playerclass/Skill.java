@@ -1,6 +1,8 @@
 package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.EventEmitter;
+import com.mcquest.server.event.PlayerCharacterUnlockSkillEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
@@ -13,6 +15,7 @@ public class Skill {
     private final String description;
     private final int skillTreeRow;
     private final int skillTreeColumn;
+    private final EventEmitter<PlayerCharacterUnlockSkillEvent> onUnlock;
     PlayerClass playerClass;
 
     Skill(int id, String name, int level, Material icon,
@@ -24,6 +27,7 @@ public class Skill {
         this.description = description;
         this.skillTreeRow = skillTreeRow;
         this.skillTreeColumn = skillTreeColumn;
+        this.onUnlock = new EventEmitter<>();
     }
 
     public int getId() {
@@ -52,6 +56,10 @@ public class Skill {
 
     public int getSkillTreeColumn() {
         return skillTreeColumn;
+    }
+
+    public EventEmitter<PlayerCharacterUnlockSkillEvent> onUnlock() {
+        return onUnlock;
     }
 
     public PlayerClass getPlayerClass() {

@@ -8,6 +8,8 @@ import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.reader.ModelReader;
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +40,14 @@ public class ResourceUtility {
         try {
             ModelReader reader = BBModelReader.blockbench();
             return reader.read(getResourceAsStream(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Image readImage(String path) {
+        try {
+            return ImageIO.read(getResourceAsStream(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

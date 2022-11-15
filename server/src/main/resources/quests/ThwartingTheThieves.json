@@ -1,0 +1,15 @@
+{
+    "id": 2,
+    "name": "Thwarting the Thieves",
+    "level": 1,
+    "objectives": [
+        {
+            "description": "Thieves slain",
+            "goal": 10
+        },
+        {
+            "description": "Speak with mayor of Oakshire",
+            "goal": 1
+        }
+    ]
+}

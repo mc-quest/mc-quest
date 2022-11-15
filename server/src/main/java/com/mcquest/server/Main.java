@@ -15,7 +15,7 @@ public class Main {
         Mmorpg.builder()
                 .playerClasses(PlayerClasses.FIGHTER, PlayerClasses.MAGE)
                 .items(Items.ADVENTURERS_SWORD)
-                .quests(Quests.TUTORIAL)
+                .quests(Quests.TUTORIAL, Quests.THWARTING_THE_THIEVES)
                 .instances(Instances.ELADRADOR)
                 .models(Models.WOLF_SPIDER)
                 .music(Music.DUNGEON)

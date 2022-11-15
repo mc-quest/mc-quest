@@ -40,16 +40,16 @@ public class InteractionHandler {
     private static final int MENU_LOGOUT_SLOT = 7;
     private static final Component CLICK_TO_OPEN = Component.text("Click to open", NamedTextColor.GRAY);
     private static final ItemStack OPEN_SKILL_TREE = ItemStackUtility
-            .createItemStack(Material.IRON_SWORD, Component.text("Skill Tree", NamedTextColor.GREEN),
+            .createItemStack(Material.IRON_SWORD, Component.text("Skill Tree", NamedTextColor.YELLOW),
                     List.of(CLICK_TO_OPEN));
     private static final ItemStack OPEN_MAP = ItemStackUtility
-            .createItemStack(Material.MAP, Component.text("Map", NamedTextColor.GREEN),
+            .createItemStack(Material.FILLED_MAP, Component.text("Map", NamedTextColor.YELLOW),
                     List.of(CLICK_TO_OPEN));
     private static final ItemStack OPEN_QUEST_LOG = ItemStackUtility
-            .createItemStack(Material.BOOK, Component.text("Quest Log", NamedTextColor.GREEN),
+            .createItemStack(Material.BOOK, Component.text("Quest Log", NamedTextColor.YELLOW),
                     List.of(CLICK_TO_OPEN));
     private static final ItemStack LOGOUT = ItemStackUtility.createItemStack(Material.BARRIER,
-            Component.text("Logout", NamedTextColor.GREEN),
+            Component.text("Logout", NamedTextColor.YELLOW),
             List.of(Component.text("Click to logout", NamedTextColor.GRAY)));
 
     private final Mmorpg mmorpg;

@@ -8,6 +8,7 @@ import com.mcquest.server.util.ResourceUtility;
 
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");
+    public static final Quest THWARTING_THE_THIEVES = loadQuest("ThwartingTheThieves");
 
     private static Quest loadQuest(String fileName) {
         String path = "quests/" + fileName + ".json";

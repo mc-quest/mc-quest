@@ -4,15 +4,15 @@
     "level": 1,
     "objectives": [
         {
-            "description": "Open the menu",
+            "description": "Open menu",
             "goal": 1
         },
         {
-            "description": "Open your skill tree",
+            "description": "Open skill tree",
             "goal": 1
         },
         {
-            "description": "Unlock a skill",
+            "description": "Unlock skill",
             "goal": 1
         },
         {
@@ -20,15 +20,15 @@
             "goal": 1
         },
         {
-            "description": "Use a skill",
+            "description": "Use skill",
             "goal": 1
         },
         {
-            "description": "Open the map",
+            "description": "Open map",
             "goal": 1
         },
         {
-            "description": "Go to the training grounds",
+            "description": "Enter training grounds",
             "goal": 1
         },
         {
@@ -36,7 +36,7 @@
             "goal": 3
         },
         {
-            "description": "Speak with mayor of Melcher",
+            "description": "Speak with Mayor of Oakshire",
             "goal": 1
         }
     ]

@@ -21,6 +21,7 @@ public class PlayerCharacterData {
     private PersistentItem[] items;
     private PersistentQuestObjectiveData[] questObjectiveData;
     private int[] completedQuestIds;
+    private int[] trackedQuestIds;
     private Integer songId;
     private boolean canMount;
 
@@ -45,6 +46,7 @@ public class PlayerCharacterData {
         data.items = new PersistentItem[]{new PersistentItem(weapon.getId(), 1, 8)};
         data.questObjectiveData = new PersistentQuestObjectiveData[0];
         data.completedQuestIds = new int[0];
+        data.trackedQuestIds = new int[0];
         data.songId = null;
         data.canMount = true;
         return data;
@@ -110,6 +112,10 @@ public class PlayerCharacterData {
 
     public int[] getCompletedQuestIds() {
         return completedQuestIds;
+    }
+
+    public int[] getTrackedQuestIds() {
+        return trackedQuestIds;
     }
 
     public @Nullable Integer getSongId() {

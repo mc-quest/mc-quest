@@ -117,7 +117,14 @@ public final class PlayerCharacter extends Character {
             completedQuests.add(quest);
         }
 
-        return new PlayerCharacterQuestTracker(this, objectiveProgress, completedQuests);
+        List<Quest> trackedQuests = new ArrayList<>();
+        int[] trackedQuestIds = data.getTrackedQuestIds();
+        for (int id : trackedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            trackedQuests.add(quest);
+        }
+
+        return new PlayerCharacterQuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
     }
 
     private void initInventory(PlayerCharacterData data) {

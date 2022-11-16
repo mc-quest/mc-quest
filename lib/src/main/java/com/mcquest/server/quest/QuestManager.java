@@ -1,18 +1,24 @@
 package com.mcquest.server.quest;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.mcquest.server.character.PlayerCharacter;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.Instance;
+import org.jetbrains.annotations.ApiStatus;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * The QuestManager is used to register and retrieve Quests.
  */
 public class QuestManager {
     private final Map<Integer, Quest> questsById;
+    private final Map<Quest, Collection<QuestMarker>> questMarkers;
 
+    @ApiStatus.Internal
     public QuestManager(Quest[] quests) {
         questsById = new HashMap<>();
+        questMarkers = new HashMap<>();
         for (Quest quest : quests) {
             registerQuest(quest);
         }
@@ -36,5 +42,17 @@ public class QuestManager {
 
     public Collection<Quest> getQuests() {
         return Collections.unmodifiableCollection(questsById.values());
+    }
+
+    public QuestMarker createQuestMarker(Instance instance, Pos position,
+                                         Quest quest, QuestMarkerIcon icon,
+                                         Predicate<PlayerCharacter> shouldShow) {
+        QuestMarker questMarker = new QuestMarker(instance, position, quest, icon, shouldShow);
+        if (!questMarkers.containsKey(quest)) {
+            questMarkers.put(quest, new ArrayList<>());
+        }
+        Collection<QuestMarker> markersForQuest = questMarkers.get(quest);
+        markersForQuest.add(questMarker);
+        return questMarker;
     }
 }

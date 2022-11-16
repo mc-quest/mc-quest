@@ -25,6 +25,7 @@ import java.util.Map;
 
 public class ResourceUtility {
     private static final Gson GSON = new Gson();
+    private static final ModelReader modelReader = BBModelReader.blockbench();
 
     public static InputStream getResourceAsStream(@NotNull String resourcePath) {
         return ResourceUtility.class.getClassLoader().getResourceAsStream(resourcePath);
@@ -38,8 +39,7 @@ public class ResourceUtility {
 
     public static Model readModel(String path) {
         try {
-            ModelReader reader = BBModelReader.blockbench();
-            return reader.read(getResourceAsStream(path));
+            return modelReader.read(getResourceAsStream(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

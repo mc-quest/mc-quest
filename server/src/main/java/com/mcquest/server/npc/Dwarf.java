@@ -1,23 +1,21 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.server.Mmorpg;
-import com.mcquest.server.character.*;
 import com.mcquest.server.character.Character;
+import com.mcquest.server.character.*;
+import com.mcquest.server.constants.Models;
 import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.metadata.other.ArmorStandMeta;
+import net.minestom.server.entity.ai.EntityAIGroupBuilder;
+import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.instance.Instance;
-import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.minestom.BoneEntity;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 public class Dwarf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
 
-    private Model model;
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final Collider hitbox;
@@ -75,46 +73,18 @@ public class Dwarf extends NonPlayerCharacter {
         private final Dwarf dwarf;
 
         public Entity(Dwarf dwarf) {
-            super(EntityType.ARMOR_STAND, dwarf.model);
-            ArmorStandMeta meta = (ArmorStandMeta) getEntityMeta();
-            meta.setSmall(true);
-            meta.setMarker(false);
+            super(Models.WOLF_SPIDER);
             this.dwarf = dwarf;
-            // setNoGravity(false);
-//            addAIGroup(new EntityAIGroupBuilder()
-//                    .addGoalSelector(new RandomStrollGoal(this, 20))
-//                    .build());
-//            getNavigator().getPathingEntity().setAvian(true);
+            setNoGravity(false);
+            addAIGroup(new EntityAIGroupBuilder()
+                    .addGoalSelector(new RandomStrollGoal(this, 20))
+                    .build());
         }
 
         @Override
         public void tick(long time) {
             super.tick(time);
-            this.tickAnimations();
-            if (dwarf.getPosition().equals(position)) {
-                setAnimation("idle");
-            } else {
-                setAnimation("walk");
-            }
             dwarf.setPosition(getPosition());
-        }
-
-        private String animation = "idle";
-
-        private void setAnimation(String animation) {
-            if (this.animation.equals(animation)) {
-                return;
-            }
-            this.animation = animation;
-            // playAnimation(animation);
-        }
-
-        @Override
-        public void remove() {
-            super.remove();
-            for (BoneEntity bone : bones()) {
-                bone.remove();
-            }
         }
     }
 }

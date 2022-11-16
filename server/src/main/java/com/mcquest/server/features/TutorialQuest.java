@@ -21,12 +21,13 @@ import net.minestom.server.event.GlobalEventHandler;
 import java.time.Duration;
 
 public class TutorialQuest implements Feature {
-    private static final Pos[] TRAINING_DUMMY_POSITIONS = {};
+    private Mmorpg mmorpg;
 
     @Override
     public void hook(Mmorpg mmorpg) {
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
+        this.mmorpg = mmorpg;
+        createTrainingGroundsBounds();
+        spawnTrainingDummies();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
         eventHandler.addListener(PlayerCharacterOpenMenuEvent.class, this::handleOpenMenu);
@@ -35,6 +36,10 @@ public class TutorialQuest implements Feature {
         eventHandler.addListener(PlayerCharacterAddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
         eventHandler.addListener(PlayerCharacterUseActiveSkillEvent.class, this::handleUseSkill);
         eventHandler.addListener(PlayerCharacterOpenMapEvent.class, this::handleOpenMap);
+    }
+
+    private void createTrainingGroundsBounds() {
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         Collider trainingGroundsBounds = new Collider(Instances.ELADRADOR,
                 0, 0, 0, 0, 0, 0) {
             @Override
@@ -46,7 +51,12 @@ public class TutorialQuest implements Feature {
             }
         };
         physicsManager.addCollider(trainingGroundsBounds);
-        for (Pos position : TRAINING_DUMMY_POSITIONS) {
+    }
+
+    private void spawnTrainingDummies() {
+        NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
+        Pos[] positions = new Pos[]{new Pos(0, 70, 0)};
+        for (Pos position : positions) {
             TrainingDummy trainingDummy = new TrainingDummy(mmorpg, Instances.ELADRADOR, position);
             npcSpawner.add(trainingDummy);
         }

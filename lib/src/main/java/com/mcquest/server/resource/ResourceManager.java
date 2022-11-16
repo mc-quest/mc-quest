@@ -26,7 +26,7 @@ public class ResourceManager {
             tree.write(Metadata.builder()
                     .add(PackMeta.of(9, "MCQuest resource pack"))
                     .build());
-            ModelWriter.resource("mcquest").write(tree, models);
+            ModelWriter.resource().write(tree, models);
         });
         ResourcePackServer server;
         try {

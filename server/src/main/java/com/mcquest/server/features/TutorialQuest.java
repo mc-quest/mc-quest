@@ -7,6 +7,7 @@ import com.mcquest.server.constants.Instances;
 import com.mcquest.server.constants.Quests;
 import com.mcquest.server.event.*;
 import com.mcquest.server.feature.Feature;
+import com.mcquest.server.npc.Dwarf;
 import com.mcquest.server.npc.TrainingDummy;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
@@ -57,8 +58,11 @@ public class TutorialQuest implements Feature {
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
         Pos[] positions = new Pos[]{new Pos(0, 70, 0)};
         for (Pos position : positions) {
-            TrainingDummy trainingDummy = new TrainingDummy(mmorpg, Instances.ELADRADOR, position);
-            npcSpawner.add(trainingDummy);
+            for (int i = 0; i < 5; i++) {
+                Dwarf trainingDummy = new Dwarf(mmorpg, Instances.ELADRADOR, position);
+                // TrainingDummy trainingDummy = new TrainingDummy(mmorpg, Instances.ELADRADOR, position);
+                npcSpawner.add(trainingDummy);
+            }
         }
     }
 
@@ -84,7 +88,7 @@ public class TutorialQuest implements Feature {
         if (!openMenuObjective.isAccessible(pc) || openMenuObjective.isComplete(pc)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(0).complete(pc);
+        openMenuObjective.complete(pc);
         Quests.TUTORIAL.getObjective(1).setAccessible(pc, true);
         Tutorial.message(pc,
                 Component.text("Open your skill tree to unlock powerful abilities!"),
@@ -93,6 +97,7 @@ public class TutorialQuest implements Feature {
 
     private void handleOpenSkillTree(PlayerCharacterOpenSkillTreeEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        QuestObjective openSkillTreeObjective = Quests.TUTORIAL.getObjective(1);
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;
         }

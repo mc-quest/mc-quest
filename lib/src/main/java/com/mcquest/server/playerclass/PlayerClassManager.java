@@ -76,9 +76,9 @@ public class PlayerClassManager {
             // TODO: sound
             return;
         }
-        PlayerCharacterSkillManager skillManager = pc.getSkillManager();
         pc.removeMana(manaCost);
         PlayerCharacterUseActiveSkillEvent event = new PlayerCharacterUseActiveSkillEvent(pc, skill);
+        skill.onUse().emit(event);
         mmorpg.getGlobalEventHandler().call(event);
     }
 

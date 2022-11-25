@@ -6,10 +6,11 @@
             "id": 1,
             "name": "Bash",
             "level": 1,
+            "prerequisiteId": null,
             "icon": "minecraft:shield",
             "description": "Damage enemies in front of you",
             "manaCost": 5,
-            "prerequisites": [],
+            "cooldown": 8,
             "skillTreeRow": 0,
             "skillTreeColumn": 4
         },
@@ -17,12 +18,11 @@
             "id": 2,
             "name": "Self Heal",
             "level": 2,
+            "prerequisiteId": 1,
             "icon": "minecraft:emerald",
             "manaCost": 5,
+            "cooldown": 20,
             "description": "Heal yourself",
-            "prerequisites": [
-                1
-            ],
             "skillTreeRow": 0,
             "skillTreeColumn": 4
         }

@@ -7,6 +7,8 @@ import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.ResourceUtility;
 import net.minestom.server.item.Material;
 
+import java.time.Duration;
+
 public class PlayerClasses {
     public static final PlayerClass FIGHTER = loadPlayerClass("Fighter");
     public static final PlayerClass MAGE = loadPlayerClass("Mage");
@@ -23,13 +25,18 @@ public class PlayerClasses {
             int skillId = skillObject.get("id").getAsInt();
             String skillName = skillObject.get("name").getAsString();
             int skillLevel = skillObject.get("level").getAsInt();
+            JsonElement skillPrerequisiteIdElement = skillObject.get("prerequisiteId");
+            Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
+                    : skillPrerequisiteIdElement.getAsInt();
             Material skillIcon = Material.fromNamespaceId(skillObject.get("icon").getAsString());
             String skillDescription = skillObject.get("description").getAsString();
-            int skillManaCost = skillObject.get("manaCost").getAsInt();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();
-            builder.activeSkill(skillId, skillName, skillLevel, skillIcon,
-                    skillDescription, skillManaCost, skillTreeRow, skillTreeColumn);
+            int skillManaCost = skillObject.get("manaCost").getAsInt();
+            double skillCooldownSeconds = skillObject.get("cooldown").getAsDouble();
+            Duration skillCooldown = Duration.ofMillis((long) (skillCooldownSeconds * 1000));
+            builder.activeSkill(skillId, skillName, skillLevel, skillPrerequisiteId, skillIcon,
+                    skillDescription, skillTreeRow, skillTreeColumn, skillManaCost, skillCooldown);
         }
         JsonArray skillTreeDecorations = object.get("skillTreeDecorations").getAsJsonArray();
         for (JsonElement skillTreeDecoration : skillTreeDecorations) {

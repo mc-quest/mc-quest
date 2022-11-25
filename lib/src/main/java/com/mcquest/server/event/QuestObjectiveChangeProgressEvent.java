@@ -33,4 +33,8 @@ public class QuestObjectiveChangeProgressEvent implements Event {
     public int getNewProgress() {
         return newProgress;
     }
+
+    public boolean objectiveIsComplete() {
+        return newProgress == objective.getGoal();
+    }
 }

@@ -6,11 +6,13 @@ import com.mcquest.server.event.PlayerCharacterUnlockSkillEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
-public class Skill {
+public abstract class Skill {
     private final int id;
     private final String name;
     private final int level;
+    private final @Nullable Integer prerequisiteId;
     private final Material icon;
     private final String description;
     private final int skillTreeRow;
@@ -18,11 +20,12 @@ public class Skill {
     private final EventEmitter<PlayerCharacterUnlockSkillEvent> onUnlock;
     PlayerClass playerClass;
 
-    Skill(int id, String name, int level, Material icon,
-          String description, int skillTreeRow, int skillTreeColumn) {
+    Skill(int id, String name, int level, @Nullable Integer prerequisiteId,
+          Material icon, String description, int skillTreeRow, int skillTreeColumn) {
         this.id = id;
         this.name = name;
         this.level = level;
+        this.prerequisiteId = prerequisiteId;
         this.icon = icon;
         this.description = description;
         this.skillTreeRow = skillTreeRow;
@@ -40,6 +43,13 @@ public class Skill {
 
     public int getLevel() {
         return level;
+    }
+
+    public @Nullable Skill getPrerequisite() {
+        if (prerequisiteId == null) {
+            return null;
+        }
+        return playerClass.getSkill(prerequisiteId);
     }
 
     public Material getIcon() {
@@ -66,13 +76,9 @@ public class Skill {
         return playerClass;
     }
 
-    @ApiStatus.Internal
-    public ItemStack getHotbarItemStack() {
-        // TODO
-        return ItemStack.of(Material.DIAMOND);
-    }
-
     public boolean isUnlocked(PlayerCharacter pc) {
         return pc.getSkillManager().isUnlocked(this);
     }
+
+    public abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);
 }

@@ -5,6 +5,7 @@ import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.event.PlayerCharacterReceiveItemEvent;
 import com.mcquest.server.event.PlayerCharacterRemoveItemEvent;
 import com.mcquest.server.item.*;
+import com.mcquest.server.mount.Mount;
 import com.mcquest.server.music.MusicManager;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
@@ -18,6 +19,7 @@ import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.util.MathUtility;
+import com.mcquest.server.zone.Zone;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -40,6 +42,7 @@ import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.*;
@@ -62,6 +65,7 @@ public final class PlayerCharacter extends Character {
     private final PlayerCharacterQuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final Hitbox hitbox;
+    private Zone zone;
     private Pos respawnPosition;
     private double mana;
     private double maxMana;
@@ -91,6 +95,7 @@ public final class PlayerCharacter extends Character {
         mana = data.getMana();
         healthRegenRate = 1;
         hitbox = initHitbox();
+        zone = mmorpg.getZoneManager().getZone(data.getZoneId());
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
@@ -142,8 +147,9 @@ public final class PlayerCharacter extends Character {
     }
 
     private void initUi() {
-        // hidePlayerNameplate();
+        // TODO: hidePlayerNameplate();
         updateActionBar();
+        showZoneText();
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
@@ -306,17 +312,13 @@ public final class PlayerCharacter extends Character {
         int newLevel = getLevel() + 1;
         super.setLevel(newLevel);
         sendMessage(Component.text("Level increased to " + newLevel, NamedTextColor.GREEN));
-        grantSkillPoint();
+        skillManager.grantSkillPoint();
     }
 
     @Override
     public void setLevel(int level) {
         // Don't set PlayerCharacter level explicitly.
         throw new UnsupportedOperationException();
-    }
-
-    private void grantSkillPoint() {
-        // TODO
     }
 
     private void updateExperienceBar() {
@@ -409,6 +411,29 @@ public final class PlayerCharacter extends Character {
 
     public PlayerCharacterQuestTracker getQuestTracker() {
         return questTracker;
+    }
+
+    public Zone getZone() {
+        return zone;
+    }
+
+    public void setZone(Zone zone) {
+        if (this.zone == zone) {
+            return;
+        }
+        this.zone = zone;
+        showZoneText();
+    }
+
+    private void showZoneText() {
+        Component zoneText = Component.text(zone.getName(), zone.getType().getColor());
+        Component levelText = Component.text("Level " + zone.getLevel(), NamedTextColor.GOLD);
+        Duration fadeIn = Duration.ofSeconds(1);
+        Duration stay = Duration.ofSeconds(3);
+        Duration fadeOut = Duration.ofSeconds(1);
+        Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
+        Title title = Title.title(zoneText, levelText, times);
+        player.showTitle(title);
     }
 
     public Weapon getWeapon() {
@@ -528,12 +553,22 @@ public final class PlayerCharacter extends Character {
         return amountRemoved;
     }
 
+    /**
+     * Returns the mount currently being ridden, or null if there is none.
+     */
+    public @Nullable Mount getMount() {
+        // TODO
+        // may want to return a MountInstance instead?
+        return null;
+    }
+
     public boolean canMount() {
         return canMount;
     }
 
     public void setCanMount(boolean canMount) {
         this.canMount = canMount;
+        // TODO: unmount
     }
 
     public boolean isDisarmed() {

@@ -5,6 +5,7 @@ import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.zone.Zone;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,7 @@ public class PlayerCharacterData {
     private int instanceId;
     private Pos position;
     private Pos respawnPosition;
+    private int zoneId;
     private double health;
     private double maxHealth;
     private double mana;
@@ -32,12 +34,13 @@ public class PlayerCharacterData {
      * Constructs a new PlayerCharacterData for a new PlayerCharacter.
      */
     public static PlayerCharacterData create(PlayerClass playerClass, Instance instance,
-                                             Pos position, Weapon weapon) {
+                                             Pos position, Zone zone, Weapon weapon) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClassId = playerClass.getId();
         data.instanceId = instance.getId();
         data.position = position;
         data.respawnPosition = position;
+        data.zoneId = zone.getId();
         data.health = 1;
         data.maxHealth = 1;
         data.mana = 1;
@@ -55,6 +58,8 @@ public class PlayerCharacterData {
     public static PlayerCharacterData save(PlayerCharacter pc) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClassId = pc.getPlayerClass().getId();
+        data.instanceId = ((Instance) pc.getInstance()).getId();
+        data.position = pc.getPosition();
         data.health = pc.getHealth();
         data.maxHealth = pc.getMaxHealth();
         data.mana = pc.getMana();
@@ -80,6 +85,10 @@ public class PlayerCharacterData {
 
     public Pos getRespawnPosition() {
         return respawnPosition;
+    }
+
+    public int getZoneId() {
+        return zoneId;
     }
 
     public double getHealth() {

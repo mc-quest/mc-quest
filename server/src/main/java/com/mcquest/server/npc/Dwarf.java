@@ -9,6 +9,8 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
+import net.minestom.server.entity.ai.goal.DoNothingGoal;
+import net.minestom.server.entity.ai.goal.RandomLookAroundGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.instance.Instance;
 import team.unnamed.hephaestus.minestom.ModelEntity;
@@ -75,10 +77,16 @@ public class Dwarf extends NonPlayerCharacter {
         public Entity(Dwarf dwarf) {
             super(Models.WOLF_SPIDER);
             this.dwarf = dwarf;
-            setNoGravity(false);
+            getNavigator().getPathingEntity().setAvian(true);
             addAIGroup(new EntityAIGroupBuilder()
-                    .addGoalSelector(new RandomStrollGoal(this, 20))
+                    .addGoalSelector(new DoNothingGoal(this, 2000, 0.5f))
+                    .addGoalSelector(new RandomStrollGoal(this, 5))
+                    .addGoalSelector(new RandomLookAroundGoal(this, 1))
                     .build());
+        }
+
+        public void setPosition(Pos pos) {
+            this.position = pos;
         }
 
         @Override

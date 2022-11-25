@@ -22,6 +22,8 @@ import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.resource.ResourceManager;
 import com.mcquest.server.ui.InteractionHandler;
 import com.mcquest.server.ui.PlayerCharacterLogoutType;
+import com.mcquest.server.zone.Zone;
+import com.mcquest.server.zone.ZoneManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -36,6 +38,7 @@ public class Mmorpg {
     private final PlayerClassManager playerClassManager;
     private final ItemManager itemManager;
     private final QuestManager questManager;
+    private final ZoneManager zoneManager;
     private final MusicManager musicManager;
     private final MapManager mapManager;
     private final InstanceManager instanceManager;
@@ -51,6 +54,7 @@ public class Mmorpg {
         playerClassManager = new PlayerClassManager(this, builder.playerClasses);
         itemManager = new ItemManager(builder.items);
         questManager = new QuestManager(builder.quests);
+        zoneManager = new ZoneManager(builder.zones);
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
         instanceManager = new InstanceManager(builder.instances);
@@ -83,6 +87,10 @@ public class Mmorpg {
 
     public QuestManager getQuestManager() {
         return questManager;
+    }
+
+    public ZoneManager getZoneManager() {
+        return zoneManager;
     }
 
     public MusicManager getMusicManager() {
@@ -134,6 +142,7 @@ public class Mmorpg {
         private PlayerClass[] playerClasses;
         private Item[] items;
         private Quest[] quests;
+        private Zone[] zones;
         private Song[] music;
         private AreaMap[] maps;
         private Instance[] instances;
@@ -168,6 +177,11 @@ public class Mmorpg {
 
         public Builder quests(Quest... quests) {
             this.quests = quests.clone();
+            return this;
+        }
+
+        public Builder zones(Zone... zones) {
+            this.zones = zones.clone();
             return this;
         }
 

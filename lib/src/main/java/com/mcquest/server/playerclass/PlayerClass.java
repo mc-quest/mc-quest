@@ -1,7 +1,9 @@
 package com.mcquest.server.playerclass;
 
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
 import java.util.*;
 
 /**
@@ -66,20 +68,20 @@ public final class PlayerClass {
             this.skillTreeDecorations = new ArrayList<>();
         }
 
-        public Builder activeSkill(int id, String name, int level, Material icon,
-                                   String description, double manaCost,
-                                   int skillTreeRow, int skillTreeColumn) {
-            ActiveSkill skill = new ActiveSkill(id, name, level, icon, description,
-                    skillTreeRow, skillTreeColumn, manaCost);
+        public Builder activeSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
+                                   Material icon, String description, int skillTreeRow,
+                                   int skillTreeColumn, double manaCost, Duration cooldown) {
+            ActiveSkill skill = new ActiveSkill(id, name, level, prerequisiteId, icon,
+                    description, skillTreeRow, skillTreeColumn, manaCost, cooldown);
             skills.add(skill);
             return this;
         }
 
-        public Builder passiveSkill(int id, String name, int level, Material icon,
-                                    String description, int skillTreeRow,
+        public Builder passiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
+                                    Material icon, String description, int skillTreeRow,
                                     int skillTreeColumn) {
-            PassiveSkill skill = new PassiveSkill(id, name, level, icon, description,
-                    skillTreeRow, skillTreeColumn);
+            PassiveSkill skill = new PassiveSkill(id, name, level, prerequisiteId, icon,
+                    description, skillTreeRow, skillTreeColumn);
             skills.add(skill);
             return this;
         }

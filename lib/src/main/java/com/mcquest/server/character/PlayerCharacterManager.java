@@ -62,7 +62,7 @@ public class PlayerCharacterManager {
         Instance instance = mmorpg.getInstanceManager().getInstance(data.getInstanceId());
         event.setSpawningInstance(instance);
         player.setRespawnPoint(data.getPosition());
-        player.setGameMode(GameMode.CREATIVE);
+        player.setGameMode(GameMode.ADVENTURE);
         player.setResourcePack(mmorpg.getResourceManager().getResourcePack());
         PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
         pcs.put(player, pc);

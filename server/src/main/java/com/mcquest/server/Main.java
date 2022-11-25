@@ -16,6 +16,7 @@ public class Main {
                 .playerClasses(PlayerClasses.FIGHTER, PlayerClasses.MAGE)
                 .items(Items.ADVENTURERS_SWORD)
                 .quests(Quests.TUTORIAL, Quests.THWARTING_THE_THIEVES)
+                .zones(Zones.OAKSHIRE)
                 .instances(Instances.ELADRADOR)
                 .models(Models.WOLF_SPIDER)
                 .music(Music.DUNGEON)

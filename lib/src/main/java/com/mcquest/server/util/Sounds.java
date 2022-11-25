@@ -1,0 +1,11 @@
+package com.mcquest.server.util;
+
+import net.kyori.adventure.sound.Sound;
+import net.minestom.server.sound.SoundEvent;
+
+public class Sounds {
+    public static final Sound CLICK =
+            Sound.sound(SoundEvent.BLOCK_LEVER_CLICK, Sound.Source.MASTER, 1f, 1f);
+    public static final Sound ENTER_DUNGEON =
+            Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f);
+}

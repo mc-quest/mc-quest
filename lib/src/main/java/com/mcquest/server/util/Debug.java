@@ -1,8 +1,8 @@
 package com.mcquest.server.util;
 
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.physics.Collider;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;

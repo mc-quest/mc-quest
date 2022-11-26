@@ -1,6 +1,6 @@
 package com.mcquest.server.physics;
 
-import net.minestom.server.instance.Instance;
+import com.mcquest.server.instance.Instance;
 
 import java.util.Objects;
 
@@ -15,22 +15,6 @@ class ColliderBucketAddress {
         this.x = x;
         this.y = y;
         this.z = z;
-    }
-
-    Instance getInstance() {
-        return instance;
-    }
-
-    int getX() {
-        return x;
-    }
-
-    int getY() {
-        return y;
-    }
-
-    int getZ() {
-        return z;
     }
 
     @Override

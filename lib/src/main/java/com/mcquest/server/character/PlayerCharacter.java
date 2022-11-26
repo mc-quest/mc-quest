@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -74,6 +75,7 @@ public final class PlayerCharacter extends Character {
     private double experiencePoints;
     private boolean canMount;
     private boolean isDisarmed;
+    private boolean canAct;
     private Task undisarmTask;
     private long undisarmTime;
     private boolean removed;
@@ -102,6 +104,8 @@ public final class PlayerCharacter extends Character {
         initInventory(data);
         initUi();
         canMount = data.canMount();
+        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0);
+        canAct = true;
         removed = false;
     }
 
@@ -142,6 +146,7 @@ public final class PlayerCharacter extends Character {
             int slot = persistentItem.getInventorySlot();
             Item item = itemManager.getItem(itemId);
             ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
+            System.out.println(itemStack.meta().getAttributes());
             inventory.setItemStack(slot, itemStack);
         }
     }
@@ -613,6 +618,15 @@ public final class PlayerCharacter extends Character {
         passenger.setInvisible(true);
         passenger.setInstance(getInstance());
         player.addPassenger(passenger);
+    }
+
+    public boolean canAct() {
+        return canAct;
+    }
+
+    public void setCanAct() {
+        this.canAct = canAct;
+        // TODO: disable skills, consumables, and basic attacks
     }
 
     public boolean isRemoved() {

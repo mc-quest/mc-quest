@@ -4,6 +4,7 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.*;
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.Weapon;
@@ -20,7 +21,6 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.*;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
@@ -180,8 +180,8 @@ public class InteractionHandler {
             return;
         }
         Weapon weapon = pc.getWeapon();
-        PlayerCharacterBasicAttackEvent basicAttackEvent = new PlayerCharacterBasicAttackEvent(pc, weapon);
-        weapon.onBasicAttack().emit(basicAttackEvent);
+        PlayerCharacterAutoAttackEvent basicAttackEvent = new PlayerCharacterAutoAttackEvent(pc, weapon);
+        weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
     }
 

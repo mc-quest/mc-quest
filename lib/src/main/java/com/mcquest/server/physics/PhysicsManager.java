@@ -1,9 +1,9 @@
 package com.mcquest.server.physics;
 
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.util.MathUtility;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;

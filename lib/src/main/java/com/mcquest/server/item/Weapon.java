@@ -1,7 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
+import com.mcquest.server.event.PlayerCharacterAutoAttackEvent;
 import com.mcquest.server.event.PlayerCharacterEquipWeaponEvent;
 import com.mcquest.server.event.PlayerCharacterUnequipWeaponEvent;
 import net.kyori.adventure.text.Component;
@@ -20,7 +20,7 @@ public class Weapon extends Item {
     private final double physicalDamage;
     private final EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip;
     private final EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip;
-    private final EventEmitter<PlayerCharacterBasicAttackEvent> onBasicAttack;
+    private final EventEmitter<PlayerCharacterAutoAttackEvent> onAutoAttack;
 
     Weapon(Builder builder) {
         super(builder);
@@ -29,7 +29,7 @@ public class Weapon extends Item {
         physicalDamage = builder.physicalDamage;
         onEquip = new EventEmitter<>();
         onUnequip = new EventEmitter<>();
-        onBasicAttack = new EventEmitter<>();
+        onAutoAttack = new EventEmitter<>();
     }
 
     public WeaponType getType() {
@@ -75,8 +75,8 @@ public class Weapon extends Item {
         return onUnequip;
     }
 
-    public EventEmitter<PlayerCharacterBasicAttackEvent> onBasicAttack() {
-        return onBasicAttack;
+    public EventEmitter<PlayerCharacterAutoAttackEvent> onAutoAttack() {
+        return onAutoAttack;
     }
 
     public static Builder builder(int id, String name, ItemRarity rarity,

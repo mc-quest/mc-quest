@@ -5,7 +5,6 @@ import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.PlayerCharacterUnlockSkillEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Skill {

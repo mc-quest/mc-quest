@@ -5,7 +5,7 @@ import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.Items;
-import com.mcquest.server.event.PlayerCharacterBasicAttackEvent;
+import com.mcquest.server.event.PlayerCharacterAutoAttackEvent;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
@@ -25,10 +25,10 @@ public class Swords implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-        Items.ADVENTURERS_SWORD.onBasicAttack().subscribe(this::basicAttack);
+        Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::basicAttack);
     }
 
-    public void basicAttack(PlayerCharacterBasicAttackEvent event) {
+    public void basicAttack(PlayerCharacterAutoAttackEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Weapon weapon = event.getWeapon();
         double physicalDamage = weapon.getPhysicalDamage();
@@ -44,7 +44,7 @@ public class Swords implements Feature {
             CharacterHitbox hitbox = (CharacterHitbox) hit.getCollider();
             Character character = hitbox.getCharacter();
             character.damage(pc, physicalDamage);
-            instance.playSound(Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.MASTER, 1f, 1f));
+            instance.playSound(Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.MASTER, 0.5f, 1f));
         }
     }
 

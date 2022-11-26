@@ -115,7 +115,6 @@ public class PlayerCharacterQuestTracker {
         currentProgress[objectiveIndex] = progress;
         if (progress == goal) {
             pc.sendMessage(Component.empty()
-                    .append(Component.text(quest.getName() + ": ", NamedTextColor.YELLOW))
                     .append(Component.text(goal + "/" + goal + " ", NamedTextColor.GREEN))
                     .append(TextUtility.deserializeText(objective.getDescription()))
                     .append(Component.text(" complete!", NamedTextColor.GREEN)));

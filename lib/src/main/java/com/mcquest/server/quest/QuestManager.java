@@ -1,8 +1,8 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.instance.Instance;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;

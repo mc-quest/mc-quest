@@ -6,6 +6,7 @@ import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.*;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
+import com.mcquest.server.item.Weapon;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
@@ -178,8 +179,10 @@ public class InteractionHandler {
         if (pc.isDisarmed()) {
             return;
         }
-        MinecraftServer.getGlobalEventHandler()
-                .call(new PlayerCharacterBasicAttackEvent(pc, pc.getWeapon()));
+        Weapon weapon = pc.getWeapon();
+        PlayerCharacterBasicAttackEvent basicAttackEvent = new PlayerCharacterBasicAttackEvent(pc, weapon);
+        weapon.onBasicAttack().emit(basicAttackEvent);
+        MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
     }
 
     private void handleInteract(PlayerEntityInteractEvent event) {

@@ -1,11 +1,11 @@
 package com.mcquest.server.character;
 
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.hologram.Hologram;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public class Character implements DamageSource {
     private Hologram healthBar;
 
     Character(@NotNull Component displayName, int level,
-                     @NotNull Instance instance, @NotNull Pos position) {
+              @NotNull Instance instance, @NotNull Pos position) {
         if (level < 1) {
             throw new IllegalArgumentException();
         }
@@ -145,7 +145,7 @@ public class Character implements DamageSource {
     }
 
     public final boolean isAlive() {
-        return health > 0;
+        return health > 0.0;
     }
 
     @MustBeInvokedByOverriders

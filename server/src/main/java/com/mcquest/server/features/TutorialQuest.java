@@ -8,7 +8,6 @@ import com.mcquest.server.constants.Quests;
 import com.mcquest.server.event.*;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.npc.Dwarf;
-import com.mcquest.server.npc.TrainingDummy;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.QuestObjective;

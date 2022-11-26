@@ -21,7 +21,8 @@ public class Main {
                 .models(Models.WOLF_SPIDER)
                 .music(Music.DUNGEON)
                 .maps(Maps.MELCHER)
-                .features(Features.FIGHTER_PLAYER_CLASS, Features.MAGE_PLAYER_CLASS, Features.TUTORIAL_QUEST)
+                .features(Features.FIGHTER_PLAYER_CLASS, Features.MAGE_PLAYER_CLASS,
+                        Features.SWORDS, Features.TUTORIAL_QUEST)
                 .playerCharacterDataProvider(database::getPlayerCharacterData)
                 .playerCharacterLogoutHandler(database::savePlayerCharacterData)
                 .start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);

@@ -26,6 +26,7 @@ public class PlayerCharacterData {
     private int[] trackedQuestIds;
     private Integer songId;
     private boolean canMount;
+    public int[] mountIds;
 
     private PlayerCharacterData() {
     }
@@ -52,13 +53,14 @@ public class PlayerCharacterData {
         data.trackedQuestIds = new int[0];
         data.songId = null;
         data.canMount = true;
+        data.mountIds = new int[0];
         return data;
     }
 
     public static PlayerCharacterData save(PlayerCharacter pc) {
         PlayerCharacterData data = new PlayerCharacterData();
         data.playerClassId = pc.getPlayerClass().getId();
-        data.instanceId = ((Instance) pc.getInstance()).getId();
+        data.instanceId = (pc.getInstance()).getId();
         data.position = pc.getPosition();
         data.health = pc.getHealth();
         data.maxHealth = pc.getMaxHealth();
@@ -133,5 +135,9 @@ public class PlayerCharacterData {
 
     public boolean canMount() {
         return canMount;
+    }
+
+    public int[] getMountIds() {
+        return mountIds;
     }
 }

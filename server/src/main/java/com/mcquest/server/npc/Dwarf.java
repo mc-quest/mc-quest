@@ -4,16 +4,20 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.*;
 import com.mcquest.server.constants.Models;
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
-import net.minestom.server.entity.ai.goal.DoNothingGoal;
+import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.goal.RandomLookAroundGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
-import net.minestom.server.instance.Instance;
+import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import team.unnamed.hephaestus.minestom.ModelEntity;
+
+import java.time.Duration;
 
 public class Dwarf extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
@@ -28,6 +32,8 @@ public class Dwarf extends NonPlayerCharacter {
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
+        setMaxHealth(100);
+        setHealth(getMaxHealth());
     }
 
     @Override
@@ -62,8 +68,13 @@ public class Dwarf extends NonPlayerCharacter {
         if (!isAlive()) {
             if (source instanceof PlayerCharacter pc) {
                 pc.grantExperiencePoints(50);
+                mmorpg.getSchedulerManager().buildTask(this::respawn).delay(Duration.ofSeconds(5)).schedule();
             }
         }
+    }
+
+    private void respawn() {
+        setHealth(getMaxHealth());
     }
 
     @Override
@@ -79,14 +90,11 @@ public class Dwarf extends NonPlayerCharacter {
             this.dwarf = dwarf;
             getNavigator().getPathingEntity().setAvian(true);
             addAIGroup(new EntityAIGroupBuilder()
-                    .addGoalSelector(new DoNothingGoal(this, 2000, 0.5f))
+                    .addTargetSelector(new ClosestEntityTarget(this, 5.0, e -> e instanceof Player))
+                    .addGoalSelector(new MeleeAttackGoal(this, 1.0, Duration.ofSeconds(1)))
                     .addGoalSelector(new RandomStrollGoal(this, 5))
                     .addGoalSelector(new RandomLookAroundGoal(this, 1))
                     .build());
-        }
-
-        public void setPosition(Pos pos) {
-            this.position = pos;
         }
 
         @Override

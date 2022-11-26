@@ -4,14 +4,13 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.instance.Chunk;
-import net.minestom.server.instance.InstanceContainer;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class InstanceManager {
-    private final Map<Integer, InstanceContainer> instancesById;
+    private final Map<Integer, Instance> instancesById;
 
     @ApiStatus.Internal
     public InstanceManager(Instance[] instances) {
@@ -32,7 +31,7 @@ public class InstanceManager {
         MinecraftServer.getInstanceManager().registerInstance(instance);
     }
 
-    public InstanceContainer getInstance(int id) {
+    public Instance getInstance(int id) {
         return instancesById.get(id);
     }
 

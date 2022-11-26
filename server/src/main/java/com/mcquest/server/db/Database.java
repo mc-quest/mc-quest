@@ -26,7 +26,7 @@ public class Database {
     public void savePlayerCharacterData(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
         // TODO: write to database.
         PlayerCharacterData data = PlayerCharacterData.save(pc);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         System.out.println(gson.toJson(data));
     }
 }

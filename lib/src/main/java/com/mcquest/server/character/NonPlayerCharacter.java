@@ -1,10 +1,10 @@
 package com.mcquest.server.character;
 
+import com.mcquest.server.instance.Instance;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.instance.EntityTracker;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 

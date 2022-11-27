@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -27,19 +28,40 @@ public class ResourceUtility {
     private static final Gson GSON = new Gson();
     private static final ModelReader modelReader = BBModelReader.blockbench();
 
+    private static ClassLoader classLoader() {
+        return ResourceUtility.class.getClassLoader();
+    }
+
+    public static URL getResource(@NotNull String resourcePath) {
+        return classLoader().getResource(resourcePath);
+    }
+
+    /**
+     * Returns an InputStream for the resource with the given path. The caller
+     * is responsible for closing the stream.
+     */
     public static InputStream getResourceAsStream(@NotNull String resourcePath) {
-        return ResourceUtility.class.getClassLoader().getResourceAsStream(resourcePath);
+        return classLoader().getResourceAsStream(resourcePath);
     }
 
     public static JsonElement getResourceAsJson(@NotNull String resourcePath) {
-        InputStream stream = getResourceAsStream(resourcePath);
-        Reader reader = new InputStreamReader(stream);
-        return JsonParser.parseReader(reader);
+        try {
+            InputStream stream = getResourceAsStream(resourcePath);
+            Reader reader = new InputStreamReader(stream);
+            JsonElement json = JsonParser.parseReader(reader);
+            stream.close();
+            return json;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Model readModel(String path) {
         try {
-            return modelReader.read(getResourceAsStream(path));
+            InputStream inputStream = getResourceAsStream(path);
+            Model model = modelReader.read(inputStream);
+            inputStream.close();
+            return model;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -47,7 +69,10 @@ public class ResourceUtility {
 
     public static Image readImage(String path) {
         try {
-            return ImageIO.read(getResourceAsStream(path));
+            InputStream inputStream = getResourceAsStream(path);
+            Image image = ImageIO.read(inputStream);
+            inputStream.close();
+            return image;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -64,9 +89,15 @@ public class ResourceUtility {
      */
     public static <T> T deserializeJsonResource(@NotNull String resourcePath,
                                                 @NotNull Class<T> classOfT) {
-        InputStream inputStream = getResourceAsStream(resourcePath);
-        InputStreamReader reader = new InputStreamReader(inputStream);
-        return GSON.fromJson(reader, classOfT);
+        try {
+            InputStream inputStream = getResourceAsStream(resourcePath);
+            InputStreamReader reader = new InputStreamReader(inputStream);
+            T object = GSON.fromJson(reader, classOfT);
+            inputStream.close();
+            return object;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

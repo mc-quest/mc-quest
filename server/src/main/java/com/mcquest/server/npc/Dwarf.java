@@ -4,7 +4,10 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.*;
 import com.mcquest.server.constants.Models;
+import com.mcquest.server.constants.Music;
 import com.mcquest.server.instance.Instance;
+import com.mcquest.server.music.PlayerCharacterMusicPlayer;
+import com.mcquest.server.music.Song;
 import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -15,6 +18,7 @@ import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
 import net.minestom.server.entity.ai.goal.RandomLookAroundGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.ai.target.ClosestEntityTarget;
+import net.minestom.server.entity.damage.DamageType;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 import java.time.Duration;
@@ -64,7 +68,17 @@ public class Dwarf extends NonPlayerCharacter {
 
     @Override
     public void damage(DamageSource source, double amount) {
+        if (source instanceof PlayerCharacter pc) {
+            PlayerCharacterMusicPlayer musicPlayer = pc.getMusicPlayer();
+            Song song = musicPlayer.getSong();
+            if (song == Music.DUNGEON) {
+                musicPlayer.setSong(null);
+            } else {
+                musicPlayer.setSong(Music.DUNGEON);
+            }
+        }
         super.damage(source, amount);
+        entity.damage(DamageType.VOID, 0f);
         if (!isAlive()) {
             if (source instanceof PlayerCharacter pc) {
                 pc.grantExperiencePoints(50);

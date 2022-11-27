@@ -19,7 +19,7 @@ import com.mcquest.server.playerclass.PlayerClassManager;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.instance.InstanceManager;
-import com.mcquest.server.resource.ResourceManager;
+import com.mcquest.server.resourcepack.ResourcePackManager;
 import com.mcquest.server.ui.InteractionHandler;
 import com.mcquest.server.ui.PlayerCharacterLogoutType;
 import com.mcquest.server.zone.Zone;
@@ -42,7 +42,7 @@ public class Mmorpg {
     private final MusicManager musicManager;
     private final MapManager mapManager;
     private final InstanceManager instanceManager;
-    private final ResourceManager resourceManager;
+    private final ResourcePackManager resourceManager;
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
@@ -58,7 +58,7 @@ public class Mmorpg {
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
         instanceManager = new InstanceManager(builder.instances);
-        resourceManager = new ResourceManager(builder.models);
+        resourceManager = new ResourcePackManager(builder.models, builder.music);
         pcManager = new PlayerCharacterManager(this,
                 builder.pcDataProvider, builder.pcLogoutHandler);
         npcSpawner = new NonPlayerCharacterSpawner();
@@ -105,7 +105,7 @@ public class Mmorpg {
         return instanceManager;
     }
 
-    public ResourceManager getResourceManager() {
+    public ResourcePackManager getResourceManager() {
         return resourceManager;
     }
 

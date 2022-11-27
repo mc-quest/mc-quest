@@ -34,6 +34,7 @@ class SkillTreeMenu {
         inventory.addInventoryCondition((Player player, int slot, ClickType clickType,
                                          InventoryConditionResult inventoryConditionResult) -> {
             handleSkillClick(pc, inventory, slot, clickType);
+            inventoryConditionResult.setCancel(true);
         });
         pc.getPlayer().openInventory(inventory);
     }

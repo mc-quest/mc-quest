@@ -15,6 +15,7 @@ subprojects {
         implementation 'team.unnamed:creative-api:0.5.0-SNAPSHOT'
         implementation 'team.unnamed:creative-server:0.5.0-SNAPSHOT'
         implementation 'com.github.mc-quest:hephaestus-engine:main-SNAPSHOT'
+        implementation 'org.gagravarr:vorbis-java-core:0.8'
     }
 
     test {

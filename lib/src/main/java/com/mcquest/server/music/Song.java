@@ -1,88 +1,58 @@
 package com.mcquest.server.music;
 
-import net.minestom.server.sound.SoundEvent;
-import org.jetbrains.annotations.NotNull;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import org.gagravarr.ogg.OggFile;
+import org.gagravarr.ogg.audio.OggAudioStatistics;
+import org.gagravarr.vorbis.VorbisFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.time.Duration;
 
 public class Song {
     private final int id;
-    private final double duration;
-    private final double beatsPerMinute;
-    private final Note[] notes;
+    private final URL ogg;
+    private final Sound sound;
+    private final Duration duration;
 
-    private Song(Builder builder) {
-        this.id = builder.id;
-        this.duration = builder.duration;
-        this.beatsPerMinute = builder.beatsPerMinute;
-        this.notes = builder.notes.toArray(new Note[0]);
+    public Song(int id, URL ogg) {
+        this.id = id;
+        this.ogg = ogg;
+        Key key = Key.key("music", String.valueOf(id));
+        this.sound = Sound.sound(key, Sound.Source.MUSIC, 1f, 1f);
+        this.duration = computeDuration(ogg);
+    }
+
+    private static Duration computeDuration(URL resource) {
+        try {
+            InputStream inputStream = resource.openStream();
+            OggFile oggFile = new OggFile(inputStream);
+            VorbisFile vorbisFile = new VorbisFile(oggFile);
+            OggAudioStatistics statistics = new OggAudioStatistics(vorbisFile, vorbisFile);
+            statistics.calculate();
+            long durationMillis = (long) (statistics.getDurationSeconds() * 1000.0);
+            inputStream.close();
+            return Duration.ofMillis(durationMillis);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int getId() {
         return id;
     }
 
-    public double getDuration() {
+    public URL getOgg() {
+        return ogg;
+    }
+
+    public Sound getSound() {
+        return sound;
+    }
+
+    public Duration getDuration() {
         return duration;
-    }
-
-    public double getBeatsPerMinute() {
-        return beatsPerMinute;
-    }
-
-    public int getNoteCount() {
-        return notes.length;
-    }
-
-    public Note getNote(int index) {
-        return notes[index];
-    }
-
-    public static Builder builder(int id, double duration, double beatsPerMinute) {
-        return new Builder(id, duration, beatsPerMinute);
-    }
-
-    public static class Builder {
-        private final int id;
-        private final double duration;
-        private final double beatsPerMinute;
-        private final List<Note> notes;
-        private SoundEvent instrument;
-        private float volume;
-
-        private Builder(int id, double duration, double beatsPerMinute) {
-            this.id = id;
-            this.duration = duration;
-            this.beatsPerMinute = beatsPerMinute;
-            this.notes = new ArrayList<>();
-            this.instrument = null;
-            this.volume = 1f;
-        }
-
-        public Builder instrument(@NotNull SoundEvent instrument) {
-            this.instrument = instrument;
-            return this;
-        }
-
-        public Builder volume(float volume) {
-            this.volume = volume;
-            return this;
-        }
-
-        public Builder note(double time, Pitch pitch) {
-            if (instrument == null) {
-                throw new IllegalStateException("You need to specify an instrument");
-            }
-            if (time > duration) {
-                throw new IllegalArgumentException("time > duration");
-            }
-            notes.add(new Note(time, instrument, volume, pitch));
-            return this;
-        }
-
-        public Song build() {
-            return new Song(this);
-        }
     }
 }

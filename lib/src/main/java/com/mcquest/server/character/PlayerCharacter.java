@@ -104,6 +104,7 @@ public final class PlayerCharacter extends Character {
         initInventory(data);
         initUi();
         canMount = data.canMount();
+        // TODO
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0);
         canAct = true;
         removed = false;
@@ -146,7 +147,6 @@ public final class PlayerCharacter extends Character {
             int slot = persistentItem.getInventorySlot();
             Item item = itemManager.getItem(itemId);
             ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
-            System.out.println(itemStack.meta().getAttributes());
             inventory.setItemStack(slot, itemStack);
         }
     }

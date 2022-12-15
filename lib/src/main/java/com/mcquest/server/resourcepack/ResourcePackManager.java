@@ -47,12 +47,23 @@ public class ResourcePackManager {
     }
 
     private void writeResourcePack(FileTree tree) {
+        writePackMeta(tree);
+        writeModels(tree);
+        writeMusic(tree);
+        disableBackgroundMusic(tree);
+    }
+
+    private void writePackMeta(FileTree tree) {
         tree.write(Metadata.builder()
                 .add(PackMeta.of(9, "MMORPG resource pack"))
                 .build());
+    }
 
+    private void writeModels(FileTree tree) {
         ModelWriter.resource().write(tree, List.of(models));
+    }
 
+    private void writeMusic(FileTree tree) {
         Map<String, SoundEvent> sounds = new HashMap<>();
         for (Song song : music) {
             Key key = song.getSound().name();
@@ -65,8 +76,6 @@ public class ResourcePackManager {
         }
         SoundRegistry soundRegistry = SoundRegistry.of("music", sounds);
         tree.write(soundRegistry);
-
-        disableBackgroundMusic(tree);
     }
 
     private void disableBackgroundMusic(FileTree tree) {

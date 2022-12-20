@@ -16,6 +16,7 @@ import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
+import com.mcquest.server.playerclass.Skill;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.instance.InstanceManager;
@@ -28,9 +29,14 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.timer.SchedulerManager;
+import team.unnamed.creative.file.FileTree;
 import team.unnamed.hephaestus.Model;
 
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Mmorpg {
@@ -42,12 +48,12 @@ public class Mmorpg {
     private final MusicManager musicManager;
     private final MapManager mapManager;
     private final InstanceManager instanceManager;
-    private final ResourcePackManager resourceManager;
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
     private final Feature[] features;
+    private final ResourcePackManager resourcePackManager;
 
     private Mmorpg(Builder builder) {
         server = builder.server;
@@ -58,13 +64,18 @@ public class Mmorpg {
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
         instanceManager = new InstanceManager(builder.instances);
-        resourceManager = new ResourcePackManager(builder.models, builder.music);
+        Collection<Skill> skills = new ArrayList<>();
+        for (PlayerClass playerClass : builder.playerClasses) {
+            skills.addAll(playerClass.getSkills());
+        }
         pcManager = new PlayerCharacterManager(this,
                 builder.pcDataProvider, builder.pcLogoutHandler);
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         features = builder.features;
+        resourcePackManager = new ResourcePackManager(builder.resourcePackWriter,
+                skills.toArray(new Skill[0]), builder.items, builder.music, builder.models);
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }
@@ -73,7 +84,7 @@ public class Mmorpg {
         for (Feature feature : features) {
             feature.hook(this);
         }
-        resourceManager.startResourcePackServer(address, resourcePackServerPort);
+        resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
     }
 
@@ -105,10 +116,6 @@ public class Mmorpg {
         return instanceManager;
     }
 
-    public ResourcePackManager getResourceManager() {
-        return resourceManager;
-    }
-
     public PlayerCharacterManager getPlayerCharacterManager() {
         return pcManager;
     }
@@ -133,6 +140,10 @@ public class Mmorpg {
         return MinecraftServer.getSchedulerManager();
     }
 
+    public ResourcePackManager getResourcePackManager() {
+        return resourcePackManager;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -148,6 +159,7 @@ public class Mmorpg {
         private Instance[] instances;
         private Model[] models;
         private Feature[] features;
+        private Consumer<FileTree> resourcePackWriter;
         private Function<Player, PlayerCharacterData> pcDataProvider;
         private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> pcLogoutHandler;
 
@@ -156,11 +168,13 @@ public class Mmorpg {
             playerClasses = new PlayerClass[0];
             items = new Item[0];
             quests = new Quest[0];
+            zones = new Zone[0];
             music = new Song[0];
             maps = new AreaMap[0];
             instances = new Instance[0];
             models = new Model[0];
             features = new Feature[0];
+            resourcePackWriter = null;
             pcDataProvider = null;
             pcLogoutHandler = null;
         }
@@ -210,6 +224,11 @@ public class Mmorpg {
             return this;
         }
 
+        public Builder resourcePack(Consumer<FileTree> writer) {
+            resourcePackWriter = writer;
+            return this;
+        }
+
         public Builder playerCharacterDataProvider(Function<Player,
                 PlayerCharacterData> dataProvider) {
             this.pcDataProvider = dataProvider;
@@ -224,10 +243,13 @@ public class Mmorpg {
 
         public void start(String address, int port, int resourcePackServerPort) {
             if (pcDataProvider == null) {
-                throw new NullPointerException("You need to specify a player character data provider");
+                throw new NullPointerException("No player character data provider specified");
             }
             if (pcLogoutHandler == null) {
-                throw new NullPointerException("You need to specify a player character logout handler");
+                throw new NullPointerException("No player character logout handler specified");
+            }
+            if (resourcePackWriter == null) {
+                throw new NullPointerException("No resource pack writer specified");
             }
             Mmorpg mmorpg = new Mmorpg(this);
             mmorpg.start(address, port, resourcePackServerPort);

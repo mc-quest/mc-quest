@@ -45,8 +45,12 @@ public class ResourceUtility {
     }
 
     public static JsonElement getResourceAsJson(@NotNull String resourcePath) {
+        return getResourceAsJson(getResource(resourcePath));
+    }
+
+    public static JsonElement getResourceAsJson(@NotNull URL resource) {
         try {
-            InputStream stream = getResourceAsStream(resourcePath);
+            InputStream stream = resource.openStream();
             Reader reader = new InputStreamReader(stream);
             JsonElement json = JsonParser.parseReader(reader);
             stream.close();
@@ -112,7 +116,7 @@ public class ResourceUtility {
     public static void extractResources(@NotNull String resourcesPath,
                                         @NotNull String destinationPath) {
         try {
-            URI resourcesUri = ResourceUtility.class.getResource("/" + resourcesPath).toURI();
+            URI resourcesUri = classLoader().getResource(resourcesPath).toURI();
             FileSystem fileSystem = null;
 
             // Only create a new FileSystem if running from a jar.

@@ -4,7 +4,7 @@ import com.mcquest.server.util.ResourceUtility;
 import team.unnamed.hephaestus.Model;
 
 public class Models {
-    public static final Model WOLF_SPIDER = loadModel("wolf_spider");
+    public static final Model DEER = loadModel("deer_antler");
 
     private static Model loadModel(String fileName) {
         String path = "models/" + fileName + ".bbmodel";

@@ -11,6 +11,7 @@ import com.mcquest.server.item.Weapon;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
+import com.mcquest.server.playerclass.ActiveSkill;
 import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -115,7 +116,7 @@ public class InteractionHandler {
     private void openSkillTree(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new PlayerCharacterOpenSkillTreeEvent(pc));
-        SkillTreeMenu.open(pc);
+        pc.getSkillManager().openSkillTree();
     }
 
     private void openQuestLog(PlayerCharacter pc) {
@@ -158,6 +159,7 @@ public class InteractionHandler {
         int slot = event.getSlot();
         PlayerInventory inventory = player.getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
+
         Item item = mmorpg.getItemManager().getItem(itemStack);
         if (item instanceof ConsumableItem consumableItem) {
             int newAmount = itemStack.amount() - 1;

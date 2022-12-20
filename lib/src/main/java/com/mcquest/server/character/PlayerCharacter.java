@@ -88,7 +88,7 @@ public final class PlayerCharacter extends Character {
         this.player = player;
         respawnPosition = data.getRespawnPosition();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
-        skillManager = new PlayerCharacterSkillManager(this);
+        skillManager = new PlayerCharacterSkillManager(this, data.getSkillPoints());
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
         setMaxHealth(data.getMaxHealth());
@@ -316,8 +316,9 @@ public final class PlayerCharacter extends Character {
     private void levelUp() {
         int newLevel = getLevel() + 1;
         super.setLevel(newLevel);
-        sendMessage(Component.text("Level increased to " + newLevel, NamedTextColor.GREEN));
+        sendMessage(Component.text("Level increased to " + newLevel + "!", NamedTextColor.GREEN));
         skillManager.grantSkillPoint();
+        sendMessage(Component.text("Received 1 skill point!", NamedTextColor.GREEN));
     }
 
     @Override
@@ -614,9 +615,9 @@ public final class PlayerCharacter extends Character {
     }
 
     private void hidePlayerNameplate() {
-        Entity passenger = new EntityCreature(EntityType.ARMOR_STAND);
+        Entity passenger = new Entity(EntityType.ARMOR_STAND);
         passenger.setInvisible(true);
-        passenger.setInstance(getInstance());
+        passenger.setInstance(getInstance()).join();
         player.addPassenger(passenger);
     }
 

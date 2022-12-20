@@ -20,6 +20,7 @@ public class PlayerCharacterData {
     private double mana;
     private double maxMana;
     private double experiencePoints;
+    private int skillPoints;
     private PersistentItem[] items;
     private PersistentQuestObjectiveData[] questObjectiveData;
     private int[] completedQuestIds;
@@ -47,6 +48,7 @@ public class PlayerCharacterData {
         data.mana = 1;
         data.maxMana = 1;
         data.experiencePoints = 0;
+        data.skillPoints = 1;
         data.items = new PersistentItem[]{new PersistentItem(weapon.getId(), 1, 8)};
         data.questObjectiveData = new PersistentQuestObjectiveData[0];
         data.completedQuestIds = new int[0];
@@ -67,6 +69,7 @@ public class PlayerCharacterData {
         data.mana = pc.getMana();
         data.maxMana = pc.getMaxMana();
         data.experiencePoints = pc.getExperiencePoints();
+        data.skillPoints = pc.getSkillManager().getSkillPoints();
         Song song = pc.getMusicPlayer().getSong();
         data.songId = song == null ? null : song.getId();
         data.canMount = pc.canMount();
@@ -111,6 +114,10 @@ public class PlayerCharacterData {
 
     public double getExperiencePoints() {
         return experiencePoints;
+    }
+
+    public int getSkillPoints() {
+        return skillPoints;
     }
 
     public PersistentItem[] getItems() {

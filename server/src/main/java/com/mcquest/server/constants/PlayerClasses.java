@@ -5,17 +5,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.ResourceUtility;
-import net.minestom.server.item.Material;
 
+import java.net.URL;
 import java.time.Duration;
 
 public class PlayerClasses {
-    public static final PlayerClass FIGHTER = loadPlayerClass("Fighter");
-    public static final PlayerClass MAGE = loadPlayerClass("Mage");
+    public static final PlayerClass FIGHTER = loadPlayerClass("fighter", "Fighter.json");
+    public static final PlayerClass MAGE = loadPlayerClass("mage", "Mage.json");
 
-    private static PlayerClass loadPlayerClass(String fileName) {
-        String path = "playerclasses/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+    private static PlayerClass loadPlayerClass(String dirName, String fileName) {
+        String dirPath = "playerclasses/" + dirName;
+        String filePath = dirPath + "/" + fileName;
+        JsonObject object = ResourceUtility.getResourceAsJson(filePath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         PlayerClass.Builder builder = PlayerClass.builder(id, name);
@@ -28,7 +29,8 @@ public class PlayerClasses {
             JsonElement skillPrerequisiteIdElement = skillObject.get("prerequisiteId");
             Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
                     : skillPrerequisiteIdElement.getAsInt();
-            Material skillIcon = Material.fromNamespaceId(skillObject.get("icon").getAsString());
+            String skillIconPath = dirPath + "/icons/" + skillObject.get("icon").getAsString();
+            URL skillIcon = ResourceUtility.getResource(skillIconPath);
             String skillDescription = skillObject.get("description").getAsString();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();
@@ -37,15 +39,6 @@ public class PlayerClasses {
             Duration skillCooldown = Duration.ofMillis((long) (skillCooldownSeconds * 1000));
             builder.activeSkill(skillId, skillName, skillLevel, skillPrerequisiteId, skillIcon,
                     skillDescription, skillTreeRow, skillTreeColumn, skillManaCost, skillCooldown);
-        }
-        JsonArray skillTreeDecorations = object.get("skillTreeDecorations").getAsJsonArray();
-        for (JsonElement skillTreeDecoration : skillTreeDecorations) {
-            JsonObject skillTreeDecorationObject = skillTreeDecoration.getAsJsonObject();
-            Material decorationIcon = Material.fromNamespaceId(
-                    skillTreeDecorationObject.get("icon").getAsString());
-            int decorationRow = skillTreeDecorationObject.get("row").getAsInt();
-            int decorationColumn = skillTreeDecorationObject.get("column").getAsInt();
-            builder.skillTreeDecoration(decorationIcon, decorationRow, decorationColumn);
         }
         return builder.build();
     }

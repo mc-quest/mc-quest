@@ -7,7 +7,7 @@
             "name": "Bash",
             "level": 1,
             "prerequisiteId": null,
-            "icon": "minecraft:shield",
+            "icon": "Bash.png",
             "description": "Damage enemies in front of you",
             "manaCost": 5,
             "cooldown": 8,
@@ -19,19 +19,12 @@
             "name": "Self Heal",
             "level": 2,
             "prerequisiteId": 1,
-            "icon": "minecraft:emerald",
+            "icon": "SelfHeal.png",
             "manaCost": 5,
             "cooldown": 20,
             "description": "Heal yourself",
-            "skillTreeRow": 0,
+            "skillTreeRow": 1,
             "skillTreeColumn": 4
-        }
-    ],
-    "skillTreeDecorations": [
-        {
-            "icon": "minecraft:dirt_block",
-            "row": 0,
-            "column": 0
         }
     ]
 }

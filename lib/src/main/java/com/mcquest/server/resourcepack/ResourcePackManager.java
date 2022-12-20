@@ -1,112 +1,48 @@
 package com.mcquest.server.resourcepack;
 
+import com.mcquest.server.item.Item;
 import com.mcquest.server.music.Song;
-import net.kyori.adventure.key.Key;
+import com.mcquest.server.playerclass.Skill;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
-import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
-import team.unnamed.creative.metadata.Metadata;
-import team.unnamed.creative.metadata.PackMeta;
 import team.unnamed.creative.server.ResourcePackServer;
-import team.unnamed.creative.sound.Sound;
-import team.unnamed.creative.sound.SoundEvent;
-import team.unnamed.creative.sound.SoundRegistry;
 import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.writer.ModelWriter;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.function.Consumer;
 
+@ApiStatus.Internal
 public class ResourcePackManager {
-    private final Model[] models;
-    private final Song[] music;
-    private net.minestom.server.resourcepack.ResourcePack resourcePack;
+    private final ResourcePack resourcePack;
+    private ResourcePackServer server;
+    private String resourcePackUrl;
 
-    public ResourcePackManager(Model[] models, Song[] music) {
-        this.models = models;
-        this.music = music;
+    public ResourcePackManager(Consumer<FileTree> baseWriter, Skill[] skills,
+                               Item[] items, Song[] music, Model[] models) {
+        ResourcePackBuilder builder = new ResourcePackBuilder(
+                baseWriter, skills, items, music, models);
+        resourcePack = builder.build();
     }
 
-    @ApiStatus.Internal
-    public void startResourcePackServer(String address, int port) {
+    public void startServer(String address, int port) {
         try {
-            ResourcePack resourcePack = ResourcePack.build(this::writeResourcePack);
-            ResourcePackServer server = ResourcePackServer.builder()
+            resourcePackUrl = String.format("http://%s:%d", address, port);
+            server = ResourcePackServer.builder()
                     .pack(resourcePack)
                     .address(address, port)
                     .build();
             server.start();
-            this.resourcePack = net.minestom.server.resourcepack.ResourcePack
-                    .forced("http://" + address + ":" + port, resourcePack.hash());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void writeResourcePack(FileTree tree) {
-        writePackMeta(tree);
-        writeModels(tree);
-        writeMusic(tree);
-        disableBackgroundMusic(tree);
+    public String getResourcePackHash() {
+        return resourcePack.hash();
     }
 
-    private void writePackMeta(FileTree tree) {
-        tree.write(Metadata.builder()
-                .add(PackMeta.of(9, "MMORPG resource pack"))
-                .build());
-    }
-
-    private void writeModels(FileTree tree) {
-        ModelWriter.resource().write(tree, List.of(models));
-    }
-
-    private void writeMusic(FileTree tree) {
-        Map<String, SoundEvent> sounds = new HashMap<>();
-        for (Song song : music) {
-            Key key = song.getSound().name();
-            Writable data = Writable.inputStream(() -> song.getOgg().openStream());
-            Sound.File soundFile = Sound.File.of(key, data);
-            tree.write(soundFile);
-            Sound sound = Sound.builder().nameSound(key).stream(true).build();
-            SoundEvent soundEvent = SoundEvent.builder().sounds(sound).build();
-            sounds.put(key.value(), soundEvent);
-        }
-        SoundRegistry soundRegistry = SoundRegistry.of("music", sounds);
-        tree.write(soundRegistry);
-    }
-
-    private void disableBackgroundMusic(FileTree tree) {
-        List<String> backgroundMusic = List.of(
-                "music.game",
-                "music.creative",
-                "music.under_water",
-                "music.menu",
-                "music.credits",
-                "music.nether.basalt_deltas",
-                "music.nether.nether_wastes",
-                "music.nether.soul_sand_valley",
-                "music.nether.crimson_forest",
-                "music.nether.crimson_forest",
-                "music.nether.nether_wastes",
-                "music.nether.basalt_deltas",
-                "music.nether.soul_sand_valley",
-                "music.dragon",
-                "music.end"
-        );
-        Map<String, SoundEvent> sounds = new HashMap<>();
-        for (String backgroundSong : backgroundMusic) {
-            SoundEvent soundEvent = SoundEvent.builder().replace(true).build();
-            sounds.put(backgroundSong, soundEvent);
-        }
-        SoundRegistry soundRegistry = SoundRegistry.of("minecraft", sounds);
-        tree.write(soundRegistry);
-    }
-
-    @ApiStatus.Internal
-    public net.minestom.server.resourcepack.ResourcePack getResourcePack() {
-        return resourcePack;
+    public String getResourcePackUrl() {
+        return resourcePackUrl;
     }
 }

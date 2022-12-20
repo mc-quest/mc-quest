@@ -6,6 +6,7 @@ import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.event.PlayerCharacterLogoutEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.persistence.PlayerCharacterData;
+import com.mcquest.server.resourcepack.ResourcePackManager;
 import com.mcquest.server.ui.PlayerCharacterLogoutType;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
@@ -15,6 +16,7 @@ import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.instance.EntityTracker;
+import net.minestom.server.resourcepack.ResourcePack;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -45,6 +47,10 @@ public class PlayerCharacterManager {
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
     }
 
+    public Collection<PlayerCharacter> getPlayerCharacters() {
+        return Collections.unmodifiableCollection(pcs.values());
+    }
+
     public PlayerCharacter getPlayerCharacter(Player player) {
         return pcs.get(player);
     }
@@ -63,7 +69,10 @@ public class PlayerCharacterManager {
         event.setSpawningInstance(instance);
         player.setRespawnPoint(data.getPosition());
         player.setGameMode(GameMode.ADVENTURE);
-        player.setResourcePack(mmorpg.getResourceManager().getResourcePack());
+        ResourcePackManager resourcePackManager = mmorpg.getResourcePackManager();
+        ResourcePack resourcePack = ResourcePack.forced(resourcePackManager.getResourcePackUrl(),
+                resourcePackManager.getResourcePackHash());
+        player.setResourcePack(resourcePack);
         PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
         pcs.put(player, pc);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();

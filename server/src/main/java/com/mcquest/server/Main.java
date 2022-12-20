@@ -3,6 +3,12 @@ package com.mcquest.server;
 import com.mcquest.server.constants.*;
 import com.mcquest.server.db.Database;
 import com.mcquest.server.util.ResourceUtility;
+import net.minestom.server.MinecraftServer;
+import team.unnamed.creative.base.Writable;
+import team.unnamed.creative.file.FileTree;
+
+import java.net.URL;
+import java.util.List;
 
 public class Main {
     private static final String SERVER_ADDRESS = "0.0.0.0";
@@ -18,11 +24,12 @@ public class Main {
                 .quests(Quests.TUTORIAL, Quests.THWARTING_THE_THIEVES)
                 .zones(Zones.OAKSHIRE)
                 .instances(Instances.ELADRADOR)
-                .models(Models.WOLF_SPIDER)
+                .models(Models.DEER)
                 .music(Music.DUNGEON)
                 .maps(Maps.MELCHER)
                 .features(Features.FIGHTER_PLAYER_CLASS, Features.MAGE_PLAYER_CLASS,
                         Features.SWORDS, Features.TUTORIAL_QUEST)
+                .resourcePack(Main::writeResourcePack)
                 .playerCharacterDataProvider(database::getPlayerCharacterData)
                 .playerCharacterLogoutHandler(database::savePlayerCharacterData)
                 .start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);
@@ -30,5 +37,15 @@ public class Main {
 
     private static void extractWorldResources() {
         ResourceUtility.extractResources("worlds", "world");
+    }
+
+    private static void writeResourcePack(FileTree tree) {
+        String basePath = "resourcepack";
+        List<String> paths = ResourceUtility.getResources(basePath);
+        for (String path : paths) {
+            URL resource = ResourceUtility.getResource(path);
+            String subPath = path.substring(basePath.length() + 1);
+            tree.write(subPath, Writable.inputStream(() -> resource.openStream()));
+        }
     }
 }

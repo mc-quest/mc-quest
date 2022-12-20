@@ -11,31 +11,30 @@ import com.mcquest.server.music.Song;
 import com.mcquest.server.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Player;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
-import net.minestom.server.entity.ai.goal.MeleeAttackGoal;
-import net.minestom.server.entity.ai.goal.RandomLookAroundGoal;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
-import net.minestom.server.entity.ai.target.ClosestEntityTarget;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.player.PlayerChatEvent;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 import java.time.Duration;
 
-public class Dwarf extends NonPlayerCharacter {
-    private static final Component DISPLAY_NAME = Component.text("Dwarf", NamedTextColor.GREEN);
+public class Deer extends NonPlayerCharacter {
+    private static final Component DISPLAY_NAME = Component.text("Deer", NamedTextColor.GREEN);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
     private final Collider hitbox;
     private Entity entity;
 
-    public Dwarf(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
-        super(DISPLAY_NAME, 25, instance, spawnPosition);
+    public Deer(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
+        super(DISPLAY_NAME, 2, instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
+        setHeight(1.5);
         setMaxHealth(100);
         setHealth(getMaxHealth());
     }
@@ -97,24 +96,24 @@ public class Dwarf extends NonPlayerCharacter {
     }
 
     public static class Entity extends ModelEntity {
-        private final Dwarf dwarf;
+        private final Deer deer;
 
-        public Entity(Dwarf dwarf) {
-            super(Models.WOLF_SPIDER);
-            this.dwarf = dwarf;
-            getNavigator().getPathingEntity().setAvian(true);
+        public Entity(Deer deer) {
+            super(Models.DEER);
+            this.deer = deer;
+            getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.05f);
             addAIGroup(new EntityAIGroupBuilder()
-                    .addTargetSelector(new ClosestEntityTarget(this, 5.0, e -> e instanceof Player))
-                    .addGoalSelector(new MeleeAttackGoal(this, 1.0, Duration.ofSeconds(1)))
-                    .addGoalSelector(new RandomStrollGoal(this, 5))
-                    .addGoalSelector(new RandomLookAroundGoal(this, 1))
+                    .addGoalSelector(new RandomStrollGoal(this, 10))
                     .build());
+            deer.mmorpg.getGlobalEventHandler().addListener(PlayerChatEvent.class, e -> {
+                playAnimation("walk");
+            });
         }
 
         @Override
         public void tick(long time) {
             super.tick(time);
-            dwarf.setPosition(getPosition());
+            deer.setPosition(getPosition());
         }
     }
 }

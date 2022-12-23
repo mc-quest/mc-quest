@@ -3,11 +3,9 @@ package com.mcquest.server;
 import com.mcquest.server.constants.*;
 import com.mcquest.server.db.Database;
 import com.mcquest.server.util.ResourceUtility;
-import net.minestom.server.MinecraftServer;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
 
-import java.net.URL;
 import java.util.List;
 
 public class Main {
@@ -43,9 +41,9 @@ public class Main {
         String basePath = "resourcepack";
         List<String> paths = ResourceUtility.getResources(basePath);
         for (String path : paths) {
-            URL resource = ResourceUtility.getResource(path);
             String subPath = path.substring(basePath.length() + 1);
-            tree.write(subPath, Writable.inputStream(() -> resource.openStream()));
+            tree.write(subPath, Writable.inputStream(() ->
+                    ResourceUtility.getStream(path)));
         }
     }
 }

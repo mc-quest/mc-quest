@@ -5,14 +5,21 @@ import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.PlayerCharacterUnlockSkillEvent;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import team.unnamed.creative.file.FileTree;
+
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 public abstract class Skill {
+    private static final Material SKILL_MATERIAL = Material.WOODEN_AXE;
+
     private final int id;
     private final String name;
     private final int level;
     private final @Nullable Integer prerequisiteId;
-    private final Material icon;
+    private final Callable<InputStream> icon;
     private final String description;
     private final int skillTreeRow;
     private final int skillTreeColumn;
@@ -20,7 +27,8 @@ public abstract class Skill {
     PlayerClass playerClass;
 
     Skill(int id, String name, int level, @Nullable Integer prerequisiteId,
-          Material icon, String description, int skillTreeRow, int skillTreeColumn) {
+          Callable<InputStream> icon, String description, int skillTreeRow,
+          int skillTreeColumn) {
         this.id = id;
         this.name = name;
         this.level = level;
@@ -51,7 +59,7 @@ public abstract class Skill {
         return playerClass.getSkill(prerequisiteId);
     }
 
-    public Material getIcon() {
+    public Callable<InputStream> getIcon() {
         return icon;
     }
 
@@ -79,5 +87,11 @@ public abstract class Skill {
         return pc.getSkillManager().isUnlocked(this);
     }
 
-    public abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);
+    abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);
+
+    /**
+     * Returns the number of textures written.
+     */
+    @ApiStatus.Internal
+    public abstract int writeResources(FileTree tree);
 }

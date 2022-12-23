@@ -5,10 +5,13 @@ import com.mcquest.server.event.PlayerCharacterAutoAttackEvent;
 import com.mcquest.server.event.PlayerCharacterEquipWeaponEvent;
 import com.mcquest.server.event.PlayerCharacterUnequipWeaponEvent;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.item.Material;
+import org.jetbrains.annotations.ApiStatus;
+import team.unnamed.creative.file.FileTree;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
@@ -17,23 +20,21 @@ import java.util.List;
 public class Weapon extends Item {
     private final int level;
     private final WeaponType type;
+    private final Callable<InputStream> model;
     private final double physicalDamage;
     private final EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip;
     private final EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip;
     private final EventEmitter<PlayerCharacterAutoAttackEvent> onAutoAttack;
 
     Weapon(Builder builder) {
-        super(builder);
+        super(builder.id, builder.name, builder.quality, builder.description);
         level = builder.level;
         type = builder.type;
+        model = builder.model;
         physicalDamage = builder.physicalDamage;
         onEquip = new EventEmitter<>();
         onUnequip = new EventEmitter<>();
         onAutoAttack = new EventEmitter<>();
-    }
-
-    public WeaponType getType() {
-        return type;
     }
 
     /**
@@ -43,28 +44,16 @@ public class Weapon extends Item {
         return level;
     }
 
-    public double getPhysicalDamage() {
-        return physicalDamage;
+    public WeaponType getType() {
+        return type;
     }
 
-    @Override
-    List<Component> getItemStackLore() {
-        ItemRarity rarity = getRarity();
-        String description = getDescription();
-        List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.rarityText(rarity, type.getText()));
-        lore.add(ItemUtility.levelText(level));
-        lore.add(Component.empty());
-        if (physicalDamage != 0.0) {
-            lore.add(ItemUtility.statText("Physical Damage", physicalDamage));
-        }
-        if (description != null) {
-            lore.add(Component.empty());
-            lore.addAll(ItemUtility.descriptionText(description));
-        }
-        lore.add(Component.empty());
-        lore.add(ItemUtility.equipText());
-        return lore;
+    public Callable<InputStream> getModel() {
+        return model;
+    }
+
+    public double getPhysicalDamage() {
+        return physicalDamage;
     }
 
     public EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip() {
@@ -79,33 +68,123 @@ public class Weapon extends Item {
         return onAutoAttack;
     }
 
-    public static Builder builder(int id, String name, ItemRarity rarity,
-                                  Material icon, int level, WeaponType type) {
-        return new Builder(id, name, rarity, icon, level, type);
+    @Override
+    List<Component> getItemStackLore() {
+        ItemQuality quality = getQuality();
+        String description = getDescription();
+        List<Component> lore = new ArrayList<>();
+        lore.add(ItemUtility.qualityText(quality, type.getText()));
+        lore.add(ItemUtility.levelText(level));
+        lore.add(Component.empty());
+        if (physicalDamage != 0.0) {
+            lore.add(ItemUtility.statText("Physical Damage", physicalDamage));
+        }
+        if (description != null) {
+            lore.add(Component.empty());
+            lore.addAll(ItemUtility.descriptionText(description));
+        }
+        lore.add(Component.empty());
+        lore.add(ItemUtility.equipText());
+        return lore;
     }
 
-    public static class Builder extends Item.Builder {
-        final int level;
-        final WeaponType type;
-        private double physicalDamage;
+    @ApiStatus.Internal
+    @Override
+    public void writeResources(FileTree tree) {
+        // TODO
+    }
 
-        Builder(int id, String name, ItemRarity rarity,
-                Material icon, int level, WeaponType type) {
-            super(id, name, rarity, icon);
-            this.level = level;
-            this.type = type;
-            physicalDamage = 0.0;
+    public static IdStep builder() {
+        return new Builder();
+    }
+
+    public interface IdStep {
+        NameStep id(int id);
+    }
+
+    public interface NameStep {
+        QualityStep name(String name);
+    }
+
+    public interface QualityStep {
+        LevelStep quality(ItemQuality quality);
+    }
+
+    public interface LevelStep {
+        TypeStep level(int level);
+    }
+
+    public interface TypeStep {
+        ModelStep type(WeaponType type);
+    }
+
+    public interface ModelStep {
+        BuildStep model(Callable<InputStream> model);
+    }
+
+    public interface BuildStep {
+        BuildStep description(String description);
+
+        BuildStep physicalDamage(double physicalDamage);
+
+        Weapon build();
+    }
+
+    public static class Builder implements IdStep, NameStep, QualityStep,
+            LevelStep, TypeStep, ModelStep, BuildStep {
+        private int id;
+        private String name;
+        private ItemQuality quality;
+        private int level;
+        private WeaponType type;
+        private double physicalDamage;
+        private Callable<InputStream> model;
+        private String description;
+
+        @Override
+        public NameStep id(int id) {
+            this.id = id;
+            return this;
         }
 
         @Override
-        public Builder description(String description) {
-            return (Builder) super.description(description);
+        public QualityStep name(String name) {
+            this.name = name;
+            return this;
         }
 
-        public Builder physicalDamage(double physicalDamage) {
-            if (physicalDamage < 0) {
-                throw new IllegalArgumentException();
-            }
+        @Override
+        public LevelStep quality(ItemQuality quality) {
+            this.quality = quality;
+            return this;
+        }
+
+        @Override
+        public TypeStep level(int level) {
+            this.level = level;
+            return this;
+        }
+
+        @Override
+        public ModelStep type(WeaponType type) {
+            this.type = type;
+            return this;
+        }
+
+        @Override
+        public BuildStep model(Callable<InputStream> model) {
+            this.model = model;
+            return this;
+        }
+
+        @Override
+        public BuildStep description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        @Override
+        public BuildStep physicalDamage(double physicalDamage) {
             this.physicalDamage = physicalDamage;
             return this;
         }

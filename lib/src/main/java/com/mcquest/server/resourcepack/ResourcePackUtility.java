@@ -3,7 +3,6 @@ package com.mcquest.server.resourcepack;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mcquest.server.util.ResourceUtility;
 import net.kyori.adventure.key.Key;
 import team.unnamed.creative.base.*;
 import team.unnamed.creative.file.FileTree;
@@ -42,7 +41,7 @@ public class ResourcePackUtility {
     public static void writeItemModel(FileTree tree, URL bbmodel, int itemId,
                                       List<ItemOverride> overrides) {
         // TODO: might need to account for texture resolution
-        JsonObject modelJson = ResourceUtility.getResourceAsJson(bbmodel).getAsJsonObject();
+        JsonObject modelJson = null; // TODO: ResourceUtility.getResourceAsJson(bbmodel).getAsJsonObject();
 
         JsonObject displaysJson = modelJson.get("display").getAsJsonObject();
         Map<ItemTransform.Type, ItemTransform> displays = parseDisplays(displaysJson);

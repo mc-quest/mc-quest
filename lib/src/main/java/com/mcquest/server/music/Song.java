@@ -10,24 +10,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
+import java.util.concurrent.Callable;
 
 public class Song {
     private final int id;
-    private final URL ogg;
+    private final Callable<InputStream> audio;
     private final Sound sound;
     private final Duration duration;
 
-    public Song(int id, URL ogg) {
+    public Song(int id, Callable<InputStream> audio) {
         this.id = id;
-        this.ogg = ogg;
+        this.audio = audio;
         Key key = Key.key("music", String.valueOf(id));
         this.sound = Sound.sound(key, Sound.Source.MUSIC, 1f, 1f);
-        this.duration = computeDuration(ogg);
+        this.duration = computeDuration(audio);
     }
 
-    private static Duration computeDuration(URL resource) {
+    private static Duration computeDuration(Callable<InputStream> audio) {
         try {
-            InputStream inputStream = resource.openStream();
+            InputStream inputStream = audio.call();
             OggFile oggFile = new OggFile(inputStream);
             VorbisFile vorbisFile = new VorbisFile(oggFile);
             OggAudioStatistics statistics = new OggAudioStatistics(vorbisFile, vorbisFile);
@@ -35,7 +36,7 @@ public class Song {
             long durationMillis = (long) (statistics.getDurationSeconds() * 1000.0);
             inputStream.close();
             return Duration.ofMillis(durationMillis);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -44,8 +45,8 @@ public class Song {
         return id;
     }
 
-    public URL getOgg() {
-        return ogg;
+    public Callable<InputStream> getAudio() {
+        return audio;
     }
 
     public Sound getSound() {

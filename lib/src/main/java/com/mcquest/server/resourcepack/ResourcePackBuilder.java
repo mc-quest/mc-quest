@@ -80,7 +80,7 @@ class ResourcePackBuilder {
         Map<String, SoundEvent> sounds = new HashMap<>();
         for (Song song : music) {
             Key key = song.getSound().name();
-            Writable data = Writable.inputStream(() -> song.getOgg().openStream());
+            Writable data = Writable.inputStream(song.getAudio());
             Sound.File soundFile = Sound.File.of(key, data);
             tree.write(soundFile);
             Sound sound = Sound.builder().nameSound(key).stream(true).build();

@@ -6,8 +6,9 @@ import com.google.gson.JsonObject;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.ResourceUtility;
 
-import java.net.URL;
+import java.io.InputStream;
 import java.time.Duration;
+import java.util.concurrent.Callable;
 
 public class PlayerClasses {
     public static final PlayerClass FIGHTER = loadPlayerClass("fighter", "Fighter.json");
@@ -16,7 +17,7 @@ public class PlayerClasses {
     private static PlayerClass loadPlayerClass(String dirName, String fileName) {
         String dirPath = "playerclasses/" + dirName;
         String filePath = dirPath + "/" + fileName;
-        JsonObject object = ResourceUtility.getResourceAsJson(filePath).getAsJsonObject();
+        JsonObject object = ResourceUtility.readJson(filePath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         PlayerClass.Builder builder = PlayerClass.builder(id, name);
@@ -30,7 +31,7 @@ public class PlayerClasses {
             Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
                     : skillPrerequisiteIdElement.getAsInt();
             String skillIconPath = dirPath + "/icons/" + skillObject.get("icon").getAsString();
-            URL skillIcon = ResourceUtility.getResource(skillIconPath);
+            Callable<InputStream> skillIcon = () -> ResourceUtility.getStream(skillIconPath);
             String skillDescription = skillObject.get("description").getAsString();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();

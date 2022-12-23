@@ -16,7 +16,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -24,6 +23,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Utilities for reading project resources.
+ */
 public class ResourceUtility {
     private static final Gson GSON = new Gson();
     private static final ModelReader modelReader = BBModelReader.blockbench();
@@ -32,25 +34,17 @@ public class ResourceUtility {
         return ResourceUtility.class.getClassLoader();
     }
 
-    public static URL getResource(@NotNull String resourcePath) {
-        return classLoader().getResource(resourcePath);
-    }
-
     /**
      * Returns an InputStream for the resource with the given path. The caller
      * is responsible for closing the stream.
      */
-    public static InputStream getResourceAsStream(@NotNull String resourcePath) {
-        return classLoader().getResourceAsStream(resourcePath);
+    public static InputStream getStream(@NotNull String path) {
+        return classLoader().getResourceAsStream(path);
     }
 
-    public static JsonElement getResourceAsJson(@NotNull String resourcePath) {
-        return getResourceAsJson(getResource(resourcePath));
-    }
-
-    public static JsonElement getResourceAsJson(@NotNull URL resource) {
+    public static JsonElement readJson(@NotNull String path) {
         try {
-            InputStream stream = resource.openStream();
+            InputStream stream = getStream(path);
             Reader reader = new InputStreamReader(stream);
             JsonElement json = JsonParser.parseReader(reader);
             stream.close();
@@ -62,7 +56,7 @@ public class ResourceUtility {
 
     public static Model readModel(String path) {
         try {
-            InputStream inputStream = getResourceAsStream(path);
+            InputStream inputStream = getStream(path);
             Model model = modelReader.read(inputStream);
             inputStream.close();
             return model;
@@ -73,7 +67,7 @@ public class ResourceUtility {
 
     public static Image readImage(String path) {
         try {
-            InputStream inputStream = getResourceAsStream(path);
+            InputStream inputStream = getStream(path);
             Image image = ImageIO.read(inputStream);
             inputStream.close();
             return image;
@@ -85,16 +79,16 @@ public class ResourceUtility {
     /**
      * Deserializes a JSON resource.
      *
-     * @param resourcePath the path of the resource file, relative to the
-     *                     resources directory
-     * @param classOfT     the class of the object being deserialized
-     * @param <T>          the type of the object being deserialized
+     * @param path     the path of the resource file, relative to the
+     *                 resources directory
+     * @param classOfT the class of the object being deserialized
+     * @param <T>      the type of the object being deserialized
      * @return the deserialized object
      */
-    public static <T> T deserializeJsonResource(@NotNull String resourcePath,
-                                                @NotNull Class<T> classOfT) {
+    public static <T> T deserializeJson(@NotNull String path,
+                                        @NotNull Class<T> classOfT) {
         try {
-            InputStream inputStream = getResourceAsStream(resourcePath);
+            InputStream inputStream = getStream(path);
             InputStreamReader reader = new InputStreamReader(inputStream);
             T object = GSON.fromJson(reader, classOfT);
             inputStream.close();
@@ -108,15 +102,15 @@ public class ResourceUtility {
      * Extracts all resources inside a directory of resources to a directory on
      * the file system.
      *
-     * @param resourcesPath   the path to the directory of resources, relative
-     *                        to the resources directory
-     * @param destinationPath the relative path to where the resources will be
-     *                        extracted
+     * @param srcPath  the path to the directory of resources, relative
+     *                 to the resources directory
+     * @param destPath the path to where the resources will be
+     *                 extracted
      */
-    public static void extractResources(@NotNull String resourcesPath,
-                                        @NotNull String destinationPath) {
+    public static void extractResources(@NotNull String srcPath,
+                                        @NotNull String destPath) {
         try {
-            URI resourcesUri = classLoader().getResource(resourcesPath).toURI();
+            URI resourcesUri = classLoader().getResource(srcPath).toURI();
             FileSystem fileSystem = null;
 
             // Only create a new FileSystem if running from a jar.
@@ -125,7 +119,7 @@ public class ResourceUtility {
             }
 
             Path resources = Paths.get(resourcesUri);
-            Path destination = Path.of(destinationPath);
+            Path destination = Path.of(destPath);
 
             Files.walkFileTree(resources, new SimpleFileVisitor<>() {
                 @Override
@@ -154,9 +148,9 @@ public class ResourceUtility {
     /**
      * Returns the resources in a directory given by a path.
      */
-    public static List<String> getResources(@NotNull String resourcesPath) {
+    public static List<String> getResources(@NotNull String path) {
         try {
-            URI resourcesUri = ResourceUtility.class.getResource("/" + resourcesPath).toURI();
+            URI resourcesUri = ResourceUtility.class.getResource("/" + path).toURI();
 
             // Only create a new FileSystem if running from a jar.
             FileSystem fileSystem = null;
@@ -170,7 +164,7 @@ public class ResourceUtility {
             Files.walkFileTree(resources, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    String resourcePath = resourcesPath + "/" + resources.relativize(file);
+                    String resourcePath = path + "/" + resources.relativize(file);
                     results.add(resourcePath);
                     return FileVisitResult.CONTINUE;
                 }

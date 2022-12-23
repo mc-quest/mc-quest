@@ -2,6 +2,7 @@ package com.mcquest.server.playerclass;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.PlayerCharacterUseActiveSkillEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,6 +13,8 @@ import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
+import net.minestom.server.timer.SchedulerManager;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
@@ -38,6 +41,8 @@ public class PlayerClassManager {
         }
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
+        scheduler.buildTask(this::tickSkillCooldowns).repeat(TaskSchedule.nextTick()).schedule();
     }
 
     private void registerPlayerClass(PlayerClass playerClass) {
@@ -53,14 +58,11 @@ public class PlayerClassManager {
         PlayerInventory inventory = player.getInventory();
         int slot = event.getSlot();
         ItemStack itemStack = inventory.getItemStack(slot);
-        if (!itemStack.hasTag(PLAYER_CLASS_ID_TAG)) {
+        ActiveSkill skill = getActiveSkill(itemStack);
+        if (skill == null) {
             return;
         }
         PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
-        int playerClassId = itemStack.getTag(PLAYER_CLASS_ID_TAG);
-        int skillId = itemStack.getTag(SKILL_ID_TAG);
-        PlayerClass playerClass = getPlayerClass(playerClassId);
-        ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
         handleUseSkill(pc, skill);
     }
 
@@ -93,7 +95,7 @@ public class PlayerClassManager {
         return Collections.unmodifiableCollection(playerClassesById.values());
     }
 
-    public Skill getSkill(ItemStack hotbarItemStack) {
+    private ActiveSkill getActiveSkill(ItemStack hotbarItemStack) {
         if (!hotbarItemStack.hasTag(PLAYER_CLASS_ID_TAG) ||
                 !hotbarItemStack.hasTag(SKILL_ID_TAG)) {
             return null;
@@ -104,6 +106,14 @@ public class PlayerClassManager {
             return null;
         }
         int skillId = hotbarItemStack.getTag(SKILL_ID_TAG);
-        return playerClass.getSkill(skillId);
+        return (ActiveSkill) playerClass.getSkill(skillId);
+    }
+
+    private void tickSkillCooldowns() {
+        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
+        for (PlayerCharacter pc : pcManager.getPlayerCharacters()) {
+            PlayerCharacterSkillManager skillManager = pc.getSkillManager();
+            skillManager.tickSkillCooldowns();
+        }
     }
 }

@@ -7,7 +7,7 @@ import com.mcquest.server.constants.Instances;
 import com.mcquest.server.constants.Quests;
 import com.mcquest.server.event.*;
 import com.mcquest.server.feature.Feature;
-import com.mcquest.server.npc.Dwarf;
+import com.mcquest.server.npc.Deer;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.quest.QuestObjective;
@@ -58,7 +58,7 @@ public class TutorialQuest implements Feature {
         Pos[] positions = new Pos[]{new Pos(0, 70, 0)};
         for (Pos position : positions) {
             for (int i = 0; i < 5; i++) {
-                Dwarf trainingDummy = new Dwarf(mmorpg, Instances.ELADRADOR, position);
+                Deer trainingDummy = new Deer(mmorpg, Instances.ELADRADOR, position);
                 // TrainingDummy trainingDummy = new TrainingDummy(mmorpg, Instances.ELADRADOR, position);
                 npcSpawner.add(trainingDummy);
             }

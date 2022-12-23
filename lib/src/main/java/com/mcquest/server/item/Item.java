@@ -8,25 +8,24 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import team.unnamed.creative.file.FileTree;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Item {
+public abstract class Item {
     private final int id;
     private final String name;
-    private final ItemRarity rarity;
-    private final Material icon;
+    private final ItemQuality quality;
     private final String description;
     private ItemStack itemStack;
 
-    Item(Builder builder) {
-        id = builder.id;
-        name = builder.name;
-        rarity = builder.rarity;
-        icon = builder.icon;
-        description = builder.description;
+    Item(int id, String name, ItemQuality quality, String description) {
+        this.id = id;
+        this.name = name;
+        this.quality = quality;
+        this.description = description;
     }
 
     public int getId() {
@@ -37,12 +36,8 @@ public class Item {
         return name;
     }
 
-    public ItemRarity getRarity() {
-        return rarity;
-    }
-
-    public Material getIcon() {
-        return icon;
+    public ItemQuality getQuality() {
+        return quality;
     }
 
     public String getDescription() {
@@ -58,22 +53,7 @@ public class Item {
     }
 
     public TextComponent getDisplayName() {
-        return Component.text(name, rarity.getColor());
-    }
-
-    private ItemStack createItemStack() {
-        return ItemStackUtility.createItemStack(icon, getDisplayName(), getItemStackLore())
-                .withTag(ItemManager.ID_TAG, id);
-    }
-
-    List<Component> getItemStackLore() {
-        List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.rarityText(rarity, "Item"));
-        if (description != null) {
-            lore.add(Component.empty());
-            lore.addAll(ItemUtility.descriptionText(description));
-        }
-        return lore;
+        return Component.text(name, quality.getColor());
     }
 
     public void drop(Instance instance, Pos position) {
@@ -90,32 +70,13 @@ public class Item {
         drop.setInstance(instance, position);
     }
 
-    public static Builder builder(int id, String name, ItemRarity rarity, Material icon) {
-        return new Builder(id, name, rarity, icon);
+    private ItemStack createItemStack() {
+        return ItemStackUtility.createItemStack(Material.WOODEN_AXE, getDisplayName(), getItemStackLore())
+                .withTag(ItemManager.ID_TAG, id);
     }
 
-    public static class Builder {
-        final int id;
-        final String name;
-        final ItemRarity rarity;
-        final Material icon;
-        String description;
+    abstract List<Component> getItemStackLore();
 
-        Builder(int id, String name, ItemRarity rarity, Material icon) {
-            this.id = id;
-            this.name = name;
-            this.rarity = rarity;
-            this.icon = icon;
-            this.description = null;
-        }
-
-        public Builder description(String description) {
-            this.description = description;
-            return this;
-        }
-
-        public Item build() {
-            return new Item(this);
-        }
-    }
+    @ApiStatus.Internal
+    public abstract void writeResources(FileTree tree);
 }

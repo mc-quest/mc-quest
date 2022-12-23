@@ -8,21 +8,26 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import team.unnamed.creative.file.FileTree;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class PassiveSkill extends Skill {
     PassiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                 Material icon, String description, int skillTreeRow, int skillTreeColumn) {
+                 Callable<InputStream> icon, String description, int skillTreeRow,
+                 int skillTreeColumn) {
         super(id, name, level, prerequisiteId, icon, description, skillTreeRow, skillTreeColumn);
     }
 
     @Override
-    public ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
+    ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? getIcon() : Material.BARRIER;
+        Material icon = isUnlocked ? null /* TODO */ : Material.BARRIER;
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Passive Skill", NamedTextColor.GRAY));
@@ -41,5 +46,12 @@ public class PassiveSkill extends Skill {
             }
         }
         return ItemStackUtility.createItemStack(icon, displayName, lore);
+    }
+
+    @Override
+    @ApiStatus.Internal
+    public int writeResources(FileTree tree) {
+        // TODO
+        return 0;
     }
 }

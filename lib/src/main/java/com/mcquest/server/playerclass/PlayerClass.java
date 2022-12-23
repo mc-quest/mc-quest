@@ -1,10 +1,11 @@
 package com.mcquest.server.playerclass;
 
-import net.minestom.server.item.Material;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 /**
  * A PlayerClass represents the specialization of a PlayerCharacter.
@@ -13,7 +14,6 @@ public final class PlayerClass {
     private final int id;
     private final String name;
     private final Map<Integer, Skill> skillsById;
-    private final SkillTreeDecoration[] skillTreeDecorations;
 
     PlayerClass(Builder builder) {
         id = builder.id;
@@ -23,8 +23,6 @@ public final class PlayerClass {
             skill.playerClass = this;
             skillsById.put(skill.getId(), skill);
         }
-        skillTreeDecorations = builder.skillTreeDecorations
-                .toArray(new SkillTreeDecoration[0]);
     }
 
     public int getId() {
@@ -43,14 +41,6 @@ public final class PlayerClass {
         return Collections.unmodifiableCollection(skillsById.values());
     }
 
-    public SkillTreeDecoration getSkillTreeDecoration(int index) {
-        return skillTreeDecorations[index];
-    }
-
-    public int getSkillTreeDecorationCount() {
-        return skillTreeDecorations.length;
-    }
-
     public static Builder builder(int id, String name) {
         return new Builder(id, name);
     }
@@ -59,17 +49,15 @@ public final class PlayerClass {
         final int id;
         final String name;
         final List<Skill> skills;
-        final List<SkillTreeDecoration> skillTreeDecorations;
 
         private Builder(int id, String name) {
             this.id = id;
             this.name = name;
             this.skills = new ArrayList<>();
-            this.skillTreeDecorations = new ArrayList<>();
         }
 
         public Builder activeSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                   Material icon, String description, int skillTreeRow,
+                                   Callable<InputStream> icon, String description, int skillTreeRow,
                                    int skillTreeColumn, double manaCost, Duration cooldown) {
             ActiveSkill skill = new ActiveSkill(id, name, level, prerequisiteId, icon,
                     description, skillTreeRow, skillTreeColumn, manaCost, cooldown);
@@ -78,17 +66,11 @@ public final class PlayerClass {
         }
 
         public Builder passiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                    Material icon, String description, int skillTreeRow,
+                                    Callable<InputStream> icon, String description, int skillTreeRow,
                                     int skillTreeColumn) {
             PassiveSkill skill = new PassiveSkill(id, name, level, prerequisiteId, icon,
                     description, skillTreeRow, skillTreeColumn);
             skills.add(skill);
-            return this;
-        }
-
-        public Builder skillTreeDecoration(Material icon, int row, int column) {
-            SkillTreeDecoration decoration = new SkillTreeDecoration(icon, row, column);
-            skillTreeDecorations.add(decoration);
             return this;
         }
 

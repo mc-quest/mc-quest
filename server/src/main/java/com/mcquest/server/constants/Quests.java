@@ -12,7 +12,7 @@ public class Quests {
 
     private static Quest loadQuest(String fileName) {
         String path = "quests/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+        JsonObject object = ResourceUtility.readJson(path).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         int level = object.get("level").getAsInt();

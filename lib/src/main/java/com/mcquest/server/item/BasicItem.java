@@ -1,7 +1,5 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterConsumeItemEvent;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
@@ -11,32 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-/**
- * A ConsumableItem is an Item that can be consumed by a PlayerCharacter to
- * have some effect.
- */
-public class ConsumableItem extends Item {
-    private final int level;
+public class BasicItem extends Item {
     private final Callable<InputStream> icon;
-    private final EventEmitter<PlayerCharacterConsumeItemEvent> onConsume;
 
-    ConsumableItem(Builder builder) {
+    public BasicItem(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
-        level = builder.level;
         icon = builder.icon;
-        onConsume = new EventEmitter<>();
-    }
-
-    public int getLevel() {
-        return level;
     }
 
     public Callable<InputStream> getIcon() {
         return icon;
-    }
-
-    public EventEmitter<PlayerCharacterConsumeItemEvent> onConsume() {
-        return onConsume;
     }
 
     @Override
@@ -44,14 +26,11 @@ public class ConsumableItem extends Item {
         ItemQuality quality = getQuality();
         String description = getDescription();
         List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.qualityText(quality, "Consumable"));
-        lore.add(ItemUtility.levelText(level));
+        lore.add(ItemUtility.qualityText(quality, "Item"));
         if (description != null) {
             lore.add(Component.empty());
             lore.addAll(ItemUtility.descriptionText(description));
         }
-        lore.add(Component.empty());
-        lore.add(ItemUtility.consumeText());
         return lore;
     }
 
@@ -74,11 +53,7 @@ public class ConsumableItem extends Item {
     }
 
     public interface QualityStep {
-        LevelStep quality(ItemQuality quality);
-    }
-
-    public interface LevelStep {
-        IconStep level(int level);
+        IconStep quality(ItemQuality quality);
     }
 
     public interface IconStep {
@@ -88,15 +63,13 @@ public class ConsumableItem extends Item {
     public interface BuildStep {
         BuildStep description(String description);
 
-        ConsumableItem build();
+        BasicItem build();
     }
 
-    public static class Builder implements IdStep, NameStep, QualityStep,
-            LevelStep, IconStep, BuildStep {
+    public static class Builder implements IdStep, NameStep, QualityStep, IconStep, BuildStep {
         private int id;
         private String name;
         private ItemQuality quality;
-        private int level;
         private Callable<InputStream> icon;
         private String description;
 
@@ -113,14 +86,8 @@ public class ConsumableItem extends Item {
         }
 
         @Override
-        public LevelStep quality(ItemQuality quality) {
+        public IconStep quality(ItemQuality quality) {
             this.quality = quality;
-            return this;
-        }
-
-        @Override
-        public IconStep level(int level) {
-            this.level = level;
             return this;
         }
 
@@ -137,8 +104,8 @@ public class ConsumableItem extends Item {
         }
 
         @Override
-        public ConsumableItem build() {
-            return new ConsumableItem(this);
+        public BasicItem build() {
+            return new BasicItem(this);
         }
     }
 }

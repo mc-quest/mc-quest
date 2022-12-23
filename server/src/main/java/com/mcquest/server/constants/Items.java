@@ -3,19 +3,27 @@ package com.mcquest.server.constants;
 import com.google.gson.JsonObject;
 import com.mcquest.server.item.*;
 import com.mcquest.server.util.ResourceUtility;
-import net.minestom.server.item.Material;
+
+import java.io.InputStream;
+import java.util.concurrent.Callable;
 
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("AdventurersSword");
 
-    private static Item loadItem(String fileName) {
-        String path = "items/items/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+    private static BasicItem loadBasicItem(String fileName) {
+        String basePath = "items/basic/" + fileName;
+        String itemPath = basePath + ".json";
+        String iconPath = basePath + ".png";
+        JsonObject object = ResourceUtility.readJson(itemPath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
-        ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
-        Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
-        Item.Builder builder = Item.builder(id, name, rarity, icon);
+        ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
+        Callable<InputStream> icon = () -> ResourceUtility.getStream(iconPath);
+        BasicItem.BuildStep builder = BasicItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .icon(icon);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -23,15 +31,23 @@ public class Items {
     }
 
     private static Weapon loadWeapon(String fileName) {
-        String path = "items/weapons/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+        String basePath = "items/weapons/" + fileName;
+        String itemPath = basePath + ".json";
+        String modelPath = basePath + ".bbmodel";
+        JsonObject object = ResourceUtility.readJson(itemPath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
-        ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
-        Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
+        ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
-        Weapon.Builder builder = Weapon.builder(id, name, rarity, icon, level, type);
+        Callable<InputStream> model = () -> ResourceUtility.getStream(modelPath);
+        Weapon.BuildStep builder = Weapon.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .type(type)
+                .model(model);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -43,34 +59,50 @@ public class Items {
     }
 
     private static ArmorItem loadArmor(String fileName) {
-        String path = "items/armor/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+        String basePath = "items/armor/" + fileName;
+        String itemPath = basePath + ".json";
+        String modelPath = basePath + ".bbmodel";
+        JsonObject object = ResourceUtility.readJson(itemPath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
-        ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
-        Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
+        ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
-        double protections = object.get("protections").getAsDouble();
-        ArmorItem.Builder builder = ArmorItem.builder(
-                id, name, rarity, icon, level, type, slot, protections);
+        Callable<InputStream> model = () -> ResourceUtility.getStream(modelPath);
+        ArmorItem.BuildStep builder = ArmorItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .type(type)
+                .slot(slot)
+                .model(model);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
+        }
+        if (object.has("protections")) {
+            builder.protections(object.get("protections").getAsDouble());
         }
         return builder.build();
     }
 
     private static ConsumableItem loadConsumable(String fileName) {
-        String path = "items/consumables/" + fileName + ".json";
-        JsonObject object = ResourceUtility.getResourceAsJson(path).getAsJsonObject();
+        String basePath = "items/weapons/" + fileName;
+        String itemPath = basePath + ".json";
+        String iconPath = basePath + ".png";
+        JsonObject object = ResourceUtility.readJson(itemPath).getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
-        ItemRarity rarity = ItemRarity.valueOf(object.get("rarity").getAsString());
-        Material icon = Material.fromNamespaceId(object.get("icon").getAsString());
+        ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
-        ConsumableItem.Builder builder = ConsumableItem.builder(
-                id, name, rarity, icon, level);
+        Callable<InputStream> icon = () -> ResourceUtility.getStream(iconPath);
+        ConsumableItem.BuildStep builder = ConsumableItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .icon(icon);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }

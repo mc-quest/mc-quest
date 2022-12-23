@@ -1,6 +1,5 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -10,8 +9,8 @@ import net.kyori.adventure.text.format.TextDecoration;
 import java.util.List;
 
 class ItemUtility {
-    static TextComponent rarityText(ItemRarity rarity, String itemType) {
-        return Component.text(rarity.getText() + " " + itemType, NamedTextColor.GRAY);
+    static TextComponent qualityText(ItemQuality quality, String itemType) {
+        return Component.text(quality.getText() + " " + itemType, NamedTextColor.GRAY);
     }
 
     static List<TextComponent> descriptionText(String description) {
@@ -20,14 +19,6 @@ class ItemUtility {
 
     static TextComponent levelText(int level) {
         return Component.text("Level " + level, NamedTextColor.GRAY);
-    }
-
-    static TextComponent playerClassText(PlayerClass[] playerClasses) {
-        String[] names = new String[playerClasses.length];
-        for (int i = 0; i < playerClasses.length; i++) {
-            names[i] = playerClasses[i].getName();
-        }
-        return Component.text(String.join(", ", names), NamedTextColor.GRAY);
     }
 
     static TextComponent statText(String statName, double stat) {

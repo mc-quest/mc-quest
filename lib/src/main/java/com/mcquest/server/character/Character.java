@@ -176,6 +176,10 @@ public class Character implements DamageSource {
         updateNameplateAndHealthBarPosition();
     }
 
+    public boolean isFriendly(@NotNull Character other) {
+        return false;
+    }
+
     boolean nameplateAndHealthBarVisible() {
         return healthBar != null;
     }
@@ -190,10 +194,6 @@ public class Character implements DamageSource {
         healthBar.remove();
         nameplate = null;
         healthBar = null;
-    }
-
-    public boolean isFriendly(@NotNull Character other) {
-        return false;
     }
 
     private void updateNameplateAndHealthBarPosition() {

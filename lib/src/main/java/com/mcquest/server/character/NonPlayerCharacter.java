@@ -20,6 +20,15 @@ public class NonPlayerCharacter extends Character {
         isSpawned = false;
     }
 
+    @MustBeInvokedByOverriders
+    @Override
+    public void damage(DamageSource source, double amount) {
+        super.damage(source, amount);
+        if (getHealth() == 0) {
+            despawn();
+        }
+    }
+
     public final boolean isSpawned() {
         return isSpawned;
     }
@@ -34,15 +43,6 @@ public class NonPlayerCharacter extends Character {
     protected void despawn() {
         isSpawned = false;
         hideNameplateAndHealthBar();
-    }
-
-    @MustBeInvokedByOverriders
-    @Override
-    public void damage(DamageSource source, double amount) {
-        super.damage(source, amount);
-        if (getHealth() == 0) {
-            despawn();
-        }
     }
 
     protected boolean shouldSpawn() {

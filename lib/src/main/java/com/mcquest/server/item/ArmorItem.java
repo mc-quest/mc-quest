@@ -1,6 +1,8 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.*;
+import com.mcquest.server.event.EventEmitter;
+import com.mcquest.server.event.PlayerCharacterEquipArmorItemEvent;
+import com.mcquest.server.event.PlayerCharacterUnequipArmorItemEvent;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
@@ -126,7 +128,7 @@ public class ArmorItem extends Item {
         ArmorItem build();
     }
 
-    public static class Builder implements IdStep, NameStep, QualityStep,
+    private static class Builder implements IdStep, NameStep, QualityStep,
             LevelStep, TypeStep, SlotStep, ModelStep, BuildStep {
         private int id;
         private String name;

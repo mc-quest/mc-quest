@@ -91,7 +91,7 @@ public class ConsumableItem extends Item {
         ConsumableItem build();
     }
 
-    public static class Builder implements IdStep, NameStep, QualityStep,
+    private static class Builder implements IdStep, NameStep, QualityStep,
             LevelStep, IconStep, BuildStep {
         private int id;
         private String name;

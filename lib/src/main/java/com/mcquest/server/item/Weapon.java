@@ -130,7 +130,7 @@ public class Weapon extends Item {
         Weapon build();
     }
 
-    public static class Builder implements IdStep, NameStep, QualityStep,
+    private static class Builder implements IdStep, NameStep, QualityStep,
             LevelStep, TypeStep, ModelStep, BuildStep {
         private int id;
         private String name;

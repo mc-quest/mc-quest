@@ -66,7 +66,7 @@ public class BasicItem extends Item {
         BasicItem build();
     }
 
-    public static class Builder implements IdStep, NameStep, QualityStep, IconStep, BuildStep {
+    private static class Builder implements IdStep, NameStep, QualityStep, IconStep, BuildStep {
         private int id;
         private String name;
         private ItemQuality quality;

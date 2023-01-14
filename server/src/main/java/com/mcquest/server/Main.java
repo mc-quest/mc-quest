@@ -41,8 +41,8 @@ public class Main {
         List<String> paths = ResourceUtility.getResources(basePath);
         for (String path : paths) {
             String subPath = path.substring(basePath.length() + 1);
-            tree.write(subPath, Writable.inputStream(() ->
-                    ResourceUtility.getStream(path)));
+            tree.write(subPath, Writable.inputStream(
+                    ResourceUtility.streamCallable(path)));
         }
     }
 }

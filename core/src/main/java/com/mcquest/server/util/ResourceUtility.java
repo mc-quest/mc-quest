@@ -1,6 +1,7 @@
 package com.mcquest.server.util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +29,19 @@ import java.util.concurrent.Callable;
  * Utilities for reading project resources.
  */
 public class ResourceUtility {
-    private static final Gson GSON = new Gson();
+    private static final Gson GSON = new GsonBuilder().serializeNulls().create();
     private static final ModelReader modelReader = BBModelReader.blockbench();
 
     private static ClassLoader classLoader() {
         return ResourceUtility.class.getClassLoader();
+    }
+
+    public static String jsonStringify(Object obj) {
+        return GSON.toJson(obj);
+    }
+
+    public static <T> T parseJson(String json, Class<T> classOfT) {
+        return GSON.fromJson(json, classOfT);
     }
 
     /**

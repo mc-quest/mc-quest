@@ -151,11 +151,67 @@ public class Mmorpg {
         return resourcePackManager;
     }
 
-    public static Builder builder() {
+    public static PlayerClassesStep builder() {
         return new Builder();
     }
 
-    public static class Builder {
+    public interface PlayerClassesStep {
+        ItemsStep playerClasses(PlayerClass... playerClasses);
+    }
+
+    public interface ItemsStep {
+        QuestsStep items(Item... items);
+    }
+
+    public interface QuestsStep {
+        ZonesStep quests(Quest... quests);
+    }
+
+    public interface ZonesStep {
+        MusicStep zones(Zone... zones);
+    }
+
+    public interface MusicStep {
+        MapsStep music(Song... music);
+    }
+
+    public interface MapsStep {
+        InstancesStep maps(AreaMap... maps);
+    }
+
+    public interface InstancesStep {
+        ModelsStep instances(Instance... instances);
+    }
+
+    public interface ModelsStep {
+        FeaturesStep models(Model... models);
+    }
+
+    public interface FeaturesStep {
+        ResourcePackStep features(Feature... features);
+    }
+
+    public interface ResourcePackStep {
+        PlayerCharacterDataProviderStep resourcePack(Consumer<FileTree> writer);
+    }
+
+    public interface PlayerCharacterDataProviderStep {
+        PlayerCharacterLogoutHandlerStep
+        playerCharacterDataProvider(Function<Player, PlayerCharacterData> dataProvider);
+    }
+
+    public interface PlayerCharacterLogoutHandlerStep {
+        StartStep
+        playerCharacterLogoutHandler(BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler);
+    }
+
+    public interface StartStep {
+        void start(String address, int port, int resourcePackServerPort);
+    }
+
+    private static class Builder implements PlayerClassesStep, ItemsStep, QuestsStep, ZonesStep,
+            MusicStep, MapsStep, InstancesStep, ModelsStep, FeaturesStep, ResourcePackStep,
+            PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep, StartStep {
         private final MinecraftServer server;
         private PlayerClass[] playerClasses;
         private Item[] items;
@@ -172,92 +228,85 @@ public class Mmorpg {
 
         private Builder() {
             server = MinecraftServer.init();
-            playerClasses = new PlayerClass[0];
-            items = new Item[0];
-            quests = new Quest[0];
-            zones = new Zone[0];
-            music = new Song[0];
-            maps = new AreaMap[0];
-            instances = new Instance[0];
-            models = new Model[0];
-            features = new Feature[0];
-            resourcePackWriter = null;
-            pcDataProvider = null;
-            pcLogoutHandler = null;
         }
 
-        public Builder playerClasses(PlayerClass... playerClasses) {
+        @Override
+        public ItemsStep playerClasses(PlayerClass... playerClasses) {
             this.playerClasses = playerClasses.clone();
             return this;
         }
 
-        public Builder items(Item... items) {
+        @Override
+        public QuestsStep items(Item... items) {
             this.items = items.clone();
             return this;
         }
 
-        public Builder quests(Quest... quests) {
+        @Override
+        public ZonesStep quests(Quest... quests) {
             this.quests = quests.clone();
             return this;
         }
 
-        public Builder zones(Zone... zones) {
+        @Override
+        public MusicStep zones(Zone... zones) {
             this.zones = zones.clone();
             return this;
         }
 
-        public Builder music(Song... music) {
+        @Override
+        public MapsStep music(Song... music) {
             this.music = music.clone();
             return this;
         }
 
-        public Builder maps(AreaMap... maps) {
+        @Override
+        public InstancesStep maps(AreaMap... maps) {
             this.maps = maps.clone();
             return this;
         }
 
-        public Builder instances(Instance... instances) {
+        @Override
+        public ModelsStep instances(Instance... instances) {
             this.instances = instances.clone();
             return this;
         }
 
-        public Builder models(Model... models) {
+        @Override
+        public FeaturesStep models(Model... models) {
             this.models = models.clone();
             return this;
         }
 
-        public Builder features(Feature... features) {
+        @Override
+        public ResourcePackStep features(Feature... features) {
             this.features = features.clone();
             return this;
         }
 
-        public Builder resourcePack(Consumer<FileTree> writer) {
+        @Override
+        public PlayerCharacterDataProviderStep resourcePack(Consumer<FileTree> writer) {
             resourcePackWriter = writer;
             return this;
         }
 
-        public Builder playerCharacterDataProvider(Function<Player,
-                PlayerCharacterData> dataProvider) {
+        @Override
+        public PlayerCharacterLogoutHandlerStep playerCharacterDataProvider(
+                Function<Player, PlayerCharacterData> dataProvider) {
             this.pcDataProvider = dataProvider;
             return this;
         }
 
-        public Builder playerCharacterLogoutHandler(
+
+        @Override
+        public StartStep playerCharacterLogoutHandler(
                 BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
             this.pcLogoutHandler = logoutHandler;
             return this;
         }
 
+        @Override
         public void start(String address, int port, int resourcePackServerPort) {
-            if (pcDataProvider == null) {
-                throw new NullPointerException("No player character data provider specified");
-            }
-            if (pcLogoutHandler == null) {
-                throw new NullPointerException("No player character logout handler specified");
-            }
-            if (resourcePackWriter == null) {
-                throw new NullPointerException("No resource pack writer specified");
-            }
             Mmorpg mmorpg = new Mmorpg(this);
             mmorpg.start(address, port, resourcePackServerPort);
         }

@@ -11,7 +11,6 @@ import com.mcquest.server.item.Weapon;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.physics.RaycastHit;
-import com.mcquest.server.playerclass.ActiveSkill;
 import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -110,18 +109,18 @@ public class InteractionHandler {
         });
         pc.getPlayer().openInventory(menu);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.call(new PlayerCharacterOpenMenuEvent(pc));
+        eventHandler.call(new MenuOpenEvent(pc));
     }
 
     private void openSkillTree(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.call(new PlayerCharacterOpenSkillTreeEvent(pc));
+        eventHandler.call(new SkillTreeOpenEvent(pc));
         pc.getSkillManager().openSkillTree();
     }
 
     private void openQuestLog(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.call(new PlayerCharacterOpenQuestLogEvent(pc));
+        eventHandler.call(new QuestLogOpenEvent(pc));
         // TODO: actually open
     }
 
@@ -133,7 +132,7 @@ public class InteractionHandler {
     private void handleLogoutClick(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         // PlayerCharacterManager listens to this event.
-        eventHandler.call(new PlayerCharacterClickMenuLogoutEvent(pc));
+        eventHandler.call(new ClickMenuLogoutEvent(pc));
     }
 
     private void handlePickupItem(PickupItemEvent event) {
@@ -166,7 +165,7 @@ public class InteractionHandler {
             inventory.setItemStack(slot, itemStack.withAmount(newAmount));
             pc.sendMessage(Component.text("Used ", NamedTextColor.GRAY).append(item.getDisplayName()));
             GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-            eventHandler.call(new PlayerCharacterConsumeItemEvent(pc, consumableItem));
+            eventHandler.call(new ItemConsumeEvent(pc, consumableItem));
             return;
         }
     }
@@ -182,7 +181,7 @@ public class InteractionHandler {
             return;
         }
         Weapon weapon = pc.getWeapon();
-        PlayerCharacterAutoAttackEvent basicAttackEvent = new PlayerCharacterAutoAttackEvent(pc, weapon);
+        AutoAttackEvent basicAttackEvent = new AutoAttackEvent(pc, weapon);
         weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
     }

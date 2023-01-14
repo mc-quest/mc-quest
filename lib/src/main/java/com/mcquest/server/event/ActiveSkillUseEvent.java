@@ -4,12 +4,12 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.playerclass.ActiveSkill;
 import net.minestom.server.event.trait.CancellableEvent;
 
-public class PlayerCharacterUseActiveSkillEvent implements CancellableEvent {
+public class ActiveSkillUseEvent implements CancellableEvent {
     private final PlayerCharacter pc;
     private final ActiveSkill skill;
     private boolean cancelled;
 
-    public PlayerCharacterUseActiveSkillEvent(PlayerCharacter pc, ActiveSkill skill) {
+    public ActiveSkillUseEvent(PlayerCharacter pc, ActiveSkill skill) {
         this.pc = pc;
         this.skill = skill;
     }

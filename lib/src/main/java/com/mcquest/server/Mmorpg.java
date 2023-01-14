@@ -67,14 +67,22 @@ public class Mmorpg {
         for (PlayerClass playerClass : builder.playerClasses) {
             skills.addAll(playerClass.getSkills());
         }
-        pcManager = new PlayerCharacterManager(this,
-                builder.pcDataProvider, builder.pcLogoutHandler);
+        pcManager = new PlayerCharacterManager(
+                this,
+                builder.pcDataProvider,
+                builder.pcLogoutHandler
+        );
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         features = builder.features;
-        resourcePackManager = new ResourcePackManager(builder.resourcePackWriter,
-                skills.toArray(new Skill[0]), builder.items, builder.music, builder.models);
+        resourcePackManager = new ResourcePackManager(
+                builder.resourcePackWriter,
+                skills.toArray(new Skill[0]),
+                builder.items,
+                builder.music,
+                builder.models
+        );
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }

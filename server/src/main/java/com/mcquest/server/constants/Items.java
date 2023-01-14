@@ -10,6 +10,12 @@ import java.util.concurrent.Callable;
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("AdventurersSword");
 
+    public static Item[] all() {
+        return new Item[]{
+                ADVENTURERS_SWORD
+        };
+    }
+
     private static BasicItem loadBasicItem(String fileName) {
         String basePath = "items/basic/" + fileName;
         String itemPath = basePath + ".json";
@@ -18,7 +24,7 @@ public class Items {
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
-        Callable<InputStream> icon = () -> ResourceUtility.getStream(iconPath);
+        Callable<InputStream> icon = ResourceUtility.streamCallable(iconPath);
         BasicItem.BuildStep builder = BasicItem.builder()
                 .id(id)
                 .name(name)
@@ -40,7 +46,7 @@ public class Items {
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
-        Callable<InputStream> model = () -> ResourceUtility.getStream(modelPath);
+        Callable<InputStream> model = ResourceUtility.streamCallable(modelPath);
         Weapon.BuildStep builder = Weapon.builder()
                 .id(id)
                 .name(name)
@@ -69,7 +75,7 @@ public class Items {
         int level = object.get("level").getAsInt();
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
-        Callable<InputStream> model = () -> ResourceUtility.getStream(modelPath);
+        Callable<InputStream> model = ResourceUtility.streamCallable(modelPath);
         ArmorItem.BuildStep builder = ArmorItem.builder()
                 .id(id)
                 .name(name)
@@ -96,7 +102,7 @@ public class Items {
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
-        Callable<InputStream> icon = () -> ResourceUtility.getStream(iconPath);
+        Callable<InputStream> icon = ResourceUtility.streamCallable(iconPath);
         ConsumableItem.BuildStep builder = ConsumableItem.builder()
                 .id(id)
                 .name(name)

@@ -1,7 +1,7 @@
 package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
-import com.mcquest.server.event.PlayerCharacterClickMenuLogoutEvent;
+import com.mcquest.server.event.ClickMenuLogoutEvent;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.event.PlayerCharacterLogoutEvent;
 import com.mcquest.server.instance.Instance;
@@ -41,7 +41,7 @@ public class PlayerCharacterManager {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
-        eventHandler.addListener(PlayerCharacterClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
+        eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::synchronizePlayerPosition);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
@@ -87,7 +87,7 @@ public class PlayerCharacterManager {
         handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.DISCONNECT);
     }
 
-    private void handlePlayerCharacterMenuLogout(PlayerCharacterClickMenuLogoutEvent event) {
+    private void handlePlayerCharacterMenuLogout(ClickMenuLogoutEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.MENU_LOGOUT);
     }

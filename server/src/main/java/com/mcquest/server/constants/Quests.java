@@ -10,6 +10,13 @@ public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");
     public static final Quest THWARTING_THE_THIEVES = loadQuest("ThwartingTheThieves");
 
+    public static Quest[] all() {
+        return new Quest[]{
+                TUTORIAL,
+                THWARTING_THE_THIEVES
+        };
+    }
+
     private static Quest loadQuest(String fileName) {
         String path = "quests/" + fileName + ".json";
         JsonObject object = ResourceUtility.readJson(path).getAsJsonObject();

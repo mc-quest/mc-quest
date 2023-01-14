@@ -5,7 +5,7 @@ import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.Items;
-import com.mcquest.server.event.PlayerCharacterAutoAttackEvent;
+import com.mcquest.server.event.AutoAttackEvent;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
@@ -28,7 +28,7 @@ public class Swords implements Feature {
         Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::basicAttack);
     }
 
-    public void basicAttack(PlayerCharacterAutoAttackEvent event) {
+    public void basicAttack(AutoAttackEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Weapon weapon = event.getWeapon();
         double physicalDamage = weapon.getPhysicalDamage();

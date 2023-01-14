@@ -1,8 +1,8 @@
 package com.mcquest.server.quest;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.PlayerCharacterCompleteQuestEvent;
-import com.mcquest.server.event.PlayerCharacterStartQuestEvent;
+import com.mcquest.server.event.QuestCompleteEvent;
+import com.mcquest.server.event.QuestStartEvent;
 import com.mcquest.server.ui.ChatColor;
 import com.mcquest.server.util.MathUtility;
 import com.mcquest.server.util.TextUtility;
@@ -81,7 +81,7 @@ public class PlayerCharacterQuestTracker {
         updateSidebar();
         pc.sendMessage(Component.text("Quest started: " + quest.getName(), NamedTextColor.YELLOW));
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.call(new PlayerCharacterStartQuestEvent(pc, quest));
+        eventHandler.call(new QuestStartEvent(pc, quest));
     }
 
     public int getProgress(QuestObjective objective) {
@@ -172,7 +172,7 @@ public class PlayerCharacterQuestTracker {
         completedQuests.add(quest);
         trackedQuests.remove(quest);
         pc.sendMessage(Component.text("Quest completed: " + quest.getName(), NamedTextColor.YELLOW));
-        eventHandler.call(new PlayerCharacterCompleteQuestEvent(pc, quest));
+        eventHandler.call(new QuestCompleteEvent(pc, quest));
         updateSidebar();
     }
 

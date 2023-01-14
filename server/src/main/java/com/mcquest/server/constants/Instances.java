@@ -7,4 +7,10 @@ public class Instances {
     public static final Instance ELADRADOR = Instance.builder(1)
             .chunkLoader(new AnvilLoader("world/eladrador"))
             .build();
+
+    public static Instance[] all() {
+        return new Instance[]{
+                ELADRADOR
+        };
+    }
 }

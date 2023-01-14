@@ -4,15 +4,15 @@ import com.mcquest.server.item.Item;
 import com.mcquest.server.character.PlayerCharacter;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterRemoveItemEvent implements Event {
+public class ItemReceiveEvent implements Event {
     private final PlayerCharacter pc;
     private final Item item;
-    private final int amountRemoved;
+    private final int amountReceived;
 
-    public PlayerCharacterRemoveItemEvent(PlayerCharacter pc, Item item, int amountRemoved) {
+    public ItemReceiveEvent(PlayerCharacter pc, Item item, int amountReceived) {
         this.pc = pc;
         this.item = item;
-        this.amountRemoved = amountRemoved;
+        this.amountReceived = amountReceived;
     }
 
     public PlayerCharacter getPlayerCharacter() {
@@ -23,7 +23,7 @@ public class PlayerCharacterRemoveItemEvent implements Event {
         return item;
     }
 
-    public int getAmountRemoved() {
-        return amountRemoved;
+    public int getAmountReceived() {
+        return amountReceived;
     }
 }

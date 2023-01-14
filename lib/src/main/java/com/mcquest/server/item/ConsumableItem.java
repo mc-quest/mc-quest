@@ -1,7 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterConsumeItemEvent;
+import com.mcquest.server.event.ItemConsumeEvent;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
@@ -18,7 +18,7 @@ import java.util.concurrent.Callable;
 public class ConsumableItem extends Item {
     private final int level;
     private final Callable<InputStream> icon;
-    private final EventEmitter<PlayerCharacterConsumeItemEvent> onConsume;
+    private final EventEmitter<ItemConsumeEvent> onConsume;
 
     ConsumableItem(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
@@ -35,7 +35,7 @@ public class ConsumableItem extends Item {
         return icon;
     }
 
-    public EventEmitter<PlayerCharacterConsumeItemEvent> onConsume() {
+    public EventEmitter<ItemConsumeEvent> onConsume() {
         return onConsume;
     }
 

@@ -1,10 +1,8 @@
 package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.PlayerCharacterUnlockSkillEvent;
-import com.mcquest.server.util.ItemStackUtility;
+import com.mcquest.server.event.SkillUnlockEvent;
 import com.mcquest.server.util.Sounds;
-import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -17,8 +15,6 @@ import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.inventory.condition.InventoryConditionResult;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.timer.TaskSchedule;
-import net.minestom.server.utils.NamespaceID;
 import net.minestom.server.utils.time.Tick;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -65,7 +61,7 @@ public class PlayerCharacterSkillManager {
         skillPoints--;
         unlockedSkills.add(skill);
         pc.sendMessage(Component.text("Unlocked " + skill.getName(), NamedTextColor.GREEN));
-        PlayerCharacterUnlockSkillEvent event = new PlayerCharacterUnlockSkillEvent(pc, skill);
+        SkillUnlockEvent event = new SkillUnlockEvent(pc, skill);
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.call(event);
     }

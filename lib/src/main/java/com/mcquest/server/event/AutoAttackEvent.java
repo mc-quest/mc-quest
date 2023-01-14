@@ -4,11 +4,11 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.Weapon;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterAutoAttackEvent implements Event {
+public class AutoAttackEvent implements Event {
     private final PlayerCharacter pc;
     private final Weapon weapon;
 
-    public PlayerCharacterAutoAttackEvent(PlayerCharacter pc, Weapon weapon) {
+    public AutoAttackEvent(PlayerCharacter pc, Weapon weapon) {
         this.pc = pc;
         this.weapon = weapon;
     }

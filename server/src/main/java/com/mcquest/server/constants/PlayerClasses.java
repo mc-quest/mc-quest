@@ -14,6 +14,13 @@ public class PlayerClasses {
     public static final PlayerClass FIGHTER = loadPlayerClass("fighter", "Fighter.json");
     public static final PlayerClass MAGE = loadPlayerClass("mage", "Mage.json");
 
+    public static PlayerClass[] all() {
+        return new PlayerClass[]{
+                FIGHTER,
+                MAGE
+        };
+    }
+
     private static PlayerClass loadPlayerClass(String dirName, String fileName) {
         String dirPath = "playerclasses/" + dirName;
         String filePath = dirPath + "/" + fileName;
@@ -31,7 +38,7 @@ public class PlayerClasses {
             Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
                     : skillPrerequisiteIdElement.getAsInt();
             String skillIconPath = dirPath + "/icons/" + skillObject.get("icon").getAsString();
-            Callable<InputStream> skillIcon = () -> ResourceUtility.getStream(skillIconPath);
+            Callable<InputStream> skillIcon = ResourceUtility.streamCallable(skillIconPath);
             String skillDescription = skillObject.get("description").getAsString();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();

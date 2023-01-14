@@ -4,11 +4,11 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.quest.Quest;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterCompleteQuestEvent implements Event {
+public class QuestCompleteEvent implements Event {
     private final PlayerCharacter pc;
     private final Quest quest;
 
-    public PlayerCharacterCompleteQuestEvent(PlayerCharacter pc, Quest quest) {
+    public QuestCompleteEvent(PlayerCharacter pc, Quest quest) {
         this.pc = pc;
         this.quest = quest;
     }

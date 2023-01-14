@@ -2,8 +2,8 @@ package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.cartography.CardinalDirection;
-import com.mcquest.server.event.PlayerCharacterReceiveItemEvent;
-import com.mcquest.server.event.PlayerCharacterRemoveItemEvent;
+import com.mcquest.server.event.ItemReceiveEvent;
+import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.*;
 import com.mcquest.server.mount.Mount;
@@ -485,8 +485,7 @@ public final class PlayerCharacter extends Character {
             }
             message = message.append((item.getDisplayName()));
             sendMessage(message);
-            PlayerCharacterReceiveItemEvent event = new
-                    PlayerCharacterReceiveItemEvent(this, item, received);
+            ItemReceiveEvent event = new ItemReceiveEvent(this, item, received);
             MinecraftServer.getGlobalEventHandler().call(event);
         }
         return received;
@@ -551,8 +550,7 @@ public final class PlayerCharacter extends Character {
             }
             message = message.append((item.getDisplayName()));
             sendMessage(message);
-            PlayerCharacterRemoveItemEvent event = new
-                    PlayerCharacterRemoveItemEvent(this, item, amountRemoved);
+            ItemRemoveEvent event = new ItemRemoveEvent(this, item, amountRemoved);
             MinecraftServer.getGlobalEventHandler().call(event);
         }
         return amountRemoved;

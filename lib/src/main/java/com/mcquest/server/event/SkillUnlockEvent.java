@@ -4,11 +4,11 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.playerclass.Skill;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterUnlockSkillEvent implements Event {
+public class SkillUnlockEvent implements Event {
     private final PlayerCharacter pc;
     private final Skill skill;
 
-    public PlayerCharacterUnlockSkillEvent(PlayerCharacter pc, Skill skill) {
+    public SkillUnlockEvent(PlayerCharacter pc, Skill skill) {
         this.pc = pc;
         this.skill = skill;
     }

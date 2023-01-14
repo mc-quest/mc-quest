@@ -3,7 +3,7 @@ package com.mcquest.server.playerclass;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
-import com.mcquest.server.event.PlayerCharacterUseActiveSkillEvent;
+import com.mcquest.server.event.ActiveSkillUseEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -79,7 +79,7 @@ public class PlayerClassManager {
             return;
         }
         pc.removeMana(manaCost);
-        PlayerCharacterUseActiveSkillEvent event = new PlayerCharacterUseActiveSkillEvent(pc, skill);
+        ActiveSkillUseEvent event = new ActiveSkillUseEvent(pc, skill);
         skill.onUse().emit(event);
         mmorpg.getGlobalEventHandler().call(event);
     }

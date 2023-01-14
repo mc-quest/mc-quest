@@ -1,9 +1,9 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterAutoAttackEvent;
-import com.mcquest.server.event.PlayerCharacterEquipWeaponEvent;
-import com.mcquest.server.event.PlayerCharacterUnequipWeaponEvent;
+import com.mcquest.server.event.AutoAttackEvent;
+import com.mcquest.server.event.WeaponEquipEvent;
+import com.mcquest.server.event.WeaponUnequipEvent;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
@@ -22,9 +22,9 @@ public class Weapon extends Item {
     private final WeaponType type;
     private final Callable<InputStream> model;
     private final double physicalDamage;
-    private final EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip;
-    private final EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip;
-    private final EventEmitter<PlayerCharacterAutoAttackEvent> onAutoAttack;
+    private final EventEmitter<WeaponEquipEvent> onEquip;
+    private final EventEmitter<WeaponUnequipEvent> onUnequip;
+    private final EventEmitter<AutoAttackEvent> onAutoAttack;
 
     Weapon(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
@@ -56,15 +56,15 @@ public class Weapon extends Item {
         return physicalDamage;
     }
 
-    public EventEmitter<PlayerCharacterEquipWeaponEvent> onEquip() {
+    public EventEmitter<WeaponEquipEvent> onEquip() {
         return onEquip;
     }
 
-    public EventEmitter<PlayerCharacterUnequipWeaponEvent> onUnequip() {
+    public EventEmitter<WeaponUnequipEvent> onUnequip() {
         return onUnequip;
     }
 
-    public EventEmitter<PlayerCharacterAutoAttackEvent> onAutoAttack() {
+    public EventEmitter<AutoAttackEvent> onAutoAttack() {
         return onAutoAttack;
     }
 

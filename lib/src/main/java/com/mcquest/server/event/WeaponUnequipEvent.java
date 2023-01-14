@@ -4,11 +4,11 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.item.Weapon;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterUnequipWeaponEvent implements Event {
+public class WeaponUnequipEvent implements Event {
     private final PlayerCharacter pc;
     private final Weapon weapon;
 
-    public PlayerCharacterUnequipWeaponEvent(PlayerCharacter pc, Weapon weapon) {
+    public WeaponUnequipEvent(PlayerCharacter pc, Weapon weapon) {
         this.pc = pc;
         this.weapon = weapon;
     }

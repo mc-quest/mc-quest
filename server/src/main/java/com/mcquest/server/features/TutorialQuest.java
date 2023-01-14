@@ -30,12 +30,12 @@ public class TutorialQuest implements Feature {
         spawnTrainingDummies();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
-        eventHandler.addListener(PlayerCharacterOpenMenuEvent.class, this::handleOpenMenu);
-        eventHandler.addListener(PlayerCharacterOpenSkillTreeEvent.class, this::handleOpenSkillTree);
-        eventHandler.addListener(PlayerCharacterUnlockSkillEvent.class, this::handleSkillUpgrade);
-        eventHandler.addListener(PlayerCharacterAddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
-        eventHandler.addListener(PlayerCharacterUseActiveSkillEvent.class, this::handleUseSkill);
-        eventHandler.addListener(PlayerCharacterOpenMapEvent.class, this::handleOpenMap);
+        eventHandler.addListener(MenuOpenEvent.class, this::handleOpenMenu);
+        eventHandler.addListener(SkillTreeOpenEvent.class, this::handleOpenSkillTree);
+        eventHandler.addListener(SkillUnlockEvent.class, this::handleSkillUpgrade);
+        eventHandler.addListener(AddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
+        eventHandler.addListener(ActiveSkillUseEvent.class, this::handleUseSkill);
+        eventHandler.addListener(MapOpenEvent.class, this::handleOpenMap);
     }
 
     private void createTrainingGroundsBounds() {
@@ -81,7 +81,7 @@ public class TutorialQuest implements Feature {
                 Duration.ofSeconds(5));
     }
 
-    private void handleOpenMenu(PlayerCharacterOpenMenuEvent event) {
+    private void handleOpenMenu(MenuOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         QuestObjective openMenuObjective = Quests.TUTORIAL.getObjective(0);
         if (!openMenuObjective.isAccessible(pc) || openMenuObjective.isComplete(pc)) {
@@ -94,7 +94,7 @@ public class TutorialQuest implements Feature {
                 Duration.ofSeconds(2));
     }
 
-    private void handleOpenSkillTree(PlayerCharacterOpenSkillTreeEvent event) {
+    private void handleOpenSkillTree(SkillTreeOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         QuestObjective openSkillTreeObjective = Quests.TUTORIAL.getObjective(1);
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
@@ -107,7 +107,7 @@ public class TutorialQuest implements Feature {
                 Duration.ofSeconds(2));
     }
 
-    private void handleSkillUpgrade(PlayerCharacterUnlockSkillEvent event) {
+    private void handleSkillUpgrade(SkillUnlockEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;
@@ -116,7 +116,7 @@ public class TutorialQuest implements Feature {
         Quests.TUTORIAL.getObjective(3).setAccessible(pc, true);
     }
 
-    private void handleAddSkillToHotbar(PlayerCharacterAddSkillToHotbarEvent event) {
+    private void handleAddSkillToHotbar(AddSkillToHotbarEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;
@@ -125,7 +125,7 @@ public class TutorialQuest implements Feature {
         Quests.TUTORIAL.getObjective(4).setAccessible(pc, true);
     }
 
-    private void handleUseSkill(PlayerCharacterUseActiveSkillEvent event) {
+    private void handleUseSkill(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;
@@ -134,7 +134,7 @@ public class TutorialQuest implements Feature {
         Quests.TUTORIAL.getObjective(5).setAccessible(pc, true);
     }
 
-    private void handleOpenMap(PlayerCharacterOpenMapEvent event) {
+    private void handleOpenMap(MapOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
             return;

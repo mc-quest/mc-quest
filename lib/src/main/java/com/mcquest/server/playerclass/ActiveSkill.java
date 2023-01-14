@@ -2,7 +2,7 @@ package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterUseActiveSkillEvent;
+import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.resourcepack.ResourcePackUtility;
 import com.mcquest.server.util.ItemStackUtility;
 import com.mcquest.server.util.TextUtility;
@@ -21,7 +21,6 @@ import team.unnamed.creative.texture.Texture;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ public class ActiveSkill extends Skill {
 
     private final double manaCost;
     private final Duration cooldown;
-    private final EventEmitter<PlayerCharacterUseActiveSkillEvent> onUse;
+    private final EventEmitter<ActiveSkillUseEvent> onUse;
 
     ActiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
                 Callable<InputStream> icon, String description, int skillTreeRow,
@@ -52,7 +51,7 @@ public class ActiveSkill extends Skill {
         return cooldown;
     }
 
-    public EventEmitter<PlayerCharacterUseActiveSkillEvent> onUse() {
+    public EventEmitter<ActiveSkillUseEvent> onUse() {
         return onUse;
     }
 

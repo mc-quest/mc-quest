@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Utilities for reading project resources.
@@ -40,6 +41,10 @@ public class ResourceUtility {
      */
     public static InputStream getStream(@NotNull String path) {
         return classLoader().getResourceAsStream(path);
+    }
+
+    public static Callable<InputStream> streamCallable(@NotNull String path) {
+        return () -> getStream(path);
     }
 
     public static JsonElement readJson(@NotNull String path) {

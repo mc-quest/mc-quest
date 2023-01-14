@@ -2,7 +2,7 @@ package com.mcquest.server.features;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.constants.MageSkills;
-import com.mcquest.server.event.PlayerCharacterUseActiveSkillEvent;
+import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.feature.Feature;
 
 public class MagePlayerClass implements Feature {
@@ -14,6 +14,6 @@ public class MagePlayerClass implements Feature {
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
     }
 
-    private void useFireball(PlayerCharacterUseActiveSkillEvent event) {
+    private void useFireball(ActiveSkillUseEvent event) {
     }
 }

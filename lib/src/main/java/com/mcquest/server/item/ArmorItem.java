@@ -1,9 +1,10 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.PlayerCharacterEquipArmorItemEvent;
-import com.mcquest.server.event.PlayerCharacterUnequipArmorItemEvent;
+import com.mcquest.server.event.ArmorEquipEvent;
+import com.mcquest.server.event.ArmorUnequipEvent;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.color.Color;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 
@@ -22,8 +23,8 @@ public class ArmorItem extends Item {
     private final ArmorSlot slot;
     private final Callable<InputStream> model;
     private final double protections;
-    private final EventEmitter<PlayerCharacterEquipArmorItemEvent> onEquip;
-    private final EventEmitter<PlayerCharacterUnequipArmorItemEvent> onUnequip;
+    private final EventEmitter<ArmorEquipEvent> onEquip;
+    private final EventEmitter<ArmorUnequipEvent> onUnequip;
 
     ArmorItem(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
@@ -56,11 +57,11 @@ public class ArmorItem extends Item {
         return protections;
     }
 
-    public EventEmitter<PlayerCharacterEquipArmorItemEvent> onEquip() {
+    public EventEmitter<ArmorEquipEvent> onEquip() {
         return onEquip;
     }
 
-    public EventEmitter<PlayerCharacterUnequipArmorItemEvent> onUnequip() {
+    public EventEmitter<ArmorUnequipEvent> onUnequip() {
         return onUnequip;
     }
 
@@ -125,6 +126,8 @@ public class ArmorItem extends Item {
 
         BuildStep protections(double protections);
 
+        BuildStep color(Color color);
+
         ArmorItem build();
     }
 
@@ -139,6 +142,7 @@ public class ArmorItem extends Item {
         private Callable<InputStream> model;
         private String description;
         private double protections;
+        private Color color;
 
         @Override
         public NameStep id(int id) {
@@ -191,6 +195,12 @@ public class ArmorItem extends Item {
         @Override
         public BuildStep protections(double protections) {
             this.protections = protections;
+            return this;
+        }
+
+        @Override
+        public BuildStep color(Color color) {
+            this.color = color;
             return this;
         }
 

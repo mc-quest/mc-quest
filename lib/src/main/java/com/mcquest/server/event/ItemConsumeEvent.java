@@ -1,14 +1,14 @@
 package com.mcquest.server.event;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.item.ArmorItem;
+import com.mcquest.server.item.ConsumableItem;
 import net.minestom.server.event.Event;
 
-public class PlayerCharacterEquipArmorItemEvent implements Event {
+public class ItemConsumeEvent implements Event {
     private final PlayerCharacter pc;
-    private final ArmorItem item;
+    private final ConsumableItem item;
 
-    public PlayerCharacterEquipArmorItemEvent(PlayerCharacter pc, ArmorItem item) {
+    public ItemConsumeEvent(PlayerCharacter pc, ConsumableItem item) {
         this.pc = pc;
         this.item = item;
     }
@@ -17,7 +17,7 @@ public class PlayerCharacterEquipArmorItemEvent implements Event {
         return pc;
     }
 
-    public ArmorItem getItem() {
+    public ConsumableItem getItem() {
         return item;
     }
 }

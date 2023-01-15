@@ -71,7 +71,7 @@ public class PlayerCharacterSkillManager {
         pc.getPlayer().openInventory(menu);
     }
 
-    public Inventory makeSkillTreeMenu() {
+    private Inventory makeSkillTreeMenu() {
         PlayerClass playerClass = pc.getPlayerClass();
         String title = playerClass.getName() + " Skill Tree (" + skillPoints + " points)";
         Inventory inventory = new Inventory(InventoryType.CHEST_6_ROW, title);

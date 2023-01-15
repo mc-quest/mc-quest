@@ -38,7 +38,7 @@ public class PlayerClasses {
             Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
                     : skillPrerequisiteIdElement.getAsInt();
             String skillIconPath = dirPath + "/icons/" + skillObject.get("icon").getAsString();
-            Callable<InputStream> skillIcon = ResourceUtility.streamCallable(skillIconPath);
+            Callable<InputStream> skillIcon = ResourceUtility.streamSupplier(skillIconPath);
             String skillDescription = skillObject.get("description").getAsString();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();

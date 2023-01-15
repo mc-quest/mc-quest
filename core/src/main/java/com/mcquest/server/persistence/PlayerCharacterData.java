@@ -28,7 +28,7 @@ public class PlayerCharacterData {
     private int[] trackedQuestIds;
     private Integer songId;
     private boolean canMount;
-    public int[] mountIds;
+    public int[] ownedMountIds;
 
     private PlayerCharacterData() {
     }
@@ -56,7 +56,7 @@ public class PlayerCharacterData {
         data.trackedQuestIds = new int[0];
         data.songId = null;
         data.canMount = true;
-        data.mountIds = new int[0];
+        data.ownedMountIds = new int[0];
         return data;
     }
 
@@ -150,7 +150,7 @@ public class PlayerCharacterData {
     }
 
     public int[] getOwnedMountIds() {
-        return mountIds;
+        return ownedMountIds;
     }
 
     public String toJson() {

@@ -5,12 +5,14 @@ import com.mcquest.server.event.ArmorEquipEvent;
 import com.mcquest.server.event.ArmorUnequipEvent;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.color.Color;
+import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 /**
@@ -18,9 +20,15 @@ import java.util.concurrent.Callable;
  * protection.
  */
 public class ArmorItem extends Item {
+    private static final Set<Material> LEATHER_ARMOR_MATS = Set.of(
+            Material.LEATHER_BOOTS, Material.LEATHER_LEGGINGS,
+            Material.LEATHER_CHESTPLATE, Material.LEATHER_HELMET);
+
     private final int level;
     private final ArmorType type;
     private final ArmorSlot slot;
+    private Material material;
+    private Color color;
     private final Callable<InputStream> model;
     private final double protections;
     private final EventEmitter<ArmorEquipEvent> onEquip;
@@ -47,10 +55,6 @@ public class ArmorItem extends Item {
 
     public ArmorSlot getSlot() {
         return slot;
-    }
-
-    public Callable<InputStream> getModel() {
-        return model;
     }
 
     public double getProtections() {
@@ -86,7 +90,9 @@ public class ArmorItem extends Item {
     @ApiStatus.Internal
     @Override
     public void writeResources(FileTree tree) {
-        // TODO
+        if (model != null) {
+            // TODO: write model
+        }
     }
 
     public static IdStep builder() {
@@ -119,14 +125,16 @@ public class ArmorItem extends Item {
 
     public interface ModelStep {
         BuildStep model(Callable<InputStream> model);
+
+        BuildStep model(Material model);
     }
 
     public interface BuildStep {
         BuildStep description(String description);
 
-        BuildStep protections(double protections);
-
         BuildStep color(Color color);
+
+        BuildStep protections(double protections);
 
         ArmorItem build();
     }
@@ -139,10 +147,11 @@ public class ArmorItem extends Item {
         private int level;
         private ArmorType type;
         private ArmorSlot slot;
-        private Callable<InputStream> model;
         private String description;
-        private double protections;
+        private Material materialModel;
         private Color color;
+        private Callable<InputStream> model;
+        private double protections;
 
         @Override
         public NameStep id(int id) {
@@ -182,7 +191,16 @@ public class ArmorItem extends Item {
 
         @Override
         public BuildStep model(Callable<InputStream> model) {
+            if (slot != ArmorSlot.HEAD) {
+                throw new IllegalStateException();
+            }
             this.model = model;
+            return this;
+        }
+
+        @Override
+        public BuildStep model(Material model) {
+            this.materialModel = model;
             return this;
         }
 
@@ -193,14 +211,17 @@ public class ArmorItem extends Item {
         }
 
         @Override
-        public BuildStep protections(double protections) {
-            this.protections = protections;
+        public BuildStep color(Color color) {
+            if (!LEATHER_ARMOR_MATS.contains(materialModel)) {
+                throw new IllegalStateException();
+            }
+            this.color = color;
             return this;
         }
 
         @Override
-        public BuildStep color(Color color) {
-            this.color = color;
+        public BuildStep protections(double protections) {
+            this.protections = protections;
             return this;
         }
 

@@ -24,7 +24,7 @@ public class Items {
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
-        Callable<InputStream> icon = ResourceUtility.streamCallable(iconPath);
+        Callable<InputStream> icon = ResourceUtility.streamSupplier(iconPath);
         BasicItem.BuildStep builder = BasicItem.builder()
                 .id(id)
                 .name(name)
@@ -46,7 +46,7 @@ public class Items {
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
-        Callable<InputStream> model = ResourceUtility.streamCallable(modelPath);
+        Callable<InputStream> model = ResourceUtility.streamSupplier(modelPath);
         Weapon.BuildStep builder = Weapon.builder()
                 .id(id)
                 .name(name)
@@ -75,7 +75,7 @@ public class Items {
         int level = object.get("level").getAsInt();
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
-        Callable<InputStream> model = ResourceUtility.streamCallable(modelPath);
+        Callable<InputStream> model = ResourceUtility.streamSupplier(modelPath);
         ArmorItem.BuildStep builder = ArmorItem.builder()
                 .id(id)
                 .name(name)
@@ -102,7 +102,7 @@ public class Items {
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
-        Callable<InputStream> icon = ResourceUtility.streamCallable(iconPath);
+        Callable<InputStream> icon = ResourceUtility.streamSupplier(iconPath);
         ConsumableItem.BuildStep builder = ConsumableItem.builder()
                 .id(id)
                 .name(name)

@@ -52,18 +52,22 @@ public class ResourceUtility {
         return classLoader().getResourceAsStream(path);
     }
 
-    public static Callable<InputStream> streamCallable(@NotNull String path) {
+    public static Callable<InputStream> streamSupplier(@NotNull String path) {
         return () -> getStream(path);
     }
 
     public static JsonElement readJson(@NotNull String path) {
+        return readJson(streamSupplier(path));
+    }
+
+    public static JsonElement readJson(@NotNull Callable<InputStream> streamSupplier) {
         try {
-            InputStream stream = getStream(path);
+            InputStream stream = streamSupplier.call();
             Reader reader = new InputStreamReader(stream);
             JsonElement json = JsonParser.parseReader(reader);
             stream.close();
             return json;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -42,7 +42,7 @@ public class Main {
         for (String path : paths) {
             String subPath = path.substring(basePath.length() + 1);
             tree.write(subPath, Writable.inputStream(
-                    ResourceUtility.streamCallable(path)));
+                    ResourceUtility.streamSupplier(path)));
         }
     }
 }

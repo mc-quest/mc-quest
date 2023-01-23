@@ -63,10 +63,6 @@ public class Mmorpg {
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
         instanceManager = new InstanceManager(builder.instances);
-        Collection<Skill> skills = new ArrayList<>();
-        for (PlayerClass playerClass : builder.playerClasses) {
-            skills.addAll(playerClass.getSkills());
-        }
         pcManager = new PlayerCharacterManager(
                 this,
                 builder.pcDataProvider,
@@ -76,6 +72,10 @@ public class Mmorpg {
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         features = builder.features;
+        Collection<Skill> skills = new ArrayList<>();
+        for (PlayerClass playerClass : builder.playerClasses) {
+            skills.addAll(playerClass.getSkills());
+        }
         resourcePackManager = new ResourcePackManager(
                 builder.resourcePackWriter,
                 skills.toArray(new Skill[0]),

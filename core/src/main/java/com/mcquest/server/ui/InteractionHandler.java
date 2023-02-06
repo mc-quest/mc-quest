@@ -208,8 +208,7 @@ public class InteractionHandler {
         RaycastHit hit = physicsManager.raycast(instance, origin, direction,
                 MAX_INTERACTION_DISTANCE, this::isInteractionCollider);
         if (hit != null) {
-            PlayerCharacterInteractionCollider collider =
-                    (PlayerCharacterInteractionCollider) hit.getCollider();
+            InteractCollider collider = (InteractCollider) hit.getCollider();
             collider.interact(pc);
         }
     }
@@ -220,6 +219,6 @@ public class InteractionHandler {
     }
 
     private boolean isInteractionCollider(Collider collider) {
-        return collider instanceof PlayerCharacterInteractionCollider;
+        return collider instanceof InteractCollider;
     }
 }

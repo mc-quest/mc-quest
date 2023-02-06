@@ -23,14 +23,14 @@ public class PhysicsManager {
     }
 
     public void addCollider(Collider collider) {
-        if (collider.isEnabled()) {
+        if (collider.getPhysicsManager() != null) {
             throw new IllegalArgumentException("collider already added");
         }
         collider.enable(this);
     }
 
     public void removeCollider(Collider collider) {
-        if (!collider.isEnabled()) {
+        if (collider.getPhysicsManager() != this) {
             throw new IllegalArgumentException("collider not added");
         }
         collider.disable();
@@ -116,12 +116,14 @@ public class PhysicsManager {
         double divY = directionY == 0.0 ? Double.MAX_VALUE : 1.0 / directionY;
         double divZ = directionZ == 0.0 ? Double.MAX_VALUE : 1.0 / directionZ;
 
-        double colliderMinX = collider.getMinX();
-        double colliderMinY = collider.getMinY();
-        double colliderMinZ = collider.getMinZ();
-        double colliderMaxX = collider.getMaxX();
-        double colliderMaxY = collider.getMaxY();
-        double colliderMaxZ = collider.getMaxZ();
+        Pos colliderMin = collider.getMin();
+        Pos colliderMax = collider.getMax();
+        double colliderMinX = colliderMin.x();
+        double colliderMinY = colliderMin.y();
+        double colliderMinZ = colliderMin.z();
+        double colliderMaxX = colliderMax.x();
+        double colliderMaxY = colliderMax.y();
+        double colliderMaxZ = colliderMax.z();
 
         double tMin;
         double tMax;

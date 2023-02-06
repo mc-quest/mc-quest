@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.damage.DamageType;
@@ -23,6 +24,7 @@ import java.time.Duration;
 
 public class Deer extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Deer", NamedTextColor.GREEN);
+    private static final Vec SIZE = new Vec(1, 1.5, 1);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -33,7 +35,7 @@ public class Deer extends NonPlayerCharacter {
         super(DISPLAY_NAME, 2, instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
-        this.hitbox = new CharacterHitbox(this, instance, spawnPosition, 1, 2, 1);
+        this.hitbox = new CharacterHitbox(this, instance, spawnPosition, SIZE);
         setHeight(1.5);
         setMaxHealth(100);
         setHealth(getMaxHealth());

@@ -40,16 +40,13 @@ public class TutorialQuest implements Feature {
 
     private void createTrainingGroundsBounds() {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        Collider trainingGroundsBounds = new Collider(Instances.ELADRADOR,
-                0, 0, 0, 0, 0, 0) {
-            @Override
-            public void onCollisionEnter(Collider other) {
-                if (other instanceof PlayerCharacter.Hitbox hitbox) {
-                    PlayerCharacter pc = hitbox.getCharacter();
-                    handleEnterTrainingGrounds(pc);
-                }
+        Collider trainingGroundsBounds = new Collider(Instances.ELADRADOR, Pos.ZERO, Pos.ZERO);
+        trainingGroundsBounds.onCollisionEnter(other -> {
+            if (other instanceof PlayerCharacter.Hitbox hitbox) {
+                PlayerCharacter pc = hitbox.getCharacter();
+                handleEnterTrainingGrounds(pc);
             }
-        };
+        });
         physicsManager.addCollider(trainingGroundsBounds);
     }
 

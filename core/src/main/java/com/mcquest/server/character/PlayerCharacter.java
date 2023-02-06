@@ -636,8 +636,10 @@ public final class PlayerCharacter extends Character {
     }
 
     public static class Hitbox extends CharacterHitbox {
+        private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
+
         public Hitbox(PlayerCharacter pc) {
-            super(pc, pc.getInstance(), pc.hitboxCenter(), 1.0, 2.0, 1.0);
+            super(pc, pc.getInstance(), pc.hitboxCenter(), SIZE);
         }
 
         @Override

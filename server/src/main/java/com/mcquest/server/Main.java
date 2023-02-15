@@ -23,6 +23,7 @@ public class Main {
                 .zones(Zones.all())
                 .music(Music.all())
                 .maps(Maps.all())
+                .mounts(Mounts.all())
                 .instances(Instances.all())
                 .models(Models.all())
                 .features(Features.all())

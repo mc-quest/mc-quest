@@ -1,19 +1,24 @@
 package com.mcquest.server.mount;
 
-public class Mount {
+import net.minestom.server.entity.Entity;
+import org.jetbrains.annotations.Nullable;
+
+public abstract class Mount {
     private final int id;
+    private final MountType type;
 
-    public Mount(int id) {
+    public Mount(int id, MountType type) {
         this.id = id;
+        this.type = type;
     }
-
-    /**
-     * TODO: Listen to ClientSteerVehiclePacket
-     * packet.flags() == 1: jump
-     * packet.flags() == 2: shift
-     */
 
     public int getId() {
         return id;
     }
+
+    public MountType getType() {
+        return type;
+    }
+
+    protected abstract @Nullable Entity createEntity();
 }

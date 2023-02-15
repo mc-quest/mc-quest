@@ -3,6 +3,7 @@ package com.mcquest.server.mount;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerPacketEvent;
@@ -52,5 +53,16 @@ public class MountManager {
         if (mount == null) {
             return;
         }
+        Entity mountEntity = player.getVehicle();
+        float forward = vehiclePacket.forward();
+        float sideways = vehiclePacket.sideways();
+        if (mountEntity.isOnGround()) {
+
+        }
+        /*
+         * TODO: Listen to ClientSteerVehiclePacket
+         * packet.flags() == 1: jump
+         * packet.flags() == 2: shift
+         */
     }
 }

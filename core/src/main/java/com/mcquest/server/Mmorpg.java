@@ -11,6 +11,8 @@ import com.mcquest.server.instance.Instance;
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
+import com.mcquest.server.mount.Mount;
+import com.mcquest.server.mount.MountManager;
 import com.mcquest.server.music.MusicManager;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PlayerCharacterData;
@@ -46,6 +48,7 @@ public class Mmorpg {
     private final ZoneManager zoneManager;
     private final MusicManager musicManager;
     private final MapManager mapManager;
+    private final MountManager mountManager;
     private final InstanceManager instanceManager;
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
@@ -62,6 +65,7 @@ public class Mmorpg {
         zoneManager = new ZoneManager(builder.zones);
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
+        mountManager = new MountManager(this, builder.mounts);
         instanceManager = new InstanceManager(builder.instances);
         pcManager = new PlayerCharacterManager(
                 this,
@@ -117,6 +121,10 @@ public class Mmorpg {
 
     public MapManager getMapManager() {
         return mapManager;
+    }
+
+    public MountManager getMountManager() {
+        return mountManager;
     }
 
     public InstanceManager getInstanceManager() {
@@ -176,7 +184,11 @@ public class Mmorpg {
     }
 
     public interface MapsStep {
-        InstancesStep maps(AreaMap... maps);
+        MountsStep maps(AreaMap... maps);
+    }
+
+    public interface MountsStep {
+        InstancesStep mounts(Mount... mounts);
     }
 
     public interface InstancesStep {
@@ -210,7 +222,7 @@ public class Mmorpg {
     }
 
     private static class Builder implements PlayerClassesStep, ItemsStep, QuestsStep, ZonesStep,
-            MusicStep, MapsStep, InstancesStep, ModelsStep, FeaturesStep, ResourcePackStep,
+            MusicStep, MapsStep, MountsStep, InstancesStep, ModelsStep, FeaturesStep, ResourcePackStep,
             PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep, StartStep {
         private final MinecraftServer server;
         private PlayerClass[] playerClasses;
@@ -219,6 +231,7 @@ public class Mmorpg {
         private Zone[] zones;
         private Song[] music;
         private AreaMap[] maps;
+        private Mount[] mounts;
         private Instance[] instances;
         private Model[] models;
         private Feature[] features;
@@ -261,8 +274,13 @@ public class Mmorpg {
         }
 
         @Override
-        public InstancesStep maps(AreaMap... maps) {
+        public MountsStep maps(AreaMap... maps) {
             this.maps = maps.clone();
+            return this;
+        }
+
+        public InstancesStep mounts(Mount... mounts) {
+            this.mounts = mounts;
             return this;
         }
 

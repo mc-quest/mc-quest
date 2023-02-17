@@ -1,8 +1,9 @@
 package com.mcquest.server.event;
 
 import com.mcquest.server.character.PlayerCharacter;
+import net.minestom.server.event.Event;
 
-public class PlayerCharacterLevelUpEvent {
+public class PlayerCharacterLevelUpEvent implements Event {
     private final PlayerCharacter pc;
     private final int newLevel;
 

@@ -4,6 +4,7 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.ActiveSkillUseEvent;
+import com.mcquest.server.util.Sounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -67,21 +68,23 @@ public class PlayerClassManager {
     }
 
     private void handleUseSkill(PlayerCharacter pc, ActiveSkill skill) {
+        pc.playSound(Sounds.CLICK);
         double manaCost = skill.getManaCost();
         if (pc.getMana() < skill.getManaCost()) {
             pc.sendMessage(Component.text("Not enough mana", NamedTextColor.RED));
-            // TODO: sound
             return;
         }
         if (!skill.getCooldown(pc).isZero()) {
             pc.sendMessage(Component.text("On cooldown", NamedTextColor.RED));
-            // TODO: sound
             return;
         }
-        pc.removeMana(manaCost);
         ActiveSkillUseEvent event = new ActiveSkillUseEvent(pc, skill);
         skill.onUse().emit(event);
         mmorpg.getGlobalEventHandler().call(event);
+        if (!event.isCancelled()) {
+            pc.removeMana(manaCost);
+            pc.getSkillManager().startCooldown(skill);
+        }
     }
 
     /**

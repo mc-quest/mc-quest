@@ -62,7 +62,7 @@ public class ActiveSkill extends Skill {
     @Override
     ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? null /* TODO */ : Material.BARRIER;
+        Material icon = isUnlocked ? SKILL_MATERIAL : Material.BARRIER;
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
@@ -91,7 +91,6 @@ public class ActiveSkill extends Skill {
 
     ItemStack getHotbarItemStack() {
         String namespaceId = "skill:player_class_" + playerClass.getId() + "_skill_" + getId() + "_cooldown_" + "TODO";
-        Material icon = Material.fromNamespaceId(namespaceId);
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
@@ -100,7 +99,7 @@ public class ActiveSkill extends Skill {
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
         lore.add(Component.empty());
         lore.addAll(TextUtility.wordWrap(getDescription()));
-        return ItemStackUtility.createItemStack(icon, displayName, lore)
+        return ItemStackUtility.createItemStack(SKILL_MATERIAL, displayName, lore)
                 .withTag(PlayerClassManager.PLAYER_CLASS_ID_TAG, playerClass.getId())
                 .withTag(PlayerClassManager.SKILL_ID_TAG, getId());
     }

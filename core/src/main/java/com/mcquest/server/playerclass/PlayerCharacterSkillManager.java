@@ -28,7 +28,7 @@ public class PlayerCharacterSkillManager {
     private final PlayerCharacter pc;
     private int skillPoints;
     private final Set<Skill> unlockedSkills;
-    private final Map<ActiveSkill, Duration> cooldowns;
+    private final Map<Integer, Duration> cooldowns;
 
     public PlayerCharacterSkillManager(PlayerCharacter pc, int skillPoints) {
         this.pc = pc;
@@ -41,11 +41,40 @@ public class PlayerCharacterSkillManager {
         return unlockedSkills.contains(skill);
     }
 
+    void startCooldown(ActiveSkill skill) {
+        cooldowns.put(skill.getId(), skill.getCooldown());
+    }
+
     public Duration getCooldown(ActiveSkill skill) {
-        if (cooldowns.containsKey(skill)) {
-            return cooldowns.get(skill);
+        return cooldowns.getOrDefault(skill.getId(), Duration.ZERO);
+    }
+
+    void tickSkillCooldowns() {
+        Duration tick = Tick.server(1);
+        cooldowns.replaceAll((skillId, cooldown) -> cooldown.minus(tick));
+        cooldowns.values().removeIf(cooldown -> cooldown.isNegative());
+        updateHotbar();
+    }
+
+    private void updateHotbar() {
+        PlayerClass playerClass = pc.getPlayerClass();
+        PlayerInventory inventory = pc.getPlayer().getInventory();
+        for (int i = 0; i < 8; i++) {
+            if (true) continue;
+            ItemStack itemStack = inventory.getItemStack(i);
+            if (!itemStack.hasTag(PlayerClassManager.SKILL_ID_TAG)) {
+                continue;
+            }
+            int skillId = itemStack.getTag(PlayerClassManager.SKILL_ID_TAG);
+            ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
+            Duration cooldown = cooldowns.get(skill);
+            double currentMillis = cooldown.toMillis();
+            double totalMillis = skill.getCooldown().toMillis();
+            int cooldownDivision = (int) Math.ceil(currentMillis / totalMillis);
+            Material material = Material.fromNamespaceId(""); // TODO
+            ItemStack newItemStack = itemStack.withMaterial(material).withMeta(builder -> builder.customModelData(1));
+            inventory.setItemStack(i, newItemStack);
         }
-        return Duration.ZERO;
     }
 
     public int getSkillPoints() {
@@ -141,37 +170,5 @@ public class PlayerCharacterSkillManager {
             }
         }
         return false;
-    }
-
-    void tickSkillCooldowns() {
-        for (Map.Entry<ActiveSkill, Duration> entry : cooldowns.entrySet()) {
-            ActiveSkill skill = entry.getKey();
-            Duration cooldown = entry.getValue();
-            Duration newCooldown = cooldown.minus(Tick.server(1));
-            cooldowns.put(skill, newCooldown);
-        }
-
-        updateHotbar();
-    }
-
-    private void updateHotbar() {
-        PlayerClass playerClass = pc.getPlayerClass();
-        PlayerInventory inventory = pc.getPlayer().getInventory();
-        for (int i = 0; i < 8; i++) {
-            if (true) continue;
-            ItemStack itemStack = inventory.getItemStack(i);
-            if (!itemStack.hasTag(PlayerClassManager.SKILL_ID_TAG)) {
-                continue;
-            }
-            int skillId = itemStack.getTag(PlayerClassManager.SKILL_ID_TAG);
-            ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
-            Duration cooldown = cooldowns.get(skill);
-            double currentMillis = cooldown.toMillis();
-            double totalMillis = skill.getCooldown().toMillis();
-            int cooldownDivision = (int) Math.ceil(currentMillis / totalMillis);
-            Material material = Material.fromNamespaceId(""); // TODO
-            ItemStack newItemStack = itemStack.withMaterial(material).withMeta(builder -> builder.customModelData(1));
-            inventory.setItemStack(i, newItemStack);
-        }
     }
 }

@@ -10,6 +10,7 @@ import com.mcquest.server.feature.Feature;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
+import com.mcquest.server.util.Debug;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -55,8 +56,10 @@ public class MagePlayerClass implements Feature {
             }
             double damageAmount = 6;
             character.damage(pc, damageAmount);
-            fireballEntity.remove();
-            physicsManager.removeCollider(hitbox);
+            if (!fireballEntity.isRemoved()) {
+                fireballEntity.remove();
+                physicsManager.removeCollider(hitbox);
+            }
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound);
         });

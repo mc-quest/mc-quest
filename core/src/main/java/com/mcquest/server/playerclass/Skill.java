@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.util.concurrent.Callable;
 
 public abstract class Skill {
-    private static final Material SKILL_MATERIAL = Material.WOODEN_AXE;
+    static final Material SKILL_MATERIAL = Material.WOODEN_AXE;
 
     private final int id;
     private final String name;

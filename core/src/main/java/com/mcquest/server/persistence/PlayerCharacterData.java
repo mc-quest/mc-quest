@@ -57,6 +57,7 @@ public class PlayerCharacterData {
         data.songId = null;
         data.canMount = true;
         data.ownedMountIds = new int[0];
+        // TODO: Check that pc is able to equip weapon.
         return data;
     }
 

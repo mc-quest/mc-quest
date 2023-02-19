@@ -31,7 +31,7 @@ public class PhysicsManager {
 
     public void removeCollider(Collider collider) {
         if (collider.getPhysicsManager() != this) {
-            throw new IllegalArgumentException("collider not added");
+            throw new IllegalArgumentException("collider not added or already removed");
         }
         collider.disable();
     }

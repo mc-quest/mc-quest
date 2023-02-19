@@ -30,6 +30,7 @@ import com.mcquest.server.zone.ZoneManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.timer.SchedulerManager;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.hephaestus.Model;
@@ -241,6 +242,7 @@ public class Mmorpg {
 
         private Builder() {
             server = MinecraftServer.init();
+            MojangAuth.init();
         }
 
         @Override

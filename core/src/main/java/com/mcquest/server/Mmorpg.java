@@ -55,8 +55,8 @@ public class Mmorpg {
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
-    private final Feature[] features;
     private final ResourcePackManager resourcePackManager;
+    private final Feature[] features;
 
     private Mmorpg(Builder builder) {
         server = builder.server;
@@ -76,7 +76,6 @@ public class Mmorpg {
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
-        features = builder.features;
         Collection<Skill> skills = new ArrayList<>();
         for (PlayerClass playerClass : builder.playerClasses) {
             skills.addAll(playerClass.getSkills());
@@ -88,6 +87,7 @@ public class Mmorpg {
                 builder.music,
                 builder.models
         );
+        features = builder.features;
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }

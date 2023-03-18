@@ -45,4 +45,15 @@ public class ResourcePackManager {
     public String getResourcePackUrl() {
         return resourcePackUrl;
     }
+
+    /**
+     * Writes the server resource pack to the specified file. Used only for debugging.
+     */
+    public void writeResourcePack(File file) {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+            outputStream.write(resourcePack.bytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

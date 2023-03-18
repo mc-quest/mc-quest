@@ -102,9 +102,9 @@ public final class PlayerCharacter extends Character {
         undisarmTime = 0;
         initInventory(data);
         initUi();
+        updateAttackSpeed();
         canMount = data.canMount();
         // TODO
-        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue(0);
         canAct = true;
         removed = false;
     }
@@ -157,6 +157,11 @@ public final class PlayerCharacter extends Character {
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
+    }
+
+    private void updateAttackSpeed() {
+        double attackSpeed = getWeapon().getAttackSpeed();
+        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
     }
 
     private PlayerCharacterMusicPlayer initMusic(PlayerCharacterData data) {

@@ -21,6 +21,7 @@ public class Weapon extends Item {
     private final int level;
     private final WeaponType type;
     private final Callable<InputStream> model;
+    private final double attackSpeed;
     private final double physicalDamage;
     private final EventEmitter<WeaponEquipEvent> onEquip;
     private final EventEmitter<WeaponUnequipEvent> onUnequip;
@@ -31,6 +32,7 @@ public class Weapon extends Item {
         level = builder.level;
         type = builder.type;
         model = builder.model;
+        this.attackSpeed = builder.attackSpeed;
         physicalDamage = builder.physicalDamage;
         onEquip = new EventEmitter<>();
         onUnequip = new EventEmitter<>();
@@ -50,6 +52,10 @@ public class Weapon extends Item {
 
     public Callable<InputStream> getModel() {
         return model;
+    }
+
+    public double getAttackSpeed() {
+        return attackSpeed;
     }
 
     public double getPhysicalDamage() {
@@ -90,8 +96,8 @@ public class Weapon extends Item {
 
     @ApiStatus.Internal
     @Override
-    public void writeResources(FileTree tree) {
-        // TODO
+    public int writeResources(FileTree tree, int customModelDataStart) {
+        return 1;
     }
 
     public static IdStep builder() {
@@ -119,7 +125,11 @@ public class Weapon extends Item {
     }
 
     public interface ModelStep {
-        BuildStep model(Callable<InputStream> model);
+        AttackSpeedStep model(Callable<InputStream> model);
+    }
+
+    public interface AttackSpeedStep {
+        BuildStep attackSpeed(double attackSpeed);
     }
 
     public interface BuildStep {
@@ -131,14 +141,15 @@ public class Weapon extends Item {
     }
 
     private static class Builder implements IdStep, NameStep, QualityStep,
-            LevelStep, TypeStep, ModelStep, BuildStep {
+            LevelStep, TypeStep, ModelStep, AttackSpeedStep, BuildStep {
         private int id;
         private String name;
         private ItemQuality quality;
         private int level;
         private WeaponType type;
-        private double physicalDamage;
         private Callable<InputStream> model;
+        private double attackSpeed;
+        private double physicalDamage;
         private String description;
 
         @Override
@@ -172,8 +183,14 @@ public class Weapon extends Item {
         }
 
         @Override
-        public BuildStep model(Callable<InputStream> model) {
+        public AttackSpeedStep model(Callable<InputStream> model) {
             this.model = model;
+            return this;
+        }
+
+        @Override
+        public BuildStep attackSpeed(double attackSpeed) {
+            this.attackSpeed = attackSpeed;
             return this;
         }
 

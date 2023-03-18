@@ -47,13 +47,15 @@ public class Items {
         int level = object.get("level").getAsInt();
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
         Callable<InputStream> model = ResourceUtility.streamSupplier(modelPath);
+        double attackSpeed = object.get("attackSpeed").getAsDouble();
         Weapon.BuildStep builder = Weapon.builder()
                 .id(id)
                 .name(name)
                 .quality(quality)
                 .level(level)
                 .type(type)
-                .model(model);
+                .model(model)
+                .attackSpeed(attackSpeed);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }

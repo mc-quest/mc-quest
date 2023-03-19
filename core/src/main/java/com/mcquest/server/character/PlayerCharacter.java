@@ -218,6 +218,10 @@ public final class PlayerCharacter extends Character {
                 .add(lookDirection.rotateAroundY(-Math.PI / 4.0).mul(0.5));
     }
 
+    public Pos getTargetBlockPosition(double maxDistance) {
+        return Pos.fromPoint(player.getTargetBlockPosition((int) maxDistance));
+    }
+
     public Player getPlayer() {
         return player;
     }

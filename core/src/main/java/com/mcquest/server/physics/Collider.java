@@ -107,17 +107,26 @@ public class Collider {
         this.onCollisionExit = onCollisionExit;
     }
 
-    PhysicsManager getPhysicsManager() {
-        return physicsManager;
-    }
-
     void enable(PhysicsManager physicsManager) {
+        if (this.physicsManager == physicsManager) {
+            return;
+        }
+
+        if (this.physicsManager != null) {
+            disable();
+        }
+
         this.physicsManager = physicsManager;
         updateOccupiedBuckets();
         checkForCollisions();
     }
 
     void disable() {
+        if (physicsManager == null) {
+            // Already disabled.
+            return;
+        }
+
         for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
             removeFromBucket(bucketAddress);
         }

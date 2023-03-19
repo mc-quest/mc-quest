@@ -23,16 +23,10 @@ public class PhysicsManager {
     }
 
     public void addCollider(Collider collider) {
-        if (collider.getPhysicsManager() != null) {
-            throw new IllegalArgumentException("collider already added");
-        }
         collider.enable(this);
     }
 
     public void removeCollider(Collider collider) {
-        if (collider.getPhysicsManager() != this) {
-            throw new IllegalArgumentException("collider not added or already removed");
-        }
         collider.disable();
     }
 

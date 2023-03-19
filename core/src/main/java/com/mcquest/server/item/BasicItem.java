@@ -36,8 +36,9 @@ public class BasicItem extends Item {
 
     @ApiStatus.Internal
     @Override
-    public void writeResources(FileTree tree) {
+    public int writeResources(FileTree tree, int customModelDataStart) {
         // TODO
+        return 1;
     }
 
     public static IdStep builder() {

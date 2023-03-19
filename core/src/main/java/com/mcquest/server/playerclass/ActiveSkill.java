@@ -1,8 +1,8 @@
 package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.ActiveSkillUseEvent;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.resourcepack.ResourcePackUtility;
 import com.mcquest.server.util.ItemStackUtility;
 import com.mcquest.server.util.TextUtility;
@@ -16,6 +16,8 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.Model;
+import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.texture.Texture;
 
 import javax.imageio.ImageIO;
@@ -33,6 +35,7 @@ public class ActiveSkill extends Skill {
     private final double manaCost;
     private final Duration cooldown;
     private final EventEmitter<ActiveSkillUseEvent> onUse;
+    int customModelDataStart;
 
     ActiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
                 Callable<InputStream> icon, String description, int skillTreeRow,
@@ -90,7 +93,6 @@ public class ActiveSkill extends Skill {
     }
 
     ItemStack getHotbarItemStack() {
-        String namespaceId = "skill:player_class_" + playerClass.getId() + "_skill_" + getId() + "_cooldown_" + "TODO";
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
@@ -101,23 +103,27 @@ public class ActiveSkill extends Skill {
         lore.addAll(TextUtility.wordWrap(getDescription()));
         return ItemStackUtility.createItemStack(SKILL_MATERIAL, displayName, lore)
                 .withTag(PlayerClassManager.PLAYER_CLASS_ID_TAG, playerClass.getId())
-                .withTag(PlayerClassManager.SKILL_ID_TAG, getId());
+                .withTag(PlayerClassManager.SKILL_ID_TAG, getId())
+                .withMeta(builder -> builder.customModelData(customModelDataStart));
     }
 
     @Override
     @ApiStatus.Internal
-    public int writeResources(FileTree tree) {
+    public int writeResources(FileTree tree, int customModelDataStart) {
+        this.customModelDataStart = customModelDataStart;
         // Default texture.
         // TODO: move this
         String TEXTURE_NAMESPACE = "skill";
-        String defaultKeyValue = String.format("%d-%d", playerClass.getId(), getId());
+//        String defaultKeyValue = String.format("%d-%d", playerClass.getId(), getId());
 //        Model model = Model.builder()
 //                .key(null)
 //                .textures(ModelTexture.builder()
 //                        .layers()
 //                        .build())
 //                .build();
-        // tree.write(defaultTexture);
+//         tree.write(defaultTexture);
+
+        // Locked texture.
 
         // Cooldown textures.
         for (int i = 1; i <= COOLDOWN_DIVISIONS; i++) {
@@ -130,7 +136,7 @@ public class ActiveSkill extends Skill {
             tree.write(texture);
         }
 
-        return COOLDOWN_DIVISIONS + 1;
+        return 2 + COOLDOWN_DIVISIONS;
     }
 
     private byte[] cooldownTexture(int cooldownDivision) {

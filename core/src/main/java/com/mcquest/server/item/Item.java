@@ -78,5 +78,5 @@ public abstract class Item {
     abstract List<Component> getItemStackLore();
 
     @ApiStatus.Internal
-    public abstract void writeResources(FileTree tree);
+    public abstract int writeResources(FileTree tree, int customModelDataStart);
 }

@@ -65,14 +65,16 @@ class ResourcePackBuilder {
     }
 
     private void writeSkillResources(FileTree tree) {
+        int customModelData = 0;
         for (Skill skill : skills) {
-            skill.writeResources(tree);
+            customModelData += skill.writeResources(tree, customModelData);
         }
     }
 
     private void writeItemResources(FileTree tree) {
+        int customModelData = 0;
         for (Item item : items) {
-            item.writeResources(tree);
+            customModelData += item.writeResources(tree, customModelData);
         }
     }
 
@@ -96,7 +98,7 @@ class ResourcePackBuilder {
     }
 
     private void disableBackgroundMusic(FileTree tree) {
-        List<String> backgroundMusic = List.of(
+        String[] backgroundMusic = {
                 "music.game",
                 "music.creative",
                 "music.under_water",
@@ -112,7 +114,7 @@ class ResourcePackBuilder {
                 "music.nether.soul_sand_valley",
                 "music.dragon",
                 "music.end"
-        );
+        };
         Map<String, SoundEvent> sounds = new HashMap<>();
         for (String backgroundSong : backgroundMusic) {
             SoundEvent soundEvent = SoundEvent.builder().replace(true).build();

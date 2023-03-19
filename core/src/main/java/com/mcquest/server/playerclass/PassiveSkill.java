@@ -50,8 +50,8 @@ public class PassiveSkill extends Skill {
 
     @Override
     @ApiStatus.Internal
-    public int writeResources(FileTree tree) {
+    public int writeResources(FileTree tree, int customModelDataStart) {
         // TODO
-        return 0;
+        return 2;
     }
 }

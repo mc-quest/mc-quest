@@ -89,10 +89,11 @@ public class ArmorItem extends Item {
 
     @ApiStatus.Internal
     @Override
-    public void writeResources(FileTree tree) {
+    public int writeResources(FileTree tree, int customModelDataStart) {
         if (model != null) {
             // TODO: write model
         }
+        return 0;
     }
 
     public static IdStep builder() {

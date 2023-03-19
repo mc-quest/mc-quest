@@ -93,5 +93,5 @@ public abstract class Skill {
      * Returns the number of textures written.
      */
     @ApiStatus.Internal
-    public abstract int writeResources(FileTree tree);
+    public abstract int writeResources(FileTree tree, int customModelDataStart);
 }

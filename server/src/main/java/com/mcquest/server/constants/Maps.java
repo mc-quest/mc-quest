@@ -6,7 +6,7 @@ import net.minestom.server.coordinate.Pos;
 
 public class Maps {
     public static final AreaMap MELCHER = new AreaMap(1, Pos.ZERO,
-            ResourceUtility.readImage("maps/Melcher.png"));
+            ResourceUtility.streamSupplier("maps/Melcher.png"));
 
     public static AreaMap[] all() {
         return new AreaMap[]{

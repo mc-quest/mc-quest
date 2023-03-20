@@ -4,9 +4,11 @@ import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.AutoAttackEvent;
 import com.mcquest.server.event.WeaponEquipEvent;
 import com.mcquest.server.event.WeaponUnequipEvent;
+import com.mcquest.server.resourcepack.ResourcePackUtility;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class Weapon extends Item {
     private final EventEmitter<WeaponEquipEvent> onEquip;
     private final EventEmitter<WeaponUnequipEvent> onUnequip;
     private final EventEmitter<AutoAttackEvent> onAutoAttack;
+    private int customModelData;
 
     Weapon(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
@@ -96,7 +99,9 @@ public class Weapon extends Item {
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart) {
+    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
+        customModelData = customModelDataStart;
+        ResourcePackUtility.writeItemModel(tree, model, customModelData, overrides);
         return 1;
     }
 

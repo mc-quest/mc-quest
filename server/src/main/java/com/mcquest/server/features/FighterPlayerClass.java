@@ -5,6 +5,7 @@ import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.FighterSkills;
+import com.mcquest.server.constants.Items;
 import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.feature.Feature;
@@ -19,11 +20,17 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
+import java.io.File;
+
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
 
     @Override
     public void hook(Mmorpg mmorpg) {
+        mmorpg.getResourcePackManager().writeResourcePack(new File("resourcepack.zip"));
+        mmorpg.getGlobalEventHandler().addListener(PlayerCharacterLoginEvent.class, event -> {
+            event.getPlayerCharacter().giveItem(Items.TEST_ITEM);
+        });
         this.mmorpg = mmorpg;
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLevelUp);

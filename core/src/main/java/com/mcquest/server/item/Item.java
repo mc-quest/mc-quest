@@ -11,10 +11,13 @@ import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 
 import java.util.List;
 
 public abstract class Item {
+    public static final Material ITEM_MATERIAL = Material.WOODEN_AXE;
+
     private final int id;
     private final String name;
     private final ItemQuality quality;
@@ -71,12 +74,13 @@ public abstract class Item {
     }
 
     private ItemStack createItemStack() {
-        return ItemStackUtility.createItemStack(Material.WOODEN_AXE, getDisplayName(), getItemStackLore())
-                .withTag(ItemManager.ID_TAG, id);
+        return ItemStackUtility.createItemStack(ITEM_MATERIAL, getDisplayName(), getItemStackLore())
+                .withTag(ItemManager.ID_TAG, id)
+                .withMeta(builder -> builder.customModelData(1));
     }
 
     abstract List<Component> getItemStackLore();
 
     @ApiStatus.Internal
-    public abstract int writeResources(FileTree tree, int customModelDataStart);
+    public abstract int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides);
 }

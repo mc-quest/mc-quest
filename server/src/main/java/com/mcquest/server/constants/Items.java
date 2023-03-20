@@ -9,10 +9,12 @@ import java.util.concurrent.Callable;
 
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("AdventurersSword");
+    public static final BasicItem TEST_ITEM = loadBasicItem("TestItem");
 
     public static Item[] all() {
         return new Item[]{
-                ADVENTURERS_SWORD
+                ADVENTURERS_SWORD,
+                TEST_ITEM
         };
     }
 

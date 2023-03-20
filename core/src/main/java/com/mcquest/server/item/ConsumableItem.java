@@ -5,6 +5,7 @@ import com.mcquest.server.event.ItemConsumeEvent;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class ConsumableItem extends Item {
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart) {
+    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
         // TODO
         return 0;
     }

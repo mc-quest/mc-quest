@@ -7,6 +7,7 @@ import net.kyori.adventure.key.Key;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 import team.unnamed.creative.sound.Sound;
 import team.unnamed.creative.sound.SoundEvent;
 import team.unnamed.creative.sound.SoundRegistry;
@@ -14,6 +15,7 @@ import team.unnamed.creative.texture.Texture;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.writer.ModelWriter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,9 +75,11 @@ class ResourcePackBuilder {
 
     private void writeItemResources(FileTree tree) {
         int customModelData = 0;
+        List<ItemOverride> overrides = new ArrayList<>();
         for (Item item : items) {
-            customModelData += item.writeResources(tree, customModelData);
+            customModelData += item.writeResources(tree, customModelData, overrides);
         }
+        ResourcePackUtility.writeItemOverrides(tree, Item.ITEM_MATERIAL, overrides);
     }
 
     private void writeMusicResources(FileTree tree) {

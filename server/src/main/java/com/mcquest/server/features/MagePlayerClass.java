@@ -36,16 +36,24 @@ public class MagePlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos startPosition = pc.getEyePosition().add(pc.getLookDirection().mul(1f));
+        double maxDistance = 20.0;
         Vec hitboxSize = new Vec(1f, 1f, 1f);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         Collider hitbox = new Collider(instance, startPosition, hitboxSize);
+        double fireballSpeed = 20.0;
+        Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
         Entity fireballEntity = new Entity(EntityType.FIREBALL) {
             @Override
             public void tick(long time) {
                 super.tick(time);
-                hitbox.setCenter(this.getPosition());
+                hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
+                setVelocity(fireballVelocity);
+                if (getPosition().distanceSquared(startPosition) > maxDistance * maxDistance) {
+                    remove();
+                    physicsManager.removeCollider(hitbox);
+                }
             }
         };
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         hitbox.onCollisionEnter(other -> {
             if (!(other instanceof CharacterHitbox characterHitbox)) {
                 return;
@@ -54,7 +62,7 @@ public class MagePlayerClass implements Feature {
             if (character.isFriendly(pc)) {
                 return;
             }
-            double damageAmount = 6;
+            double damageAmount = 6.0;
             character.damage(pc, damageAmount);
             if (!fireballEntity.isRemoved()) {
                 fireballEntity.remove();
@@ -63,12 +71,11 @@ public class MagePlayerClass implements Feature {
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound);
         });
+        fireballEntity.setInstance(instance, startPosition.sub(0.0, 0.5, 0.0)).join();
         physicsManager.addCollider(hitbox);
-        Vec fireballVelocity = pc.getLookDirection().mul(20.0);
-        fireballEntity.setInstance(instance, startPosition).join();
         fireballEntity.setNoGravity(true);
-        fireballEntity.setVelocity(fireballVelocity);
         Sound summonFireballSound = Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f);
         instance.playSound(summonFireballSound);
+        Debug.showCollider(hitbox);
     }
 }

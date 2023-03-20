@@ -1,8 +1,15 @@
 package com.mcquest.server.item;
 
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
+import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
+import team.unnamed.creative.model.ItemPredicate;
+import team.unnamed.creative.model.Model;
+import team.unnamed.creative.model.ModelTexture;
+import team.unnamed.creative.texture.Texture;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -11,6 +18,7 @@ import java.util.concurrent.Callable;
 
 public class BasicItem extends Item {
     private final Callable<InputStream> icon;
+    private int customModelData;
 
     public BasicItem(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
@@ -36,8 +44,27 @@ public class BasicItem extends Item {
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart) {
-        // TODO
+    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
+        customModelData = customModelDataStart;
+
+        Key key = Key.key("item", String.valueOf(getId()));
+        Texture texture = Texture.of(key, Writable.inputStream(icon));
+        tree.write(texture);
+
+        Model model = Model.builder()
+                .key(key)
+                .parent(Key.key("minecraft", "item/handheld"))
+                .textures(ModelTexture.builder()
+                        .layers(key)
+                        .build())
+                .build();
+        tree.write(model);
+
+        ItemPredicate itemPredicate = ItemPredicate.customModelData(customModelData);
+        Key modelKey = Key.key("item", String.valueOf(getId()));
+        ItemOverride itemOverride = ItemOverride.of(modelKey, itemPredicate);
+        overrides.add(itemOverride);
+
         return 1;
     }
 

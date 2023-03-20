@@ -5,7 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.util.ResourceUtility;
 import net.kyori.adventure.key.Key;
+import net.minestom.server.item.Material;
 import team.unnamed.creative.base.*;
+import team.unnamed.creative.file.FileResource;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;
@@ -20,6 +22,19 @@ public class ResourcePackUtility {
     private static final Key WOODEN_AXE = Key.key("item/wooden_axe");
     private static final String ITEM_NAMESPACE = "item";
     private static final String TEXTURE_DATA_PREFIX = "data:image/png;base64,";
+
+    public static void writeItemOverrides(FileTree tree, Material material, List<ItemOverride> overrides) {
+        Key materialKey = Key.key(material.key().namespace(), "item/" + material.key().value());
+        Model model = Model.builder()
+                .key(materialKey)
+                .parent(Key.key("minecraft", "item/handheld"))
+                .textures(ModelTexture.builder()
+                        .layers(materialKey)
+                        .build())
+                .overrides(overrides)
+                .build();
+        tree.write(model);
+    }
 
     private static void applyCooldownTexture(BufferedImage texture) {
 

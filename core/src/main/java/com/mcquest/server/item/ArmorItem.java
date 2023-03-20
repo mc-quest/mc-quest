@@ -8,6 +8,7 @@ import net.minestom.server.color.Color;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ public class ArmorItem extends Item {
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart) {
+    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
         if (model != null) {
             // TODO: write model
         }

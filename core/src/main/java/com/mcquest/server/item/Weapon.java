@@ -101,7 +101,7 @@ public class Weapon extends Item {
     @Override
     public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
         customModelData = customModelDataStart;
-        ResourcePackUtility.writeItemModel(tree, model, customModelData, overrides);
+        // ResourcePackUtility.writeItemModel(tree, model, customModelData, overrides);
         return 1;
     }
 

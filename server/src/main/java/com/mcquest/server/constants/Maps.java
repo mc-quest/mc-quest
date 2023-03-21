@@ -5,8 +5,8 @@ import com.mcquest.server.util.ResourceUtility;
 import net.minestom.server.coordinate.Pos;
 
 public class Maps {
-    public static final AreaMap MELCHER = new AreaMap(1, Pos.ZERO,
-            ResourceUtility.streamSupplier("maps/Melcher.png"));
+    public static final AreaMap MELCHER = new AreaMap(1, new Pos(0, 0, 0),
+            ResourceUtility.streamSupplier("maps/MelcherTavernBasement.png"));
 
     public static AreaMap[] all() {
         return new AreaMap[]{

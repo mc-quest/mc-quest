@@ -4,6 +4,6 @@
     "quality": "COMMON",
     "level": 1,
     "type": "SWORD",
-    "attackSpeed": 0.05,
+    "attackSpeed": 1,
     "physicalDamage": 3
 }

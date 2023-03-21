@@ -6,6 +6,7 @@ import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.FighterSkills;
 import com.mcquest.server.constants.Items;
+import com.mcquest.server.constants.Maps;
 import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.feature.Feature;
@@ -30,6 +31,7 @@ public class FighterPlayerClass implements Feature {
         mmorpg.getResourcePackManager().writeResourcePack(new File("resourcepack.zip"));
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterLoginEvent.class, event -> {
             event.getPlayerCharacter().giveItem(Items.TEST_ITEM);
+            event.getPlayerCharacter().getMapManager().setMap(Maps.MELCHER);
         });
         this.mmorpg = mmorpg;
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();

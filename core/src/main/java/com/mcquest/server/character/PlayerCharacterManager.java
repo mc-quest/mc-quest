@@ -4,10 +4,12 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.event.ClickMenuLogoutEvent;
 import com.mcquest.server.event.PlayerCharacterLoginEvent;
 import com.mcquest.server.event.PlayerCharacterLogoutEvent;
+import com.mcquest.server.event.PlayerCharacterMoveEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.resourcepack.ResourcePackManager;
 import com.mcquest.server.ui.PlayerCharacterLogoutType;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
@@ -42,7 +44,7 @@ public class PlayerCharacterManager {
         eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
         eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
-        eventHandler.addListener(PlayerMoveEvent.class, this::synchronizePlayerPosition);
+        eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
     }
@@ -100,17 +102,21 @@ public class PlayerCharacterManager {
         eventHandler.call(event);
     }
 
+    private void handlePlayerMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacter pc = getPlayerCharacter(player);
+        PlayerCharacterMoveEvent pcMoveEvent = new PlayerCharacterMoveEvent(pc, event);
+        MinecraftServer.getGlobalEventHandler().call(pcMoveEvent);
+        if (!pcMoveEvent.isCancelled()) {
+            pc.setPosition(pcMoveEvent.getNewPosition());
+        }
+    }
+
     @ApiStatus.Internal
     public void remove(PlayerCharacter pc) {
         Player player = pc.getPlayer();
         pcs.remove(player);
         mmorpg.getCharacterEntityManager().unbind(player);
-    }
-
-    private void synchronizePlayerPosition(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacter pc = getPlayerCharacter(player);
-        pc.setPosition(event.getNewPosition());
     }
 
     private void regeneratePlayerCharacters() {

@@ -2,21 +2,22 @@ package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.cartography.CardinalDirection;
+import com.mcquest.server.cartography.PlayerCharacterMapManager;
 import com.mcquest.server.event.ItemReceiveEvent;
 import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.*;
 import com.mcquest.server.mount.Mount;
 import com.mcquest.server.music.MusicManager;
+import com.mcquest.server.music.PlayerCharacterMusicPlayer;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.persistence.PersistentQuestObjectiveData;
+import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerCharacterSkillManager;
-import com.mcquest.server.quest.PlayerCharacterQuestTracker;
-import com.mcquest.server.music.PlayerCharacterMusicPlayer;
-import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.quest.PlayerCharacterQuestTracker;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.util.MathUtility;
@@ -64,6 +65,7 @@ public final class PlayerCharacter extends Character {
     private final PlayerCharacterSkillManager skillManager;
     private final PlayerCharacterQuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
+    private final PlayerCharacterMapManager mapManager;
     private final Hitbox hitbox;
     private Zone zone;
     private Pos respawnPosition;
@@ -90,6 +92,7 @@ public final class PlayerCharacter extends Character {
         skillManager = new PlayerCharacterSkillManager(this, data.getSkillPoints());
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
+        mapManager = new PlayerCharacterMapManager(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
@@ -232,6 +235,10 @@ public final class PlayerCharacter extends Character {
 
     public PlayerCharacterMusicPlayer getMusicPlayer() {
         return musicPlayer;
+    }
+
+    public PlayerCharacterMapManager getMapManager() {
+        return mapManager;
     }
 
     public double getMana() {

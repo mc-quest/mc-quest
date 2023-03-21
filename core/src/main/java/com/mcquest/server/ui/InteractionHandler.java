@@ -125,8 +125,8 @@ public class InteractionHandler {
     }
 
     private void openMap(PlayerCharacter pc) {
-        pc.sendMessage(Component.text("open map"));
-        // TODO
+        pc.getMapManager().openMap();
+        pc.getPlayer().closeInventory();
     }
 
     private void handleLogoutClick(PlayerCharacter pc) {

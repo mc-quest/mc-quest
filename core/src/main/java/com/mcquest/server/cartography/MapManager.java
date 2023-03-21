@@ -1,5 +1,11 @@
 package com.mcquest.server.cartography;
 
+import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.PlayerCharacterMoveEvent;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -14,12 +20,22 @@ public class MapManager {
         for (AreaMap map : maps) {
             registerMap(map);
         }
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.addListener(PlayerCharacterMoveEvent.class, this::handlePlayerMove);
     }
 
     private void registerMap(AreaMap map) {
         int id = map.getId();
         if (mapsById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
+        }
+    }
+
+    private void handlePlayerMove(PlayerCharacterMoveEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+        PlayerCharacterMapManager pcMapManager = pc.getMapManager();
+        if (pcMapManager.isMapOpen()) {
+            pc.getMapManager().getMap().render(pc);
         }
     }
 

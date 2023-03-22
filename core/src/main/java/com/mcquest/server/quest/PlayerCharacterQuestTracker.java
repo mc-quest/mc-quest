@@ -112,6 +112,9 @@ public class PlayerCharacterQuestTracker {
         }
         int goal = objective.getGoal();
         progress = MathUtility.clamp(progress, 0, goal);
+        if (currentProgress[objectiveIndex] == progress) {
+            return;
+        }
         currentProgress[objectiveIndex] = progress;
         if (progress == goal) {
             pc.sendMessage(Component.empty()

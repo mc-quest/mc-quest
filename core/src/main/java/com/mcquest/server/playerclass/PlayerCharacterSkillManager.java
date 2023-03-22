@@ -1,6 +1,7 @@
 package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.AddSkillToHotbarEvent;
 import com.mcquest.server.event.SkillUnlockEvent;
 import com.mcquest.server.util.Sounds;
 import net.kyori.adventure.text.Component;
@@ -122,20 +123,25 @@ public class PlayerCharacterSkillManager {
         pc.getPlayer().playSound(Sounds.CLICK);
         boolean isUnlocked = skill.isUnlocked(pc);
         if (clickType == ClickType.LEFT_CLICK) {
-            if (!(skill instanceof ActiveSkill)) {
+            if (!(skill instanceof ActiveSkill activeSkill)) {
                 return;
             }
             if (isUnlocked) {
-                PlayerInventory playerInventory = pc.getPlayer().getInventory();
-                if (roomOnHotbar(playerInventory)) {
+                PlayerInventory inventory = pc.getPlayer().getInventory();
+                int hotbarSlot = firstEmptyHotbarSlot(inventory);
+                if (hotbarSlot == -1) {
+                    pc.sendMessage(Component.text(
+                            "No room on hotbar", NamedTextColor.RED));
+                } else if (skillOnHotbar(skill, inventory)) {
+                    pc.sendMessage(Component.text(
+                            skill.getName() + " is already on your hotbar", NamedTextColor.RED));
+                } else {
                     ItemStack hotbarItemStack = ((ActiveSkill) skill).getHotbarItemStack();
-                    playerInventory.addItemStack(hotbarItemStack);
+                    inventory.addItemStack(hotbarItemStack);
                     pc.sendMessage(Component.text(
                             "Added " + skill.getName() + " to hotbar", NamedTextColor.GREEN));
-                } else {
-                    pc.sendMessage(Component.text(
-                            "No room on hotbar", NamedTextColor.RED
-                    ));
+                    AddSkillToHotbarEvent event = new AddSkillToHotbarEvent(pc, activeSkill, hotbarSlot);
+                    MinecraftServer.getGlobalEventHandler().call(event);
                 }
             } else {
                 pc.sendMessage(
@@ -145,6 +151,8 @@ public class PlayerCharacterSkillManager {
             if (isUnlocked) {
                 pc.sendMessage(Component.text(
                         skill.getName() + " is already unlocked", NamedTextColor.RED));
+            } else if (skillPoints == 0) {
+                pc.sendMessage(Component.text("No skill points available", NamedTextColor.RED));
             } else {
                 unlockSkill(skill);
                 // Rerender.
@@ -162,10 +170,21 @@ public class PlayerCharacterSkillManager {
         return null;
     }
 
-    private static boolean roomOnHotbar(PlayerInventory inventory) {
-        for (int slot = 0; slot < 9; slot++) {
-            ItemStack itemStack = inventory.getItemStack(slot);
+    private static int firstEmptyHotbarSlot(PlayerInventory inventory) {
+        for (int i = 0; i < 8; i++) {
+            ItemStack itemStack = inventory.getItemStack(i);
             if (itemStack.isAir()) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static boolean skillOnHotbar(Skill skill, PlayerInventory inventory) {
+        for (int i = 0; i < 8; i++) {
+            ItemStack itemStack = inventory.getItemStack(i);
+            if (itemStack.hasTag(PlayerClassManager.SKILL_ID_TAG) &&
+                    itemStack.getTag(PlayerClassManager.SKILL_ID_TAG) == skill.getId()) {
                 return true;
             }
         }

@@ -11,6 +11,7 @@ import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -83,10 +84,10 @@ public class ResourceUtility {
         }
     }
 
-    public static Image readImage(String path) {
+    public static BufferedImage readImage(String path) {
         try {
             InputStream inputStream = getStream(path);
-            Image image = ImageIO.read(inputStream);
+            BufferedImage image = ImageIO.read(inputStream);
             inputStream.close();
             return image;
         } catch (IOException e) {

@@ -1,6 +1,8 @@
 package com.mcquest.server.cartography;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.MapCloseEvent;
+import com.mcquest.server.event.MapOpenEvent;
 import com.mcquest.server.item.Weapon;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
@@ -8,7 +10,6 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.MapMeta;
-import net.minestom.server.timer.TaskSchedule;
 
 public class PlayerCharacterMapManager {
     private final PlayerCharacter pc;
@@ -42,10 +43,14 @@ public class PlayerCharacterMapManager {
                 .meta(new MapMeta.Builder().mapId(AreaMap.MAP_ID).build())
                 .build();
         inventory.setItemInMainHand(mapItemStack);
-        MinecraftServer.getSchedulerManager().buildTask(() -> map.render(pc)).delay(TaskSchedule.seconds(1)).schedule();
+        map.render(pc);
+        MapOpenEvent event = new MapOpenEvent(pc);
+        MinecraftServer.getGlobalEventHandler().call(event);
     }
 
     public void closeMap() {
         savedWeapon = null;
+        MapCloseEvent event = new MapCloseEvent(pc);
+        MinecraftServer.getGlobalEventHandler().call(event);
     }
 }

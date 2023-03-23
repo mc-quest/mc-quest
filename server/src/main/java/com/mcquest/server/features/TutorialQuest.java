@@ -4,17 +4,18 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.constants.Instances;
+import com.mcquest.server.constants.Maps;
 import com.mcquest.server.constants.Quests;
 import com.mcquest.server.event.*;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.npc.Deer;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
-import com.mcquest.server.quest.QuestObjective;
-import com.mcquest.server.quest.QuestStatus;
+import com.mcquest.server.quest.*;
 import com.mcquest.server.ui.Tutorial;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.GlobalEventHandler;
 
@@ -28,6 +29,7 @@ public class TutorialQuest implements Feature {
         this.mmorpg = mmorpg;
         createTrainingGroundsBounds();
         spawnTrainingDummies();
+        createQuestMarkers();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
         eventHandler.addListener(MenuOpenEvent.class, this::handleOpenMenu);
@@ -62,9 +64,26 @@ public class TutorialQuest implements Feature {
         }
     }
 
+    private void createQuestMarkers() {
+        QuestManager questManager = mmorpg.getQuestManager();
+        QuestMarker trainingGroundsMarker = questManager.createQuestMarker(Instances.ELADRADOR,
+                new Pos(0, 70, 0), Quests.TUTORIAL, QuestMarkerIcon.OBJECTIVE,
+                pc -> Quests.TUTORIAL.getObjective(6).isAccessible(pc));
+        Maps.MELCHER.addQuestMarker(trainingGroundsMarker);
+    }
+
+    private boolean tutorialObjectiveActive(PlayerCharacter pc, int objectiveIndex) {
+        QuestObjective objective = Quests.TUTORIAL.getObjective(objectiveIndex);
+        return objective.isAccessible(pc) && !objective.isComplete(pc);
+
+    }
+
     private void handleLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.NOT_STARTED) {
+        pc.getPlayer().getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(1);
+        pc.getPlayer().getAttribute(Attribute.FLYING_SPEED).setBaseValue(1);
+        pc.getPlayer().setAllowFlying(true);
+        if (!Quests.TUTORIAL.compareStatus(pc, QuestStatus.NOT_STARTED)) {
             return;
         }
         Quests.TUTORIAL.start(pc);
@@ -80,11 +99,10 @@ public class TutorialQuest implements Feature {
 
     private void handleOpenMenu(MenuOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        QuestObjective openMenuObjective = Quests.TUTORIAL.getObjective(0);
-        if (!openMenuObjective.isAccessible(pc) || openMenuObjective.isComplete(pc)) {
+        if (!tutorialObjectiveActive(pc, 0)) {
             return;
         }
-        openMenuObjective.complete(pc);
+        Quests.TUTORIAL.getObjective(0).complete(pc);
         Quests.TUTORIAL.getObjective(1).setAccessible(pc, true);
         Tutorial.message(pc,
                 Component.text("Open your skill tree to unlock powerful abilities!"),
@@ -93,8 +111,7 @@ public class TutorialQuest implements Feature {
 
     private void handleOpenSkillTree(SkillTreeOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        QuestObjective openSkillTreeObjective = Quests.TUTORIAL.getObjective(1);
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 1)) {
             return;
         }
         Quests.TUTORIAL.getObjective(1).complete(pc);
@@ -106,7 +123,7 @@ public class TutorialQuest implements Feature {
 
     private void handleSkillUpgrade(SkillUnlockEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 2)) {
             return;
         }
         Quests.TUTORIAL.getObjective(2).complete(pc);
@@ -115,7 +132,7 @@ public class TutorialQuest implements Feature {
 
     private void handleAddSkillToHotbar(AddSkillToHotbarEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 3)) {
             return;
         }
         Quests.TUTORIAL.getObjective(3).complete(pc);
@@ -124,7 +141,7 @@ public class TutorialQuest implements Feature {
 
     private void handleUseSkill(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 4)) {
             return;
         }
         Quests.TUTORIAL.getObjective(4).complete(pc);
@@ -133,7 +150,7 @@ public class TutorialQuest implements Feature {
 
     private void handleOpenMap(MapOpenEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 5)) {
             return;
         }
         Quests.TUTORIAL.getObjective(5).complete(pc);
@@ -141,7 +158,7 @@ public class TutorialQuest implements Feature {
     }
 
     private void handleEnterTrainingGrounds(PlayerCharacter pc) {
-        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.IN_PROGRESS) {
+        if (!tutorialObjectiveActive(pc, 6)) {
             return;
         }
         Quests.TUTORIAL.getObjective(6).complete(pc);

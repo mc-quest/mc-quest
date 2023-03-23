@@ -7,7 +7,6 @@ import com.mcquest.server.util.ResourceUtility;
 import net.kyori.adventure.key.Key;
 import net.minestom.server.item.Material;
 import team.unnamed.creative.base.*;
-import team.unnamed.creative.file.FileResource;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;

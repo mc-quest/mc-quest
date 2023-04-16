@@ -1,5 +1,6 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.event.EventEmitter;
@@ -16,18 +17,14 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
-import team.unnamed.creative.model.Model;
-import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.texture.Texture;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class ActiveSkill extends Skill {
     private static final int COOLDOWN_DIVISIONS = 16;
@@ -38,7 +35,7 @@ public class ActiveSkill extends Skill {
     int customModelDataStart;
 
     ActiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                Callable<InputStream> icon, String description, int skillTreeRow,
+                Asset icon, String description, int skillTreeRow,
                 int skillTreeColumn, double manaCost, Duration cooldown) {
         super(id, name, level, prerequisiteId, icon, description, skillTreeRow, skillTreeColumn);
         this.manaCost = manaCost;
@@ -142,8 +139,7 @@ public class ActiveSkill extends Skill {
     private byte[] cooldownTexture(int cooldownDivision) {
         try {
             double thetaMax = (double) cooldownDivision / COOLDOWN_DIVISIONS * 2.0 * Math.PI;
-            InputStream inputStream = getIcon().call();
-            BufferedImage image = ImageIO.read(inputStream);
+            BufferedImage image = getIcon().readImage();
             double cx = image.getWidth() / 2.0;
             double cy = image.getHeight() / 2.0;
             for (int x = 0; x < image.getWidth(); x++) {

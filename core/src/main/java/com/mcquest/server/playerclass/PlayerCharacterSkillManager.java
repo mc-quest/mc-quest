@@ -53,7 +53,7 @@ public class PlayerCharacterSkillManager {
     void tickSkillCooldowns() {
         Duration tick = Tick.server(1);
         cooldowns.replaceAll((skillId, cooldown) -> cooldown.minus(tick));
-        cooldowns.values().removeIf(cooldown -> cooldown.isNegative());
+        cooldowns.values().removeIf(cooldown -> cooldown.isNegative() || cooldown.isZero());
         updateHotbar();
     }
 
@@ -68,7 +68,7 @@ public class PlayerCharacterSkillManager {
             }
             int skillId = itemStack.getTag(PlayerClassManager.SKILL_ID_TAG);
             ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
-            Duration cooldown = cooldowns.get(skill);
+            Duration cooldown = cooldowns.get(skill.getId());
             double currentMillis = cooldown.toMillis();
             double totalMillis = skill.getCooldown().toMillis();
             int cooldownDivision = (int) Math.ceil(currentMillis / totalMillis);

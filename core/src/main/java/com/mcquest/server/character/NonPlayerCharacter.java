@@ -22,7 +22,7 @@ public class NonPlayerCharacter extends Character {
 
     @MustBeInvokedByOverriders
     @Override
-    public void damage(DamageSource source, double amount) {
+    public void damage(@NotNull DamageSource source, double amount) {
         super.damage(source, amount);
         if (getHealth() == 0) {
             despawn();

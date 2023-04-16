@@ -3,7 +3,7 @@ package com.mcquest.server.resourcepack;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mcquest.server.util.ResourceUtility;
+import com.mcquest.server.asset.Asset;
 import net.kyori.adventure.key.Key;
 import net.minestom.server.item.Material;
 import team.unnamed.creative.base.*;
@@ -12,9 +12,7 @@ import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;
 
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 public class ResourcePackUtility {
     public static final int COOLDOWN_DIVISIONS = 16;
@@ -53,10 +51,10 @@ public class ResourcePackUtility {
         return ret;
     }
 
-    public static void writeItemModel(FileTree tree, Callable<InputStream> bbmodel, int itemId,
+    public static void writeItemModel(FileTree tree, Asset bbmodel, int itemId,
                                       List<ItemOverride> overrides) {
         // TODO: might need to account for texture resolution
-        JsonObject modelJson = ResourceUtility.readJson(bbmodel).getAsJsonObject();
+        JsonObject modelJson = bbmodel.readJson().getAsJsonObject();
 
         JsonObject displaysJson = modelJson.get("display").getAsJsonObject();
         Map<ItemTransform.Type, ItemTransform> displays = parseDisplays(displaysJson);

@@ -1,11 +1,10 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.asset.Asset;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 /**
  * A PlayerClass represents the specialization of a PlayerCharacter.
@@ -57,7 +56,7 @@ public final class PlayerClass {
         }
 
         public Builder activeSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                   Callable<InputStream> icon, String description, int skillTreeRow,
+                                   Asset icon, String description, int skillTreeRow,
                                    int skillTreeColumn, double manaCost, Duration cooldown) {
             ActiveSkill skill = new ActiveSkill(id, name, level, prerequisiteId, icon,
                     description, skillTreeRow, skillTreeColumn, manaCost, cooldown);
@@ -66,8 +65,7 @@ public final class PlayerClass {
         }
 
         public Builder passiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                    Callable<InputStream> icon, String description, int skillTreeRow,
-                                    int skillTreeColumn) {
+                                    Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
             PassiveSkill skill = new PassiveSkill(id, name, level, prerequisiteId, icon,
                     description, skillTreeRow, skillTreeColumn);
             skills.add(skill);

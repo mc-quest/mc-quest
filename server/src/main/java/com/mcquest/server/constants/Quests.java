@@ -3,8 +3,8 @@ package com.mcquest.server.constants;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.quest.Quest;
-import com.mcquest.server.util.ResourceUtility;
 
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");
@@ -18,8 +18,9 @@ public class Quests {
     }
 
     private static Quest loadQuest(String fileName) {
+        ClassLoader classLoader = Quests.class.getClassLoader();
         String path = "quests/" + fileName + ".json";
-        JsonObject object = ResourceUtility.readJson(path).getAsJsonObject();
+        JsonObject object = new Asset(classLoader, path).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         int level = object.get("level").getAsInt();

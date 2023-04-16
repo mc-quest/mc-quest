@@ -1,5 +1,6 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.asset.Asset;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,13 +12,11 @@ import team.unnamed.creative.model.Model;
 import team.unnamed.creative.model.ModelTexture;
 import team.unnamed.creative.texture.Texture;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class BasicItem extends Item {
-    private final Callable<InputStream> icon;
+    private final Asset icon;
     private int customModelData;
 
     public BasicItem(Builder builder) {
@@ -25,7 +24,7 @@ public class BasicItem extends Item {
         icon = builder.icon;
     }
 
-    public Callable<InputStream> getIcon() {
+    public Asset getIcon() {
         return icon;
     }
 
@@ -48,7 +47,7 @@ public class BasicItem extends Item {
         customModelData = customModelDataStart;
 
         Key key = Key.key("item", String.valueOf(getId()));
-        Texture texture = Texture.of(key, Writable.inputStream(icon));
+        Texture texture = Texture.of(key, Writable.inputStream(icon::getStream));
         tree.write(texture);
 
         Model model = Model.builder()
@@ -85,7 +84,7 @@ public class BasicItem extends Item {
     }
 
     public interface IconStep {
-        BuildStep icon(Callable<InputStream> icon);
+        BuildStep icon(Asset icon);
     }
 
     public interface BuildStep {
@@ -98,7 +97,7 @@ public class BasicItem extends Item {
         private int id;
         private String name;
         private ItemQuality quality;
-        private Callable<InputStream> icon;
+        private Asset icon;
         private String description;
 
         @Override
@@ -120,7 +119,7 @@ public class BasicItem extends Item {
         }
 
         @Override
-        public BuildStep icon(Callable<InputStream> icon) {
+        public BuildStep icon(Asset icon) {
             this.icon = icon;
             return this;
         }

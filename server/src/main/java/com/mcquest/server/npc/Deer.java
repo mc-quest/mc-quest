@@ -18,6 +18,7 @@ import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.event.player.PlayerChatEvent;
+import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 import java.time.Duration;
@@ -62,13 +63,13 @@ public class Deer extends NonPlayerCharacter {
     }
 
     @Override
-    public void setPosition(Pos position) {
+    public void setPosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(position.add(0.0, getHeight() / 2.0, 0.0));
     }
 
     @Override
-    public void damage(DamageSource source, double amount) {
+    public void damage(@NotNull DamageSource source, double amount) {
         if (source instanceof PlayerCharacter pc) {
             PlayerCharacterMusicPlayer musicPlayer = pc.getMusicPlayer();
             Song song = musicPlayer.getSong();
@@ -93,7 +94,7 @@ public class Deer extends NonPlayerCharacter {
     }
 
     @Override
-    public boolean isFriendly(Character character) {
+    public boolean isFriendly(@NotNull Character character) {
         return false;
     }
 

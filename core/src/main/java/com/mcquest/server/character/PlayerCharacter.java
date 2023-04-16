@@ -28,6 +28,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -186,7 +187,7 @@ public final class PlayerCharacter extends Character {
     }
 
     @Override
-    public void setInstance(Instance instance) {
+    public void setInstance(@NotNull Instance instance) {
         super.setInstance(instance);
         if (player.getInstance() != instance) {
             player.setInstance(instance).join();
@@ -222,7 +223,11 @@ public final class PlayerCharacter extends Character {
     }
 
     public Pos getTargetBlockPosition(double maxDistance) {
-        return Pos.fromPoint(player.getTargetBlockPosition((int) maxDistance));
+        Point target = player.getTargetBlockPosition((int) maxDistance);
+        if (target == null) {
+            return null;
+        }
+        return Pos.fromPoint(target);
     }
 
     public Player getPlayer() {
@@ -408,7 +413,7 @@ public final class PlayerCharacter extends Character {
     }
 
     @Override
-    public void damage(DamageSource source, double amount) {
+    public void damage(@NotNull DamageSource source, double amount) {
         super.damage(source, amount);
         player.damage(DamageType.VOID, 0.0f);
         if (getHealth() == 0.0) {
@@ -620,7 +625,7 @@ public final class PlayerCharacter extends Character {
     }
 
     @Override
-    public boolean isFriendly(Character other) {
+    public boolean isFriendly(@NotNull Character other) {
         if (other instanceof PlayerCharacter) {
             return true;
         }
@@ -638,7 +643,7 @@ public final class PlayerCharacter extends Character {
         return canAct;
     }
 
-    public void setCanAct() {
+    public void setCanAct(boolean canAct) {
         this.canAct = canAct;
         // TODO: disable skills, consumables, and basic attacks
     }

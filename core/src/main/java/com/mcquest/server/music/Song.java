@@ -1,5 +1,6 @@
 package com.mcquest.server.music;
 
+import com.mcquest.server.asset.Asset;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.gagravarr.ogg.OggFile;
@@ -8,17 +9,16 @@ import org.gagravarr.vorbis.VorbisFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.UncheckedIOException;
 import java.time.Duration;
-import java.util.concurrent.Callable;
 
 public class Song {
     private final int id;
-    private final Callable<InputStream> audio;
+    private final Asset audio;
     private final Sound sound;
     private final Duration duration;
 
-    public Song(int id, Callable<InputStream> audio) {
+    public Song(int id, Asset audio) {
         this.id = id;
         this.audio = audio;
         Key key = Key.key("music", String.valueOf(id));
@@ -26,18 +26,18 @@ public class Song {
         this.duration = computeDuration(audio);
     }
 
-    private static Duration computeDuration(Callable<InputStream> audio) {
+    private static Duration computeDuration(Asset audio) {
         try {
-            InputStream inputStream = audio.call();
-            OggFile oggFile = new OggFile(inputStream);
+            InputStream stream = audio.getStream();
+            OggFile oggFile = new OggFile(stream);
             VorbisFile vorbisFile = new VorbisFile(oggFile);
             OggAudioStatistics statistics = new OggAudioStatistics(vorbisFile, vorbisFile);
             statistics.calculate();
             long durationMillis = (long) (statistics.getDurationSeconds() * 1000.0);
-            inputStream.close();
+            stream.close();
             return Duration.ofMillis(durationMillis);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -45,7 +45,7 @@ public class Song {
         return id;
     }
 
-    public Callable<InputStream> getAudio() {
+    public Asset getAudio() {
         return audio;
     }
 

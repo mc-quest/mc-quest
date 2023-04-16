@@ -1,5 +1,6 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.SkillUnlockEvent;
@@ -9,9 +10,6 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
 
-import java.io.InputStream;
-import java.util.concurrent.Callable;
-
 public abstract class Skill {
     static final Material SKILL_MATERIAL = Material.WOODEN_AXE;
 
@@ -19,7 +17,7 @@ public abstract class Skill {
     private final String name;
     private final int level;
     private final @Nullable Integer prerequisiteId;
-    private final Callable<InputStream> icon;
+    private final Asset icon;
     private final String description;
     private final int skillTreeRow;
     private final int skillTreeColumn;
@@ -27,8 +25,7 @@ public abstract class Skill {
     PlayerClass playerClass;
 
     Skill(int id, String name, int level, @Nullable Integer prerequisiteId,
-          Callable<InputStream> icon, String description, int skillTreeRow,
-          int skillTreeColumn) {
+          Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
         this.id = id;
         this.name = name;
         this.level = level;
@@ -59,7 +56,7 @@ public abstract class Skill {
         return playerClass.getSkill(prerequisiteId);
     }
 
-    public Callable<InputStream> getIcon() {
+    public Asset getIcon() {
         return icon;
     }
 

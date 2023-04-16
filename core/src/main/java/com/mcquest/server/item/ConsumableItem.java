@@ -1,5 +1,6 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.ItemConsumeEvent;
 import net.kyori.adventure.text.Component;
@@ -7,10 +8,8 @@ import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * A ConsumableItem is an Item that can be consumed by a PlayerCharacter to
@@ -18,7 +17,7 @@ import java.util.concurrent.Callable;
  */
 public class ConsumableItem extends Item {
     private final int level;
-    private final Callable<InputStream> icon;
+    private final Asset icon;
     private final EventEmitter<ItemConsumeEvent> onConsume;
 
     ConsumableItem(Builder builder) {
@@ -32,7 +31,7 @@ public class ConsumableItem extends Item {
         return level;
     }
 
-    public Callable<InputStream> getIcon() {
+    public Asset getIcon() {
         return icon;
     }
 
@@ -84,7 +83,7 @@ public class ConsumableItem extends Item {
     }
 
     public interface IconStep {
-        BuildStep icon(Callable<InputStream> icon);
+        BuildStep icon(Asset icon);
     }
 
     public interface BuildStep {
@@ -99,7 +98,7 @@ public class ConsumableItem extends Item {
         private String name;
         private ItemQuality quality;
         private int level;
-        private Callable<InputStream> icon;
+        private Asset icon;
         private String description;
 
         @Override
@@ -127,7 +126,7 @@ public class ConsumableItem extends Item {
         }
 
         @Override
-        public BuildStep icon(Callable<InputStream> icon) {
+        public BuildStep icon(Asset icon) {
             this.icon = icon;
             return this;
         }

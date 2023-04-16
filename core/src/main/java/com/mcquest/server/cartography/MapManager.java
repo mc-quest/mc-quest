@@ -3,9 +3,7 @@ package com.mcquest.server.cartography;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.PlayerCharacterMoveEvent;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerMoveEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -29,6 +27,7 @@ public class MapManager {
         if (mapsById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
+        mapsById.put(id, map);
     }
 
     private void handlePlayerMove(PlayerCharacterMoveEvent event) {

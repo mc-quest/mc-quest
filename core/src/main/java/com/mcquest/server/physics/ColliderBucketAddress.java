@@ -23,11 +23,10 @@ class ColliderBucketAddress {
             return true;
         }
 
-        if (!(o instanceof ColliderBucketAddress)) {
+        if (!(o instanceof ColliderBucketAddress address)) {
             return false;
         }
 
-        ColliderBucketAddress address = (ColliderBucketAddress) o;
         return this.instance == address.instance && this.x == address.x
                 && this.y == address.y && this.z == address.z;
     }

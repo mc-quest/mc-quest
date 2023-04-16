@@ -1,11 +1,13 @@
 package com.mcquest.server;
 
+import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetDirectory;
 import com.mcquest.server.constants.*;
 import com.mcquest.server.db.Database;
-import com.mcquest.server.util.ResourceUtility;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
 
+import java.io.File;
 import java.util.List;
 
 public class Main {
@@ -34,16 +36,20 @@ public class Main {
     }
 
     private static void extractWorldResources() {
-        ResourceUtility.extractResources("worlds", "world");
+        ClassLoader classLoader = Main.class.getClassLoader();
+        AssetDirectory worldsDir = new AssetDirectory(classLoader, "worlds");
+        File worldDir = new File("world");
+        worldsDir.extractAssets(worldDir);
     }
 
     private static void writeResourcePack(FileTree tree) {
+        ClassLoader classLoader = Main.class.getClassLoader();
         String basePath = "resourcepack";
-        List<String> paths = ResourceUtility.getResources(basePath);
-        for (String path : paths) {
-            String subPath = path.substring(basePath.length() + 1);
-            tree.write(subPath, Writable.inputStream(
-                    ResourceUtility.streamSupplier(path)));
+        AssetDirectory resourcePackDir = new AssetDirectory(classLoader, basePath);
+        List<Asset> assets = resourcePackDir.getAssets();
+        for (Asset asset : assets) {
+            String subPath = asset.getPath().substring(basePath.length() + 1);
+            tree.write(subPath, Writable.inputStream(asset::getStream));
         }
     }
 }

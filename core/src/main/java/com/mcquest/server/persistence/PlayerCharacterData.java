@@ -5,7 +5,7 @@ import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.music.Song;
 import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.util.ResourceUtility;
+import com.mcquest.server.util.JsonUtility;
 import com.mcquest.server.zone.Zone;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.Nullable;
@@ -79,7 +79,7 @@ public class PlayerCharacterData {
     }
 
     public PlayerCharacter fromJson(String json) {
-        return ResourceUtility.parseJson(json, PlayerCharacter.class);
+        return JsonUtility.parse(json, PlayerCharacter.class);
     }
 
     public int getPlayerClassId() {
@@ -155,6 +155,6 @@ public class PlayerCharacterData {
     }
 
     public String toJson() {
-        return ResourceUtility.jsonStringify(this);
+        return JsonUtility.stringify(this);
     }
 }

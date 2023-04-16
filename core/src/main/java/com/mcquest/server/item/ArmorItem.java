@@ -1,8 +1,9 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.EventEmitter;
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.event.ArmorEquipEvent;
 import com.mcquest.server.event.ArmorUnequipEvent;
+import com.mcquest.server.event.EventEmitter;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.color.Color;
 import net.minestom.server.item.Material;
@@ -10,11 +11,9 @@ import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 /**
  * An ArmorItem is an Item that can be equipped by a PlayerCharacter to provide
@@ -30,7 +29,7 @@ public class ArmorItem extends Item {
     private final ArmorSlot slot;
     private Material material;
     private Color color;
-    private final Callable<InputStream> model;
+    private final Asset model;
     private final double protections;
     private final EventEmitter<ArmorEquipEvent> onEquip;
     private final EventEmitter<ArmorUnequipEvent> onUnequip;
@@ -126,7 +125,7 @@ public class ArmorItem extends Item {
     }
 
     public interface ModelStep {
-        BuildStep model(Callable<InputStream> model);
+        BuildStep model(Asset model);
 
         BuildStep model(Material model);
     }
@@ -152,7 +151,7 @@ public class ArmorItem extends Item {
         private String description;
         private Material materialModel;
         private Color color;
-        private Callable<InputStream> model;
+        private Asset model;
         private double protections;
 
         @Override
@@ -192,7 +191,7 @@ public class ArmorItem extends Item {
         }
 
         @Override
-        public BuildStep model(Callable<InputStream> model) {
+        public BuildStep model(Asset model) {
             if (slot != ArmorSlot.HEAD) {
                 throw new IllegalStateException();
             }

@@ -1,25 +1,21 @@
 package com.mcquest.server.cartography;
 
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestMarker;
 import com.mcquest.server.quest.QuestMarkerIcon;
-import com.mcquest.server.util.ResourceUtility;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.map.framebuffers.Graphics2DFramebuffer;
 import net.minestom.server.network.packet.server.play.MapDataPacket;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class AreaMap {
     static final int MAP_ID = 1;
@@ -34,13 +30,11 @@ public class AreaMap {
     private final BufferedImage image;
     private final Collection<QuestMarker> questMarkers;
 
-    public AreaMap(int id, Pos origin, Callable<InputStream> image) {
+    public AreaMap(int id, Pos origin, Asset image) {
         try {
             this.id = id;
             this.origin = origin;
-            InputStream inputStream = image.call();
-            this.image = ImageIO.read(inputStream);
-            inputStream.close();
+            this.image = image.readImage();
             this.questMarkers = new ArrayList<>();
         } catch (Exception e) {
             throw new RuntimeException(e);

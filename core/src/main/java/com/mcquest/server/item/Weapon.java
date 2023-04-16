@@ -1,19 +1,17 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.event.EventEmitter;
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.event.AutoAttackEvent;
+import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.WeaponEquipEvent;
 import com.mcquest.server.event.WeaponUnequipEvent;
-import com.mcquest.server.resourcepack.ResourcePackUtility;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
@@ -22,7 +20,7 @@ import java.util.concurrent.Callable;
 public class Weapon extends Item {
     private final int level;
     private final WeaponType type;
-    private final Callable<InputStream> model;
+    private final Asset model;
     private final double attackSpeed;
     private final double physicalDamage;
     private final EventEmitter<WeaponEquipEvent> onEquip;
@@ -53,7 +51,7 @@ public class Weapon extends Item {
         return type;
     }
 
-    public Callable<InputStream> getModel() {
+    public Asset getModel() {
         return model;
     }
 
@@ -130,7 +128,7 @@ public class Weapon extends Item {
     }
 
     public interface ModelStep {
-        AttackSpeedStep model(Callable<InputStream> model);
+        AttackSpeedStep model(Asset model);
     }
 
     public interface AttackSpeedStep {
@@ -152,7 +150,7 @@ public class Weapon extends Item {
         private ItemQuality quality;
         private int level;
         private WeaponType type;
-        private Callable<InputStream> model;
+        private Asset model;
         private double attackSpeed;
         private double physicalDamage;
         private String description;
@@ -188,7 +186,7 @@ public class Weapon extends Item {
         }
 
         @Override
-        public AttackSpeedStep model(Callable<InputStream> model) {
+        public AttackSpeedStep model(Asset model) {
             this.model = model;
             return this;
         }

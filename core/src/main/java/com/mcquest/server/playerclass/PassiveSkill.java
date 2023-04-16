@@ -1,5 +1,6 @@
 package com.mcquest.server.playerclass;
 
+import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.util.ItemStackUtility;
 import com.mcquest.server.util.TextUtility;
@@ -12,15 +13,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class PassiveSkill extends Skill {
     PassiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                 Callable<InputStream> icon, String description, int skillTreeRow,
-                 int skillTreeColumn) {
+                 Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
         super(id, name, level, prerequisiteId, icon, description, skillTreeRow, skillTreeColumn);
     }
 

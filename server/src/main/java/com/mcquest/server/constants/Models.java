@@ -8,11 +8,16 @@ import team.unnamed.hephaestus.reader.blockbench.BBModelReader;
 
 public class Models {
     private static final ModelReader reader = BBModelReader.blockbench();
+
     public static final Model DEER = loadModel("deer_antler");
+    public static final Model CROW = loadModel("crow");
+    public static final Model WOLF_SPIDER = loadModel("wolf_spider");
 
     public static Model[] all() {
         return new Model[]{
-                DEER
+                DEER,
+                CROW,
+                WOLF_SPIDER
         };
     }
 

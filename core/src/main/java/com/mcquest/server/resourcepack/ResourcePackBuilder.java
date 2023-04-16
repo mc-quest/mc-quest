@@ -2,6 +2,7 @@ package com.mcquest.server.resourcepack;
 
 import com.mcquest.server.item.Item;
 import com.mcquest.server.music.Song;
+import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.Skill;
 import net.kyori.adventure.key.Key;
 import team.unnamed.creative.ResourcePack;
@@ -23,15 +24,15 @@ import java.util.function.Consumer;
 
 class ResourcePackBuilder {
     private final Consumer<FileTree> baseWriter;
-    private final Skill[] skills;
+    private final PlayerClass[] playerClasses;
     private final Item[] items;
     private final Song[] music;
     private final Model[] models;
 
-    ResourcePackBuilder(Consumer<FileTree> baseWriter, Skill[] skills,
+    ResourcePackBuilder(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
                         Item[] items, Song[] music, Model[] models) {
         this.baseWriter = baseWriter;
-        this.skills = skills;
+        this.playerClasses = playerClasses;
         this.items = items;
         this.music = music;
         this.models = models;
@@ -68,8 +69,10 @@ class ResourcePackBuilder {
 
     private void writeSkillResources(FileTree tree) {
         int customModelData = 0;
-        for (Skill skill : skills) {
-            customModelData += skill.writeResources(tree, customModelData);
+        for (PlayerClass playerClass : playerClasses) {
+            for (Skill skill : playerClass.getSkills()) {
+                customModelData += skill.writeResources(tree, customModelData);
+            }
         }
     }
 

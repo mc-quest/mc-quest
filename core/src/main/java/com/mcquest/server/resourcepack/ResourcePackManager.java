@@ -2,14 +2,16 @@ package com.mcquest.server.resourcepack;
 
 import com.mcquest.server.item.Item;
 import com.mcquest.server.music.Song;
-import com.mcquest.server.playerclass.Skill;
+import com.mcquest.server.playerclass.PlayerClass;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.server.ResourcePackServer;
 import team.unnamed.hephaestus.Model;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 @ApiStatus.Internal
@@ -18,10 +20,10 @@ public class ResourcePackManager {
     private ResourcePackServer server;
     private String resourcePackUrl;
 
-    public ResourcePackManager(Consumer<FileTree> baseWriter, Skill[] skills,
+    public ResourcePackManager(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
                                Item[] items, Song[] music, Model[] models) {
         ResourcePackBuilder builder = new ResourcePackBuilder(
-                baseWriter, skills, items, music, models);
+                baseWriter, playerClasses, items, music, models);
         resourcePack = builder.build();
     }
 

@@ -19,7 +19,6 @@ import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.PlayerClassManager;
-import com.mcquest.server.playerclass.Skill;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.resourcepack.ResourcePackManager;
@@ -35,8 +34,6 @@ import net.minestom.server.timer.SchedulerManager;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.hephaestus.Model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -76,13 +73,9 @@ public class Mmorpg {
         npcSpawner = new NonPlayerCharacterSpawner();
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
-        Collection<Skill> skills = new ArrayList<>();
-        for (PlayerClass playerClass : builder.playerClasses) {
-            skills.addAll(playerClass.getSkills());
-        }
         resourcePackManager = new ResourcePackManager(
                 builder.resourcePackWriter,
-                skills.toArray(new Skill[0]),
+                builder.playerClasses,
                 builder.items,
                 builder.music,
                 builder.models

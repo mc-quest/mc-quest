@@ -1,6 +1,7 @@
 package com.mcquest.server.music;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.gagravarr.ogg.OggFile;
@@ -20,6 +21,7 @@ public class Song {
 
     public Song(int id, Asset audio) {
         this.id = id;
+        audio.ensureType(AssetTypes.OGG);
         this.audio = audio;
         Key key = Key.key("music", String.valueOf(id));
         this.sound = Sound.sound(key, Sound.Source.MUSIC, 1f, 1f);

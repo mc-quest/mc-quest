@@ -1,5 +1,6 @@
 package com.mcquest.server.constants;
 
+import com.mcquest.server.Assets;
 import com.mcquest.server.asset.Asset;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.reader.ModelReader;
@@ -16,9 +17,8 @@ public class Models {
     }
 
     private static Model loadModel(String name) {
-        ClassLoader classLoader = Models.class.getClassLoader();
         String path = "models/" + name + ".bbmodel";
-        Asset asset = new Asset(classLoader, path);
+        Asset asset = Assets.asset(path);
         return asset.readModel(reader);
     }
 }

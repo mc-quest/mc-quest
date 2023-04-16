@@ -3,6 +3,7 @@ package com.mcquest.server.constants;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcquest.server.Assets;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.playerclass.PlayerClass;
 
@@ -20,10 +21,9 @@ public class PlayerClasses {
     }
 
     private static PlayerClass loadPlayerClass(String dirName, String fileName) {
-        ClassLoader classLoader = PlayerClasses.class.getClassLoader();
         String dirPath = "playerclasses/" + dirName;
         String filePath = dirPath + "/" + fileName;
-        JsonObject object = new Asset(classLoader, filePath).readJson().getAsJsonObject();
+        JsonObject object = Assets.asset(filePath).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         PlayerClass.Builder builder = PlayerClass.builder(id, name);
@@ -37,7 +37,7 @@ public class PlayerClasses {
             Integer skillPrerequisiteId = skillPrerequisiteIdElement.isJsonNull() ? null
                     : skillPrerequisiteIdElement.getAsInt();
             String skillIconPath = dirPath + "/icons/" + skillObject.get("icon").getAsString();
-            Asset skillIcon = new Asset(classLoader, skillIconPath);
+            Asset skillIcon = Assets.asset(skillIconPath);
             String skillDescription = skillObject.get("description").getAsString();
             int skillTreeRow = skillObject.get("skillTreeRow").getAsInt();
             int skillTreeColumn = skillObject.get("skillTreeColumn").getAsInt();

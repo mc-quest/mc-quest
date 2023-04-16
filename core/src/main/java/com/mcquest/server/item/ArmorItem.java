@@ -1,6 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.event.ArmorEquipEvent;
 import com.mcquest.server.event.ArmorUnequipEvent;
 import com.mcquest.server.event.EventEmitter;
@@ -195,6 +196,7 @@ public class ArmorItem extends Item {
             if (slot != ArmorSlot.HEAD) {
                 throw new IllegalStateException();
             }
+            model.ensureType(AssetTypes.BBMODEL);
             this.model = model;
             return this;
         }

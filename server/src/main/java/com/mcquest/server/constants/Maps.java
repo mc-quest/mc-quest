@@ -1,5 +1,6 @@
 package com.mcquest.server.constants;
 
+import com.mcquest.server.Assets;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.cartography.AreaMap;
 import net.minestom.server.coordinate.Pos;
@@ -15,8 +16,7 @@ public class Maps {
     }
 
     private static Asset image(String name) {
-        ClassLoader classLoader = Maps.class.getClassLoader();
         String path = "maps/" + name + ".png";
-        return new Asset(classLoader, path);
+        return Assets.asset(path);
     }
 }

@@ -3,7 +3,7 @@ package com.mcquest.server.asset;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mcquest.server.util.JsonUtility;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.reader.ModelReader;
 
@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.util.Objects;
 
 public class Asset {
     private final ClassLoader classLoader;
@@ -27,12 +28,19 @@ public class Asset {
         return path;
     }
 
-    public String getType() {
+    public @Nullable String getType() {
         int dotIndex = path.lastIndexOf('.');
         if (dotIndex == -1) {
             return null;
         }
         return path.substring(dotIndex + 1);
+    }
+
+    public void ensureType(String type) {
+        String actualType = getType();
+        if (!Objects.equals(actualType, type)) {
+            throw new AssetTypeException(type, actualType);
+        }
     }
 
     public InputStream getStream() {
@@ -47,7 +55,7 @@ public class Asset {
         }
     }
 
-    public <T> T deserializeJson(@NotNull Class<T> classOfT) {
+    public <T> T readJson(Class<T> classOfT) {
         try (InputStreamReader reader = new InputStreamReader(getStream())) {
             return JsonUtility.parse(reader, classOfT);
         } catch (IOException e) {

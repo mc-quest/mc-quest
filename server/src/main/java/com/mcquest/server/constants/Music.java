@@ -1,5 +1,6 @@
 package com.mcquest.server.constants;
 
+import com.mcquest.server.Assets;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.music.Song;
 
@@ -13,8 +14,7 @@ public class Music {
     }
 
     private static Asset audio(String name) {
-        ClassLoader classLoader = Music.class.getClassLoader();
         String path = "music/" + name + ".ogg";
-        return new Asset(classLoader, path);
+        return Assets.asset(path);
     }
 }

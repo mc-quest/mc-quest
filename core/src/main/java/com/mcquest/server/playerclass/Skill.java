@@ -30,6 +30,7 @@ public abstract class Skill {
         this.name = name;
         this.level = level;
         this.prerequisiteId = prerequisiteId;
+        icon.ensureType("png");
         this.icon = icon;
         this.description = description;
         this.skillTreeRow = skillTreeRow;

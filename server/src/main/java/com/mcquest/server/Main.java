@@ -36,16 +36,14 @@ public class Main {
     }
 
     private static void extractWorldResources() {
-        ClassLoader classLoader = Main.class.getClassLoader();
-        AssetDirectory worldsDir = new AssetDirectory(classLoader, "worlds");
+        AssetDirectory worldsDir = Assets.directory("worlds");
         File worldDir = new File("world");
         worldsDir.extractAssets(worldDir);
     }
 
     private static void writeResourcePack(FileTree tree) {
-        ClassLoader classLoader = Main.class.getClassLoader();
         String basePath = "resourcepack";
-        AssetDirectory resourcePackDir = new AssetDirectory(classLoader, basePath);
+        AssetDirectory resourcePackDir = Assets.directory(basePath);
         List<Asset> assets = resourcePackDir.getAssets();
         for (Asset asset : assets) {
             String subPath = asset.getPath().substring(basePath.length() + 1);

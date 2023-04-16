@@ -1,6 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.ItemConsumeEvent;
 import net.kyori.adventure.text.Component;
@@ -127,6 +128,7 @@ public class ConsumableItem extends Item {
 
         @Override
         public BuildStep icon(Asset icon) {
+            icon.ensureType(AssetTypes.PNG);
             this.icon = icon;
             return this;
         }

@@ -1,6 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.ApiStatus;
@@ -120,6 +121,7 @@ public class BasicItem extends Item {
 
         @Override
         public BuildStep icon(Asset icon) {
+            icon.ensureType(AssetTypes.PNG);
             this.icon = icon;
             return this;
         }

@@ -1,6 +1,7 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.event.AutoAttackEvent;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.WeaponEquipEvent;
@@ -187,6 +188,7 @@ public class Weapon extends Item {
 
         @Override
         public AttackSpeedStep model(Asset model) {
+            model.ensureType(AssetTypes.BBMODEL);
             this.model = model;
             return this;
         }

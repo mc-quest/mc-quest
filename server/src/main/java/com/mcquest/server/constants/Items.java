@@ -1,6 +1,7 @@
 package com.mcquest.server.constants;
 
 import com.google.gson.JsonObject;
+import com.mcquest.server.Assets;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.item.*;
 
@@ -16,15 +17,14 @@ public class Items {
     }
 
     private static BasicItem loadBasicItem(String fileName) {
-        ClassLoader classLoader = Items.class.getClassLoader();
         String basePath = "items/basic/" + fileName;
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
-        JsonObject object = new Asset(classLoader, itemPath).readJson().getAsJsonObject();
+        JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
-        Asset icon = new Asset(classLoader, iconPath);
+        Asset icon = Assets.asset(iconPath);
         BasicItem.BuildStep builder = BasicItem.builder()
                 .id(id)
                 .name(name)
@@ -37,17 +37,16 @@ public class Items {
     }
 
     private static Weapon loadWeapon(String fileName) {
-        ClassLoader classLoader = Items.class.getClassLoader();
         String basePath = "items/weapons/" + fileName;
         String itemPath = basePath + ".json";
         String modelPath = basePath + ".bbmodel";
-        JsonObject object = new Asset(classLoader, itemPath).readJson().getAsJsonObject();
+        JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
-        Asset model = new Asset(classLoader, modelPath);
+        Asset model = Assets.asset(modelPath);
         double attackSpeed = object.get("attackSpeed").getAsDouble();
         Weapon.BuildStep builder = Weapon.builder()
                 .id(id)
@@ -68,18 +67,17 @@ public class Items {
     }
 
     private static ArmorItem loadArmor(String fileName) {
-        ClassLoader classLoader = Items.class.getClassLoader();
         String basePath = "items/armor/" + fileName;
         String itemPath = basePath + ".json";
         String modelPath = basePath + ".bbmodel";
-        JsonObject object = new Asset(classLoader, itemPath).readJson().getAsJsonObject();
+        JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
-        Asset model = new Asset(classLoader, modelPath);
+        Asset model = Assets.asset(modelPath);
         ArmorItem.BuildStep builder = ArmorItem.builder()
                 .id(id)
                 .name(name)
@@ -98,16 +96,15 @@ public class Items {
     }
 
     private static ConsumableItem loadConsumable(String fileName) {
-        ClassLoader classLoader = Items.class.getClassLoader();
         String basePath = "items/weapons/" + fileName;
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
-        JsonObject object = new Asset(classLoader, itemPath).readJson().getAsJsonObject();
+        JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
         int id = object.get("id").getAsInt();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
-        Asset icon = new Asset(classLoader, iconPath);
+        Asset icon = Assets.asset(iconPath);
         ConsumableItem.BuildStep builder = ConsumableItem.builder()
                 .id(id)
                 .name(name)

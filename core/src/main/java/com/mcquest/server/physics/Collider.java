@@ -18,7 +18,7 @@ public class Collider {
     private @NotNull Pos min, max;
     private Consumer<Collider> onCollisionEnter;
     private Consumer<Collider> onCollisionExit;
-    private final Set<ColliderBucketAddress> occupiedBuckets;
+    private final Set<SpatialHashCell> occupiedCells;
     private final Set<Collider> contacts;
     private PhysicsManager physicsManager;
 
@@ -29,7 +29,7 @@ public class Collider {
         this.max = max;
         onCollisionEnter = null;
         onCollisionExit = null;
-        occupiedBuckets = new HashSet<>();
+        occupiedCells = new HashSet<>();
         contacts = new HashSet<>();
         physicsManager = null;
     }
@@ -117,7 +117,7 @@ public class Collider {
         }
 
         this.physicsManager = physicsManager;
-        updateOccupiedBuckets();
+        updateOccupiedCells();
         checkForCollisions();
     }
 
@@ -127,10 +127,10 @@ public class Collider {
             return;
         }
 
-        for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
-            removeFromBucket(bucketAddress);
+        for (SpatialHashCell cell : occupiedCells) {
+            removeFromCell(cell);
         }
-        occupiedBuckets.clear();
+        occupiedCells.clear();
 
         Set<Collider> oldContacts = new HashSet<>(contacts);
         contacts.clear();
@@ -158,60 +158,58 @@ public class Collider {
 
     private void handleChange() {
         if (physicsManager != null) {
-            updateOccupiedBuckets();
+            updateOccupiedCells();
             checkForCollisions();
         }
     }
 
-    private void updateOccupiedBuckets() {
-        // Compute new buckets.
-        Set<ColliderBucketAddress> newOccupiedBuckets = new HashSet<>();
-        int minBucketX = (int) Math.floor(min.x() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        int minBucketY = (int) Math.floor(min.y() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        int minBucketZ = (int) Math.floor(min.z() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        int maxBucketX = (int) Math.floor(max.x() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        int maxBucketY = (int) Math.floor(max.y() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        int maxBucketZ = (int) Math.floor(max.z() / PhysicsManager.COLLIDER_BUCKET_SIZE);
-        for (int x = minBucketX; x <= maxBucketX; x++) {
-            for (int y = minBucketY; y <= maxBucketY; y++) {
-                for (int z = minBucketZ; z <= maxBucketZ; z++) {
-                    ColliderBucketAddress address = new ColliderBucketAddress(instance, x, y, z);
-                    newOccupiedBuckets.add(address);
-                    if (!physicsManager.colliderBuckets.containsKey(address)) {
-                        physicsManager.colliderBuckets.put(address, new HashSet<>());
+    private void updateOccupiedCells() {
+        // Compute new cells.
+        Set<SpatialHashCell> newOccupiedCells = new HashSet<>();
+
+        SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, PhysicsManager.CELL_SIZE);
+        SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, PhysicsManager.CELL_SIZE);
+
+        for (int x = minCell.getX(); x <= maxCell.getX(); x++) {
+            for (int y = minCell.getY(); y <= maxCell.getY(); y++) {
+                for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
+                    SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
+                    newOccupiedCells.add(cell);
+                    if (!physicsManager.colliders.containsKey(cell)) {
+                        physicsManager.colliders.put(cell, new HashSet<>());
                     }
-                    Set<Collider> bucket = physicsManager.colliderBuckets.get(address);
+                    Set<Collider> cellColliders = physicsManager.colliders.get(cell);
                     // Redundant adding is fine.
-                    bucket.add(this);
+                    cellColliders.add(this);
                 }
             }
         }
 
-        // Remove from old buckets.
-        for (ColliderBucketAddress oldAddress : occupiedBuckets) {
-            if (!newOccupiedBuckets.contains(oldAddress)) {
-                removeFromBucket(oldAddress);
+        // Remove from old cells.
+        for (SpatialHashCell oldCell : occupiedCells) {
+            if (!newOccupiedCells.contains(oldCell)) {
+                removeFromCell(oldCell);
             }
         }
 
-        occupiedBuckets.clear();
-        occupiedBuckets.addAll(newOccupiedBuckets);
+        occupiedCells.clear();
+        occupiedCells.addAll(newOccupiedCells);
     }
 
-    private void removeFromBucket(ColliderBucketAddress address) {
-        Set<Collider> bucket = physicsManager.colliderBuckets.get(address);
-        bucket.remove(this);
-        if (bucket.isEmpty()) {
-            physicsManager.colliderBuckets.remove(address);
+    private void removeFromCell(SpatialHashCell cell) {
+        Set<Collider> cellColliders = physicsManager.colliders.get(cell);
+        cellColliders.remove(this);
+        if (cellColliders.isEmpty()) {
+            physicsManager.colliders.remove(cell);
         }
     }
 
     private void checkForCollisions() {
         Set<Collider> enteringColliders = new HashSet<>();
         Set<Collider> exitingColliders = new HashSet<>();
-        for (ColliderBucketAddress bucketAddress : occupiedBuckets) {
-            Set<Collider> bucket = new HashSet<>(physicsManager.colliderBuckets.get(bucketAddress));
-            for (Collider other : bucket) {
+        for (SpatialHashCell cell : occupiedCells) {
+            Set<Collider> cellColliders = new HashSet<>(physicsManager.colliders.get(cell));
+            for (Collider other : cellColliders) {
                 if (this == other) {
                     continue;
                 }

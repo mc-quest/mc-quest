@@ -11,15 +11,15 @@ import java.util.function.Predicate;
 
 public class PhysicsManager {
     /**
-     * The lengths, widths, and heights of collider buckets.
+     * The lengths, widths, and heights of collider cells in the spatial hash.
      */
-    static final int COLLIDER_BUCKET_SIZE = 256;
+    static final double CELL_SIZE = 256.0;
 
-    final Map<ColliderBucketAddress, Set<Collider>> colliderBuckets;
+    final Map<SpatialHashCell, Set<Collider>> colliders;
 
     @ApiStatus.Internal
     public PhysicsManager() {
-        colliderBuckets = new HashMap<>();
+        colliders = new HashMap<>();
     }
 
     public void addCollider(Collider collider) {
@@ -40,23 +40,17 @@ public class PhysicsManager {
         Pos min = MathUtility.min(origin, end);
         Pos max = MathUtility.max(origin, end);
 
-        int bucketMinX = (int) Math.floor(min.x() / COLLIDER_BUCKET_SIZE);
-        int bucketMinY = (int) Math.floor(min.y() / COLLIDER_BUCKET_SIZE);
-        int bucketMinZ = (int) Math.floor(min.z() / COLLIDER_BUCKET_SIZE);
-
-        int bucketMaxX = (int) Math.floor(max.x() / COLLIDER_BUCKET_SIZE);
-        int bucketMaxY = (int) Math.floor(max.y() / COLLIDER_BUCKET_SIZE);
-        int bucketMaxZ = (int) Math.floor(max.z() / COLLIDER_BUCKET_SIZE);
+        SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, CELL_SIZE);
+        SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, CELL_SIZE);
 
         Set<Collider> nearbyColliders = new HashSet<>();
-
-        for (int x = bucketMinX; x <= bucketMaxX; x++) {
-            for (int y = bucketMinY; y <= bucketMaxY; y++) {
-                for (int z = bucketMinZ; z <= bucketMaxZ; z++) {
-                    ColliderBucketAddress bucketAddress = new ColliderBucketAddress(instance, x, y, z);
-                    Set<Collider> bucket = colliderBuckets.get(bucketAddress);
-                    if (bucket != null) {
-                        for (Collider collider : bucket) {
+        for (int x = minCell.getX(); x <= maxCell.getX(); x++) {
+            for (int y = minCell.getY(); y <= maxCell.getY(); y++) {
+                for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
+                    SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
+                    Set<Collider> cellColliders = colliders.get(cell);
+                    if (cellColliders != null) {
+                        for (Collider collider : cellColliders) {
                             if (filter.test(collider)) {
                                 nearbyColliders.add(collider);
                             }

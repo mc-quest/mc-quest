@@ -70,7 +70,7 @@ public class Mmorpg {
                 builder.pcDataProvider,
                 builder.pcLogoutHandler
         );
-        npcSpawner = new NonPlayerCharacterSpawner();
+        npcSpawner = new NonPlayerCharacterSpawner(this);
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
         resourcePackManager = new ResourcePackManager(

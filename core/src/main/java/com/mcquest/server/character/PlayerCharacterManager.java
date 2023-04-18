@@ -95,11 +95,12 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
-        pc.remove();
         logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
         eventHandler.call(event);
+        pc.remove();
+        pcs.remove(pc.getPlayer());
     }
 
     private void handlePlayerMove(PlayerMoveEvent event) {
@@ -110,13 +111,6 @@ public class PlayerCharacterManager {
         if (!pcMoveEvent.isCancelled()) {
             pc.setPosition(pcMoveEvent.getNewPosition());
         }
-    }
-
-    @ApiStatus.Internal
-    public void remove(PlayerCharacter pc) {
-        Player player = pc.getPlayer();
-        pcs.remove(player);
-        mmorpg.getCharacterEntityManager().unbind(player);
     }
 
     private void regeneratePlayerCharacters() {

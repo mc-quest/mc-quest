@@ -1,6 +1,7 @@
 package com.mcquest.server.cartography;
 
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestMarker;
@@ -34,6 +35,7 @@ public class AreaMap {
         try {
             this.id = id;
             this.origin = origin;
+            image.ensureType(AssetTypes.PNG);
             this.image = image.readImage();
             this.questMarkers = new ArrayList<>();
         } catch (Exception e) {

@@ -12,6 +12,7 @@ import team.unnamed.hephaestus.Model;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
 @ApiStatus.Internal
@@ -36,7 +37,7 @@ public class ResourcePackManager {
                     .build();
             server.start();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -55,7 +56,7 @@ public class ResourcePackManager {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             outputStream.write(resourcePack.bytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 }

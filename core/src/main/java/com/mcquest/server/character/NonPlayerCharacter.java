@@ -38,9 +38,14 @@ public class NonPlayerCharacter extends Character {
     @MustBeInvokedByOverriders
     @Override
     public void damage(@NotNull DamageSource source, double amount) {
+        double prevHealth = getHealth();
         super.damage(source, amount);
-        if (getHealth() == 0) {
-            despawn();
+        double newHealth = getHealth();
+        if (prevHealth != newHealth && newHealth == 0.0) {
+            if (isSpawned) {
+                despawn();
+                spawner.handleDeath(this);
+            }
         }
     }
 

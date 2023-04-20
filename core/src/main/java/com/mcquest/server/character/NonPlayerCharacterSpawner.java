@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class NonPlayerCharacterSpawner {
-    private static final double CELL_SIZE = 85.0;
+    private static final double CELL_SIZE = 256.0;
     private static final double SPAWN_RADIUS = 75.0;
     private static final double DESPAWN_RADIUS = 85.0;
 
@@ -55,7 +55,7 @@ public class NonPlayerCharacterSpawner {
                         if (cellNpcs != null) {
                             for (NonPlayerCharacter npc : cellNpcs) {
                                 if (npc.getPosition().distanceSquared(pcPosition) <= SPAWN_RADIUS * SPAWN_RADIUS
-                                        && !npc.isSpawned()) {
+                                        && !npc.isSpawned() && npc.isAlive()) {
                                     toSpawn.add(npc);
                                 }
                                 if (npc.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS
@@ -86,6 +86,7 @@ public class NonPlayerCharacterSpawner {
         if (npc.spawner != null) {
             throw new IllegalArgumentException("npc already added");
         }
+        npc.spawner = this;
         Instance instance = npc.getInstance();
         Pos position = npc.getPosition();
         SpatialHashCell cell = SpatialHashCell.cellAt(instance, position, CELL_SIZE);
@@ -98,6 +99,7 @@ public class NonPlayerCharacterSpawner {
         }
         if (npc.isSpawned()) {
             npc.despawn();
+            spawnedNpcs.remove(npc);
         }
         npc.spawner = null;
         Instance instance = npc.getInstance();
@@ -113,8 +115,12 @@ public class NonPlayerCharacterSpawner {
         SpatialHashCell newCell = SpatialHashCell.cellAt(newInstance, newPosition, CELL_SIZE);
         if (!newCell.equals(prevCell)) {
             removeFromCell(prevCell, npc);
-            addToCell(prevCell, npc);
+            addToCell(newCell, npc);
         }
+    }
+
+    void handleDeath(NonPlayerCharacter npc) {
+        spawnedNpcs.remove(npc);
     }
 
     private void addToCell(SpatialHashCell cell, NonPlayerCharacter npc) {

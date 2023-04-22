@@ -9,9 +9,9 @@ import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.*;
 import com.mcquest.server.mount.Mount;
-import com.mcquest.server.music.MusicManager;
-import com.mcquest.server.music.PlayerCharacterMusicPlayer;
-import com.mcquest.server.music.Song;
+import com.mcquest.server.audio.MusicManager;
+import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.persistence.PersistentQuestObjectiveData;
 import com.mcquest.server.persistence.PlayerCharacterData;
@@ -24,6 +24,7 @@ import com.mcquest.server.quest.QuestManager;
 import com.mcquest.server.util.MathUtility;
 import com.mcquest.server.zone.Zone;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
@@ -619,6 +620,10 @@ public final class PlayerCharacter extends Character {
 
     public void playSound(Sound sound) {
         player.playSound(sound);
+    }
+
+    public void stopSound(SoundStop stop) {
+        player.stopSound(stop);
     }
 
     @Override

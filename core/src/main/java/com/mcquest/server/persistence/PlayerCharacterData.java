@@ -3,7 +3,7 @@ package com.mcquest.server.persistence;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.Weapon;
-import com.mcquest.server.music.Song;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.util.JsonUtility;
 import com.mcquest.server.zone.Zone;

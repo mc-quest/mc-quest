@@ -1,4 +1,4 @@
-package com.mcquest.server.music;
+package com.mcquest.server.audio;
 
 import java.util.HashMap;
 import java.util.Map;

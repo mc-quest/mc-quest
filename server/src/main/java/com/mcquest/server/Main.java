@@ -28,6 +28,7 @@ public class Main {
                 .mounts(Mounts.all())
                 .instances(Instances.all())
                 .models(Models.all())
+                .audio(AudioClips.all())
                 .features(Features.all())
                 .resourcePack(Main::writeResourcePack)
                 .playerCharacterDataProvider(database::getPlayerCharacterData)

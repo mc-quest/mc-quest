@@ -1,7 +1,8 @@
 package com.mcquest.server.resourcepack;
 
+import com.mcquest.server.audio.AudioClip;
 import com.mcquest.server.item.Item;
-import com.mcquest.server.music.Song;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
@@ -22,9 +23,9 @@ public class ResourcePackManager {
     private String resourcePackUrl;
 
     public ResourcePackManager(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
-                               Item[] items, Song[] music, Model[] models) {
+                               Item[] items, Model[] models, AudioClip[] audio) {
         ResourcePackBuilder builder = new ResourcePackBuilder(
-                baseWriter, playerClasses, items, music, models);
+                baseWriter, playerClasses, items, models, audio);
         resourcePack = builder.build();
     }
 

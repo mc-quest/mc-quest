@@ -6,9 +6,10 @@ import com.mcquest.server.character.*;
 import com.mcquest.server.constants.Models;
 import com.mcquest.server.constants.Music;
 import com.mcquest.server.instance.Instance;
-import com.mcquest.server.music.PlayerCharacterMusicPlayer;
-import com.mcquest.server.music.Song;
+import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.physics.Collider;
+import com.mcquest.server.util.Debug;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.attribute.Attribute;
@@ -17,7 +18,6 @@ import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.player.PlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
@@ -25,7 +25,7 @@ import java.time.Duration;
 
 public class Deer extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Deer", NamedTextColor.GREEN);
-    private static final Vec SIZE = new Vec(1, 1.5, 1);
+    private static final Vec SIZE = new Vec(5, 5, 5);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -36,20 +36,22 @@ public class Deer extends NonPlayerCharacter {
         super(DISPLAY_NAME, 2, instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
-        this.hitbox = new CharacterHitbox(this, instance, spawnPosition, SIZE);
-        setHeight(1.5);
-        setMaxHealth(100);
+        this.hitbox = new CharacterHitbox(this, instance, hitboxPosition(), SIZE);
+        setHeight(8);
+        setMaxHealth(10);
         setHealth(getMaxHealth());
     }
 
     @Override
     public void spawn() {
         super.spawn();
+        Debug.showCollider(hitbox);
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition()).join();
         mmorpg.getPhysicsManager().addCollider(hitbox);
+        entity.playAnimation("walk");
     }
 
     @Override
@@ -65,7 +67,11 @@ public class Deer extends NonPlayerCharacter {
     @Override
     public void setPosition(@NotNull Pos position) {
         super.setPosition(position);
-        hitbox.setCenter(position.add(0.0, getHeight() / 2.0, 0.0));
+        hitbox.setCenter(hitboxPosition());
+    }
+
+    private Pos hitboxPosition() {
+        return getPosition().add(0.0, SIZE.y() / 2.0, 0.0);
     }
 
     @Override
@@ -80,12 +86,13 @@ public class Deer extends NonPlayerCharacter {
             }
         }
         super.damage(source, amount);
-        entity.damage(DamageType.VOID, 0f);
-        if (!isAlive()) {
+        if (isAlive()) {
+            entity.damage(DamageType.VOID, 0f);
+        } else {
             if (source instanceof PlayerCharacter pc) {
                 pc.grantExperiencePoints(50);
-                mmorpg.getSchedulerManager().buildTask(this::respawn).delay(Duration.ofSeconds(5)).schedule();
             }
+            mmorpg.getSchedulerManager().buildTask(this::respawn).delay(Duration.ofSeconds(5)).schedule();
         }
     }
 
@@ -101,22 +108,21 @@ public class Deer extends NonPlayerCharacter {
     public static class Entity extends ModelEntity {
         private final Deer deer;
 
-        public Entity(Deer deer) {
-            super(Models.DEER);
+        private Entity(Deer deer) {
+            super(Models.REDSTONE_MONSTROSITY);
             this.deer = deer;
             getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.05f);
             addAIGroup(new EntityAIGroupBuilder()
                     .addGoalSelector(new RandomStrollGoal(this, 10))
                     .build());
-            deer.mmorpg.getGlobalEventHandler().addListener(PlayerChatEvent.class, e -> {
-                playAnimation("walk");
-            });
         }
 
         @Override
         public void tick(long time) {
             super.tick(time);
-            deer.setPosition(getPosition());
+            if (deer.isSpawned()) {
+                deer.setPosition(getPosition());
+            }
         }
     }
 }

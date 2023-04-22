@@ -1,7 +1,8 @@
 package com.mcquest.server.resourcepack;
 
+import com.mcquest.server.asset.Asset;
+import com.mcquest.server.audio.AudioClip;
 import com.mcquest.server.item.Item;
-import com.mcquest.server.music.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.Skill;
 import net.kyori.adventure.key.Key;
@@ -9,7 +10,6 @@ import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
-import team.unnamed.creative.sound.Sound;
 import team.unnamed.creative.sound.SoundEvent;
 import team.unnamed.creative.sound.SoundRegistry;
 import team.unnamed.creative.texture.Texture;
@@ -26,16 +26,16 @@ class ResourcePackBuilder {
     private final Consumer<FileTree> baseWriter;
     private final PlayerClass[] playerClasses;
     private final Item[] items;
-    private final Song[] music;
     private final Model[] models;
+    private final AudioClip[] audio;
 
     ResourcePackBuilder(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
-                        Item[] items, Song[] music, Model[] models) {
+                        Item[] items, Model[] models, AudioClip[] audio) {
         this.baseWriter = baseWriter;
         this.playerClasses = playerClasses;
         this.items = items;
-        this.music = music;
         this.models = models;
+        this.audio = audio;
     }
 
     ResourcePack build() {
@@ -50,8 +50,8 @@ class ResourcePackBuilder {
         writeGuiTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
-        writeMusicResources(tree);
         writeModelResources(tree);
+        writeAudioResources(tree);
         disableBackgroundMusic(tree);
     }
 
@@ -85,43 +85,24 @@ class ResourcePackBuilder {
         ResourcePackUtility.writeItemOverrides(tree, Item.ITEM_MATERIAL, overrides);
     }
 
-    private void writeMusicResources(FileTree tree) {
-        Map<String, SoundEvent> sounds = new HashMap<>();
-        for (Song song : music) {
-            Key key = song.getSound().name();
-            Writable data = Writable.inputStream(song.getAudio()::getStream);
-            Sound.File soundFile = Sound.File.of(key, data);
-            tree.write(soundFile);
-            Sound sound = Sound.builder().nameSound(key).stream(true).build();
-            SoundEvent soundEvent = SoundEvent.builder().sounds(sound).build();
-            sounds.put(key.value(), soundEvent);
-        }
-        SoundRegistry soundRegistry = SoundRegistry.of("music", sounds);
-        tree.write(soundRegistry);
-    }
-
     private void writeModelResources(FileTree tree) {
         ModelWriter.resource().write(tree, List.of(models));
     }
 
+    private void writeAudioResources(FileTree tree) {
+        Map<String, SoundEvent> sounds = new HashMap<>();
+        for (int i = 0; i < audio.length; i++) {
+            AudioClip audioClip = audio[i];
+            int id = i + 1;
+            audioClip.writeResources(tree, id, sounds);
+        }
+        SoundRegistry soundRegistry = SoundRegistry.of(Namespaces.AUDIO, sounds);
+        tree.write(soundRegistry);
+    }
+
     private void disableBackgroundMusic(FileTree tree) {
-        String[] backgroundMusic = {
-                "music.game",
-                "music.creative",
-                "music.under_water",
-                "music.menu",
-                "music.credits",
-                "music.nether.basalt_deltas",
-                "music.nether.nether_wastes",
-                "music.nether.soul_sand_valley",
-                "music.nether.crimson_forest",
-                "music.nether.crimson_forest",
-                "music.nether.nether_wastes",
-                "music.nether.basalt_deltas",
-                "music.nether.soul_sand_valley",
-                "music.dragon",
-                "music.end"
-        };
+        String[] backgroundMusic = new Asset(ResourcePackBuilder.class.getClassLoader(),
+                "MinecraftMusic.json").readJson(String[].class);
         Map<String, SoundEvent> sounds = new HashMap<>();
         for (String backgroundSong : backgroundMusic) {
             SoundEvent soundEvent = SoundEvent.builder().replace(true).build();

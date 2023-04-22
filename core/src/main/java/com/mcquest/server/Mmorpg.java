@@ -1,5 +1,6 @@
 package com.mcquest.server;
 
+import com.mcquest.server.audio.AudioClip;
 import com.mcquest.server.cartography.AreaMap;
 import com.mcquest.server.cartography.MapManager;
 import com.mcquest.server.character.CharacterEntityManager;
@@ -13,8 +14,8 @@ import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
 import com.mcquest.server.mount.Mount;
 import com.mcquest.server.mount.MountManager;
-import com.mcquest.server.music.MusicManager;
-import com.mcquest.server.music.Song;
+import com.mcquest.server.audio.MusicManager;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClass;
@@ -77,8 +78,8 @@ public class Mmorpg {
                 builder.resourcePackWriter,
                 builder.playerClasses,
                 builder.items,
-                builder.music,
-                builder.models
+                builder.models,
+                builder.audio
         );
         features = builder.features;
         InteractionHandler interactionHandler = new InteractionHandler(this);
@@ -89,6 +90,7 @@ public class Mmorpg {
         for (Feature feature : features) {
             feature.hook(this);
         }
+        MojangAuth.init();
         resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
     }
@@ -190,7 +192,11 @@ public class Mmorpg {
     }
 
     public interface ModelsStep {
-        FeaturesStep models(Model... models);
+        AudioStep models(Model... models);
+    }
+
+    public interface AudioStep {
+        FeaturesStep audio(AudioClip... audio);
     }
 
     public interface FeaturesStep {
@@ -216,8 +222,9 @@ public class Mmorpg {
     }
 
     private static class Builder implements PlayerClassesStep, ItemsStep, QuestsStep, ZonesStep,
-            MusicStep, MapsStep, MountsStep, InstancesStep, ModelsStep, FeaturesStep, ResourcePackStep,
-            PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep, StartStep {
+            MusicStep, MapsStep, MountsStep, InstancesStep, ModelsStep, AudioStep, FeaturesStep,
+            ResourcePackStep, PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep,
+            StartStep {
         private final MinecraftServer server;
         private PlayerClass[] playerClasses;
         private Item[] items;
@@ -228,6 +235,7 @@ public class Mmorpg {
         private Mount[] mounts;
         private Instance[] instances;
         private Model[] models;
+        private AudioClip[] audio;
         private Feature[] features;
         private Consumer<FileTree> resourcePackWriter;
         private Function<Player, PlayerCharacterData> pcDataProvider;
@@ -235,7 +243,6 @@ public class Mmorpg {
 
         private Builder() {
             server = MinecraftServer.init();
-            MojangAuth.init();
         }
 
         @Override
@@ -286,8 +293,13 @@ public class Mmorpg {
         }
 
         @Override
-        public FeaturesStep models(Model... models) {
+        public AudioStep models(Model... models) {
             this.models = models.clone();
+            return this;
+        }
+
+        public FeaturesStep audio(AudioClip... audio) {
+            this.audio = audio.clone();
             return this;
         }
 

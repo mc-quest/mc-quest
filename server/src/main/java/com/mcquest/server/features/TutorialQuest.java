@@ -54,13 +54,10 @@ public class TutorialQuest implements Feature {
 
     private void spawnTrainingDummies() {
         NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        Pos[] positions = new Pos[]{new Pos(0, 70, 0)};
-        for (Pos position : positions) {
-            for (int i = 0; i < 5; i++) {
-                Deer trainingDummy = new Deer(mmorpg, Instances.ELADRADOR, position);
-                // TrainingDummy trainingDummy = new TrainingDummy(mmorpg, Instances.ELADRADOR, position);
-                npcSpawner.add(trainingDummy);
-            }
+        for (int i = 0; i < 1000000; i++) {
+            Pos position = new Pos(Math.random() * 100000 - 50000, 80, Math.random() * 100000 - 50000);
+            Deer trainingDummy = new Deer(mmorpg, Instances.ELADRADOR, position);
+            npcSpawner.add(trainingDummy);
         }
     }
 

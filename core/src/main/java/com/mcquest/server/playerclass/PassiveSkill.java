@@ -2,8 +2,8 @@ package com.mcquest.server.playerclass;
 
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.text.WordWrap;
 import com.mcquest.server.util.ItemStackUtility;
-import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -30,7 +30,7 @@ public class PassiveSkill extends Skill {
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Passive Skill", NamedTextColor.GRAY));
         lore.add(Component.empty());
-        lore.addAll(TextUtility.wordWrap(getDescription()));
+        lore.addAll(WordWrap.wrap(getDescription()));
         if (!isUnlocked) {
             lore.add(Component.empty());
             Skill prerequisite = getPrerequisite();

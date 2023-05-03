@@ -3,9 +3,10 @@ package com.mcquest.server.quest;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.QuestCompleteEvent;
 import com.mcquest.server.event.QuestStartEvent;
-import com.mcquest.server.ui.ChatColor;
+import com.mcquest.server.text.ChatColor;
+import com.mcquest.server.text.TextSerializer;
+import com.mcquest.server.text.WordWrap;
 import com.mcquest.server.util.MathUtility;
-import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -119,7 +120,7 @@ public class PlayerCharacterQuestTracker {
         if (progress == goal) {
             pc.sendMessage(Component.empty()
                     .append(Component.text(goal + "/" + goal + " ", NamedTextColor.GREEN))
-                    .append(TextUtility.deserializeText(objective.getDescription()))
+                    .append(TextSerializer.deserialize(objective.getDescription()))
                     .append(Component.text(" complete!", NamedTextColor.GREEN)));
             recentlyCompletedObjectives.add(objective);
             SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
@@ -267,8 +268,13 @@ public class PlayerCharacterQuestTracker {
                     text.append('\n');
                 }
             }
-            text.append('\n');
         }
-        return TextUtility.wordWrap(text.toString());
+
+        if (!text.isEmpty()) {
+            // Remove last new line.
+            text.deleteCharAt(text.length() - 1);
+        }
+
+        return WordWrap.wrap(text.toString());
     }
 }

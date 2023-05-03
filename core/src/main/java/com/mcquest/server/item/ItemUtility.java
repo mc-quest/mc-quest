@@ -1,6 +1,6 @@
 package com.mcquest.server.item;
 
-import com.mcquest.server.util.TextUtility;
+import com.mcquest.server.text.WordWrap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -14,7 +14,7 @@ class ItemUtility {
     }
 
     static List<TextComponent> descriptionText(String description) {
-        return TextUtility.wordWrap(description);
+        return WordWrap.wrap(description);
     }
 
     static TextComponent levelText(int level) {

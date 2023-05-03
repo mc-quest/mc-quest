@@ -1,4 +1,4 @@
-package com.mcquest.server.ui;
+package com.mcquest.server.text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,16 +68,15 @@ public enum ChatColor {
 
     public static String getLastColors(String input) {
         String result = "";
-        int length = input.length();
-        for (int i = length - 1; i >= 0; i--) {
+        for (int i = input.length() - 2; i >= 0; i--) {
             char ch = input.charAt(i);
-            if (ch == COLOR_CHARACTER && i < length - 1) {
+            if (ch == COLOR_CHARACTER) {
                 char next = input.charAt(i + 1);
                 ChatColor color = forCode(next);
                 if (color != null) {
                     result = color + result;
                     // Once we find a color or reset we can stop searching.
-                    if (color.isColor() || color.equals(RESET)) {
+                    if (color.isColor() || color == RESET) {
                         break;
                     }
                 }

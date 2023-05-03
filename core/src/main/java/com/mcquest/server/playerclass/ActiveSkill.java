@@ -5,8 +5,8 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.resourcepack.ResourcePackUtility;
+import com.mcquest.server.text.WordWrap;
 import com.mcquest.server.util.ItemStackUtility;
-import com.mcquest.server.util.TextUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -70,7 +70,7 @@ public class ActiveSkill extends Skill {
         int cooldownSeconds = cooldown.toSecondsPart();
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
         lore.add(Component.empty());
-        lore.addAll(TextUtility.wordWrap(getDescription()));
+        lore.addAll(WordWrap.wrap(getDescription()));
         lore.add(Component.empty());
         if (isUnlocked) {
             lore.add(Component.text("Left-click to add to", NamedTextColor.GREEN));
@@ -97,7 +97,7 @@ public class ActiveSkill extends Skill {
         int cooldownSeconds = cooldown.toSecondsPart();
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
         lore.add(Component.empty());
-        lore.addAll(TextUtility.wordWrap(getDescription()));
+        lore.addAll(WordWrap.wrap(getDescription()));
         return ItemStackUtility.createItemStack(SKILL_MATERIAL, displayName, lore)
                 .withTag(PlayerClassManager.PLAYER_CLASS_ID_TAG, playerClass.getId())
                 .withTag(PlayerClassManager.SKILL_ID_TAG, getId())

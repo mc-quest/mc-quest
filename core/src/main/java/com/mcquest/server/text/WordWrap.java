@@ -56,7 +56,7 @@ public class WordWrap {
         return lines;
     }
 
-    static List<String> tokenize(String text, int maxWordLength) {
+    private static List<String> tokenize(String text, int maxWordLength) {
         List<String> tokens = new ArrayList<>();
         StringBuilder currentWord = new StringBuilder(maxWordLength);
 

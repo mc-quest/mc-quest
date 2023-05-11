@@ -2,11 +2,11 @@ package com.mcquest.server.audio;
 
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.instance.Instance;
 import com.mcquest.server.resourcepack.Namespaces;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
-import net.minestom.server.instance.Instance;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
@@ -55,7 +55,6 @@ public class AudioClip {
     public void writeResources(FileTree tree, int id, Map<String, SoundEvent> sounds) {
         key = Key.key(Namespaces.AUDIO, String.valueOf(id));
         Writable data = Writable.inputStream(audio::getStream);
-        System.out.println(audio.getPath());
         team.unnamed.creative.sound.Sound.File soundFile =
                 team.unnamed.creative.sound.Sound.File.of(key, data);
         tree.write(soundFile);

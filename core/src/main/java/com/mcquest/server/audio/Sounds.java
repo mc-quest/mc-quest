@@ -1,4 +1,4 @@
-package com.mcquest.server.util;
+package com.mcquest.server.audio;
 
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.sound.SoundEvent;

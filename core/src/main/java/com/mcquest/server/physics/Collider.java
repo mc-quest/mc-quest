@@ -145,14 +145,14 @@ public class Collider {
         this.physicsManager = null;
     }
 
-    private void validateBounds(Pos min, Pos max) {
-        if (!geq(max, min)) throw new IllegalArgumentException("min > max");
+    private static void validateBounds(Pos min, Pos max) {
+        if (!geq(max, min)) throw new IllegalArgumentException("!(max >= min)");
     }
 
     /**
      * Returns p1 >= p2.
      */
-    private boolean geq(Pos p1, Pos p2) {
+    private static boolean geq(Pos p1, Pos p2) {
         return p1.x() >= p2.x() && p1.y() >= p2.y() && p1.z() >= p2.z();
     }
 

@@ -1,4 +1,4 @@
-package com.mcquest.server.util;
+package com.mcquest.server.particle;
 
 import com.mcquest.server.instance.Instance;
 import net.minestom.server.coordinate.Pos;

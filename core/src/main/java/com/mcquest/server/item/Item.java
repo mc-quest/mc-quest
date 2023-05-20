@@ -16,13 +16,12 @@ import team.unnamed.creative.model.ItemOverride;
 import java.util.List;
 
 public abstract class Item {
-    public static final Material ITEM_MATERIAL = Material.WOODEN_AXE;
+    public static final Material ITEM_MATERIAL = Material.WOODEN_AXE; // TODO this might not stack
 
     private final int id;
     private final String name;
     private final ItemQuality quality;
     private final String description;
-    private ItemStack itemStack;
 
     Item(int id, String name, ItemQuality quality, String description) {
         this.id = id;
@@ -48,12 +47,14 @@ public abstract class Item {
     }
 
     public ItemStack getItemStack() {
-        // Lazy initialize because createItemStack() relies on subclass fields.
-        if (itemStack == null) {
-            itemStack = createItemStack();
-        }
-        return itemStack;
+        return createItemStack();
     }
+
+//    public abstract ItemStack getItemStack();
+//
+//    public abstract ItemStack getShopItemStack();
+//
+//    public abstract ItemStack getLootChestItemStack();
 
     public TextComponent getDisplayName() {
         return Component.text(name, quality.getColor());
@@ -67,13 +68,18 @@ public abstract class Item {
         if (amount < 0) {
             throw new IllegalArgumentException("amount < 0");
         }
+        ItemStack itemStack = getItemStack();
         ItemEntity drop = new ItemEntity(itemStack.withAmount(amount));
         drop.setCustomName(getDisplayName());
         drop.setCustomNameVisible(true);
         drop.setInstance(instance, position);
     }
 
-    private ItemStack createItemStack() {
+    public int getStackSize() {
+        return 64; // TODO OVERRIDE IN SUBCLASSES
+    }
+
+    ItemStack createItemStack() {
         return ItemStackUtility.createItemStack(ITEM_MATERIAL, getDisplayName(), getItemStackLore())
                 .withTag(ItemManager.ID_TAG, id)
                 .withMeta(builder -> builder.customModelData(1));

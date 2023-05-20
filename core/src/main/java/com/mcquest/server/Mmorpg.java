@@ -12,10 +12,12 @@ import com.mcquest.server.instance.Instance;
 import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
+import com.mcquest.server.loot.LootChestManager;
 import com.mcquest.server.mount.Mount;
 import com.mcquest.server.mount.MountManager;
 import com.mcquest.server.audio.MusicManager;
 import com.mcquest.server.audio.Song;
+import com.mcquest.server.particle.ParticleManager;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerClass;
@@ -32,6 +34,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.timer.SchedulerManager;
+import net.minestom.server.world.biomes.Biome;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.hephaestus.Model;
 
@@ -53,6 +56,8 @@ public class Mmorpg {
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final PhysicsManager physicsManager;
+    private final ParticleManager particleManager;
+    private final LootChestManager lootChestManager;
     private final ResourcePackManager resourcePackManager;
     private final Feature[] features;
 
@@ -65,7 +70,7 @@ public class Mmorpg {
         musicManager = new MusicManager(builder.music);
         mapManager = new MapManager(builder.maps);
         mountManager = new MountManager(this, builder.mounts);
-        instanceManager = new InstanceManager(builder.instances);
+        instanceManager = new InstanceManager(builder.instances, builder.biomes);
         pcManager = new PlayerCharacterManager(
                 this,
                 builder.pcDataProvider,
@@ -74,6 +79,8 @@ public class Mmorpg {
         npcSpawner = new NonPlayerCharacterSpawner(this);
         characterEntityManager = new CharacterEntityManager();
         physicsManager = new PhysicsManager();
+        particleManager = new ParticleManager();
+        lootChestManager = new LootChestManager(this);
         resourcePackManager = new ResourcePackManager(
                 builder.resourcePackWriter,
                 builder.playerClasses,
@@ -143,16 +150,24 @@ public class Mmorpg {
         return physicsManager;
     }
 
+    public ParticleManager getParticleManager() {
+        return particleManager;
+    }
+
+    public LootChestManager getLootChestManager() {
+        return lootChestManager;
+    }
+
+    public ResourcePackManager getResourcePackManager() {
+        return resourcePackManager;
+    }
+
     public GlobalEventHandler getGlobalEventHandler() {
         return MinecraftServer.getGlobalEventHandler();
     }
 
     public SchedulerManager getSchedulerManager() {
         return MinecraftServer.getSchedulerManager();
-    }
-
-    public ResourcePackManager getResourcePackManager() {
-        return resourcePackManager;
     }
 
     public static PlayerClassesStep builder() {
@@ -188,7 +203,11 @@ public class Mmorpg {
     }
 
     public interface InstancesStep {
-        ModelsStep instances(Instance... instances);
+        BiomesStep instances(Instance... instances);
+    }
+
+    public interface BiomesStep {
+        ModelsStep biomes(Biome... biomes);
     }
 
     public interface ModelsStep {
@@ -222,9 +241,9 @@ public class Mmorpg {
     }
 
     private static class Builder implements PlayerClassesStep, ItemsStep, QuestsStep, ZonesStep,
-            MusicStep, MapsStep, MountsStep, InstancesStep, ModelsStep, AudioStep, FeaturesStep,
-            ResourcePackStep, PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep,
-            StartStep {
+            MusicStep, MapsStep, MountsStep, InstancesStep, BiomesStep, ModelsStep, AudioStep,
+            FeaturesStep, ResourcePackStep, PlayerCharacterDataProviderStep,
+            PlayerCharacterLogoutHandlerStep, StartStep {
         private final MinecraftServer server;
         private PlayerClass[] playerClasses;
         private Item[] items;
@@ -233,6 +252,7 @@ public class Mmorpg {
         private Song[] music;
         private AreaMap[] maps;
         private Mount[] mounts;
+        private Biome[] biomes;
         private Instance[] instances;
         private Model[] models;
         private AudioClip[] audio;
@@ -281,14 +301,21 @@ public class Mmorpg {
             return this;
         }
 
+        @Override
         public InstancesStep mounts(Mount... mounts) {
             this.mounts = mounts;
             return this;
         }
 
         @Override
-        public ModelsStep instances(Instance... instances) {
+        public BiomesStep instances(Instance... instances) {
             this.instances = instances.clone();
+            return this;
+        }
+
+        @Override
+        public ModelsStep biomes(Biome... biomes) {
+            this.biomes = biomes;
             return this;
         }
 
@@ -298,6 +325,7 @@ public class Mmorpg {
             return this;
         }
 
+        @Override
         public FeaturesStep audio(AudioClip... audio) {
             this.audio = audio.clone();
             return this;

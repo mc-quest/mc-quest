@@ -15,7 +15,6 @@ import com.mcquest.server.quest.*;
 import com.mcquest.server.ui.Tutorial;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.GlobalEventHandler;
 
@@ -77,9 +76,6 @@ public class TutorialQuest implements Feature {
 
     private void handleLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        pc.getPlayer().getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(1);
-        pc.getPlayer().getAttribute(Attribute.FLYING_SPEED).setBaseValue(1);
-        pc.getPlayer().setAllowFlying(true);
         if (!Quests.TUTORIAL.compareStatus(pc, QuestStatus.NOT_STARTED)) {
             return;
         }

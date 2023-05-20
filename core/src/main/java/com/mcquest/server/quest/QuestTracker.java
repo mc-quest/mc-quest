@@ -20,7 +20,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.time.Duration;
 import java.util.*;
 
-public class PlayerCharacterQuestTracker {
+public class QuestTracker {
     private final PlayerCharacter pc;
     /**
      * Internally, progress of -1 indicates that objective is inaccessible.
@@ -31,8 +31,8 @@ public class PlayerCharacterQuestTracker {
     private final Collection<QuestObjective> recentlyCompletedObjectives;
 
     @ApiStatus.Internal
-    public PlayerCharacterQuestTracker(PlayerCharacter pc, Map<Quest, int[]> objectiveProgress,
-                                       Set<Quest> completedQuests, List<Quest> trackedQuests) {
+    public QuestTracker(PlayerCharacter pc, Map<Quest, int[]> objectiveProgress,
+                        Set<Quest> completedQuests, List<Quest> trackedQuests) {
         this.pc = pc;
         this.objectiveProgress = objectiveProgress;
         this.completedQuests = completedQuests;

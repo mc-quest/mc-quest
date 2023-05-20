@@ -1,15 +1,23 @@
 package com.mcquest.server.mount;
 
 import net.minestom.server.entity.Entity;
-import org.jetbrains.annotations.Nullable;
+import net.minestom.server.entity.EntityType;
 
-public abstract class Mount {
+import java.util.function.Supplier;
+
+public class Mount {
     private final int id;
     private final MountType type;
+    private Supplier<Entity> entity;
 
     public Mount(int id, MountType type) {
         this.id = id;
         this.type = type;
+        this.entity = Mount::defaultEntity;
+    }
+
+    private static Entity defaultEntity() {
+        return new Entity(EntityType.ARMOR_STAND);
     }
 
     public int getId() {
@@ -20,5 +28,11 @@ public abstract class Mount {
         return type;
     }
 
-    protected abstract @Nullable Entity createEntity();
+    public void setEntity(Supplier<Entity> entity) {
+        this.entity = entity;
+    }
+
+    Entity createEntity() {
+        return entity.get();
+    }
 }

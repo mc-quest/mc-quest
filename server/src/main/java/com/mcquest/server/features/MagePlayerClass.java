@@ -16,7 +16,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.sound.SoundEvent;
 
 public class MagePlayerClass implements Feature {
@@ -26,10 +25,6 @@ public class MagePlayerClass implements Feature {
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
-        mmorpg.getGlobalEventHandler().addListener(PlayerChatEvent.class, evt -> {
-            PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(evt.getPlayer());
-            useFireball(new ActiveSkillUseEvent(pc, null));
-        });
     }
 
     public void useFireball(ActiveSkillUseEvent event) {

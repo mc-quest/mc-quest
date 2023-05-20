@@ -2,7 +2,11 @@ package com.mcquest.server.util;
 
 import net.minestom.server.coordinate.Pos;
 
+import java.util.Random;
+
 public class MathUtility {
+    private static final Random random = new Random();
+
     public static int clamp(int value, int min, int max) {
         if (value < min) return min;
         if (value > max) return max;
@@ -33,5 +37,9 @@ public class MathUtility {
         double y = Math.max(p1.y(), p2.y());
         double z = Math.max(p1.z(), p2.z());
         return new Pos(x, y, z);
+    }
+
+    public static int randomRange(int min, int max) {
+        return random.nextInt(min, max + 1);
     }
 }

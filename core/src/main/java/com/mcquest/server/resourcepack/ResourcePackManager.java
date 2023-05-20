@@ -2,7 +2,6 @@ package com.mcquest.server.resourcepack;
 
 import com.mcquest.server.audio.AudioClip;
 import com.mcquest.server.item.Item;
-import com.mcquest.server.audio.Song;
 import com.mcquest.server.playerclass.PlayerClass;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
@@ -16,12 +15,12 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
-@ApiStatus.Internal
 public class ResourcePackManager {
     private final ResourcePack resourcePack;
     private ResourcePackServer server;
     private String resourcePackUrl;
 
+    @ApiStatus.Internal
     public ResourcePackManager(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
                                Item[] items, Model[] models, AudioClip[] audio) {
         ResourcePackBuilder builder = new ResourcePackBuilder(
@@ -29,6 +28,7 @@ public class ResourcePackManager {
         resourcePack = builder.build();
     }
 
+    @ApiStatus.Internal
     public void startServer(String address, int port) {
         try {
             resourcePackUrl = String.format("http://%s:%d", address, port);

@@ -4,7 +4,7 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.ActiveSkillUseEvent;
-import com.mcquest.server.util.Sounds;
+import com.mcquest.server.audio.Sounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;

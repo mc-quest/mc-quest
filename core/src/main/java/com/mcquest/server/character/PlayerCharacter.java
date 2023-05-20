@@ -4,6 +4,7 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.cartography.PlayerCharacterMapManager;
+import com.mcquest.server.commerce.Money;
 import com.mcquest.server.event.ItemReceiveEvent;
 import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
@@ -18,9 +19,10 @@ import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerCharacterSkillManager;
 import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.quest.PlayerCharacterQuestTracker;
+import com.mcquest.server.quest.QuestTracker;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
+import com.mcquest.server.social.Party;
 import com.mcquest.server.util.MathUtility;
 import com.mcquest.server.zone.Zone;
 import net.kyori.adventure.sound.Sound;
@@ -39,6 +41,7 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
@@ -62,7 +65,7 @@ public final class PlayerCharacter extends Character {
     private final Player player;
     private final PlayerClass playerClass;
     private final PlayerCharacterSkillManager skillManager;
-    private final PlayerCharacterQuestTracker questTracker;
+    private final QuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final PlayerCharacterMapManager mapManager;
     private final Hitbox hitbox;
@@ -73,6 +76,7 @@ public final class PlayerCharacter extends Character {
     private double healthRegenRate;
     private double manaRegenRate;
     private double experiencePoints;
+    private Money money;
     private boolean canMount;
     private boolean isDisarmed;
     private boolean canAct;
@@ -109,9 +113,12 @@ public final class PlayerCharacter extends Character {
         // TODO
         canAct = true;
         removed = false;
+
+        // TODO
+        money = new Money(0);
     }
 
-    private PlayerCharacterQuestTracker initQuestTracker(PlayerCharacterData data) {
+    private QuestTracker initQuestTracker(PlayerCharacterData data) {
         QuestManager questManager = mmorpg.getQuestManager();
 
         Map<Quest, int[]> objectiveProgress = new HashMap<>();
@@ -135,7 +142,7 @@ public final class PlayerCharacter extends Character {
             trackedQuests.add(quest);
         }
 
-        return new PlayerCharacterQuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
+        return new QuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
     }
 
     private void initInventory(PlayerCharacterData data) {
@@ -242,6 +249,11 @@ public final class PlayerCharacter extends Character {
 
     public PlayerCharacterMapManager getMapManager() {
         return mapManager;
+    }
+
+    public @Nullable Party getParty() {
+        // TODO
+        return null;
     }
 
     public double getMana() {
@@ -433,7 +445,7 @@ public final class PlayerCharacter extends Character {
         return skillManager;
     }
 
-    public PlayerCharacterQuestTracker getQuestTracker() {
+    public QuestTracker getQuestTracker() {
         return questTracker;
     }
 
@@ -458,6 +470,14 @@ public final class PlayerCharacter extends Character {
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Title title = Title.title(zoneText, levelText, times);
         player.showTitle(title);
+    }
+
+    public Money getMoney() {
+        return money;
+    }
+
+    public void setMoney(Money money) {
+        this.money = money;
     }
 
     public Weapon getWeapon() {
@@ -614,6 +634,10 @@ public final class PlayerCharacter extends Character {
         }).delay(duration).schedule();
     }
 
+    public void sendPacket(SendablePacket packet) {
+        player.sendPacket(packet);
+    }
+
     public void sendMessage(Component message) {
         player.sendMessage(message);
     }
@@ -661,7 +685,7 @@ public final class PlayerCharacter extends Character {
     public static class Hitbox extends CharacterHitbox {
         private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
 
-        public Hitbox(PlayerCharacter pc) {
+        private Hitbox(PlayerCharacter pc) {
             super(pc, pc.getInstance(), pc.hitboxCenter(), SIZE);
         }
 

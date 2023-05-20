@@ -3,7 +3,7 @@ package com.mcquest.server.playerclass;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.AddSkillToHotbarEvent;
 import com.mcquest.server.event.SkillUnlockEvent;
-import com.mcquest.server.util.Sounds;
+import com.mcquest.server.audio.Sounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;

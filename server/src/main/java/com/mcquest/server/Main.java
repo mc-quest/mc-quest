@@ -27,6 +27,7 @@ public class Main {
                 .maps(Maps.all())
                 .mounts(Mounts.all())
                 .instances(Instances.all())
+                .biomes(Biomes.all())
                 .models(Models.all())
                 .audio(AudioClips.all())
                 .features(Features.all())

@@ -7,24 +7,51 @@ import com.mcquest.server.resourcepack.Namespaces;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
+import org.gagravarr.ogg.OggFile;
+import org.gagravarr.ogg.audio.OggAudioStatistics;
+import org.gagravarr.vorbis.VorbisFile;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.sound.SoundEvent;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.time.Duration;
 import java.util.Map;
 
 public class AudioClip {
     private final Asset audio;
+    private final Duration duration;
     private Key key;
 
     public AudioClip(Asset audio) {
         audio.ensureType("ogg");
         this.audio = audio;
+        duration = computeDuration(audio);
+    }
+
+    private static Duration computeDuration(Asset audio) {
+        try (InputStream stream = audio.getStream()) {
+            OggFile oggFile = new OggFile(stream);
+            VorbisFile vorbisFile = new VorbisFile(oggFile);
+            OggAudioStatistics statistics = new OggAudioStatistics(vorbisFile, vorbisFile);
+            statistics.calculate();
+            long durationMillis = (long) (statistics.getDurationSeconds() * 1000.0);
+            stream.close();
+            return Duration.ofMillis(durationMillis);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public Asset getAudio() {
         return audio;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 
     public void play(PlayerCharacter pc, Sound.Source source) {

@@ -13,13 +13,15 @@ public class Models {
     public static final Model CROW = loadModel("crow");
     public static final Model WOLF_SPIDER = loadModel("wolf_spider");
     public static final Model REDSTONE_MONSTROSITY = loadModel("redstone_monstrosity");
+    public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
 
     public static Model[] all() {
         return new Model[]{
                 DEER,
                 CROW,
                 WOLF_SPIDER,
-                REDSTONE_MONSTROSITY
+                REDSTONE_MONSTROSITY,
+                UNDEAD_KNIGHT
         };
     }
 

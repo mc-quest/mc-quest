@@ -25,7 +25,7 @@ import java.time.Duration;
 
 public class Deer extends NonPlayerCharacter {
     private static final Component DISPLAY_NAME = Component.text("Deer", NamedTextColor.GREEN);
-    private static final Vec SIZE = new Vec(5, 5, 5);
+    private static final Vec SIZE = new Vec(1.5, 3.75, 1.5);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -37,7 +37,7 @@ public class Deer extends NonPlayerCharacter {
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, hitboxPosition(), SIZE);
-        setHeight(8);
+        setHeight(SIZE.y());
         setMaxHealth(10);
         setHealth(getMaxHealth());
     }
@@ -45,13 +45,13 @@ public class Deer extends NonPlayerCharacter {
     @Override
     public void spawn() {
         super.spawn();
-        Debug.showCollider(hitbox);
+        // Debug.showCollider(hitbox);
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
         entity.setInstance(getInstance(), getPosition()).join();
         mmorpg.getPhysicsManager().addCollider(hitbox);
-        entity.playAnimation("walk");
+        // entity.playAnimation("walk");
     }
 
     @Override
@@ -101,15 +101,15 @@ public class Deer extends NonPlayerCharacter {
     }
 
     @Override
-    public boolean isFriendly(@NotNull Character character) {
-        return false;
+    public Attitude getAttitude(@NotNull Character character) {
+        return Attitude.HOSTILE;
     }
 
     public static class Entity extends ModelEntity {
         private final Deer deer;
 
         private Entity(Deer deer) {
-            super(Models.REDSTONE_MONSTROSITY);
+            super(Models.UNDEAD_KNIGHT);
             this.deer = deer;
             getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.05f);
             addAIGroup(new EntityAIGroupBuilder()

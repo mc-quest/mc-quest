@@ -1,6 +1,7 @@
 package com.mcquest.server.features;
 
 import com.mcquest.server.Mmorpg;
+import com.mcquest.server.character.Attitude;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
@@ -53,6 +54,6 @@ public class Swords implements Feature {
             return false;
         }
         Character character = hitbox.getCharacter();
-        return !character.isFriendly(pc);
+        return character.getAttitude(pc) != Attitude.FRIENDLY;
     }
 }

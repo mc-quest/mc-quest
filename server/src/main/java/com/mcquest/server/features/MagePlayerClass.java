@@ -1,6 +1,7 @@
 package com.mcquest.server.features;
 
 import com.mcquest.server.Mmorpg;
+import com.mcquest.server.character.Attitude;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.CharacterHitbox;
 import com.mcquest.server.character.PlayerCharacter;
@@ -54,7 +55,7 @@ public class MagePlayerClass implements Feature {
                 return;
             }
             Character character = characterHitbox.getCharacter();
-            if (character.isFriendly(pc)) {
+            if (character.getAttitude(pc) == Attitude.FRIENDLY) {
                 return;
             }
             double damageAmount = 6.0;

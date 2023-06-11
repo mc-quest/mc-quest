@@ -2,6 +2,9 @@ package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.audio.MusicManager;
+import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.cartography.PlayerCharacterMapManager;
 import com.mcquest.server.commerce.Money;
@@ -10,18 +13,15 @@ import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.*;
 import com.mcquest.server.mount.Mount;
-import com.mcquest.server.audio.MusicManager;
-import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
-import com.mcquest.server.audio.Song;
 import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.persistence.PersistentQuestObjectiveData;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
 import com.mcquest.server.playerclass.PlayerCharacterSkillManager;
 import com.mcquest.server.playerclass.PlayerClass;
-import com.mcquest.server.quest.QuestTracker;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestManager;
+import com.mcquest.server.quest.QuestTracker;
 import com.mcquest.server.social.Party;
 import com.mcquest.server.util.MathUtility;
 import com.mcquest.server.zone.Zone;
@@ -651,11 +651,11 @@ public final class PlayerCharacter extends Character {
     }
 
     @Override
-    public boolean isFriendly(@NotNull Character other) {
+    public Attitude getAttitude(@NotNull Character other) {
         if (other instanceof PlayerCharacter) {
-            return true;
+            return Attitude.FRIENDLY;
         }
-        return other.isFriendly(this);
+        return other.getAttitude(this);
     }
 
     private void hidePlayerNameplate() {

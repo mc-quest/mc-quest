@@ -176,8 +176,8 @@ public class Character implements DamageSource {
         updateNameplateAndHealthBarPosition();
     }
 
-    public boolean isFriendly(@NotNull Character other) {
-        return false;
+    public Attitude getAttitude(@NotNull Character other) {
+        return Attitude.FRIENDLY;
     }
 
     boolean nameplateAndHealthBarVisible() {

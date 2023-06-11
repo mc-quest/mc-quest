@@ -6,7 +6,7 @@ public class ParticleEffect {
     private final Asset snowstorm;
 
     public ParticleEffect(Asset snowstorm) {
-        snowstorm.ensureType("json");
+        snowstorm.requireType("json");
         this.snowstorm = snowstorm;
     }
 

@@ -1,6 +1,7 @@
 package com.mcquest.server.loot;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.util.MathUtility;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,13 +78,23 @@ public class Pool {
             entries = new ArrayList<>();
         }
 
-        public Builder rolls(Supplier<Integer> rolls) {
-            this.rolls = rolls;
-            return this;
+        public Builder rolls(int rolls) {
+            if (rolls < 0) {
+                throw new IllegalArgumentException();
+            }
+            return rolls(() -> rolls);
         }
 
-        public Builder rolls(int rolls) {
-            return rolls(() -> rolls);
+        public Builder rolls(int min, int max) {
+            if (min > max) {
+                throw new IllegalArgumentException();
+            }
+            return rolls(() -> MathUtility.randomRange(min, max));
+        }
+
+        private Builder rolls(Supplier<Integer> rolls) {
+            this.rolls = rolls;
+            return this;
         }
 
         public Builder condition(Predicate<PlayerCharacter> condition) {

@@ -48,11 +48,14 @@ public class ItemPoolEntry extends PoolEntry {
         }
 
         public Builder amount(int amount) {
+            if (amount < 0 || amount > item.getStackSize()) {
+                throw new IllegalArgumentException();
+            }
             return amount(() -> amount);
         }
 
         public Builder amount(int min, int max) {
-            if (min > max) {
+            if (min < 0 || min > max || max > item.getStackSize()) {
                 throw new IllegalArgumentException();
             }
             return amount(() -> MathUtility.randomRange(min, max));

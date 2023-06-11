@@ -43,6 +43,8 @@ public class PlayerCharacterMusicPlayer {
     private void playSong() {
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         song.getAudioClip().play(pc, Sound.Source.MUSIC);
-        repeatTask = scheduler.buildTask(this::playSong).delay(song.getDuration()).schedule();
+        repeatTask = scheduler.buildTask(this::playSong)
+                .delay(song.getAudioClip().getDuration())
+                .schedule();
     }
 }

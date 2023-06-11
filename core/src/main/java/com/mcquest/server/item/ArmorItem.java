@@ -46,6 +46,11 @@ public class ArmorItem extends Item {
         onUnequip = new EventEmitter<>();
     }
 
+    @Override
+    public int getStackSize() {
+        return 1;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -196,7 +201,7 @@ public class ArmorItem extends Item {
             if (slot != ArmorSlot.HEAD) {
                 throw new IllegalStateException();
             }
-            model.ensureType(AssetTypes.BBMODEL);
+            model.requireType(AssetTypes.BBMODEL);
             this.model = model;
             return this;
         }

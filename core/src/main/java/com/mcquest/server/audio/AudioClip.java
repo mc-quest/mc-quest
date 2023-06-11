@@ -27,7 +27,7 @@ public class AudioClip {
     private Key key;
 
     public AudioClip(Asset audio) {
-        audio.ensureType("ogg");
+        audio.requireType("ogg");
         this.audio = audio;
         duration = computeDuration(audio);
     }

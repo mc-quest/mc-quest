@@ -35,7 +35,7 @@ public class AreaMap {
         try {
             this.id = id;
             this.origin = origin;
-            image.ensureType(AssetTypes.PNG);
+            image.requireType(AssetTypes.PNG);
             this.image = image.readImage();
             this.questMarkers = new ArrayList<>();
         } catch (Exception e) {

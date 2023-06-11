@@ -28,6 +28,11 @@ public class ConsumableItem extends Item {
         onConsume = new EventEmitter<>();
     }
 
+    @Override
+    public int getStackSize() {
+        return 64;
+    }
+
     public int getLevel() {
         return level;
     }
@@ -128,7 +133,7 @@ public class ConsumableItem extends Item {
 
         @Override
         public BuildStep icon(Asset icon) {
-            icon.ensureType(AssetTypes.PNG);
+            icon.requireType(AssetTypes.PNG);
             this.icon = icon;
             return this;
         }

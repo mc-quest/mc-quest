@@ -36,7 +36,7 @@ public class Asset {
         return path.substring(dotIndex + 1);
     }
 
-    public void ensureType(String type) {
+    public void requireType(String type) {
         String actualType = getType();
         if (!Objects.equals(actualType, type)) {
             throw new AssetTypeException(type, actualType);

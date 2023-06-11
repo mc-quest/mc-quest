@@ -75,9 +75,7 @@ public abstract class Item {
         drop.setInstance(instance, position);
     }
 
-    public int getStackSize() {
-        return 64; // TODO OVERRIDE IN SUBCLASSES
-    }
+    public abstract int getStackSize();
 
     ItemStack createItemStack() {
         return ItemStackUtility.createItemStack(ITEM_MATERIAL, getDisplayName(), getItemStackLore())

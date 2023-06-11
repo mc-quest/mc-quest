@@ -41,6 +41,11 @@ public class Weapon extends Item {
         onAutoAttack = new EventEmitter<>();
     }
 
+    @Override
+    public int getStackSize() {
+        return 1;
+    }
+
     /**
      * Returns the minimum level required to equip this Weapon.
      */
@@ -188,7 +193,7 @@ public class Weapon extends Item {
 
         @Override
         public AttackSpeedStep model(Asset model) {
-            model.ensureType(AssetTypes.BBMODEL);
+            model.requireType(AssetTypes.BBMODEL);
             this.model = model;
             return this;
         }

@@ -25,6 +25,11 @@ public class BasicItem extends Item {
         icon = builder.icon;
     }
 
+    @Override
+    public int getStackSize() {
+        return 64;
+    }
+
     public Asset getIcon() {
         return icon;
     }
@@ -121,7 +126,7 @@ public class BasicItem extends Item {
 
         @Override
         public BuildStep icon(Asset icon) {
-            icon.ensureType(AssetTypes.PNG);
+            icon.requireType(AssetTypes.PNG);
             this.icon = icon;
             return this;
         }

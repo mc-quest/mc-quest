@@ -86,7 +86,7 @@ class ResourcePackBuilder {
     }
 
     private void writeModelResources(FileTree tree) {
-        ModelWriter.resource().write(tree, List.of(models));
+        ModelWriter.resource(Namespaces.MODELS).write(tree, List.of(models));
     }
 
     private void writeAudioResources(FileTree tree) {

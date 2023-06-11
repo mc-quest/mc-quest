@@ -17,7 +17,6 @@ import java.util.*;
 public class ResourcePackUtility {
     public static final int COOLDOWN_DIVISIONS = 16;
     private static final Key WOODEN_AXE = Key.key("item/wooden_axe");
-    private static final String ITEM_NAMESPACE = "item";
     private static final String TEXTURE_DATA_PREFIX = "data:image/png;base64,";
 
     public static void writeItemOverrides(FileTree tree, Material material, List<ItemOverride> overrides) {
@@ -71,7 +70,7 @@ public class ResourcePackUtility {
         JsonArray elementsJson = modelJson.get("elements").getAsJsonArray();
         List<Element> elements = parseElements(elementsJson);
 
-        Key modelKey = Key.key(ITEM_NAMESPACE, String.valueOf(itemId));
+        Key modelKey = Key.key(Namespaces.ITEMS, String.valueOf(itemId));
 
         tree.write(Model.builder()
                 .key(modelKey)
@@ -141,7 +140,7 @@ public class ResourcePackUtility {
                                      Map<String, Key> textureMappings, int itemId) {
         int textureId = textureJson.get("id").getAsInt();
         String path = itemId + "/" + textureId;
-        Key textureKey = Key.key(ITEM_NAMESPACE, path);
+        Key textureKey = Key.key(Namespaces.ITEMS, path);
         String source = textureJson.get("source").getAsString();
         source = source.substring(TEXTURE_DATA_PREFIX.length());
         byte[] bytes = Base64.getDecoder().decode(source);

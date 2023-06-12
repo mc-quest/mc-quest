@@ -109,7 +109,7 @@ public class PlayerCharacterManager {
         PlayerCharacterMoveEvent pcMoveEvent = new PlayerCharacterMoveEvent(pc, event);
         MinecraftServer.getGlobalEventHandler().call(pcMoveEvent);
         if (!pcMoveEvent.isCancelled()) {
-            pc.setPosition(pcMoveEvent.getNewPosition());
+            pc.updatePosition(pcMoveEvent.getNewPosition());
         }
     }
 

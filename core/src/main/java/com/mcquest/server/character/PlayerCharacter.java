@@ -200,11 +200,19 @@ public final class PlayerCharacter extends Character {
         hitbox.setInstance(instance);
     }
 
-    @Override
-    public void setPosition(@NotNull Pos position) {
+    /**
+     * Updates the position without teleporting the player.
+     */
+    void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(hitboxCenter());
         updateActionBar();
+    }
+
+    @Override
+    public void setPosition(@NotNull Pos position) {
+        updatePosition(position);
+        player.teleport(position);
     }
 
     private Pos hitboxCenter() {

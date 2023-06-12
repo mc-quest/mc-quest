@@ -45,7 +45,6 @@ import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
@@ -115,7 +114,7 @@ public final class PlayerCharacter extends Character {
         removed = false;
 
         // TODO
-        money = new Money(0);
+        money = new Money(data.getMoney());
     }
 
     private QuestTracker initQuestTracker(PlayerCharacterData data) {
@@ -195,7 +194,8 @@ public final class PlayerCharacter extends Character {
     public void setInstance(@NotNull Instance instance) {
         super.setInstance(instance);
         if (player.getInstance() != instance) {
-            player.setInstance(instance).join();
+            // TODO: probably need to store when we're changing instances
+            player.setInstance(instance);
         }
         hitbox.setInstance(instance);
     }
@@ -215,12 +215,16 @@ public final class PlayerCharacter extends Character {
         player.teleport(position);
     }
 
-    private Pos hitboxCenter() {
-        return getPosition().add(0.0, 1.0, 0.0);
+    public Pos getRespawnPosition() {
+        return respawnPosition;
     }
 
-    public Vec getLookDirection() {
-        return getPosition().direction();
+    public void setRespawnPosition(@NotNull Pos position) {
+        this.respawnPosition = position;
+    }
+
+    private Pos hitboxCenter() {
+        return getPosition().add(0.0, 1.0, 0.0);
     }
 
     public Pos getEyePosition() {
@@ -241,6 +245,10 @@ public final class PlayerCharacter extends Character {
             return null;
         }
         return Pos.fromPoint(target);
+    }
+
+    public Vec getLookDirection() {
+        return getPosition().direction();
     }
 
     public Player getPlayer() {
@@ -634,9 +642,8 @@ public final class PlayerCharacter extends Character {
                 return;
             }
         }
-        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         undisarmTime = System.currentTimeMillis() + duration.toMillis();
-        undisarmTask = scheduler.buildTask(() -> {
+        undisarmTask = mmorpg.getSchedulerManager().buildTask(() -> {
             isDisarmed = false;
             undisarmTask = null;
         }).delay(duration).schedule();

@@ -5,11 +5,13 @@ import com.mcquest.server.asset.Asset;
 import com.mcquest.server.audio.AudioClip;
 
 public class AudioClips {
+    public static final AudioClip WILDERNESS = loadAudioClip("Wilderness");
     public static final AudioClip DUNGEON = loadAudioClip("Dungeon");
     public static final AudioClip PORTCULLIS_CLOSE = loadAudioClip("PortcullisClose");
 
     public static AudioClip[] all() {
         return new AudioClip[]{
+                WILDERNESS,
                 DUNGEON,
                 PORTCULLIS_CLOSE
         };

@@ -4,12 +4,8 @@ import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.Character;
 import com.mcquest.server.character.*;
 import com.mcquest.server.constants.Models;
-import com.mcquest.server.constants.Music;
 import com.mcquest.server.instance.Instance;
-import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
-import com.mcquest.server.audio.Song;
 import com.mcquest.server.physics.Collider;
-import com.mcquest.server.util.Debug;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.attribute.Attribute;
@@ -45,13 +41,11 @@ public class Deer extends NonPlayerCharacter {
     @Override
     public void spawn() {
         super.spawn();
-        // Debug.showCollider(hitbox);
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
         characterEntityManager.bind(entity, this);
-        entity.setInstance(getInstance(), getPosition()).join();
+        entity.setInstance(getInstance(), getPosition());
         mmorpg.getPhysicsManager().addCollider(hitbox);
-        // entity.playAnimation("walk");
     }
 
     @Override
@@ -64,8 +58,7 @@ public class Deer extends NonPlayerCharacter {
         mmorpg.getPhysicsManager().removeCollider(hitbox);
     }
 
-    @Override
-    public void setPosition(@NotNull Pos position) {
+    public void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(hitboxPosition());
     }
@@ -76,15 +69,6 @@ public class Deer extends NonPlayerCharacter {
 
     @Override
     public void damage(@NotNull DamageSource source, double amount) {
-        if (source instanceof PlayerCharacter pc) {
-            PlayerCharacterMusicPlayer musicPlayer = pc.getMusicPlayer();
-            Song song = musicPlayer.getSong();
-            if (song == Music.DUNGEON) {
-                musicPlayer.setSong(null);
-            } else {
-                musicPlayer.setSong(Music.DUNGEON);
-            }
-        }
         super.damage(source, amount);
         if (isAlive()) {
             entity.damage(DamageType.VOID, 0f);
@@ -121,7 +105,7 @@ public class Deer extends NonPlayerCharacter {
         public void tick(long time) {
             super.tick(time);
             if (deer.isSpawned()) {
-                deer.setPosition(getPosition());
+                deer.updatePosition(getPosition());
             }
         }
     }

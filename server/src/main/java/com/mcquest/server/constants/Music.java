@@ -3,10 +3,12 @@ package com.mcquest.server.constants;
 import com.mcquest.server.audio.Song;
 
 public class Music {
-    public static final Song DUNGEON = new Song(1, AudioClips.PORTCULLIS_CLOSE);
+    public static final Song WILDERNESS = new Song(1, AudioClips.WILDERNESS);
+    public static final Song DUNGEON = new Song(2, AudioClips.DUNGEON);
 
     public static Song[] all() {
         return new Song[]{
+                WILDERNESS,
                 DUNGEON
         };
     }

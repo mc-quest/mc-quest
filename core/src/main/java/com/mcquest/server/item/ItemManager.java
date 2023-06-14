@@ -4,6 +4,7 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,14 +33,14 @@ public class ItemManager {
     /**
      * Returns the Item with the given ID, or null if none exists.
      */
-    public Item getItem(int id) {
+    public @Nullable Item getItem(int id) {
         return itemsById.get(id);
     }
 
     /**
      * Returns the Item with the given ItemStack, or null if none exists.
      */
-    public Item getItem(@NotNull ItemStack itemStack) {
+    public @Nullable Item getItem(@NotNull ItemStack itemStack) {
         if (!itemStack.hasTag(ID_TAG)) {
             return null;
         }

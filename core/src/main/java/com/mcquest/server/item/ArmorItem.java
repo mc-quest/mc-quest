@@ -28,8 +28,8 @@ public class ArmorItem extends Item {
     private final int level;
     private final ArmorType type;
     private final ArmorSlot slot;
-    private Material material;
-    private Color color;
+    private final Material material;
+    private final Color color;
     private final Asset model;
     private final double protections;
     private final EventEmitter<ArmorEquipEvent> onEquip;
@@ -40,6 +40,8 @@ public class ArmorItem extends Item {
         level = builder.level;
         type = builder.type;
         slot = builder.slot;
+        material = builder.materialModel;
+        color = builder.color;
         model = builder.model;
         protections = builder.protections;
         onEquip = new EventEmitter<>();

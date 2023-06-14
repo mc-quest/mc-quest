@@ -1,6 +1,7 @@
 package com.mcquest.server.ui;
 
 import com.mcquest.server.Mmorpg;
+import com.mcquest.server.cartography.PlayerCharacterMapManager;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
 import com.mcquest.server.event.*;
@@ -19,6 +20,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.*;
 import net.minestom.server.inventory.Inventory;
@@ -34,7 +36,6 @@ import java.util.List;
 @ApiStatus.Internal
 public class InteractionHandler {
     private static final double MAX_INTERACTION_DISTANCE = 5.0;
-    private static final int WEAPON_SLOT = 8;
     private static final int MENU_SKILL_TREE_SLOT = 1;
     private static final int MENU_QUEST_LOG_SLOT = 3;
     private static final int MENU_MAP_SLOT = 5;
@@ -69,17 +70,20 @@ public class InteractionHandler {
         eventHandler.addListener(PlayerEntityInteractEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerBlockInteractEvent.class, this::handleBlockInteract);
+        eventHandler.addListener(ItemDropEvent.class, this::handleItemDrop);
     }
 
     private void handlePlayerCharacterLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Player player = pc.getPlayer();
         // Must delay a tick, or it won't work.
-        mmorpg.getSchedulerManager().buildTask(() -> player.setHeldItemSlot((byte) WEAPON_SLOT)).
-                delay(TaskSchedule.nextTick()).schedule();
+        mmorpg.getSchedulerManager()
+                .buildTask(() -> player.setHeldItemSlot((byte) Weapon.HOTBAR_SLOT))
+                .delay(TaskSchedule.nextTick())
+                .schedule();
         PlayerInventory inventory = player.getInventory();
         inventory.addInventoryCondition((p, slot, clickType, inventoryConditionResult) -> {
-            if (slot == WEAPON_SLOT || p.getOpenInventory() != null) {
+            if (slot == Weapon.HOTBAR_SLOT || p.getOpenInventory() != null) {
                 inventoryConditionResult.setCancel(true);
             }
         });
@@ -180,7 +184,13 @@ public class InteractionHandler {
         if (pc.isDisarmed()) {
             return;
         }
-        Weapon weapon = pc.getWeapon();
+
+        PlayerCharacterMapManager mapManager = pc.getMapManager();
+        if (mapManager.isMapOpen()) {
+            mapManager.closeMap();
+        }
+
+        Weapon weapon = pc.getInventory().getWeapon();
         AutoAttackEvent basicAttackEvent = new AutoAttackEvent(pc, weapon);
         weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
@@ -216,6 +226,14 @@ public class InteractionHandler {
     private void handleBlockInteract(PlayerBlockInteractEvent event) {
         // Prevent doors, trapdoors, etc. from being opened or closed.
         event.setBlockingItemUse(true);
+    }
+
+    private void handleItemDrop(ItemDropEvent event) {
+        Player player = event.getPlayer();
+        PlayerInventory inventory = player.getInventory();
+        if (event.getItemStack() == inventory.getItemStack(Weapon.HOTBAR_SLOT)) {
+            event.setCancelled(true);
+        }
     }
 
     private boolean isInteractionCollider(Collider collider) {

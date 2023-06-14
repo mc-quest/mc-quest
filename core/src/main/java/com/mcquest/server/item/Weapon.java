@@ -19,6 +19,8 @@ import java.util.List;
  * enemies.
  */
 public class Weapon extends Item {
+    public static final int HOTBAR_SLOT = 8;
+
     private final int level;
     private final WeaponType type;
     private final Asset model;

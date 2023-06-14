@@ -1,8 +1,11 @@
 package com.mcquest.server.item;
 
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.ItemReceiveEvent;
+import com.mcquest.server.event.ItemRemoveEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-// TODO: handle item events for all methods
 public class PlayerCharacterInventory {
     private final PlayerCharacter pc;
     private final ItemManager itemManager;
@@ -64,32 +66,6 @@ public class PlayerCharacterInventory {
         }
 
         return count;
-    }
-
-    public boolean add(@NotNull Item item) {
-        return add(item, 1) == 1;
-    }
-
-    public int add(@NotNull Item item, int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        ItemStack itemStack = item.getItemStack();
-        PlayerInventory inventory = inventory();
-
-        int added;
-        for (added = 0; added < amount; added++) {
-            if (!inventory.addItemStack(itemStack)) {
-                break;
-            }
-        }
-
-        if (added > 0) {
-            pc.sendMessage(addedItemsMessage(item, added));
-        }
-
-        return added;
     }
 
     /**
@@ -146,6 +122,34 @@ public class PlayerCharacterInventory {
         return canAdd;
     }
 
+    public boolean add(@NotNull Item item) {
+        return add(item, 1) == 1;
+    }
+
+    public int add(@NotNull Item item, int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        ItemStack itemStack = item.getItemStack();
+        PlayerInventory inventory = inventory();
+
+        int added;
+        for (added = 0; added < amount; added++) {
+            if (!inventory.addItemStack(itemStack)) {
+                break;
+            }
+        }
+
+        if (added > 0) {
+            pc.sendMessage(addedItemsMessage(item, added));
+            ItemReceiveEvent event = new ItemReceiveEvent(pc, item, added);
+            MinecraftServer.getGlobalEventHandler().call(event);
+        }
+
+        return added;
+    }
+
     public boolean remove(Item item) {
         return remove(item, 1) == 1;
     }
@@ -180,6 +184,12 @@ public class PlayerCharacterInventory {
             }
         }
 
+        if (removed > 0) {
+            pc.sendMessage(removedItemsMessage(item, removed));
+            ItemRemoveEvent event = new ItemRemoveEvent(pc, item, removed);
+            MinecraftServer.getGlobalEventHandler().call(event);
+        }
+
         return removed;
     }
 
@@ -205,6 +215,8 @@ public class PlayerCharacterInventory {
 
         if (removed > 0) {
             pc.sendMessage(removedItemsMessage(item, removed));
+            ItemRemoveEvent event = new ItemRemoveEvent(pc, item, removed);
+            MinecraftServer.getGlobalEventHandler().call(event);
         }
 
         return removed;

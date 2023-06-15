@@ -12,6 +12,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerCharacterInventory {
@@ -60,6 +61,10 @@ public class PlayerCharacterInventory {
             }
 
             ItemStack itemStack = inventory.getItemStack(slot);
+            if (itemStack.isAir()) {
+                continue;
+            }
+
             if (itemManager.getItem(itemStack) == item) {
                 count += itemStack.amount();
             }
@@ -71,7 +76,15 @@ public class PlayerCharacterInventory {
     /**
      * Returns whether there is enough space to add the items.
      */
-    public boolean canAdd(Map<@NotNull Item, @NotNull Integer> items) {
+    public boolean canAdd(@NotNull Map<@NotNull Item, @NotNull Integer> items) {
+        for (Integer amount : items.values()) {
+            if (amount < 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        // It's not necessary to skip weapon here.
+
         PlayerInventory inventory = inventory();
 
         ItemStack[] contents = new ItemStack[36];
@@ -79,26 +92,23 @@ public class PlayerCharacterInventory {
             contents[slot] = inventory.getItemStack(slot);
         }
 
-        boolean canAdd = true;
-
         for (Map.Entry<Item, Integer> e : items.entrySet()) {
             Item item = e.getKey();
             int amount = e.getValue();
 
             // Check occupied slots first.
             for (int slot = 0; slot < 36 && amount > 0; slot++) {
-                ItemStack slotItemStack = contents[slot];
-                if (slotItemStack.isAir()) {
+                ItemStack itemStack = contents[slot];
+                if (itemStack.isAir()) {
                     continue;
                 }
 
-                Item slotItem = itemManager.getItem(slotItemStack);
-                if (slotItem != item) {
+                if (itemManager.getItem(itemStack) != item) {
                     continue;
                 }
 
-                int add = Math.min(amount, item.getStackSize() - slotItemStack.amount());
-                contents[slot] = slotItemStack.withAmount(slotItemStack.amount() + add);
+                int add = Math.min(amount, item.getStackSize() - itemStack.amount());
+                contents[slot] = itemStack.withAmount(itemStack.amount() + add);
                 amount -= add;
             }
 
@@ -114,12 +124,11 @@ public class PlayerCharacterInventory {
             }
 
             if (amount > 0) {
-                canAdd = false;
-                break;
+                return false;
             }
         }
 
-        return canAdd;
+        return true;
     }
 
     public boolean add(@NotNull Item item) {
@@ -150,6 +159,45 @@ public class PlayerCharacterInventory {
         return added;
     }
 
+    private boolean canRemove(@NotNull Map<@NotNull Item, @NotNull Integer> items) {
+        for (Integer amount : items.values()) {
+            if (amount < 0) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        PlayerInventory inventory = inventory();
+        Map<Item, Integer> remaining = new HashMap<>(items);
+
+        // First remove entries whose amount is 0.
+        remaining.entrySet().removeIf(e -> e.getValue() == 0);
+
+        for (int slot = 0; slot < 36 && !remaining.isEmpty(); slot++) {
+            if (slot == Weapon.HOTBAR_SLOT) {
+                continue;
+            }
+
+            ItemStack itemStack = inventory.getItemStack(slot);
+            if (itemStack.isAir()) {
+                continue;
+            }
+
+            Item item = itemManager.getItem(itemStack);
+            if (item == null || !remaining.containsKey(item)) {
+                continue;
+            }
+
+            int amount = remaining.get(item);
+            if (itemStack.amount() < amount) {
+                remaining.put(item, amount - itemStack.amount());
+            } else {
+                remaining.remove(item);
+            }
+        }
+
+        return remaining.isEmpty();
+    }
+
     public boolean remove(Item item) {
         return remove(item, 1) == 1;
     }
@@ -162,26 +210,24 @@ public class PlayerCharacterInventory {
         PlayerInventory inventory = inventory();
         int removed = 0;
 
-        for (int slot = 0; slot < 36; slot++) {
+        for (int slot = 0; slot < 36 && removed < amount; slot++) {
             if (slot == Weapon.HOTBAR_SLOT) {
                 continue;
             }
 
-            ItemStack slotItemStack = inventory.getItemStack(slot);
-            if (slotItemStack.isAir()) {
+            ItemStack itemStack = inventory.getItemStack(slot);
+            if (itemStack.isAir()) {
                 continue;
             }
 
-            if (itemManager.getItem(slotItemStack) == item) {
-                int remove = Math.min(slotItemStack.amount(), amount);
-                removed += remove;
-                inventory.setItemStack(slot, slotItemStack.withAmount(
-                        slotItemStack.amount() - remove));
-
-                if (removed == amount) {
-                    break;
-                }
+            if (itemManager.getItem(itemStack) != item) {
+                continue;
             }
+
+            int remove = Math.min(itemStack.amount(), amount - removed);
+            inventory.setItemStack(slot, itemStack.withAmount(
+                    itemStack.amount() - remove));
+            removed += remove;
         }
 
         if (removed > 0) {
@@ -207,10 +253,12 @@ public class PlayerCharacterInventory {
                 continue;
             }
 
-            if (itemManager.getItem(itemStack) == item) {
-                removed += itemStack.amount();
-                inventory.setItemStack(slot, ItemStack.AIR);
+            if (itemManager.getItem(itemStack) != item) {
+                continue;
             }
+
+            removed += itemStack.amount();
+            inventory.setItemStack(slot, ItemStack.AIR);
         }
 
         if (removed > 0) {

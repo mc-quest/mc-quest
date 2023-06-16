@@ -44,6 +44,7 @@ import java.util.function.Function;
 
 public class Mmorpg {
     private final MinecraftServer server;
+    private final String name;
     private final PlayerClassManager playerClassManager;
     private final ItemManager itemManager;
     private final QuestManager questManager;
@@ -63,6 +64,7 @@ public class Mmorpg {
 
     private Mmorpg(Builder builder) {
         server = builder.server;
+        name = builder.name;
         playerClassManager = new PlayerClassManager(this, builder.playerClasses);
         itemManager = new ItemManager(builder.items);
         questManager = new QuestManager(builder.quests);
@@ -100,6 +102,10 @@ public class Mmorpg {
         MojangAuth.init();
         resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
+    }
+
+    public String getName() {
+        return name;
     }
 
     public PlayerClassManager getPlayerClassManager() {
@@ -170,8 +176,12 @@ public class Mmorpg {
         return MinecraftServer.getSchedulerManager();
     }
 
-    public static PlayerClassesStep builder() {
+    public static NameStep builder() {
         return new Builder();
+    }
+
+    public interface NameStep {
+        PlayerClassesStep name(String name);
     }
 
     public interface PlayerClassesStep {
@@ -240,11 +250,13 @@ public class Mmorpg {
         void start(String address, int port, int resourcePackServerPort);
     }
 
-    private static class Builder implements PlayerClassesStep, ItemsStep, QuestsStep, ZonesStep,
-            MusicStep, MapsStep, MountsStep, InstancesStep, BiomesStep, ModelsStep, AudioStep,
-            FeaturesStep, ResourcePackStep, PlayerCharacterDataProviderStep,
+    private static class Builder implements NameStep, PlayerClassesStep,
+            ItemsStep, QuestsStep, ZonesStep, MusicStep, MapsStep, MountsStep,
+            InstancesStep, BiomesStep, ModelsStep, AudioStep, FeaturesStep,
+            ResourcePackStep, PlayerCharacterDataProviderStep,
             PlayerCharacterLogoutHandlerStep, StartStep {
         private final MinecraftServer server;
+        private String name;
         private PlayerClass[] playerClasses;
         private Item[] items;
         private Quest[] quests;
@@ -263,6 +275,12 @@ public class Mmorpg {
 
         private Builder() {
             server = MinecraftServer.init();
+        }
+
+        @Override
+        public PlayerClassesStep name(String name) {
+            this.name = name;
+            return this;
         }
 
         @Override

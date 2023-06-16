@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.List;
 
 public class Main {
+    public static final String MMORPG_NAME = "MCQuest";
     private static final String SERVER_ADDRESS = "0.0.0.0";
     private static final int SERVER_PORT = 25565;
     private static final int RESOURCE_PACK_SERVER_PORT = 7270;
@@ -19,6 +20,7 @@ public class Main {
         extractWorldResources();
         Database database = new Database();
         Mmorpg.builder()
+                .name(MMORPG_NAME)
                 .playerClasses(PlayerClasses.all())
                 .items(Items.all())
                 .quests(Quests.all())

@@ -1,26 +1,26 @@
 package com.mcquest.server.item;
 
+import com.google.common.collect.ListMultimap;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.event.AutoAttackEvent;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.WeaponEquipEvent;
 import com.mcquest.server.event.WeaponUnequipEvent;
-import net.kyori.adventure.text.Component;
+import com.mcquest.server.resourcepack.Materials;
+import com.mcquest.server.resourcepack.ResourcePackUtility;
+import net.kyori.adventure.key.Key;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
  * enemies.
  */
 public class Weapon extends Item {
-    public static final int HOTBAR_SLOT = 8;
-
     private final int level;
     private final WeaponType type;
     private final Asset model;
@@ -43,14 +43,6 @@ public class Weapon extends Item {
         onAutoAttack = new EventEmitter<>();
     }
 
-    @Override
-    public int getStackSize() {
-        return 1;
-    }
-
-    /**
-     * Returns the minimum level required to equip this Weapon.
-     */
     public int getLevel() {
         return level;
     }
@@ -84,31 +76,25 @@ public class Weapon extends Item {
     }
 
     @Override
-    List<Component> getItemStackLore() {
-        ItemQuality quality = getQuality();
-        String description = getDescription();
-        List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.qualityText(quality, type.getText()));
-        lore.add(ItemUtility.levelText(level));
-        lore.add(Component.empty());
-        if (physicalDamage != 0.0) {
-            lore.add(ItemUtility.statText("Physical Damage", physicalDamage));
-        }
-        if (description != null) {
-            lore.add(Component.empty());
-            lore.addAll(ItemUtility.descriptionText(description));
-        }
-        lore.add(Component.empty());
-        lore.add(ItemUtility.equipText());
-        return lore;
+    public int getStackSize() {
+        return 1;
+    }
+
+    public ItemStack getItemStack() {
+        return ItemStack.builder(Materials.WEAPON)
+                .set(ID_TAG, getId())
+                .displayName(getDisplayName())
+                .meta(builder -> builder.customModelData(customModelData))
+                .build();
     }
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
-        customModelData = customModelDataStart;
-        // ResourcePackUtility.writeItemModel(tree, model, customModelData, overrides);
-        return 1;
+    public void writeResources(FileTree tree,
+                               ListMultimap<Material, ItemOverride> overrides) {
+        Key key = ItemUtility.resourcePackKey(this);
+        customModelData = ResourcePackUtility
+                .writeModel(tree, model, key, Materials.WEAPON, overrides);
     }
 
     public static IdStep builder() {

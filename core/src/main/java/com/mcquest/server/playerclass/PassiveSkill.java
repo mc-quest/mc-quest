@@ -2,8 +2,12 @@ package com.mcquest.server.playerclass;
 
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.resourcepack.Materials;
+import com.mcquest.server.resourcepack.Namespaces;
+import com.mcquest.server.resourcepack.ResourcePackUtility;
 import com.mcquest.server.text.WordWrap;
 import com.mcquest.server.util.ItemStackUtility;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -12,11 +16,14 @@ import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PassiveSkill extends Skill {
+    private int customModelDataStart;
+
     PassiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
                  Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
         super(id, name, level, prerequisiteId, icon, description, skillTreeRow, skillTreeColumn);
@@ -25,7 +32,7 @@ public class PassiveSkill extends Skill {
     @Override
     ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? null /* TODO */ : Material.BARRIER;
+        Material icon = isUnlocked ? Materials.SKILL : Material.BARRIER;
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Passive Skill", NamedTextColor.GRAY));
@@ -48,8 +55,12 @@ public class PassiveSkill extends Skill {
 
     @Override
     @ApiStatus.Internal
-    public int writeResources(FileTree tree, int customModelDataStart) {
-        // TODO
-        return 2;
+    public void writeResources(FileTree tree, List<ItemOverride> overrides) {
+        customModelDataStart = ResourcePackUtility.writeIcon(
+                tree,
+                getIcon(),
+                Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
+                overrides
+        );
     }
 }

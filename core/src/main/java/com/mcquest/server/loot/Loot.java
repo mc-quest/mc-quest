@@ -1,7 +1,7 @@
 package com.mcquest.server.loot;
 
-import com.mcquest.server.character.PlayerCharacter;
-import net.minestom.server.item.ItemStack;
+import com.mcquest.server.instance.Instance;
+import net.minestom.server.coordinate.Pos;
 
 public abstract class Loot {
     private final PoolEntry entry;
@@ -14,7 +14,5 @@ public abstract class Loot {
         return entry;
     }
 
-    abstract ItemStack getItemStack();
-
-    abstract ItemStack loot(PlayerCharacter pc);
+    abstract void drop(Instance instance, Pos position);
 }

@@ -1,14 +1,10 @@
 package com.mcquest.server;
 
-import com.mcquest.server.asset.Asset;
 import com.mcquest.server.asset.AssetDirectory;
 import com.mcquest.server.constants.*;
 import com.mcquest.server.db.Database;
-import team.unnamed.creative.base.Writable;
-import team.unnamed.creative.file.FileTree;
 
 import java.io.File;
-import java.util.List;
 
 public class Main {
     public static final String MMORPG_NAME = "MCQuest";
@@ -33,7 +29,6 @@ public class Main {
                 .models(Models.all())
                 .audio(AudioClips.all())
                 .features(Features.all())
-                .resourcePack(Main::writeResourcePack)
                 .playerCharacterDataProvider(database::getPlayerCharacterData)
                 .playerCharacterLogoutHandler(database::savePlayerCharacterData)
                 .start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);
@@ -43,15 +38,5 @@ public class Main {
         AssetDirectory worldsDir = Assets.directory("worlds");
         File worldDir = new File("world");
         worldsDir.extractAssets(worldDir);
-    }
-
-    private static void writeResourcePack(FileTree tree) {
-        String basePath = "resourcepack";
-        AssetDirectory resourcePackDir = Assets.directory(basePath);
-        List<Asset> assets = resourcePackDir.getAssets();
-        for (Asset asset : assets) {
-            String subPath = asset.getPath().substring(basePath.length() + 1);
-            tree.write(subPath, Writable.inputStream(asset::getStream));
-        }
     }
 }

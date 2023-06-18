@@ -2,6 +2,7 @@ package com.mcquest.server.persistence;
 
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.instance.Instance;
+import com.mcquest.server.item.PlayerCharacterInventory;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.audio.Song;
 import com.mcquest.server.playerclass.PlayerClass;
@@ -53,7 +54,7 @@ public class PlayerCharacterData {
         data.skillPoints = 1;
         data.money = 0;
         data.items = new PersistentItem[]{
-                new PersistentItem(weapon.getId(), 1, Weapon.HOTBAR_SLOT)
+                new PersistentItem(weapon.getId(), 1, PlayerCharacterInventory.WEAPON_SLOT)
         };
         data.questObjectiveData = new PersistentQuestObjectiveData[0];
         data.completedQuestIds = new int[0];
@@ -83,8 +84,12 @@ public class PlayerCharacterData {
         return data;
     }
 
-    public PlayerCharacter fromJson(String json) {
+    public static PlayerCharacter fromJson(String json) {
         return JsonUtility.parse(json, PlayerCharacter.class);
+    }
+
+    public String toJson() {
+        return JsonUtility.stringify(this);
     }
 
     public int getPlayerClassId() {
@@ -161,9 +166,5 @@ public class PlayerCharacterData {
 
     public int[] getOwnedMountIds() {
         return ownedMountIds;
-    }
-
-    public String toJson() {
-        return JsonUtility.stringify(this);
     }
 }

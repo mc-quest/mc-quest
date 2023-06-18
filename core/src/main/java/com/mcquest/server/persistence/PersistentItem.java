@@ -3,12 +3,12 @@ package com.mcquest.server.persistence;
 public class PersistentItem {
     private final int itemId;
     private final int amount;
-    private final int inventorySlot;
+    private final int slot;
 
-    PersistentItem(int itemId, int amount, int inventorySlot) {
+    PersistentItem(int itemId, int amount, int slot) {
         this.itemId = itemId;
         this.amount = amount;
-        this.inventorySlot = inventorySlot;
+        this.slot = slot;
     }
 
     public int getItemId() {
@@ -19,7 +19,7 @@ public class PersistentItem {
         return amount;
     }
 
-    public int getInventorySlot() {
-        return inventorySlot;
+    public int getSlot() {
+        return slot;
     }
 }

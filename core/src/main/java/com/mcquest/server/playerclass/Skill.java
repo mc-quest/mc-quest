@@ -9,10 +9,11 @@ import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.model.ItemOverride;
+
+import java.util.List;
 
 public abstract class Skill {
-    static final Material SKILL_MATERIAL = Material.WOODEN_AXE;
-
     private final int id;
     private final String name;
     private final int level;
@@ -87,9 +88,6 @@ public abstract class Skill {
 
     abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);
 
-    /**
-     * Returns the number of textures written.
-     */
     @ApiStatus.Internal
-    public abstract int writeResources(FileTree tree, int customModelDataStart);
+    public abstract void writeResources(FileTree tree, List<ItemOverride> overrides);
 }

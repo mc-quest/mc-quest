@@ -2,18 +2,15 @@ package com.mcquest.server.character;
 
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.asset.Asset;
-import com.mcquest.server.audio.MusicManager;
+import com.mcquest.server.audio.AudioManager;
 import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
 import com.mcquest.server.audio.Song;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.cartography.PlayerCharacterMapManager;
 import com.mcquest.server.commerce.Money;
-import com.mcquest.server.event.ItemReceiveEvent;
-import com.mcquest.server.event.ItemRemoveEvent;
 import com.mcquest.server.instance.Instance;
-import com.mcquest.server.item.*;
+import com.mcquest.server.item.PlayerCharacterInventory;
 import com.mcquest.server.mount.Mount;
-import com.mcquest.server.persistence.PersistentItem;
 import com.mcquest.server.persistence.PersistentQuestObjectiveData;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
@@ -39,9 +36,6 @@ import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.inventory.PlayerInventory;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.network.packet.server.SendablePacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
@@ -56,14 +50,16 @@ import java.util.*;
 public final class PlayerCharacter extends Character {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),
-            "ExperiencePointsPerLevel.json"
+            "experience_points_per_level.json"
     ).readJson(double[].class);
-    private static final double MAX_EXPERIENCE_POINTS = Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
+    private static final double MAX_EXPERIENCE_POINTS =
+            Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
 
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
     private final PlayerCharacterSkillManager skillManager;
+    private final PlayerCharacterInventory inventory;
     private final QuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final PlayerCharacterMapManager mapManager;
@@ -77,8 +73,8 @@ public final class PlayerCharacter extends Character {
     private double experiencePoints;
     private Money money;
     private boolean canMount;
-    private boolean isDisarmed;
     private boolean canAct;
+    private boolean isDisarmed;
     private Task undisarmTask;
     private long undisarmTime;
     private boolean removed;
@@ -86,12 +82,14 @@ public final class PlayerCharacter extends Character {
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
         super(Component.text(player.getUsername(), NamedTextColor.GREEN),
                 levelForExperiencePoints(data.getExperiencePoints()),
-                mmorpg.getInstanceManager().getInstance(data.getInstanceId()), data.getPosition());
+                mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
+                data.getPosition());
         this.mmorpg = mmorpg;
         this.player = player;
         respawnPosition = data.getRespawnPosition();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
         skillManager = new PlayerCharacterSkillManager(this, data.getSkillPoints());
+        inventory = new PlayerCharacterInventory(this, mmorpg.getItemManager(), data);
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
         mapManager = new PlayerCharacterMapManager(this);
@@ -105,16 +103,15 @@ public final class PlayerCharacter extends Character {
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
-        initInventory(data);
         initUi();
         updateAttackSpeed();
         canMount = data.canMount();
         // TODO
         canAct = true;
         removed = false;
-
-        // TODO
         money = new Money(data.getMoney());
+
+        zone.addPlayerCharacter(this);
     }
 
     private QuestTracker initQuestTracker(PlayerCharacterData data) {
@@ -144,36 +141,21 @@ public final class PlayerCharacter extends Character {
         return new QuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
     }
 
-    private void initInventory(PlayerCharacterData data) {
-        ItemManager itemManager = mmorpg.getItemManager();
-        PersistentItem[] persistentItems = data.getItems();
-        PlayerInventory inventory = player.getInventory();
-        for (PersistentItem persistentItem : persistentItems) {
-            int itemId = persistentItem.getItemId();
-            int itemAmount = persistentItem.getAmount();
-            int slot = persistentItem.getInventorySlot();
-            Item item = itemManager.getItem(itemId);
-            ItemStack itemStack = item.getItemStack().withAmount(itemAmount);
-            inventory.setItemStack(slot, itemStack);
-        }
-    }
-
     private void initUi() {
         // TODO: hidePlayerNameplate();
         updateActionBar();
-        showZoneText();
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
     }
 
     private void updateAttackSpeed() {
-        double attackSpeed = getWeapon().getAttackSpeed();
+        double attackSpeed = inventory.getWeapon().getAttackSpeed();
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
     }
 
     private PlayerCharacterMusicPlayer initMusic(PlayerCharacterData data) {
-        MusicManager musicManager = mmorpg.getMusicManager();
+        AudioManager musicManager = mmorpg.getAudioManager();
         PlayerCharacterMusicPlayer musicPlayer = new PlayerCharacterMusicPlayer(this);
         Integer songId = data.getSongId();
         if (songId != null) {
@@ -193,9 +175,14 @@ public final class PlayerCharacter extends Character {
     @Override
     public void setInstance(@NotNull Instance instance) {
         super.setInstance(instance);
-        if (player.getInstance() != instance) {
+
+        Instance prevInstance = (Instance) player.getInstance();
+        if (prevInstance != instance) {
             // TODO: probably need to store when we're changing instances
-            player.setInstance(instance);
+            player.setInstance(instance).thenRun(() -> {
+                prevInstance.getChunks().forEach(chunk -> chunk.removeViewer(player));
+            });
+            // TODO: need to update player's map
         }
         hitbox.setInstance(instance);
     }
@@ -461,6 +448,10 @@ public final class PlayerCharacter extends Character {
         return skillManager;
     }
 
+    public PlayerCharacterInventory getInventory() {
+        return inventory;
+    }
+
     public QuestTracker getQuestTracker() {
         return questTracker;
     }
@@ -469,23 +460,14 @@ public final class PlayerCharacter extends Character {
         return zone;
     }
 
-    public void setZone(Zone zone) {
+    public void setZone(@NotNull Zone zone) {
         if (this.zone == zone) {
             return;
         }
-        this.zone = zone;
-        showZoneText();
-    }
 
-    private void showZoneText() {
-        Component zoneText = Component.text(zone.getName(), zone.getType().getColor());
-        Component levelText = Component.text("Level " + zone.getLevel(), NamedTextColor.GOLD);
-        Duration fadeIn = Duration.ofSeconds(1);
-        Duration stay = Duration.ofSeconds(3);
-        Duration fadeOut = Duration.ofSeconds(1);
-        Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
-        Title title = Title.title(zoneText, levelText, times);
-        player.showTitle(title);
+        this.zone.removePlayerCharacter(this);
+        this.zone = zone;
+        zone.addPlayerCharacter(this);
     }
 
     public Money getMoney() {
@@ -494,121 +476,6 @@ public final class PlayerCharacter extends Character {
 
     public void setMoney(Money money) {
         this.money = money;
-    }
-
-    public Weapon getWeapon() {
-        ItemStack itemStack = player.getInventory().getItemStack(8);
-        return (Weapon) mmorpg.getItemManager().getItem(itemStack);
-    }
-
-    public ArmorItem getArmor(@NotNull ArmorSlot slot) {
-        int inventorySlot = switch (slot) {
-            case FEET -> 36;
-            case LEGS -> 37;
-            case CHEST -> 38;
-            case HEAD -> 39;
-        };
-        ItemStack itemStack = player.getInventory().getItemStack(inventorySlot);
-        return (ArmorItem) mmorpg.getItemManager().getItem(itemStack);
-    }
-
-    /**
-     * Gives the item to this PlayerCharacter. Returns true if the item was
-     * successfully given, false otherwise. An item is successfully given if
-     * there is sufficient space in this PlayerCharacter's inventory.
-     */
-    public boolean giveItem(Item item) {
-        return giveItem(item, 1) == 1;
-    }
-
-    public int giveItem(@NotNull Item item, int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-        ItemStack itemStack = item.getItemStack();
-        PlayerInventory inventory = player.getInventory();
-        int received;
-        for (received = 0; received < amount; received++) {
-            if (!inventory.addItemStack(itemStack)) {
-                break;
-            }
-        }
-        if (received > 0) {
-            Component message = Component.text("Received ", NamedTextColor.GRAY);
-            if (received != 1) {
-                message = message.append(Component.text(received + " ", NamedTextColor.GRAY));
-            }
-            message = message.append((item.getDisplayName()));
-            sendMessage(message);
-            ItemReceiveEvent event = new ItemReceiveEvent(this, item, received);
-            MinecraftServer.getGlobalEventHandler().call(event);
-        }
-        return received;
-    }
-
-    /**
-     * Returns how much of the item is in this PlayerCharacter's inventory.
-     * Weapons and armor items that are currently equipped are not counted.
-     * Items on the PlayerCharacter's cursor are also not counted.
-     */
-    public int getItemCount(Item item) {
-        ItemStack itemStack = item.getItemStack();
-        PlayerInventory inventory = player.getInventory();
-        int count = 0;
-        for (int i = 0; i < 36; i++) {
-            if (i == 4) {
-                // TODO: Make sure 4 is correct weapon slot.
-                // Skip weapon.
-                continue;
-            }
-            ItemStack inventoryItemStack = inventory.getItemStack(i);
-            if (inventoryItemStack.isSimilar(itemStack)) {
-                count += inventoryItemStack.amount();
-            }
-        }
-        return count;
-    }
-
-    private boolean removeItem(Item item) {
-        return removeItem(item, 1) == 1;
-    }
-
-    private int removeItem(Item item, int amount) {
-        ItemStack itemStack = item.getItemStack();
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-        PlayerInventory inventory = player.getInventory();
-        int amountRemoved = 0;
-        for (int i = 0; i < 36; i++) {
-            if (i == 4) {
-                // Don't remove weapon.
-                continue;
-            }
-            ItemStack inventoryItemStack = inventory.getItemStack(i);
-            if (inventoryItemStack.isSimilar(itemStack)) {
-                int reduction = Math.min(itemStack.amount(), amount);
-                ItemStack newItemStack = inventoryItemStack.withAmount(
-                        itemStack.amount() - reduction);
-                amount -= reduction;
-                amountRemoved += reduction;
-                inventory.setItemStack(i, newItemStack);
-                if (amount == 0) {
-                    break;
-                }
-            }
-        }
-        if (amountRemoved > 0) {
-            Component message = Component.text("Removed ");
-            if (amountRemoved != 1) {
-                message = message.append(Component.text(amountRemoved + " "));
-            }
-            message = message.append((item.getDisplayName()));
-            sendMessage(message);
-            ItemRemoveEvent event = new ItemRemoveEvent(this, item, amountRemoved);
-            MinecraftServer.getGlobalEventHandler().call(event);
-        }
-        return amountRemoved;
     }
 
     /**
@@ -647,10 +514,6 @@ public final class PlayerCharacter extends Character {
             isDisarmed = false;
             undisarmTask = null;
         }).delay(duration).schedule();
-    }
-
-    public void sendPacket(SendablePacket packet) {
-        player.sendPacket(packet);
     }
 
     public void sendMessage(Component message) {

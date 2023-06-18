@@ -3,7 +3,6 @@ package com.mcquest.server.loot;
 import com.mcquest.server.Mmorpg;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
-import com.mcquest.server.event.LootChestCloseEvent;
 import com.mcquest.server.event.PlayerCharacterLogoutEvent;
 import com.mcquest.server.instance.ChunkAddress;
 import com.mcquest.server.instance.Instance;
@@ -74,6 +73,7 @@ public class LootChestManager {
         if (lootChestsInChunk.isEmpty()) {
             lootChestsByChunk.remove(chunkAddress);
         }
+        // TODO
 //        if (spawned) {
 //            lootChest.remove();
 //        }
@@ -116,14 +116,5 @@ public class LootChestManager {
 
     private void handleInventoryClose(InventoryCloseEvent event) {
         // TODO
-    }
-
-    private void handleLogout(PlayerCharacterLogoutEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        if (openLootChestsByPc.containsKey(pc)) {
-            GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-            LootChest lootChest = openLootChestsByPc.get(pc);
-            eventHandler.call(new LootChestCloseEvent(pc, lootChest));
-        }
     }
 }

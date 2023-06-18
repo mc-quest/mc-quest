@@ -1,19 +1,14 @@
 package com.mcquest.server.resourcepack;
 
-import com.mcquest.server.audio.AudioClip;
-import com.mcquest.server.item.Item;
-import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.server.Mmorpg;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
-import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.server.ResourcePackServer;
-import team.unnamed.hephaestus.Model;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.function.Consumer;
 
 public class ResourcePackManager {
     private final ResourcePack resourcePack;
@@ -21,10 +16,8 @@ public class ResourcePackManager {
     private String resourcePackUrl;
 
     @ApiStatus.Internal
-    public ResourcePackManager(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
-                               Item[] items, Model[] models, AudioClip[] audio) {
-        ResourcePackBuilder builder = new ResourcePackBuilder(
-                baseWriter, playerClasses, items, models, audio);
+    public ResourcePackManager(Mmorpg mmorpg) {
+        ResourcePackBuilder builder = new ResourcePackBuilder(mmorpg);
         resourcePack = builder.build();
     }
 
@@ -51,7 +44,7 @@ public class ResourcePackManager {
     }
 
     /**
-     * Writes the server resource pack to the specified file. Used only for debugging.
+     * Writes the server resource pack to the specified file for debugging.
      */
     public void writeResourcePack(File file) {
         try (FileOutputStream outputStream = new FileOutputStream(file)) {

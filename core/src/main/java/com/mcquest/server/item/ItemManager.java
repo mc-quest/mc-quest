@@ -1,25 +1,39 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.Mmorpg;
+import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.server.event.ItemConsumeEvent;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ItemManager {
-    static final Tag<Integer> ID_TAG = Tag.Integer("item_id");
-
+    private final Mmorpg mmorpg;
     private final Map<Integer, Item> itemsById;
 
     @ApiStatus.Internal
-    public ItemManager(Item[] items) {
+    public ItemManager(Mmorpg mmorpg, Item[] items) {
+        this.mmorpg = mmorpg;
+
         itemsById = new HashMap<>();
         for (Item item : items) {
             registerItem(item);
         }
+
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.addListener(PlayerChangeHeldSlotEvent.class,
+                this::handleChangeHeldSlot);
     }
 
     private void registerItem(Item item) {
@@ -41,10 +55,50 @@ public class ItemManager {
      * Returns the Item with the given ItemStack, or null if none exists.
      */
     public @Nullable Item getItem(@NotNull ItemStack itemStack) {
-        if (!itemStack.hasTag(ID_TAG)) {
+        if (!itemStack.hasTag(Item.ID_TAG)) {
             return null;
         }
-        int id = itemStack.getTag(ID_TAG);
+        int id = itemStack.getTag(Item.ID_TAG);
         return itemsById.get(id);
+    }
+
+    public Collection<Item> getItems() {
+        return Collections.unmodifiableCollection(itemsById.values());
+    }
+
+    private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+        // TODO: sound
+
+        int slot = event.getSlot();
+        if (!(slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_1 ||
+                slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_2)) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        Player player = event.getPlayer();
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+        if (!pc.canAct()) {
+            return;
+        }
+
+        ItemStack itemStack = player.getInventory().getItemStack(slot);
+        if (itemStack.isAir()) { // TODO: will need to instead check if placeholder
+            return;
+        }
+
+        ConsumableItem item = (ConsumableItem) getItem(itemStack);
+        ItemConsumeEvent consumeEvent = new ItemConsumeEvent(pc, item);
+        item.onConsume().emit(consumeEvent);
+        MinecraftServer.getGlobalEventHandler().call(consumeEvent);
+
+        PlayerInventory inventory = player.getInventory();
+        if (itemStack.amount() == 1) {
+            // TODO: set placeholder
+            inventory.setItemStack(slot, ItemStack.AIR);
+        } else {
+            inventory.setItemStack(slot, itemStack.withAmount(itemStack.amount() - 1));
+        }
     }
 }

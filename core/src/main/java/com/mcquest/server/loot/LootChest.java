@@ -3,7 +3,6 @@ package com.mcquest.server.loot;
 import com.mcquest.server.audio.Sounds;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.EventEmitter;
-import com.mcquest.server.event.LootChestCloseEvent;
 import com.mcquest.server.event.LootChestOpenEvent;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.particle.ParticleEffects;
@@ -13,15 +12,13 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.hologram.Hologram;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.inventory.Inventory;
-import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.item.ItemStack;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Collection;
 
 public class LootChest {
     private static final int MENU_SLOTS = 27;
@@ -31,7 +28,7 @@ public class LootChest {
     private final Pos position;
     private final LootTable lootTable;
     private final EventEmitter<LootChestOpenEvent> onOpen;
-    private final EventEmitter<LootChestCloseEvent> onClose;
+    private Duration respawnDuration;
     private Hologram text;
     private Task particleEmitter;
 
@@ -39,9 +36,8 @@ public class LootChest {
         this.instance = instance;
         this.position = position;
         this.lootTable = lootTable;
-        // TODO CHECK THAT LOOT TABLE WILL NOT EXCEED MENU_SLOTS
         onOpen = new EventEmitter<>();
-        onClose = new EventEmitter<>();
+        respawnDuration = null;
     }
 
     public Instance getInstance() {
@@ -60,8 +56,12 @@ public class LootChest {
         return onOpen;
     }
 
-    public EventEmitter<LootChestCloseEvent> onClose() {
-        return onClose;
+    public @Nullable Duration getRespawnDuration() {
+        return respawnDuration;
+    }
+
+    public void respawnAfter(@Nullable Duration respawnDuration) {
+        this.respawnDuration = respawnDuration;
     }
 
     void spawn() {
@@ -74,6 +74,7 @@ public class LootChest {
                 .repeat(EMIT_PARTICLE_PERIOD).schedule();
     }
 
+    // TODO: call me
     void despawn() {
         particleEmitter.cancel();
     }
@@ -89,11 +90,11 @@ public class LootChest {
     }
 
     void open(PlayerCharacter pc) {
-        Loot[] lootBySlot = generateLoot(pc);
-        LootChestOpenEvent event = new LootChestOpenEvent(pc, this, lootBySlot);
-        onOpen().emit(event);
-        Inventory menu = createMenu(pc, lootBySlot);
-        pc.getPlayer().openInventory(menu);
+        Collection<Loot> loot = lootTable.generate(pc);
+        LootChestOpenEvent event = new LootChestOpenEvent(pc, this, loot);
+        onOpen.emit(event);
+        MinecraftServer.getGlobalEventHandler().call(event);
+        loot.forEach(l -> l.drop(instance, position));
         instance.playSound(Sounds.CHEST_OPEN, position);
         instance.setBlock(position, Block.AIR);
         text.remove();
@@ -104,45 +105,5 @@ public class LootChest {
 
     void remove() {
 
-    }
-
-    private Loot[] generateLoot(PlayerCharacter pc) {
-        Integer[] slots = new Integer[MENU_SLOTS];
-        for (int i = 0; i < MENU_SLOTS; i++) {
-            slots[i] = i;
-        }
-        Collections.shuffle(Arrays.asList(slots));
-
-        Collection<Loot> loot = lootTable.generate(pc);
-        Loot[] lootBySlot = new Loot[MENU_SLOTS];
-
-        int i = 0;
-        for (Loot l : loot) {
-            lootBySlot[slots[i]] = l;
-            i++;
-        }
-
-        return lootBySlot;
-    }
-
-    private Inventory createMenu(PlayerCharacter pc, Loot[] lootBySlot) {
-        Inventory inventory = new Inventory(InventoryType.CHEST_3_ROW, "Loot Chest");
-        for (int i = 0; i < MENU_SLOTS; i++) {
-            Loot lootInstance = lootBySlot[i];
-            if (lootInstance != null) {
-                inventory.setItemStack(i, lootInstance.getItemStack());
-            }
-        }
-
-        inventory.addInventoryCondition((player, slot, clickType, result) -> {
-            Loot lootInstance = lootBySlot[slot];
-            if (lootInstance != null) {
-                ItemStack remains = lootInstance.loot(pc);
-                inventory.setItemStack(slot, remains);
-            }
-            result.setCancel(true);
-        });
-
-        return inventory;
     }
 }

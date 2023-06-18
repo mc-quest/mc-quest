@@ -1,5 +1,13 @@
 package com.mcquest.server.commerce;
 
+import com.mcquest.server.instance.Instance;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.ItemEntity;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
+
 public class Money {
     private final int value;
 
@@ -44,5 +52,34 @@ public class Money {
 
     public Money subtract(Money money) {
         return new Money(value - money.value);
+    }
+
+    public void drop(Instance instance, Pos position) {
+        // TODO: custom model data
+        ItemStack itemStack = ItemStack.builder(Material.GOLD_NUGGET).build();
+        ItemEntity entity = new ItemEntity(itemStack);
+        entity.setCustomName(dropText());
+        entity.setCustomNameVisible(true);
+        entity.setInstance(instance, position);
+    }
+
+    private Component dropText() {
+        Component text = Component.empty();
+
+        int gold = getGoldPart();
+        int silver = getSilverPart();
+        int copper = getCopperPart();
+
+        if (gold > 0) {
+            text = text.append(Component.text(gold + "G", NamedTextColor.GOLD));
+        }
+        if (silver > 0) {
+            text = text.append(Component.text(silver + "S", NamedTextColor.GRAY));
+        }
+        if (copper > 0) {
+            text = text.append(Component.text(copper + "C", NamedTextColor.DARK_RED));
+        }
+
+        return text;
     }
 }

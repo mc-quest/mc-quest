@@ -1,11 +1,10 @@
 package com.mcquest.server.loot;
 
-import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.item.Item;
-import net.minestom.server.item.ItemStack;
+import com.mcquest.server.instance.Instance;
+import net.minestom.server.coordinate.Pos;
 
 public class ItemLoot extends Loot {
-    private int amount;
+    private final int amount;
 
     ItemLoot(ItemPoolEntry entry, int amount) {
         super(entry);
@@ -17,17 +16,7 @@ public class ItemLoot extends Loot {
         return (ItemPoolEntry) super.getEntry();
     }
 
-    @Override
-    ItemStack getItemStack() {
-        Item item = getEntry().getItem();
-        return item.getItemStack().withAmount(amount);
-    }
-
-    @Override
-    ItemStack loot(PlayerCharacter pc) {
-        Item item = getEntry().getItem();
-        int received = pc.giveItem(item, amount);
-        amount -= received;
-        return item.getItemStack().withAmount(amount);
+    void drop(Instance instance, Pos position) {
+        getEntry().getItem().drop(instance, position, amount);
     }
 }

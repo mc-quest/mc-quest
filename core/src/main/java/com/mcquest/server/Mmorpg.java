@@ -1,6 +1,8 @@
 package com.mcquest.server;
 
 import com.mcquest.server.audio.AudioClip;
+import com.mcquest.server.audio.AudioManager;
+import com.mcquest.server.audio.Song;
 import com.mcquest.server.cartography.AreaMap;
 import com.mcquest.server.cartography.MapManager;
 import com.mcquest.server.character.CharacterEntityManager;
@@ -13,10 +15,9 @@ import com.mcquest.server.instance.InstanceManager;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.item.ItemManager;
 import com.mcquest.server.loot.LootChestManager;
+import com.mcquest.server.model.ModelManager;
 import com.mcquest.server.mount.Mount;
 import com.mcquest.server.mount.MountManager;
-import com.mcquest.server.audio.MusicManager;
-import com.mcquest.server.audio.Song;
 import com.mcquest.server.particle.ParticleManager;
 import com.mcquest.server.persistence.PlayerCharacterData;
 import com.mcquest.server.physics.PhysicsManager;
@@ -35,11 +36,9 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.world.biomes.Biome;
-import team.unnamed.creative.file.FileTree;
 import team.unnamed.hephaestus.Model;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Mmorpg {
@@ -49,7 +48,8 @@ public class Mmorpg {
     private final ItemManager itemManager;
     private final QuestManager questManager;
     private final ZoneManager zoneManager;
-    private final MusicManager musicManager;
+    private final ModelManager modelManager;
+    private final AudioManager audioManager;
     private final MapManager mapManager;
     private final MountManager mountManager;
     private final InstanceManager instanceManager;
@@ -66,10 +66,11 @@ public class Mmorpg {
         server = builder.server;
         name = builder.name;
         playerClassManager = new PlayerClassManager(this, builder.playerClasses);
-        itemManager = new ItemManager(builder.items);
+        itemManager = new ItemManager(this, builder.items);
         questManager = new QuestManager(builder.quests);
         zoneManager = new ZoneManager(builder.zones);
-        musicManager = new MusicManager(builder.music);
+        modelManager = new ModelManager(builder.models);
+        audioManager = new AudioManager(builder.audio, builder.music);
         mapManager = new MapManager(builder.maps);
         mountManager = new MountManager(this, builder.mounts);
         instanceManager = new InstanceManager(builder.instances, builder.biomes);
@@ -83,13 +84,7 @@ public class Mmorpg {
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
         lootChestManager = new LootChestManager(this);
-        resourcePackManager = new ResourcePackManager(
-                builder.resourcePackWriter,
-                builder.playerClasses,
-                builder.items,
-                builder.models,
-                builder.audio
-        );
+        resourcePackManager = new ResourcePackManager(this);
         features = builder.features;
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
@@ -124,8 +119,12 @@ public class Mmorpg {
         return zoneManager;
     }
 
-    public MusicManager getMusicManager() {
-        return musicManager;
+    public ModelManager getModelManager() {
+        return modelManager;
+    }
+
+    public AudioManager getAudioManager() {
+        return audioManager;
     }
 
     public MapManager getMapManager() {
@@ -229,11 +228,7 @@ public class Mmorpg {
     }
 
     public interface FeaturesStep {
-        ResourcePackStep features(Feature... features);
-    }
-
-    public interface ResourcePackStep {
-        PlayerCharacterDataProviderStep resourcePack(Consumer<FileTree> writer);
+        PlayerCharacterDataProviderStep features(Feature... features);
     }
 
     public interface PlayerCharacterDataProviderStep {
@@ -253,8 +248,8 @@ public class Mmorpg {
     private static class Builder implements NameStep, PlayerClassesStep,
             ItemsStep, QuestsStep, ZonesStep, MusicStep, MapsStep, MountsStep,
             InstancesStep, BiomesStep, ModelsStep, AudioStep, FeaturesStep,
-            ResourcePackStep, PlayerCharacterDataProviderStep,
-            PlayerCharacterLogoutHandlerStep, StartStep {
+            PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep,
+            StartStep {
         private final MinecraftServer server;
         private String name;
         private PlayerClass[] playerClasses;
@@ -269,7 +264,6 @@ public class Mmorpg {
         private Model[] models;
         private AudioClip[] audio;
         private Feature[] features;
-        private Consumer<FileTree> resourcePackWriter;
         private Function<Player, PlayerCharacterData> pcDataProvider;
         private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> pcLogoutHandler;
 
@@ -350,14 +344,8 @@ public class Mmorpg {
         }
 
         @Override
-        public ResourcePackStep features(Feature... features) {
+        public PlayerCharacterDataProviderStep features(Feature... features) {
             this.features = features.clone();
-            return this;
-        }
-
-        @Override
-        public PlayerCharacterDataProviderStep resourcePack(Consumer<FileTree> writer) {
-            resourcePackWriter = writer;
             return this;
         }
 

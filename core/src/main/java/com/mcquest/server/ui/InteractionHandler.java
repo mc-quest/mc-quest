@@ -8,6 +8,7 @@ import com.mcquest.server.event.*;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.ConsumableItem;
 import com.mcquest.server.item.Item;
+import com.mcquest.server.item.PlayerCharacterInventory;
 import com.mcquest.server.item.Weapon;
 import com.mcquest.server.physics.Collider;
 import com.mcquest.server.physics.PhysicsManager;
@@ -78,12 +79,12 @@ public class InteractionHandler {
         Player player = pc.getPlayer();
         // Must delay a tick, or it won't work.
         mmorpg.getSchedulerManager()
-                .buildTask(() -> player.setHeldItemSlot((byte) Weapon.HOTBAR_SLOT))
+                .buildTask(() -> player.setHeldItemSlot((byte) PlayerCharacterInventory.WEAPON_SLOT))
                 .delay(TaskSchedule.nextTick())
                 .schedule();
         PlayerInventory inventory = player.getInventory();
         inventory.addInventoryCondition((p, slot, clickType, inventoryConditionResult) -> {
-            if (slot == Weapon.HOTBAR_SLOT || p.getOpenInventory() != null) {
+            if (slot == PlayerCharacterInventory.WEAPON_SLOT || p.getOpenInventory() != null) {
                 inventoryConditionResult.setCancel(true);
             }
         });
@@ -146,11 +147,7 @@ public class InteractionHandler {
             if (pc == null) {
                 return;
             }
-            PlayerInventory inventory = player.getInventory();
-            boolean successful = inventory.addItemStack(event.getItemStack());
-            if (!successful) {
-                event.setCancelled(true);
-            }
+            // TODO
         }
     }
 
@@ -231,7 +228,7 @@ public class InteractionHandler {
     private void handleItemDrop(ItemDropEvent event) {
         Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
-        if (event.getItemStack() == inventory.getItemStack(Weapon.HOTBAR_SLOT)) {
+        if (event.getItemStack() == inventory.getItemStack(PlayerCharacterInventory.WEAPON_SLOT)) {
             event.setCancelled(true);
         }
     }

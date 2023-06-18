@@ -1,25 +1,107 @@
 package com.mcquest.server.resourcepack;
 
+import com.google.common.collect.ListMultimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.ui.Hotbar;
 import net.kyori.adventure.key.Key;
 import net.minestom.server.item.Material;
+import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.base.*;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.Callable;
 
+@ApiStatus.Internal
 public class ResourcePackUtility {
-    public static final int COOLDOWN_DIVISIONS = 16;
-    private static final Key WOODEN_AXE = Key.key("item/wooden_axe");
     private static final String TEXTURE_DATA_PREFIX = "data:image/png;base64,";
 
-    public static void writeItemOverrides(FileTree tree, Material material, List<ItemOverride> overrides) {
+    public static int writeIcon(FileTree tree, Asset icon, Key key, Material material,
+                                ListMultimap<Material, ItemOverride> overrides) {
+        return writeIcon(tree, icon, key, overrides.get(material));
+    }
+
+    public static int writeIcon(FileTree tree, Asset icon, Key key,
+                                List<ItemOverride> overrides) {
+        return writeIcon(tree,
+                Writable.inputStream(icon::getStream), key, overrides);
+    }
+
+    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
+                                         int cooldownTexture, Material material,
+                                         ListMultimap<Material, ItemOverride> overrides) {
+        writeCooldownIcon(tree, icon, key, cooldownTexture, overrides.get(material));
+    }
+
+    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
+                                         int cooldownTexture,
+                                         List<ItemOverride> overrides) {
+        try {
+            double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
+            BufferedImage image = icon.readImage();
+            double cx = image.getWidth() / 2.0;
+            double cy = image.getHeight() / 2.0;
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
+                    if (theta < 0.0) {
+                        theta = 2.0 * Math.PI + theta;
+                    }
+                    if (theta < thetaMax) {
+                        int rgb = grayAndDarken(image.getRGB(x, y));
+                        image.setRGB(x, y, rgb);
+                    }
+                }
+            }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static int writeIcon(FileTree tree, Writable icon,
+                                 Key key, List<ItemOverride> overrides) {
+        int customModelData = overrides.size();
+
+        Texture texture = Texture.of(key, icon);
+        tree.write(texture);
+
+        Model model = Model.builder()
+                .key(key)
+                .parent(Key.key("minecraft", "item/handheld"))
+                .textures(ModelTexture.builder()
+                        .layers(key)
+                        .build())
+                .build();
+        tree.write(model);
+
+        ItemPredicate itemPredicate = ItemPredicate.customModelData(customModelData);
+        ItemOverride itemOverride = ItemOverride.of(key, itemPredicate);
+        overrides.add(itemOverride);
+
+        return customModelData;
+    }
+
+    public static void writeItemOverrides(FileTree tree,
+                                          ListMultimap<Material, ItemOverride> overrides) {
+        for (Material material : overrides.keySet()) {
+            writeItemOverrides(tree, material, overrides.get(material));
+        }
+    }
+
+    public static void writeItemOverrides(FileTree tree, Material material,
+                                          List<ItemOverride> overrides) {
         Key materialKey = Key.key(material.key().namespace(), "item/" + material.key().value());
         Model model = Model.builder()
                 .key(materialKey)
@@ -30,10 +112,6 @@ public class ResourcePackUtility {
                 .overrides(overrides)
                 .build();
         tree.write(model);
-    }
-
-    private static void applyCooldownTexture(BufferedImage texture) {
-
     }
 
     public static int grayAndDarken(int rgb) {
@@ -50,30 +128,44 @@ public class ResourcePackUtility {
         return ret;
     }
 
-    public static void writeItemModel(FileTree tree, Asset bbmodel, int itemId,
-                                      List<ItemOverride> overrides) {
-        // TODO: might need to account for texture resolution
+    public static int writeModel(FileTree tree, Asset bbmodel, Key key,
+                                 Material material,
+                                 ListMultimap<Material, ItemOverride> overrides) {
+        return writeModel(tree, bbmodel, key, overrides.get(material));
+    }
+
+    public static int writeModel(FileTree tree, Asset bbmodel, Key key,
+                                 List<ItemOverride> overrides) {
+        int customModelData = overrides.size();
+
         JsonObject modelJson = bbmodel.readJson().getAsJsonObject();
 
-        JsonObject displaysJson = modelJson.get("display").getAsJsonObject();
-        Map<ItemTransform.Type, ItemTransform> displays = parseDisplays(displaysJson);
+        Map<ItemTransform.Type, ItemTransform> displays;
+        if (modelJson.has("display")) {
+            JsonObject displaysJson = modelJson.get("display").getAsJsonObject();
+            displays = parseDisplays(displaysJson);
+        } else {
+            displays = Collections.emptyMap();
+        }
 
         JsonArray texturesJson = modelJson.get("textures").getAsJsonArray();
         List<Texture> textures = new ArrayList<>();
         Map<String, Key> textureMappings = new HashMap<>();
-        parseTextures(texturesJson, textures, textureMappings, itemId);
+        parseTextures(texturesJson, textures, textureMappings, key);
 
         ModelTexture modelTexture = ModelTexture.builder()
                 .variables(textureMappings)
                 .build();
 
-        JsonArray elementsJson = modelJson.get("elements").getAsJsonArray();
-        List<Element> elements = parseElements(elementsJson);
+        JsonObject resolution = modelJson.get("resolution").getAsJsonObject();
+        int textureWidth = resolution.get("width").getAsInt();
+        int textureHeight = resolution.get("height").getAsInt();
 
-        Key modelKey = Key.key(Namespaces.ITEMS, String.valueOf(itemId));
+        JsonArray elementsJson = modelJson.get("elements").getAsJsonArray();
+        List<Element> elements = parseElements(elementsJson, textureWidth, textureHeight);
 
         tree.write(Model.builder()
-                .key(modelKey)
+                .key(key)
                 .display(displays)
                 .textures(modelTexture)
                 .elements(elements)
@@ -83,8 +175,10 @@ public class ResourcePackUtility {
             tree.write(texture);
         }
 
-        ItemOverride override = ItemOverride.of(modelKey, ItemPredicate.customModelData(itemId));
+        ItemOverride override = ItemOverride.of(key, ItemPredicate.customModelData(customModelData));
         overrides.add(override);
+
+        return customModelData;
     }
 
     private static Vector3Float parseVec3(JsonArray vec) {
@@ -130,16 +224,16 @@ public class ResourcePackUtility {
     }
 
     private static void parseTextures(JsonArray texturesJson, List<Texture> textures,
-                                      Map<String, Key> textureMappings, int itemId) {
+                                      Map<String, Key> textureMappings, Key key) {
         for (JsonElement textureJson : texturesJson) {
-            parseTexture(textureJson.getAsJsonObject(), textures, textureMappings, itemId);
+            parseTexture(textureJson.getAsJsonObject(), textures, textureMappings, key);
         }
     }
 
     private static void parseTexture(JsonObject textureJson, List<Texture> textures,
-                                     Map<String, Key> textureMappings, int itemId) {
+                                     Map<String, Key> textureMappings, Key key) {
         int textureId = textureJson.get("id").getAsInt();
-        String path = itemId + "/" + textureId;
+        String path = key.value() + "/" + textureId;
         Key textureKey = Key.key(Namespaces.ITEMS, path);
         String source = textureJson.get("source").getAsString();
         source = source.substring(TEXTURE_DATA_PREFIX.length());
@@ -149,16 +243,16 @@ public class ResourcePackUtility {
         textureMappings.put(String.valueOf(textureId), textureKey);
     }
 
-    private static List<Element> parseElements(JsonArray elementsJson) {
+    private static List<Element> parseElements(JsonArray elementsJson, int textureWidth, int textureHeight) {
         List<Element> elements = new ArrayList<>();
         for (JsonElement elementJson : elementsJson) {
-            Element element = parseElement(elementJson.getAsJsonObject());
+            Element element = parseElement(elementJson.getAsJsonObject(), textureWidth, textureHeight);
             elements.add(element);
         }
         return elements;
     }
 
-    private static Element parseElement(JsonObject elementJson) {
+    private static Element parseElement(JsonObject elementJson, int textureWidth, int textureHeight) {
         Vector3Float from = parseVec3(elementJson.get("from").getAsJsonArray());
         Vector3Float to = parseVec3(elementJson.get("to").getAsJsonArray());
         JsonObject faces = elementJson.get("faces").getAsJsonObject();
@@ -166,12 +260,12 @@ public class ResourcePackUtility {
                 .from(from)
                 .to(to)
                 .rotation(parseElementRotation(elementJson))
-                .face(CubeFace.NORTH, parseElementFace(faces.get("north").getAsJsonObject()))
-                .face(CubeFace.EAST, parseElementFace(faces.get("east").getAsJsonObject()))
-                .face(CubeFace.SOUTH, parseElementFace(faces.get("south").getAsJsonObject()))
-                .face(CubeFace.WEST, parseElementFace(faces.get("west").getAsJsonObject()))
-                .face(CubeFace.UP, parseElementFace(faces.get("up").getAsJsonObject()))
-                .face(CubeFace.DOWN, parseElementFace(faces.get("down").getAsJsonObject()))
+                .face(CubeFace.NORTH, parseElementFace(faces.get("north").getAsJsonObject(), textureWidth, textureHeight))
+                .face(CubeFace.EAST, parseElementFace(faces.get("east").getAsJsonObject(), textureWidth, textureHeight))
+                .face(CubeFace.SOUTH, parseElementFace(faces.get("south").getAsJsonObject(), textureWidth, textureHeight))
+                .face(CubeFace.WEST, parseElementFace(faces.get("west").getAsJsonObject(), textureWidth, textureHeight))
+                .face(CubeFace.UP, parseElementFace(faces.get("up").getAsJsonObject(), textureWidth, textureHeight))
+                .face(CubeFace.DOWN, parseElementFace(faces.get("down").getAsJsonObject(), textureWidth, textureHeight))
                 .build();
     }
 
@@ -194,8 +288,17 @@ public class ResourcePackUtility {
         return ElementRotation.of(origin, Axis3D.Z, angle, rescale);
     }
 
-    private static ElementFace parseElementFace(JsonObject elementFace) {
+    private static ElementFace parseElementFace(JsonObject elementFace,
+                                                int textureWidth,
+                                                int textureHeight) {
         Vector4Float uv = parseVec4(elementFace.get("uv").getAsJsonArray());
+        uv = new Vector4Float(
+                uv.x() / textureWidth,
+                uv.y() / textureHeight,
+                uv.x2() / textureWidth,
+                uv.y2() / textureHeight
+        );
+        // TODO: texture property might not always exist
         int textureId = elementFace.get("texture").getAsInt();
         return ElementFace.builder()
                 .uv(uv)

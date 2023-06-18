@@ -6,6 +6,7 @@ import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.quest.Quest;
 import com.mcquest.server.quest.QuestMarker;
 import com.mcquest.server.quest.QuestMarkerIcon;
+import com.mcquest.server.zone.Zone;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
@@ -137,8 +138,9 @@ public class AreaMap {
     }
 
     private void renderZoneText(Graphics2D renderer, PlayerCharacter pc) {
-        renderer.setColor(Color.YELLOW);
-        renderer.drawString(pc.getZone().getName(), 0, 10);
+        Zone zone = pc.getZone();
+        renderer.setColor(zone.getType().getMapColor());
+        renderer.drawString(zone.getName(), 0, 10);
     }
 
     private MapDataPacket addCursor(MapDataPacket packet, PlayerCharacter pc) {

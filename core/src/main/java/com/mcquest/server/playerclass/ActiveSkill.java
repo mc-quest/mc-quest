@@ -4,8 +4,11 @@ import com.mcquest.server.asset.Asset;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.ActiveSkillUseEvent;
 import com.mcquest.server.event.EventEmitter;
+import com.mcquest.server.resourcepack.Materials;
+import com.mcquest.server.resourcepack.Namespaces;
 import com.mcquest.server.resourcepack.ResourcePackUtility;
 import com.mcquest.server.text.WordWrap;
+import com.mcquest.server.ui.Hotbar;
 import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -15,13 +18,9 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
-import team.unnamed.creative.texture.Texture;
+import team.unnamed.creative.model.ItemOverride;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +61,7 @@ public class ActiveSkill extends Skill {
     @Override
     ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? SKILL_MATERIAL : Material.BARRIER;
+        Material icon = isUnlocked ? Materials.SKILL : Material.BARRIER;
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
@@ -89,7 +88,18 @@ public class ActiveSkill extends Skill {
         return ItemStackUtility.createItemStack(icon, displayName, lore);
     }
 
-    ItemStack getHotbarItemStack() {
+    ItemStack getHotbarItemStack(PlayerCharacter pc) {
+        int cooldownTexture = cooldownTexture(pc);
+        return getHotbarItemStack(cooldownTexture);
+    }
+
+    private int cooldownTexture(PlayerCharacter pc) {
+        return (int) Math.ceil(
+                getCooldown(pc).toMillis() / getCooldown().toMillis());
+    }
+
+    private ItemStack getHotbarItemStack(int cooldownTexture) {
+        int customModelData = customModelDataStart + cooldownTexture;
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
         List<TextComponent> lore = new ArrayList<>();
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
@@ -98,67 +108,33 @@ public class ActiveSkill extends Skill {
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
         lore.add(Component.empty());
         lore.addAll(WordWrap.wrap(getDescription()));
-        return ItemStackUtility.createItemStack(SKILL_MATERIAL, displayName, lore)
+        return ItemStackUtility.createItemStack(Materials.SKILL, displayName, lore)
                 .withTag(PlayerClassManager.PLAYER_CLASS_ID_TAG, playerClass.getId())
                 .withTag(PlayerClassManager.SKILL_ID_TAG, getId())
-                .withMeta(builder -> builder.customModelData(customModelDataStart));
+                .withMeta(builder -> builder.customModelData(customModelData));
+    }
+
+    private ItemStack getInsufficientManaHotbarItemStack() {
+        return getHotbarItemStack(Hotbar.COOLDOWN_TEXTURES);
     }
 
     @Override
     @ApiStatus.Internal
-    public int writeResources(FileTree tree, int customModelDataStart) {
-        this.customModelDataStart = customModelDataStart;
+    public void writeResources(FileTree tree, List<ItemOverride> overrides) {
         // Default texture.
-        // TODO: move this
-        String TEXTURE_NAMESPACE = "skill";
-//        String defaultKeyValue = String.format("%d-%d", playerClass.getId(), getId());
-//        Model model = Model.builder()
-//                .key(null)
-//                .textures(ModelTexture.builder()
-//                        .layers()
-//                        .build())
-//                .build();
-//         tree.write(defaultTexture);
+        customModelDataStart = ResourcePackUtility.writeIcon(
+                tree,
+                getIcon(),
+                Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
+                overrides
+        );
 
         // Locked texture.
 
+
         // Cooldown textures.
         for (int i = 1; i <= COOLDOWN_DIVISIONS; i++) {
-            String keyValue = String.format("%d-%d-%d", playerClass.getId(), getId(), i);
-            Key key = Key.key(TEXTURE_NAMESPACE, keyValue);
-            Texture texture = Texture.builder()
-                    .key(key)
-                    .data(Writable.bytes(cooldownTexture(i)))
-                    .build();
-            tree.write(texture);
-        }
 
-        return 2 + COOLDOWN_DIVISIONS;
-    }
-
-    private byte[] cooldownTexture(int cooldownDivision) {
-        try {
-            double thetaMax = (double) cooldownDivision / COOLDOWN_DIVISIONS * 2.0 * Math.PI;
-            BufferedImage image = getIcon().readImage();
-            double cx = image.getWidth() / 2.0;
-            double cy = image.getHeight() / 2.0;
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
-                    if (theta < 0.0) {
-                        theta = 2.0 * Math.PI + theta;
-                    }
-                    if (theta < thetaMax) {
-                        int rgb = ResourcePackUtility.grayAndDarken(image.getRGB(x, y));
-                        image.setRGB(x, y, rgb);
-                    }
-                }
-            }
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", stream);
-            return stream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }

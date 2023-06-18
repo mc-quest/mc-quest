@@ -3,6 +3,8 @@ package com.mcquest.server.item;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.event.ItemReceiveEvent;
 import com.mcquest.server.event.ItemRemoveEvent;
+import com.mcquest.server.persistence.PersistentItem;
+import com.mcquest.server.persistence.PlayerCharacterData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -16,15 +18,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PlayerCharacterInventory {
+    // TODO: should probably be private
+    public static final int WEAPON_SLOT = 8;
+    static final int HOTBAR_CONSUMABLE_SLOT_1 = 6;
+    static final int HOTBAR_CONSUMABLE_SLOT_2 = 7;
+    static final int MIN_SLOT = 9;
+    static final int MAX_SLOT = 35;
+
     private final PlayerCharacter pc;
     private final ItemManager itemManager;
     private Weapon savedWeapon;
 
     @ApiStatus.Internal
-    public PlayerCharacterInventory(PlayerCharacter pc, ItemManager itemManager) {
+    public PlayerCharacterInventory(PlayerCharacter pc, ItemManager itemManager,
+                                    PlayerCharacterData data) {
         this.pc = pc;
         this.itemManager = itemManager;
         savedWeapon = null;
+        loadItems(data.getItems());
+
+        // TODO: should be responsible for serializing inventory
+        // TODO: inventory conditions
     }
 
     public @NotNull Weapon getWeapon() {
@@ -32,8 +46,7 @@ public class PlayerCharacterInventory {
             return savedWeapon;
         }
 
-        ItemStack itemStack = inventory().getItemStack(Weapon.HOTBAR_SLOT);
-        return (Weapon) itemManager.getItem(itemStack);
+        return (Weapon) getItem(WEAPON_SLOT);
     }
 
     public @Nullable ArmorItem getArmor(@NotNull ArmorSlot slot) {
@@ -43,23 +56,32 @@ public class PlayerCharacterInventory {
             case CHEST -> 38;
             case HEAD -> 39;
         };
-        ItemStack itemStack = inventory().getItemStack(inventorySlot);
-        return (ArmorItem) itemManager.getItem(itemStack);
+
+        return (ArmorItem) getItem(inventorySlot);
+    }
+
+    public @Nullable ConsumableItem getHotbarConsumable1() {
+        return (ConsumableItem) getItem(HOTBAR_CONSUMABLE_SLOT_1);
+    }
+
+    public @Nullable ConsumableItem getHotbarConsumable2() {
+        return (ConsumableItem) getItem(HOTBAR_CONSUMABLE_SLOT_2);
+    }
+
+    public boolean contains(@NotNull Item item) {
+        return count(item) > 0;
     }
 
     /**
      * Returns how much of the item is in this inventory. Equipped weapons,
-     * equipped armor, and items on the cursor are not counted.
+     * equipped armor, hotbar consumables, and items on the cursor are not
+     * counted.
      */
     public int count(@NotNull Item item) {
         PlayerInventory inventory = inventory();
         int count = 0;
 
-        for (int slot = 0; slot < 36; slot++) {
-            if (slot == Weapon.HOTBAR_SLOT) {
-                continue;
-            }
-
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT; slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
             if (itemStack.isAir()) {
                 continue;
@@ -83,52 +105,51 @@ public class PlayerCharacterInventory {
             }
         }
 
-        // It's not necessary to skip weapon here.
-
         PlayerInventory inventory = inventory();
+        Map<Item, Integer> remaining = new HashMap<>(items);
 
-        ItemStack[] contents = new ItemStack[36];
-        for (int slot = 0; slot < 36; slot++) {
-            contents[slot] = inventory.getItemStack(slot);
+        // First remove entries whose amount is 0.
+        remaining.entrySet().removeIf(e -> e.getValue() == 0);
+
+        // Check occupied slots first.
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && !remaining.isEmpty(); slot++) {
+            ItemStack itemStack = inventory.getItemStack(slot);
+            if (itemStack.isAir()) {
+                continue;
+            }
+
+            Item item = itemManager.getItem(itemStack);
+            if (!remaining.containsKey(item)) {
+                continue;
+            }
+
+            int amount = remaining.get(item);
+            int capacity = item.getStackSize() - itemStack.amount();
+            if (capacity < amount) {
+                remaining.put(item, amount - capacity);
+            } else {
+                remaining.remove(item);
+            }
         }
 
-        for (Map.Entry<Item, Integer> e : items.entrySet()) {
+        // Now check empty slots.
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && !remaining.isEmpty(); slot++) {
+            if (!inventory.getItemStack(slot).isAir()) {
+                continue;
+            }
+
+            Map.Entry<Item, Integer> e = remaining.entrySet().iterator().next();
             Item item = e.getKey();
             int amount = e.getValue();
 
-            // Check occupied slots first.
-            for (int slot = 0; slot < 36 && amount > 0; slot++) {
-                ItemStack itemStack = contents[slot];
-                if (itemStack.isAir()) {
-                    continue;
-                }
-
-                if (itemManager.getItem(itemStack) != item) {
-                    continue;
-                }
-
-                int add = Math.min(amount, item.getStackSize() - itemStack.amount());
-                contents[slot] = itemStack.withAmount(itemStack.amount() + add);
-                amount -= add;
-            }
-
-            // Now check empty slots.
-            for (int slot = 0; slot < 36 && amount > 0; slot++) {
-                if (!contents[slot].isAir()) {
-                    continue;
-                }
-
-                int add = Math.min(amount, item.getStackSize());
-                contents[slot] = item.getItemStack().withAmount(add);
-                amount -= add;
-            }
-
-            if (amount > 0) {
-                return false;
+            if (item.getStackSize() < amount) {
+                remaining.put(item, amount - item.getStackSize());
+            } else {
+                remaining.remove(item);
             }
         }
 
-        return true;
+        return remaining.isEmpty();
     }
 
     public boolean add(@NotNull Item item) {
@@ -140,14 +161,39 @@ public class PlayerCharacterInventory {
             throw new IllegalArgumentException();
         }
 
-        ItemStack itemStack = item.getItemStack();
         PlayerInventory inventory = inventory();
+        int added = 0;
 
-        int added;
-        for (added = 0; added < amount; added++) {
-            if (!inventory.addItemStack(itemStack)) {
-                break;
+        // Check occupied slots first.
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && added < amount; slot++) {
+            ItemStack itemStack = inventory.getItemStack(slot);
+            if (itemStack.isAir()) {
+                continue;
             }
+
+            if (itemManager.getItem(itemStack) != item) {
+                continue;
+            }
+
+            int capacity = item.getStackSize() - itemStack.amount();
+            if (capacity == 0) {
+                continue;
+            }
+
+            int add = Math.min(capacity, amount - added);
+            inventory.setItemStack(slot, itemStack.withAmount(itemStack.amount() + add));
+            added += add;
+        }
+
+        // Now check empty slots
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && added < amount; slot++) {
+            if (!inventory.getItemStack(slot).isAir()) {
+                continue;
+            }
+
+            int add = Math.min(item.getStackSize(), amount - added);
+            inventory.setItemStack(slot, item.getItemStack().withAmount(add));
+            added += add;
         }
 
         if (added > 0) {
@@ -159,7 +205,7 @@ public class PlayerCharacterInventory {
         return added;
     }
 
-    private boolean canRemove(@NotNull Map<@NotNull Item, @NotNull Integer> items) {
+    public boolean canRemove(@NotNull Map<@NotNull Item, @NotNull Integer> items) {
         for (Integer amount : items.values()) {
             if (amount < 0) {
                 throw new IllegalArgumentException();
@@ -172,18 +218,14 @@ public class PlayerCharacterInventory {
         // First remove entries whose amount is 0.
         remaining.entrySet().removeIf(e -> e.getValue() == 0);
 
-        for (int slot = 0; slot < 36 && !remaining.isEmpty(); slot++) {
-            if (slot == Weapon.HOTBAR_SLOT) {
-                continue;
-            }
-
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && !remaining.isEmpty(); slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
             if (itemStack.isAir()) {
                 continue;
             }
 
             Item item = itemManager.getItem(itemStack);
-            if (item == null || !remaining.containsKey(item)) {
+            if (!remaining.containsKey(item)) {
                 continue;
             }
 
@@ -210,11 +252,7 @@ public class PlayerCharacterInventory {
         PlayerInventory inventory = inventory();
         int removed = 0;
 
-        for (int slot = 0; slot < 36 && removed < amount; slot++) {
-            if (slot == Weapon.HOTBAR_SLOT) {
-                continue;
-            }
-
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT && removed < amount; slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
             if (itemStack.isAir()) {
                 continue;
@@ -243,11 +281,7 @@ public class PlayerCharacterInventory {
         PlayerInventory inventory = inventory();
         int removed = 0;
 
-        for (int slot = 0; slot < 36; slot++) {
-            if (slot == Weapon.HOTBAR_SLOT) {
-                continue;
-            }
-
+        for (int slot = MIN_SLOT; slot <= MAX_SLOT; slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
             if (itemStack.isAir()) {
                 continue;
@@ -277,12 +311,39 @@ public class PlayerCharacterInventory {
 
     @ApiStatus.Internal
     public void unsaveWeapon() {
-        inventory().setItemStack(Weapon.HOTBAR_SLOT, savedWeapon.getItemStack());
+        inventory().setItemStack(WEAPON_SLOT, savedWeapon.getItemStack());
         savedWeapon = null;
     }
 
     private PlayerInventory inventory() {
         return pc.getPlayer().getInventory();
+    }
+
+    private void loadItems(PersistentItem[] items) {
+        PlayerInventory inventory = inventory();
+
+        for (PersistentItem persistentItem : items) {
+            if (persistentItem == null) {
+                continue;
+            }
+
+
+            Item item = itemManager.getItem(persistentItem.getItemId());
+            ItemStack itemStack = item.getItemStack()
+                    .withAmount(persistentItem.getAmount());
+            inventory.setItemStack(persistentItem.getSlot(), itemStack);
+        }
+
+        // TODO other slots (weapon, armor, consumables)
+    }
+
+    private Item getItem(int slot) {
+        ItemStack itemStack = inventory().getItemStack(slot);
+        if (itemStack.isAir()) {
+            return null;
+        }
+
+        return itemManager.getItem(itemStack);
     }
 
     private Component addedItemsMessage(Item item, int added) {

@@ -1,9 +1,7 @@
 package com.mcquest.server.playerclass;
 
 import com.mcquest.server.character.PlayerCharacter;
-import com.mcquest.server.event.AddSkillToHotbarEvent;
 import com.mcquest.server.event.SkillUnlockEvent;
-import com.mcquest.server.audio.Sounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -15,9 +13,9 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.inventory.condition.InventoryConditionResult;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.utils.time.Tick;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -38,7 +36,7 @@ public class PlayerCharacterSkillManager {
         cooldowns = new HashMap<>();
     }
 
-    public boolean isUnlocked(Skill skill) {
+    public boolean isUnlocked(@NotNull Skill skill) {
         return unlockedSkills.contains(skill);
     }
 
@@ -46,7 +44,7 @@ public class PlayerCharacterSkillManager {
         cooldowns.put(skill.getId(), skill.getCooldown());
     }
 
-    public Duration getCooldown(ActiveSkill skill) {
+    public Duration getCooldown(@NotNull ActiveSkill skill) {
         return cooldowns.getOrDefault(skill.getId(), Duration.ZERO);
     }
 
@@ -60,21 +58,15 @@ public class PlayerCharacterSkillManager {
     private void updateHotbar() {
         PlayerClass playerClass = pc.getPlayerClass();
         PlayerInventory inventory = pc.getPlayer().getInventory();
-        for (int i = 0; i < 8; i++) {
-            if (true) continue;
-            ItemStack itemStack = inventory.getItemStack(i);
+        // TODO: make slots a constant
+        for (int slot = 0; slot < 6; slot++) {
+            ItemStack itemStack = inventory.getItemStack(slot);
             if (!itemStack.hasTag(PlayerClassManager.SKILL_ID_TAG)) {
                 continue;
             }
             int skillId = itemStack.getTag(PlayerClassManager.SKILL_ID_TAG);
             ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
-            Duration cooldown = cooldowns.get(skill.getId());
-            double currentMillis = cooldown.toMillis();
-            double totalMillis = skill.getCooldown().toMillis();
-            int cooldownDivision = (int) Math.ceil(currentMillis / totalMillis);
-            Material material = Material.fromNamespaceId(""); // TODO
-            ItemStack newItemStack = itemStack.withMaterial(material).withMeta(builder -> builder.customModelData(1));
-            inventory.setItemStack(i, newItemStack);
+            inventory.setItemStack(slot, skill.getHotbarItemStack(pc));
         }
     }
 
@@ -114,51 +106,57 @@ public class PlayerCharacterSkillManager {
     }
 
     private void handleSkillClick(Player player, int slot, ClickType clickType,
-                                  InventoryConditionResult inventoryConditionResult) {
-        inventoryConditionResult.setCancel(true);
+                                  InventoryConditionResult result) {
+        // TODO: maybe need to cancel if player clicks outside inventory
         Skill skill = skillAtSlot(slot);
         if (skill == null) {
             return;
         }
-        pc.getPlayer().playSound(Sounds.CLICK);
-        boolean isUnlocked = skill.isUnlocked(pc);
+
         if (clickType == ClickType.LEFT_CLICK) {
-            if (!(skill instanceof ActiveSkill activeSkill)) {
-                return;
-            }
-            if (isUnlocked) {
-                PlayerInventory inventory = pc.getPlayer().getInventory();
-                int hotbarSlot = firstEmptyHotbarSlot(inventory);
-                if (hotbarSlot == -1) {
-                    pc.sendMessage(Component.text(
-                            "No room on hotbar", NamedTextColor.RED));
-                } else if (skillOnHotbar(skill, inventory)) {
-                    pc.sendMessage(Component.text(
-                            skill.getName() + " is already on your hotbar", NamedTextColor.RED));
-                } else {
-                    ItemStack hotbarItemStack = ((ActiveSkill) skill).getHotbarItemStack();
-                    inventory.addItemStack(hotbarItemStack);
-                    pc.sendMessage(Component.text(
-                            "Added " + skill.getName() + " to hotbar", NamedTextColor.GREEN));
-                    AddSkillToHotbarEvent event = new AddSkillToHotbarEvent(pc, activeSkill, hotbarSlot);
-                    MinecraftServer.getGlobalEventHandler().call(event);
-                }
-            } else {
-                pc.sendMessage(
-                        Component.text(skill.getName() + " is not unlocked", NamedTextColor.RED));
-            }
+            handleLeftClick(skill, result);
         } else if (clickType == ClickType.START_SHIFT_CLICK) {
-            if (isUnlocked) {
-                pc.sendMessage(Component.text(
-                        skill.getName() + " is already unlocked", NamedTextColor.RED));
-            } else if (skillPoints == 0) {
-                pc.sendMessage(Component.text("No skill points available", NamedTextColor.RED));
-            } else {
-                unlockSkill(skill);
-                // Rerender.
-                openSkillTree();
-            }
+            handleShiftClick(skill, result);
         }
+    }
+
+    private void handleLeftClick(Skill skill, InventoryConditionResult result) {
+        if (!(skill instanceof ActiveSkill)) {
+            result.setCancel(true);
+            return;
+        }
+
+        if (!isUnlocked(skill)) {
+            result.setCancel(true);
+            return;
+        }
+
+        if (skillOnHotbar(skill)) {
+            result.setCancel(true);
+            return;
+        }
+
+        // TODO: may want to add a hotbar itemstack to cursor instead of skill
+        //  tree itemstack
+    }
+
+    private void handleShiftClick(Skill skill, InventoryConditionResult result) {
+        result.setCancel(true);
+
+        if (isUnlocked(skill)) {
+            return;
+        }
+
+        if (skill.getPrerequisite() != null && !isUnlocked(skill.getPrerequisite())) {
+            return;
+        }
+
+        if (skillPoints == 0) {
+            return;
+        }
+
+        unlockSkill(skill);
+        openSkillTree();
     }
 
     private Skill skillAtSlot(int slot) {
@@ -170,19 +168,12 @@ public class PlayerCharacterSkillManager {
         return null;
     }
 
-    private static int firstEmptyHotbarSlot(PlayerInventory inventory) {
-        for (int i = 0; i < 8; i++) {
-            ItemStack itemStack = inventory.getItemStack(i);
-            if (itemStack.isAir()) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    private static boolean skillOnHotbar(Skill skill, PlayerInventory inventory) {
-        for (int i = 0; i < 8; i++) {
-            ItemStack itemStack = inventory.getItemStack(i);
+    // TODO: should maybe replace this with some hotbar abstraction
+    private boolean skillOnHotbar(Skill skill) {
+        // TODO: slots should be a constant
+        PlayerInventory inventory = pc.getPlayer().getInventory();
+        for (int slot = 0; slot < 6; slot++) {
+            ItemStack itemStack = inventory.getItemStack(slot);
             if (itemStack.hasTag(PlayerClassManager.SKILL_ID_TAG) &&
                     itemStack.getTag(PlayerClassManager.SKILL_ID_TAG) == skill.getId()) {
                 return true;

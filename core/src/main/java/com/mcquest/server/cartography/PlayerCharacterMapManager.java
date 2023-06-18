@@ -14,7 +14,7 @@ import net.minestom.server.item.metadata.MapMeta;
 public class PlayerCharacterMapManager {
     private final PlayerCharacter pc;
     private AreaMap map;
-    private Weapon savedWeapon;
+    private boolean mapIsOpen;
 
     public PlayerCharacterMapManager(PlayerCharacter pc) {
         this.pc = pc;
@@ -32,12 +32,12 @@ public class PlayerCharacterMapManager {
     }
 
     public boolean isMapOpen() {
-        return savedWeapon != null;
+        return mapIsOpen;
     }
 
     public void openMap() {
+        pc.getInventory().saveWeapon();
         Player player = pc.getPlayer();
-        savedWeapon = pc.getWeapon();
         PlayerInventory inventory = player.getInventory();
         ItemStack mapItemStack = ItemStack.builder(Material.FILLED_MAP)
                 .meta(new MapMeta.Builder().mapId(AreaMap.MAP_ID).build())
@@ -46,11 +46,13 @@ public class PlayerCharacterMapManager {
         map.render(pc);
         MapOpenEvent event = new MapOpenEvent(pc);
         MinecraftServer.getGlobalEventHandler().call(event);
+        mapIsOpen = true;
     }
 
     public void closeMap() {
-        savedWeapon = null;
+        pc.getInventory().unsaveWeapon();
         MapCloseEvent event = new MapCloseEvent(pc);
         MinecraftServer.getGlobalEventHandler().call(event);
+        mapIsOpen = false;
     }
 }

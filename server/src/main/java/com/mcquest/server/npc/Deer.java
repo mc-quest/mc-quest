@@ -13,7 +13,6 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
-import net.minestom.server.entity.damage.DamageType;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
@@ -70,9 +69,7 @@ public class Deer extends NonPlayerCharacter {
     @Override
     public void damage(@NotNull DamageSource source, double amount) {
         super.damage(source, amount);
-        if (isAlive()) {
-            entity.damage(DamageType.VOID, 0f);
-        } else {
+        if (!isAlive()) {
             if (source instanceof PlayerCharacter pc) {
                 pc.grantExperiencePoints(50);
             }

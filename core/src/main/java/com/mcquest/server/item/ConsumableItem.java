@@ -1,10 +1,16 @@
 package com.mcquest.server.item;
 
+import com.google.common.collect.ListMultimap;
 import com.mcquest.server.asset.Asset;
 import com.mcquest.server.asset.AssetTypes;
 import com.mcquest.server.event.EventEmitter;
 import com.mcquest.server.event.ItemConsumeEvent;
+import com.mcquest.server.resourcepack.Materials;
+import com.mcquest.server.resourcepack.ResourcePackUtility;
+import com.mcquest.server.ui.Hotbar;
 import net.kyori.adventure.text.Component;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
@@ -20,17 +26,13 @@ public class ConsumableItem extends Item {
     private final int level;
     private final Asset icon;
     private final EventEmitter<ItemConsumeEvent> onConsume;
+    private int customModelDataStart;
 
     ConsumableItem(Builder builder) {
         super(builder.id, builder.name, builder.quality, builder.description);
         level = builder.level;
         icon = builder.icon;
         onConsume = new EventEmitter<>();
-    }
-
-    @Override
-    public int getStackSize() {
-        return 64;
     }
 
     public int getLevel() {
@@ -46,26 +48,61 @@ public class ConsumableItem extends Item {
     }
 
     @Override
-    List<Component> getItemStackLore() {
-        ItemQuality quality = getQuality();
-        String description = getDescription();
+    public int getStackSize() {
+        return 64;
+    }
+
+    @Override
+    public ItemStack getItemStack() {
+        return ItemStack.builder(Materials.ITEM_DEFAULT)
+                .set(ID_TAG, getId())
+                .displayName(getDisplayName())
+                .lore(lore())
+                .meta(builder -> builder.customModelData(customModelDataStart))
+                .build();
+    }
+
+    public ItemStack getItemStack(int cooldownTexture) {
+        int customModelData = customModelDataStart + cooldownTexture;
+
+        return ItemStack.builder(Materials.ITEM_DEFAULT)
+                .set(ID_TAG, getId())
+                .displayName(getDisplayName())
+                .lore(lore())
+                .meta(builder -> builder.customModelData(customModelData))
+                .build();
+    }
+
+    private List<Component> lore() {
         List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.qualityText(quality, "Consumable"));
-        lore.add(ItemUtility.levelText(level));
-        if (description != null) {
-            lore.add(Component.empty());
-            lore.addAll(ItemUtility.descriptionText(description));
-        }
-        lore.add(Component.empty());
-        lore.add(ItemUtility.consumeText());
         return lore;
     }
 
     @ApiStatus.Internal
     @Override
-    public int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides) {
-        // TODO
-        return 0;
+    public void writeResources(FileTree tree,
+                               ListMultimap<Material, ItemOverride> overrides) {
+        Material material = Materials.ITEM_DEFAULT;
+
+        customModelDataStart = ResourcePackUtility.writeIcon(
+                tree,
+                icon,
+                ItemUtility.resourcePackKey(this),
+                material,
+                overrides
+        );
+
+        // Cooldown textures.
+        for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
+            ResourcePackUtility.writeCooldownIcon(
+                    tree,
+                    icon,
+                    ItemUtility.resourcePackKey(this, i),
+                    i,
+                    material,
+                    overrides
+            );
+        }
     }
 
     public static IdStep builder() {

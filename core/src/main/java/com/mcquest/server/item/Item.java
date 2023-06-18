@@ -1,22 +1,21 @@
 package com.mcquest.server.item;
 
+import com.google.common.collect.ListMultimap;
 import com.mcquest.server.instance.Instance;
-import com.mcquest.server.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
-import java.util.List;
-
 public abstract class Item {
-    public static final Material ITEM_MATERIAL = Material.WOODEN_AXE; // TODO this might not stack
+    static final Tag<Integer> ID_TAG = Tag.Integer("item_id");
 
     private final int id;
     private final String name;
@@ -46,16 +45,6 @@ public abstract class Item {
         return description;
     }
 
-    public ItemStack getItemStack() {
-        return createItemStack();
-    }
-
-//    public abstract ItemStack getItemStack();
-//
-//    public abstract ItemStack getShopItemStack();
-//
-//    public abstract ItemStack getLootChestItemStack();
-
     public TextComponent getDisplayName() {
         return Component.text(name, quality.getColor());
     }
@@ -77,14 +66,9 @@ public abstract class Item {
 
     public abstract int getStackSize();
 
-    ItemStack createItemStack() {
-        return ItemStackUtility.createItemStack(ITEM_MATERIAL, getDisplayName(), getItemStackLore())
-                .withTag(ItemManager.ID_TAG, id)
-                .withMeta(builder -> builder.customModelData(1));
-    }
-
-    abstract List<Component> getItemStackLore();
+    abstract ItemStack getItemStack();
 
     @ApiStatus.Internal
-    public abstract int writeResources(FileTree tree, int customModelDataStart, List<ItemOverride> overrides);
+    public abstract void writeResources(FileTree tree,
+                                        ListMultimap<Material, ItemOverride> overrides);
 }

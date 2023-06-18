@@ -5,13 +5,16 @@ import com.mcquest.server.loot.LootChest;
 import com.mcquest.server.loot.Loot;
 import net.minestom.server.event.Event;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class LootChestOpenEvent implements Event {
     private final PlayerCharacter pc;
     private final LootChest lootChest;
-    private final Loot[] loot;
+    private final Collection<Loot> loot;
 
     public LootChestOpenEvent(PlayerCharacter pc, LootChest lootChest,
-                              Loot[] loot) {
+                              Collection<Loot> loot) {
         this.pc = pc;
         this.lootChest = lootChest;
         this.loot = loot;
@@ -21,7 +24,7 @@ public class LootChestOpenEvent implements Event {
         return pc;
     }
 
-    public Loot[] getLoot() {
-        return loot.clone();
+    public Collection<Loot> getLoot() {
+        return Collections.unmodifiableCollection(loot);
     }
 }

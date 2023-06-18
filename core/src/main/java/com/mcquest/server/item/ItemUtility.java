@@ -1,6 +1,8 @@
 package com.mcquest.server.item;
 
+import com.mcquest.server.resourcepack.Namespaces;
 import com.mcquest.server.text.WordWrap;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,5 +35,14 @@ class ItemUtility {
     static TextComponent consumeText() {
         return Component.text("Shift-click to use",
                 NamedTextColor.GRAY, TextDecoration.ITALIC);
+    }
+
+    static Key resourcePackKey(Item item) {
+        return Key.key(Namespaces.ITEMS, String.valueOf(item.getId()));
+    }
+
+    static Key resourcePackKey(ConsumableItem item, int cooldownTexture) {
+        return Key.key(Namespaces.ITEMS,
+                String.format("%d-%d", item.getId(), cooldownTexture));
     }
 }

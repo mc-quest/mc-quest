@@ -1,41 +1,35 @@
 package com.mcquest.server.resourcepack;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.mcquest.server.Mmorpg;
 import com.mcquest.server.asset.Asset;
+import com.mcquest.server.asset.AssetDirectory;
 import com.mcquest.server.audio.AudioClip;
 import com.mcquest.server.item.Item;
 import com.mcquest.server.playerclass.PlayerClass;
 import com.mcquest.server.playerclass.Skill;
-import net.kyori.adventure.key.Key;
+import net.minestom.server.item.Material;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.metadata.Metadata;
+import team.unnamed.creative.metadata.PackMeta;
 import team.unnamed.creative.model.ItemOverride;
 import team.unnamed.creative.sound.SoundEvent;
 import team.unnamed.creative.sound.SoundRegistry;
-import team.unnamed.creative.texture.Texture;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.writer.ModelWriter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.*;
 
 class ResourcePackBuilder {
-    private final Consumer<FileTree> baseWriter;
-    private final PlayerClass[] playerClasses;
-    private final Item[] items;
-    private final Model[] models;
-    private final AudioClip[] audio;
+    private static final int PACK_FORMAT = 9;
 
-    ResourcePackBuilder(Consumer<FileTree> baseWriter, PlayerClass[] playerClasses,
-                        Item[] items, Model[] models, AudioClip[] audio) {
-        this.baseWriter = baseWriter;
-        this.playerClasses = playerClasses;
-        this.items = items;
-        this.models = models;
-        this.audio = audio;
+    private final Mmorpg mmorpg;
+
+    ResourcePackBuilder(Mmorpg mmorpg) {
+        this.mmorpg = mmorpg;
     }
 
     ResourcePack build() {
@@ -43,11 +37,8 @@ class ResourcePackBuilder {
     }
 
     private void writeResources(FileTree tree) {
-        writeBaseResourcePack(tree);
-        if (!tree.exists("pack.mcmeta")) {
-            throw new IllegalArgumentException("Resource pack writer must write pack.mcmeta");
-        }
-        writeGuiTextures(tree);
+        writeMetadata(tree);
+        writeBaseTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
         writeModelResources(tree);
@@ -55,59 +46,82 @@ class ResourcePackBuilder {
         disableBackgroundMusic(tree);
     }
 
-    private void writeBaseResourcePack(FileTree tree) {
-        baseWriter.accept(tree);
+    private void writeMetadata(FileTree tree) {
+        String description = mmorpg.getName() + " resource pack";
+        PackMeta packMeta = PackMeta.of(PACK_FORMAT, description);
+
+        Metadata metadata = Metadata.builder()
+                .add(packMeta)
+                .build();
+
+        tree.write(metadata);
     }
 
-    private void writeGuiTextures(FileTree tree) {
-        Texture texture = Texture.builder()
-                .key(Key.key("gui/icons"))
-                .data(Writable.resource(getClass().getClassLoader(), "textures/icons.png"))
-                .build();
-        tree.write(texture);
+    private void writeBaseTextures(FileTree tree) {
+        AssetDirectory resourcePackDir =
+                new AssetDirectory(getClass().getClassLoader(), "textures");
+        List<Asset> assets = resourcePackDir.getAssets();
+        for (Asset asset : assets) {
+            tree.write("minecraft/" + asset.getPath(),
+                    Writable.inputStream(asset::getStream));
+        }
     }
 
     private void writeSkillResources(FileTree tree) {
-        int customModelData = 0;
+        Collection<PlayerClass> playerClasses = mmorpg.getPlayerClassManager()
+                .getPlayerClasses();
+        List<ItemOverride> overrides = new ArrayList<>();
+
         for (PlayerClass playerClass : playerClasses) {
             for (Skill skill : playerClass.getSkills()) {
-                customModelData += skill.writeResources(tree, customModelData);
+                skill.writeResources(tree, overrides);
             }
         }
+
+        ResourcePackUtility.writeItemOverrides(tree, Materials.SKILL, overrides);
     }
 
     private void writeItemResources(FileTree tree) {
-        int customModelData = 0;
-        List<ItemOverride> overrides = new ArrayList<>();
+        Collection<Item> items = mmorpg.getItemManager().getItems();
+        ListMultimap<Material, ItemOverride> overrides = ArrayListMultimap.create();
+
         for (Item item : items) {
-            customModelData += item.writeResources(tree, customModelData, overrides);
+            item.writeResources(tree, overrides);
         }
-        ResourcePackUtility.writeItemOverrides(tree, Item.ITEM_MATERIAL, overrides);
+
+        ResourcePackUtility.writeItemOverrides(tree, overrides);
     }
 
     private void writeModelResources(FileTree tree) {
-        ModelWriter.resource(Namespaces.MODELS).write(tree, List.of(models));
+        Collection<Model> models = mmorpg.getModelManager().getModels();
+        ModelWriter.resource(Namespaces.MODELS).write(tree, models);
     }
 
     private void writeAudioResources(FileTree tree) {
+        AudioClip[] audio = mmorpg.getAudioManager()
+                .getAudioClips().toArray(new AudioClip[0]);
         Map<String, SoundEvent> sounds = new HashMap<>();
+
         for (int i = 0; i < audio.length; i++) {
             AudioClip audioClip = audio[i];
             int id = i + 1;
             audioClip.writeResources(tree, id, sounds);
         }
+
         SoundRegistry soundRegistry = SoundRegistry.of(Namespaces.AUDIO, sounds);
         tree.write(soundRegistry);
     }
 
     private void disableBackgroundMusic(FileTree tree) {
         String[] backgroundMusic = new Asset(ResourcePackBuilder.class.getClassLoader(),
-                "MinecraftMusic.json").readJson(String[].class);
+                "minecraft_music.json").readJson(String[].class);
         Map<String, SoundEvent> sounds = new HashMap<>();
+
         for (String backgroundSong : backgroundMusic) {
             SoundEvent soundEvent = SoundEvent.builder().replace(true).build();
             sounds.put(backgroundSong, soundEvent);
         }
+
         SoundRegistry soundRegistry = SoundRegistry.of("minecraft", sounds);
         tree.write(soundRegistry);
     }

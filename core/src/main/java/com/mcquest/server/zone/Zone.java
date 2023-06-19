@@ -5,6 +5,8 @@ import com.mcquest.server.weather.Weather;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
@@ -62,7 +64,10 @@ public class Zone {
     public void addPlayerCharacter(PlayerCharacter pc) {
         pcs.add(pc);
         showZoneText(pc);
-        sendWeatherPackets(pc);
+        MinecraftServer.getSchedulerManager()
+                .buildTask(() -> sendWeatherPackets(pc))
+                .delay(TaskSchedule.nextTick())
+                .schedule();
     }
 
     @ApiStatus.Internal

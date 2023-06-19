@@ -33,15 +33,11 @@ public class AreaMap {
     private final Collection<QuestMarker> questMarkers;
 
     public AreaMap(int id, Pos origin, Asset image) {
-        try {
-            this.id = id;
-            this.origin = origin;
-            image.requireType(AssetTypes.PNG);
-            this.image = image.readImage();
-            this.questMarkers = new ArrayList<>();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        this.id = id;
+        this.origin = origin;
+        image.requireType(AssetTypes.PNG);
+        this.image = image.readImage();
+        this.questMarkers = new ArrayList<>();
     }
 
     public int getId() {

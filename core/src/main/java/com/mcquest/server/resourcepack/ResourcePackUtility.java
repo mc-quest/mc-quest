@@ -17,9 +17,9 @@ import team.unnamed.creative.texture.Texture;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 @ApiStatus.Internal
 public class ResourcePackUtility {
@@ -65,14 +65,32 @@ public class ResourcePackUtility {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", stream);
             writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static void writeLockedIcon(FileTree tree, Asset icon, Key key,
+                                       List<ItemOverride> overrides) {
+        try {
+            BufferedImage image = icon.readImage();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    int rgb = gray(image.getRGB(x, y));
+                    image.setRGB(x, y, rgb);
+                }
+            }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
     private static int writeIcon(FileTree tree, Writable icon,
                                  Key key, List<ItemOverride> overrides) {
-        int customModelData = overrides.size();
+        int customModelData = overrides.size() + 1;
 
         Texture texture = Texture.of(key, icon);
         tree.write(texture);
@@ -114,6 +132,18 @@ public class ResourcePackUtility {
         tree.write(model);
     }
 
+    public static int gray(int rgb) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = (rgb & 0xFF);
+        int gray = (r + g + b) / 3;
+        int ret = 0xFF000000 & rgb;
+        ret |= gray;
+        ret |= gray << 8;
+        ret |= gray << 16;
+        return ret;
+    }
+
     public static int grayAndDarken(int rgb) {
         int r = (rgb >> 16) & 0xFF;
         int g = (rgb >> 8) & 0xFF;
@@ -136,7 +166,7 @@ public class ResourcePackUtility {
 
     public static int writeModel(FileTree tree, Asset bbmodel, Key key,
                                  List<ItemOverride> overrides) {
-        int customModelData = overrides.size();
+        int customModelData = overrides.size() + 1;
 
         JsonObject modelJson = bbmodel.readJson().getAsJsonObject();
 

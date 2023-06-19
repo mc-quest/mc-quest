@@ -80,7 +80,8 @@ public class Weapon extends Item {
         return 1;
     }
 
-    public ItemStack getItemStack() {
+    @Override
+    ItemStack getItemStack() {
         return ItemStack.builder(Materials.WEAPON)
                 .set(ID_TAG, getId())
                 .displayName(getDisplayName())

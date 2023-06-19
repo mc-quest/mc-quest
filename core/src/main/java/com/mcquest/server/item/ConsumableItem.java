@@ -53,7 +53,7 @@ public class ConsumableItem extends Item {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    ItemStack getItemStack() {
         return ItemStack.builder(Materials.ITEM_DEFAULT)
                 .set(ID_TAG, getId())
                 .displayName(getDisplayName())
@@ -62,7 +62,7 @@ public class ConsumableItem extends Item {
                 .build();
     }
 
-    public ItemStack getItemStack(int cooldownTexture) {
+    ItemStack getHotbarItemStack(int cooldownTexture) {
         int customModelData = customModelDataStart + cooldownTexture;
 
         return ItemStack.builder(Materials.ITEM_DEFAULT)

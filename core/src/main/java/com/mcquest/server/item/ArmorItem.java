@@ -86,7 +86,7 @@ public class ArmorItem extends Item {
     }
 
     @Override
-    public ItemStack getItemStack() {
+    ItemStack getItemStack() {
         ItemStack.Builder builder = ItemStack.builder(material());
 
         if (bbmodel != null) {

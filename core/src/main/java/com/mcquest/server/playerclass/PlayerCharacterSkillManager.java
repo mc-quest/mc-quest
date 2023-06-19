@@ -127,17 +127,23 @@ public class PlayerCharacterSkillManager {
         }
 
         if (!isUnlocked(skill)) {
+            pc.sendMessage(Component.text(skill.getName() + " is locked!",
+                    NamedTextColor.RED));
             result.setCancel(true);
             return;
         }
 
         if (skillOnHotbar(skill)) {
+            pc.sendMessage(Component.text(skill.getName()
+                    + " is already on your hotbar", NamedTextColor.RED));
             result.setCancel(true);
             return;
         }
 
         // TODO: may want to add a hotbar itemstack to cursor instead of skill
         //  tree itemstack
+
+        result.setCursorItem(result.getClickedItem());
     }
 
     private void handleShiftClick(Skill skill, InventoryConditionResult result) {
@@ -148,10 +154,14 @@ public class PlayerCharacterSkillManager {
         }
 
         if (skill.getPrerequisite() != null && !isUnlocked(skill.getPrerequisite())) {
+            pc.sendMessage(Component.text(skill.getName() + " requires "
+                    + skill.getPrerequisite().getName() + "!", NamedTextColor.RED));
             return;
         }
 
         if (skillPoints == 0) {
+            pc.sendMessage(Component.text("No skill points remaining!",
+                    NamedTextColor.RED));
             return;
         }
 

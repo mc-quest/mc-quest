@@ -14,6 +14,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
@@ -45,6 +46,7 @@ public class PlayerCharacterManager {
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
         eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
+        eventHandler.addListener(EntityDamageEvent.class, this::handleDamage);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
     }
@@ -110,6 +112,12 @@ public class PlayerCharacterManager {
         MinecraftServer.getGlobalEventHandler().call(pcMoveEvent);
         if (!pcMoveEvent.isCancelled()) {
             pc.updatePosition(pcMoveEvent.getNewPosition());
+        }
+    }
+
+    private void handleDamage(EntityDamageEvent event) {
+        if (event.getEntity() instanceof Player) {
+            event.setDamage(0.0f);
         }
     }
 

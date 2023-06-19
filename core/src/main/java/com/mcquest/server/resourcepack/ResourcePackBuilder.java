@@ -62,7 +62,7 @@ class ResourcePackBuilder {
                 new AssetDirectory(getClass().getClassLoader(), "textures");
         List<Asset> assets = resourcePackDir.getAssets();
         for (Asset asset : assets) {
-            tree.write("minecraft/" + asset.getPath(),
+            tree.write("assets/minecraft/" + asset.getPath(),
                     Writable.inputStream(asset::getStream));
         }
     }

@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mcquest.server.text.TextSerializer.deserialize;
-
 public class WordWrap {
     public static final int STANDARD_LINE_LENGTH = 18;
 
@@ -26,7 +24,7 @@ public class WordWrap {
         for (String token : tokens) {
             if (token.equals("\n")) {
                 removeTrailingSpace(currentLine);
-                lines.add(deserialize(currentLine.toString()));
+                lines.add(TextSerializer.deserialize(currentLine.toString()));
                 currentLine.setLength(0);
                 currentLineLength = 0;
                 chatColor = ChatColor.getLastColors(chatColor);
@@ -40,7 +38,7 @@ public class WordWrap {
             } else {
                 if (currentLineLength + token.length() > lineLength) {
                     removeTrailingSpace(currentLine);
-                    lines.add(deserialize(currentLine.toString()));
+                    lines.add(TextSerializer.deserialize(currentLine.toString()));
                     currentLine.setLength(0);
                     currentLineLength = 0;
                     chatColor = ChatColor.getLastColors(chatColor);
@@ -51,7 +49,7 @@ public class WordWrap {
             }
         }
 
-        lines.add(deserialize(currentLine.toString()));
+        lines.add(TextSerializer.deserialize(currentLine.toString()));
 
         return lines;
     }

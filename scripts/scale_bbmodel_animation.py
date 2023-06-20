@@ -3,7 +3,6 @@
 """Adjusts Blockbench model animation speed."""
 
 import sys
-import os.path
 import json
 
 
@@ -17,12 +16,13 @@ def main():
         error("Usage: %s file_name animation_name scale" % sys.argv[0])
 
     file_name = sys.argv[1]
-    if not os.path.isfile(file_name):
-        error("File %s does not exist" % file_name)
     if not file_name.endswith(".bbmodel"):
         error("File %s is not a Blockbench model" % file_name)
-    with open(file_name, "r") as file:
-        model = json.load(file)
+    try:
+        with open(file_name, "r") as file:
+            model = json.load(file)
+    except IOError:
+        error("File %s could not be opened" % file_name)
 
     animation_name = sys.argv[2]
     animations = [animation for animation in model["animations"]

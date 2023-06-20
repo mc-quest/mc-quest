@@ -42,7 +42,7 @@ public class Shot {
                 }
             } else {
                 Duration prevTime = Iterables.getLast(keyFrames).getTime();
-                if (time.compareTo(prevTime) < 0) {
+                if (time.compareTo(prevTime) <= 0) {
                     throw new IllegalArgumentException();
                 }
             }

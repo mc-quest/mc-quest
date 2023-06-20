@@ -7,6 +7,7 @@ import com.mcquest.server.audio.PlayerCharacterMusicPlayer;
 import com.mcquest.server.audio.Song;
 import com.mcquest.server.cartography.CardinalDirection;
 import com.mcquest.server.cartography.PlayerCharacterMapManager;
+import com.mcquest.server.cinema.CutscenePlayer;
 import com.mcquest.server.commerce.Money;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.item.PlayerCharacterInventory;
@@ -63,6 +64,7 @@ public final class PlayerCharacter extends Character {
     private final QuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
     private final PlayerCharacterMapManager mapManager;
+    private final CutscenePlayer cutscenePlayer;
     private final Hitbox hitbox;
     private Zone zone;
     private Pos respawnPosition;
@@ -93,6 +95,7 @@ public final class PlayerCharacter extends Character {
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
         mapManager = new PlayerCharacterMapManager(this);
+        cutscenePlayer = new CutscenePlayer(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
@@ -252,6 +255,10 @@ public final class PlayerCharacter extends Character {
 
     public PlayerCharacterMapManager getMapManager() {
         return mapManager;
+    }
+
+    public CutscenePlayer getCutscenePlayer() {
+        return cutscenePlayer;
     }
 
     public @Nullable Party getParty() {

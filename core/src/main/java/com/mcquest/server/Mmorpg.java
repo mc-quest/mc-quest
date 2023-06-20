@@ -9,6 +9,7 @@ import com.mcquest.server.character.CharacterEntityManager;
 import com.mcquest.server.character.NonPlayerCharacterSpawner;
 import com.mcquest.server.character.PlayerCharacter;
 import com.mcquest.server.character.PlayerCharacterManager;
+import com.mcquest.server.cinema.CutsceneManager;
 import com.mcquest.server.feature.Feature;
 import com.mcquest.server.instance.Instance;
 import com.mcquest.server.instance.InstanceManager;
@@ -59,6 +60,7 @@ public class Mmorpg {
     private final PhysicsManager physicsManager;
     private final ParticleManager particleManager;
     private final LootChestManager lootChestManager;
+    private final CutsceneManager cutsceneManager;
     private final ResourcePackManager resourcePackManager;
     private final Feature[] features;
 
@@ -84,6 +86,7 @@ public class Mmorpg {
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
         lootChestManager = new LootChestManager(this);
+        cutsceneManager = new CutsceneManager(this);
         resourcePackManager = new ResourcePackManager(this);
         features = builder.features;
         InteractionHandler interactionHandler = new InteractionHandler(this);
@@ -94,7 +97,7 @@ public class Mmorpg {
         for (Feature feature : features) {
             feature.hook(this);
         }
-        MojangAuth.init();
+        // MojangAuth.init();
         resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
     }
@@ -161,6 +164,10 @@ public class Mmorpg {
 
     public LootChestManager getLootChestManager() {
         return lootChestManager;
+    }
+
+    public CutsceneManager getCutsceneManager() {
+        return cutsceneManager;
     }
 
     public ResourcePackManager getResourcePackManager() {

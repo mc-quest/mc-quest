@@ -1,8 +1,8 @@
 package com.mcquest.server.constants;
 
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.audio.AudioClip;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.audio.AudioClip;
 
 public class AudioClips {
     public static final AudioClip WILDERNESS = loadAudioClip("Wilderness");

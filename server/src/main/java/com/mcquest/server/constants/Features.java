@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.feature.Feature;
+import com.mcquest.core.feature.Feature;
 import com.mcquest.server.features.*;
 
 public class Features {

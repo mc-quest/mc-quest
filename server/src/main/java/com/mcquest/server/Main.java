@@ -1,6 +1,7 @@
 package com.mcquest.server;
 
-import com.mcquest.server.asset.AssetDirectory;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.asset.AssetDirectory;
 import com.mcquest.server.constants.*;
 import com.mcquest.server.db.Database;
 

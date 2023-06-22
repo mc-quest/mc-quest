@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.audio.Song;
+import com.mcquest.core.audio.Song;
 
 public class Music {
     public static final Song WILDERNESS = new Song(1, AudioClips.WILDERNESS);

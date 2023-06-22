@@ -1,11 +1,11 @@
 package com.mcquest.server.npc;
 
-import com.mcquest.server.Mmorpg;
-import com.mcquest.server.character.Character;
-import com.mcquest.server.character.*;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.*;
+import com.mcquest.core.character.Character;
 import com.mcquest.server.constants.Models;
-import com.mcquest.server.instance.Instance;
-import com.mcquest.server.physics.Collider;
+import com.mcquest.core.instance.Instance;
+import com.mcquest.core.physics.Collider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.attribute.Attribute;

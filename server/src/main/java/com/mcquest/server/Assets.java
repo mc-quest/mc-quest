@@ -1,7 +1,7 @@
 package com.mcquest.server;
 
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.asset.AssetDirectory;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.asset.AssetDirectory;
 
 public class Assets {
     public static Asset asset(String path) {

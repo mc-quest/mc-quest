@@ -1,6 +1,6 @@
 package com.mcquest.server;
 
-import com.mcquest.server.instance.Instance;
+import com.mcquest.core.instance.Instance;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.item.Material;

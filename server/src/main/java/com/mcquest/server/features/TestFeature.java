@@ -1,16 +1,16 @@
 package com.mcquest.server.features;
 
-import com.mcquest.server.Mmorpg;
-import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.PlayerCharacter;
+import com.mcquest.core.loot.*;
 import com.mcquest.server.constants.*;
-import com.mcquest.server.event.PlayerCharacterLoginEvent;
-import com.mcquest.server.event.PlayerCharacterMoveEvent;
-import com.mcquest.server.feature.Feature;
-import com.mcquest.server.item.Item;
-import com.mcquest.server.item.PlayerCharacterInventory;
-import com.mcquest.server.loot.*;
-import com.mcquest.server.physics.Collider;
-import com.mcquest.server.util.Debug;
+import com.mcquest.core.event.PlayerCharacterLoginEvent;
+import com.mcquest.core.event.PlayerCharacterMoveEvent;
+import com.mcquest.core.feature.Feature;
+import com.mcquest.core.item.Item;
+import com.mcquest.core.item.PlayerCharacterInventory;
+import com.mcquest.core.physics.Collider;
+import com.mcquest.core.util.Debug;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;

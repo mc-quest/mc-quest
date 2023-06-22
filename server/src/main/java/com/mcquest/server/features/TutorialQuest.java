@@ -1,18 +1,18 @@
 package com.mcquest.server.features;
 
-import com.mcquest.server.Mmorpg;
-import com.mcquest.server.character.NonPlayerCharacterSpawner;
-import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.NonPlayerCharacterSpawner;
+import com.mcquest.core.character.PlayerCharacter;
+import com.mcquest.core.event.*;
+import com.mcquest.core.quest.*;
 import com.mcquest.server.constants.Instances;
 import com.mcquest.server.constants.Maps;
 import com.mcquest.server.constants.Quests;
-import com.mcquest.server.event.*;
-import com.mcquest.server.feature.Feature;
+import com.mcquest.core.feature.Feature;
 import com.mcquest.server.npc.Deer;
-import com.mcquest.server.physics.Collider;
-import com.mcquest.server.physics.PhysicsManager;
-import com.mcquest.server.quest.*;
-import com.mcquest.server.ui.Tutorial;
+import com.mcquest.core.physics.Collider;
+import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.core.ui.Tutorial;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;

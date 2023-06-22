@@ -1,8 +1,8 @@
 package com.mcquest.server.constants;
 
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.cartography.AreaMap;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.cartography.AreaMap;
 import net.minestom.server.coordinate.Pos;
 
 public class Maps {

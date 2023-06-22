@@ -1,5 +1,6 @@
 package com.mcquest.server.text;
 
+import com.mcquest.core.text.WordWrap;
 import net.kyori.adventure.text.Component;
 import org.junit.jupiter.api.Test;
 

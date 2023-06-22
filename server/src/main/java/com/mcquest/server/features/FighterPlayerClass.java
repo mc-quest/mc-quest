@@ -1,16 +1,16 @@
 package com.mcquest.server.features;
 
-import com.mcquest.server.Mmorpg;
-import com.mcquest.server.character.Attitude;
-import com.mcquest.server.character.Character;
-import com.mcquest.server.character.CharacterHitbox;
-import com.mcquest.server.character.PlayerCharacter;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.Attitude;
+import com.mcquest.core.character.Character;
+import com.mcquest.core.character.CharacterHitbox;
+import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.server.constants.FighterSkills;
-import com.mcquest.server.event.ActiveSkillUseEvent;
-import com.mcquest.server.feature.Feature;
-import com.mcquest.server.instance.Instance;
-import com.mcquest.server.physics.Collider;
-import com.mcquest.server.physics.PhysicsManager;
+import com.mcquest.core.event.ActiveSkillUseEvent;
+import com.mcquest.core.feature.Feature;
+import com.mcquest.core.instance.Instance;
+import com.mcquest.core.physics.Collider;
+import com.mcquest.core.physics.PhysicsManager;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;

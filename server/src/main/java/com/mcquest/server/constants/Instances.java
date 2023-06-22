@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.instance.Instance;
+import com.mcquest.core.instance.Instance;
 import net.minestom.server.instance.AnvilLoader;
 
 public class Instances {

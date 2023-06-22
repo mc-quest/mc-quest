@@ -1,8 +1,8 @@
 package com.mcquest.server.constants;
 
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.particle.ParticleEffect;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.particle.ParticleEffect;
 
 public class ParticleEffects {
     public static final ParticleEffect RAINBOW = loadParticleEffect("rainbow");

@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.playerclass.ActiveSkill;
+import com.mcquest.core.playerclass.ActiveSkill;
 
 public class FighterSkills {
     public static final ActiveSkill BASH = (ActiveSkill) PlayerClasses.FIGHTER.getSkill(1);

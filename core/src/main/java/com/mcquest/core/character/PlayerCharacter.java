@@ -1,0 +1,582 @@
+package com.mcquest.core.character;
+
+import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.playerclass.PlayerCharacterSkillManager;
+import com.mcquest.core.playerclass.PlayerClass;
+import com.mcquest.core.zone.Zone;
+import com.mcquest.core.Mmorpg;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.audio.AudioManager;
+import com.mcquest.core.audio.PlayerCharacterMusicPlayer;
+import com.mcquest.core.audio.Song;
+import com.mcquest.core.cartography.CardinalDirection;
+import com.mcquest.core.cartography.PlayerCharacterMapManager;
+import com.mcquest.core.cinema.CutscenePlayer;
+import com.mcquest.core.commerce.Money;
+import com.mcquest.core.instance.Instance;
+import com.mcquest.core.item.PlayerCharacterInventory;
+import com.mcquest.core.mount.Mount;
+import com.mcquest.core.persistence.PersistentQuestObjectiveData;
+import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.core.quest.Quest;
+import com.mcquest.core.quest.QuestManager;
+import com.mcquest.core.quest.QuestTracker;
+import com.mcquest.core.social.Party;
+import com.mcquest.core.util.MathUtility;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.attribute.Attribute;
+import net.minestom.server.coordinate.Point;
+import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.Entity;
+import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.Player;
+import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.time.Duration;
+import java.util.*;
+
+public final class PlayerCharacter extends Character {
+    private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
+            PlayerCharacter.class.getClassLoader(),
+            "experience_points_per_level.json"
+    ).readJson(double[].class);
+    private static final double MAX_EXPERIENCE_POINTS =
+            Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
+
+    private final Mmorpg mmorpg;
+    private final Player player;
+    private final PlayerClass playerClass;
+    private final PlayerCharacterSkillManager skillManager;
+    private final PlayerCharacterInventory inventory;
+    private final QuestTracker questTracker;
+    private final PlayerCharacterMusicPlayer musicPlayer;
+    private final PlayerCharacterMapManager mapManager;
+    private final CutscenePlayer cutscenePlayer;
+    private final Hitbox hitbox;
+    private Zone zone;
+    private Pos respawnPosition;
+    private double mana;
+    private double maxMana;
+    private double healthRegenRate;
+    private double manaRegenRate;
+    private double experiencePoints;
+    private Money money;
+    private boolean canMount;
+    private boolean canAct;
+    private boolean isDisarmed;
+    private Task undisarmTask;
+    private long undisarmTime;
+    private boolean removed;
+
+    PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
+        super(Component.text(player.getUsername(), NamedTextColor.GREEN),
+                levelForExperiencePoints(data.getExperiencePoints()),
+                mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
+                data.getPosition());
+        this.mmorpg = mmorpg;
+        this.player = player;
+        respawnPosition = data.getRespawnPosition();
+        playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
+        skillManager = new PlayerCharacterSkillManager(this, data.getSkillPoints());
+        inventory = new PlayerCharacterInventory(this, mmorpg.getItemManager(), data);
+        questTracker = initQuestTracker(data);
+        musicPlayer = initMusic(data);
+        mapManager = new PlayerCharacterMapManager(this);
+        cutscenePlayer = new CutscenePlayer(this);
+        setMaxHealth(data.getMaxHealth());
+        setHealth(data.getHealth());
+        maxMana = data.getMaxMana();
+        mana = data.getMana();
+        healthRegenRate = 1;
+        hitbox = initHitbox();
+        zone = mmorpg.getZoneManager().getZone(data.getZoneId());
+        isDisarmed = false;
+        undisarmTask = null;
+        undisarmTime = 0;
+        initUi();
+        updateAttackSpeed();
+        canMount = data.canMount();
+        // TODO
+        canAct = true;
+        removed = false;
+        money = new Money(data.getMoney());
+
+        zone.addPlayerCharacter(this);
+    }
+
+    private QuestTracker initQuestTracker(PlayerCharacterData data) {
+        QuestManager questManager = mmorpg.getQuestManager();
+
+        Map<Quest, int[]> objectiveProgress = new HashMap<>();
+        PersistentQuestObjectiveData[] objectiveData = data.getQuestObjectiveData();
+        for (PersistentQuestObjectiveData questData : objectiveData) {
+            Quest quest = questManager.getQuest(questData.getQuestId());
+            objectiveProgress.put(quest, questData.getObjectiveProgress());
+        }
+
+        Set<Quest> completedQuests = new HashSet<>();
+        int[] completedQuestIds = data.getCompletedQuestIds();
+        for (int id : completedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            completedQuests.add(quest);
+        }
+
+        List<Quest> trackedQuests = new ArrayList<>();
+        int[] trackedQuestIds = data.getTrackedQuestIds();
+        for (int id : trackedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            trackedQuests.add(quest);
+        }
+
+        return new QuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
+    }
+
+    private void initUi() {
+        // TODO: hidePlayerNameplate();
+        updateActionBar();
+        // Updating experience bar must be delayed to work properly.
+        MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
+                .delay(TaskSchedule.nextTick()).schedule();
+    }
+
+    private void updateAttackSpeed() {
+        double attackSpeed = inventory.getWeapon().getAttackSpeed();
+        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
+    }
+
+    private PlayerCharacterMusicPlayer initMusic(PlayerCharacterData data) {
+        AudioManager musicManager = mmorpg.getAudioManager();
+        PlayerCharacterMusicPlayer musicPlayer = new PlayerCharacterMusicPlayer(this);
+        Integer songId = data.getSongId();
+        if (songId != null) {
+            Song song = musicManager.getSong(songId);
+            musicPlayer.setSong(song);
+        }
+        return musicPlayer;
+    }
+
+    private Hitbox initHitbox() {
+        Hitbox hitbox = new PlayerCharacter.Hitbox(this);
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        physicsManager.addCollider(hitbox);
+        return hitbox;
+    }
+
+    @Override
+    public void setInstance(@NotNull Instance instance) {
+        super.setInstance(instance);
+
+        Instance prevInstance = (Instance) player.getInstance();
+        if (prevInstance != instance) {
+            // TODO: probably need to store when we're changing instances
+            player.setInstance(instance).thenRun(() -> {
+                prevInstance.getChunks().forEach(chunk -> chunk.removeViewer(player));
+            });
+            // TODO: need to update player's map
+        }
+        hitbox.setInstance(instance);
+    }
+
+    /**
+     * Updates the position without teleporting the player.
+     */
+    void updatePosition(@NotNull Pos position) {
+        super.setPosition(position);
+        hitbox.setCenter(hitboxCenter());
+        updateActionBar();
+    }
+
+    @Override
+    public void setPosition(@NotNull Pos position) {
+        updatePosition(position);
+        player.teleport(position);
+    }
+
+    public Pos getRespawnPosition() {
+        return respawnPosition;
+    }
+
+    public void setRespawnPosition(@NotNull Pos position) {
+        this.respawnPosition = position;
+    }
+
+    private Pos hitboxCenter() {
+        return getPosition().add(0.0, 1.0, 0.0);
+    }
+
+    public Pos getEyePosition() {
+        Pos position = getPosition();
+        return position.withY(position.y() + 1.6);
+    }
+
+    public Pos getHandPosition() {
+        Pos position = getPosition();
+        Vec lookDirection = position.direction();
+        return position.withY(position.y() + 1.0)
+                .add(lookDirection.rotateAroundY(-Math.PI / 4.0).mul(0.5));
+    }
+
+    public Pos getTargetBlockPosition(double maxDistance) {
+        Point target = player.getTargetBlockPosition((int) maxDistance);
+        if (target == null) {
+            return null;
+        }
+        return Pos.fromPoint(target);
+    }
+
+    public Vec getLookDirection() {
+        return getPosition().direction();
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public PlayerClass getPlayerClass() {
+        return playerClass;
+    }
+
+    public PlayerCharacterMusicPlayer getMusicPlayer() {
+        return musicPlayer;
+    }
+
+    public PlayerCharacterMapManager getMapManager() {
+        return mapManager;
+    }
+
+    public CutscenePlayer getCutscenePlayer() {
+        return cutscenePlayer;
+    }
+
+    public @Nullable Party getParty() {
+        // TODO
+        return null;
+    }
+
+    public double getMana() {
+        return mana;
+    }
+
+    public void setMana(double mana) {
+        if (mana < 0.0 || mana > maxMana) {
+            throw new IllegalArgumentException();
+        }
+        this.mana = mana;
+        updateActionBar();
+    }
+
+    public void addMana(double amount) {
+        if (amount < 0.0) {
+            throw new IllegalArgumentException();
+        }
+        double newMana = MathUtility.clamp(mana + amount, 0.0, maxMana);
+        setMana(newMana);
+    }
+
+    public void removeMana(double amount) {
+        if (amount < 0.0) {
+            throw new IllegalArgumentException();
+        }
+        double newMana = MathUtility.clamp(mana - amount, 0.0, maxMana);
+        setMana(newMana);
+    }
+
+    public double getMaxMana() {
+        return maxMana;
+    }
+
+    public void setMaxMana(double maxMana) {
+        if (maxMana <= 0.0) {
+            throw new IllegalArgumentException();
+        }
+        this.maxMana = maxMana;
+        updateManaBar();
+        updateActionBar();
+    }
+
+    public double getHealthRegenRate() {
+        return healthRegenRate;
+    }
+
+    public void setHealthRegenRate(double healthRegenRate) {
+        this.healthRegenRate = healthRegenRate;
+    }
+
+    public double getManaRegenRate() {
+        return manaRegenRate;
+    }
+
+    public void setManaRegenRate(double manaRegenRate) {
+        this.manaRegenRate = manaRegenRate;
+    }
+
+    private static int levelForExperiencePoints(double experiencePoints) {
+        int level = 1;
+        while (experiencePoints >= 0) {
+            experiencePoints -= EXPERIENCE_POINTS_PER_LEVEL[level - 1];
+            level++;
+        }
+        return level - 1;
+    }
+
+    public double getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void grantExperiencePoints(double experiencePoints) {
+        sendMessage(Component.text("+" + (int) Math.round(experiencePoints) + " XP",
+                NamedTextColor.GREEN));
+        this.experiencePoints = MathUtility.clamp(this.experiencePoints + experiencePoints,
+                0, MAX_EXPERIENCE_POINTS);
+        checkForLevelUp();
+        updateExperienceBar();
+        updateActionBar();
+    }
+
+    private void checkForLevelUp() {
+        int level = levelForExperiencePoints(experiencePoints);
+        if (level != getLevel()) {
+            levelUp();
+        }
+    }
+
+    private void levelUp() {
+        int newLevel = getLevel() + 1;
+        super.setLevel(newLevel);
+        sendMessage(Component.text("Level increased to " + newLevel + "!", NamedTextColor.GREEN));
+        skillManager.grantSkillPoint();
+        sendMessage(Component.text("Received 1 skill point!", NamedTextColor.GREEN));
+    }
+
+    @Override
+    public void setLevel(int level) {
+        // Don't set PlayerCharacter level explicitly.
+        throw new UnsupportedOperationException();
+    }
+
+    private void updateExperienceBar() {
+        int level = getLevel();
+        if (player.getLevel() != level) {
+            player.setLevel(level);
+        }
+        double progress = experiencePointsThisLevel() / EXPERIENCE_POINTS_PER_LEVEL[level - 1];
+        player.setExp((float) progress);
+    }
+
+    private double experiencePointsThisLevel() {
+        int level = getLevel();
+        int maxLevel = EXPERIENCE_POINTS_PER_LEVEL.length + 1;
+        if (level == maxLevel) {
+            return 0;
+        }
+        double experiencePointsThisLevel = experiencePoints;
+        for (int i = 0; i < level - 1; i++) {
+            experiencePointsThisLevel -= EXPERIENCE_POINTS_PER_LEVEL[i];
+        }
+        return experiencePointsThisLevel;
+    }
+
+    @Override
+    public void setHealth(double health) {
+        super.setHealth(health);
+        updatePlayerHealthBar();
+        updateActionBar();
+    }
+
+    @Override
+    public void setMaxHealth(double maxHealth) {
+        super.setMaxHealth(maxHealth);
+        updatePlayerHealthBar();
+        updateActionBar();
+    }
+
+    private void updatePlayerHealthBar() {
+        float playerHealth = (float) (getHealth() / getMaxHealth() * 20.0);
+        playerHealth = MathUtility.clamp(playerHealth, 1f, 20f);
+        player.setHealth(playerHealth);
+    }
+
+    private void updateManaBar() {
+        int foodLevel = (int) (getMana() / getMaxMana() * 20.0);
+        player.setFood(foodLevel);
+    }
+
+    private void updateActionBar() {
+        int hp = (int) Math.ceil(getHealth());
+        int maxHp = (int) Math.ceil(getMaxHealth());
+        int mp = (int) Math.floor(getMana());
+        int maxMp = (int) Math.ceil(getMaxMana());
+        Pos position = getPosition();
+        int x = (int) Math.round(position.x());
+        int y = (int) Math.round(position.y());
+        int z = (int) Math.round(position.z());
+        String direction = CardinalDirection.fromDirection(position.direction()).getAbbreviation();
+        Component healthText = Component.text(String.format("%d/%d HP", hp, maxHp), NamedTextColor.RED);
+        Component manaText = Component.text(String.format("%d/%d MP", mp, maxMp), NamedTextColor.AQUA);
+        Component positionText = Component.text(String.format("(%d, %d, %d) %s", x, y, z, direction),
+                NamedTextColor.GREEN);
+        Component space = Component.text("   ");
+        player.sendActionBar(healthText.append(space).append(positionText).append(space).append(manaText));
+    }
+
+    @Override
+    public void damage(@NotNull DamageSource source, double amount) {
+        super.damage(source, amount);
+        player.damage(DamageType.VOID, 0.0f);
+        if (getHealth() == 0.0) {
+            die();
+        }
+    }
+
+    private void die() {
+        setHealth(getMaxHealth());
+        setPosition(respawnPosition);
+        player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
+        player.showTitle(Title.title(Component.text("YOU DIED", NamedTextColor.RED),
+                Component.text("Respawning...", NamedTextColor.GRAY),
+                Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(2000), Duration.ofMillis(500))));
+        player.playSound(Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f));
+    }
+
+    public PlayerCharacterSkillManager getSkillManager() {
+        return skillManager;
+    }
+
+    public PlayerCharacterInventory getInventory() {
+        return inventory;
+    }
+
+    public QuestTracker getQuestTracker() {
+        return questTracker;
+    }
+
+    public Zone getZone() {
+        return zone;
+    }
+
+    public void setZone(@NotNull Zone zone) {
+        if (this.zone == zone) {
+            return;
+        }
+
+        this.zone.removePlayerCharacter(this);
+        this.zone = zone;
+        zone.addPlayerCharacter(this);
+    }
+
+    public Money getMoney() {
+        return money;
+    }
+
+    public void setMoney(Money money) {
+        this.money = money;
+    }
+
+    /**
+     * Returns the mount currently being ridden, or null if there is none.
+     */
+    public @Nullable Mount getMount() {
+        // TODO
+        // may want to return a MountInstance instead?
+        return null;
+    }
+
+    public boolean canMount() {
+        return canMount;
+    }
+
+    public void setCanMount(boolean canMount) {
+        this.canMount = canMount;
+        // TODO: unmount
+    }
+
+    public boolean isDisarmed() {
+        return isDisarmed;
+    }
+
+    public void disarm(Duration duration) {
+        isDisarmed = true;
+        if (undisarmTask != null) {
+            if (System.currentTimeMillis() + duration.toMillis() > undisarmTime) {
+                undisarmTask.cancel();
+            } else {
+                return;
+            }
+        }
+        undisarmTime = System.currentTimeMillis() + duration.toMillis();
+        undisarmTask = mmorpg.getSchedulerManager().buildTask(() -> {
+            isDisarmed = false;
+            undisarmTask = null;
+        }).delay(duration).schedule();
+    }
+
+    public void sendMessage(Component message) {
+        player.sendMessage(message);
+    }
+
+    public void playSound(Sound sound) {
+        player.playSound(sound);
+    }
+
+    public void stopSound(SoundStop stop) {
+        player.stopSound(stop);
+    }
+
+    @Override
+    public Attitude getAttitude(@NotNull Character other) {
+        if (other instanceof PlayerCharacter) {
+            return Attitude.FRIENDLY;
+        }
+        return other.getAttitude(this);
+    }
+
+    private void hidePlayerNameplate() {
+        Entity passenger = new Entity(EntityType.ARMOR_STAND);
+        passenger.setInvisible(true);
+        passenger.setInstance(getInstance()).join();
+        player.addPassenger(passenger);
+    }
+
+    public boolean canAct() {
+        return canAct;
+    }
+
+    public void setCanAct(boolean canAct) {
+        this.canAct = canAct;
+        // TODO: disable skills, consumables, and basic attacks
+    }
+
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    void remove() {
+        removed = true;
+    }
+
+    public static class Hitbox extends CharacterHitbox {
+        private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
+
+        private Hitbox(PlayerCharacter pc) {
+            super(pc, pc.getInstance(), pc.hitboxCenter(), SIZE);
+        }
+
+        @Override
+        public PlayerCharacter getCharacter() {
+            return (PlayerCharacter) super.getCharacter();
+        }
+    }
+}

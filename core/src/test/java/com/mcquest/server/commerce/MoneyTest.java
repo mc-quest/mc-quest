@@ -1,5 +1,6 @@
 package com.mcquest.server.commerce;
 
+import com.mcquest.core.commerce.Money;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

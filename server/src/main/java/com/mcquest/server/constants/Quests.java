@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.Assets;
-import com.mcquest.server.quest.Quest;
+import com.mcquest.core.quest.Quest;
 
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");

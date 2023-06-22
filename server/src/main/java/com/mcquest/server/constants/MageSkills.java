@@ -1,6 +1,6 @@
 package com.mcquest.server.constants;
 
-import com.mcquest.server.playerclass.ActiveSkill;
+import com.mcquest.core.playerclass.ActiveSkill;
 
 public class MageSkills {
     public static final ActiveSkill FIREBALL = (ActiveSkill) PlayerClasses.MAGE.getSkill(1);

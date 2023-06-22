@@ -1,7 +1,7 @@
 package com.mcquest.server.constants;
 
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
+import com.mcquest.core.asset.Asset;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.reader.ModelReader;
 import team.unnamed.hephaestus.reader.blockbench.BBModelReader;

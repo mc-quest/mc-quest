@@ -1,9 +1,9 @@
 package com.mcquest.server.constants;
 
 import com.google.gson.JsonObject;
+import com.mcquest.core.item.*;
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.item.*;
+import com.mcquest.core.asset.Asset;
 
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("AdventurersSword");

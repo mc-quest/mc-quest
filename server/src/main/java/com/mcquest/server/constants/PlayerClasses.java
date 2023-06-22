@@ -4,8 +4,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mcquest.server.Assets;
-import com.mcquest.server.asset.Asset;
-import com.mcquest.server.playerclass.PlayerClass;
+import com.mcquest.core.asset.Asset;
+import com.mcquest.core.playerclass.PlayerClass;
 
 import java.time.Duration;
 

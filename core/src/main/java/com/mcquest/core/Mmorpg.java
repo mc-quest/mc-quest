@@ -362,7 +362,6 @@ public class Mmorpg {
             return this;
         }
 
-
         @Override
         public StartStep playerCharacterLogoutHandler(
                 BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {

@@ -128,7 +128,7 @@ public class Collider {
         }
 
         for (SpatialHashCell cell : occupiedCells) {
-            removeFromCell(cell);
+            physicsManager.colliders.remove(cell, this);
         }
         occupiedCells.clear();
 
@@ -175,12 +175,7 @@ public class Collider {
                 for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
                     SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
                     newOccupiedCells.add(cell);
-                    if (!physicsManager.colliders.containsKey(cell)) {
-                        physicsManager.colliders.put(cell, new HashSet<>());
-                    }
-                    Set<Collider> cellColliders = physicsManager.colliders.get(cell);
-                    // Redundant adding is fine.
-                    cellColliders.add(this);
+                    physicsManager.colliders.put(cell, this);
                 }
             }
         }
@@ -188,7 +183,7 @@ public class Collider {
         // Remove from old cells.
         for (SpatialHashCell oldCell : occupiedCells) {
             if (!newOccupiedCells.contains(oldCell)) {
-                removeFromCell(oldCell);
+                physicsManager.colliders.remove(oldCell, this);
             }
         }
 
@@ -196,20 +191,11 @@ public class Collider {
         occupiedCells.addAll(newOccupiedCells);
     }
 
-    private void removeFromCell(SpatialHashCell cell) {
-        Set<Collider> cellColliders = physicsManager.colliders.get(cell);
-        cellColliders.remove(this);
-        if (cellColliders.isEmpty()) {
-            physicsManager.colliders.remove(cell);
-        }
-    }
-
     private void checkForCollisions() {
-        Set<Collider> enteringColliders = new HashSet<>();
-        Set<Collider> exitingColliders = new HashSet<>();
+        Collection<Collider> enteringColliders = new ArrayList<>();
+        Collection<Collider> exitingColliders = new ArrayList<>();
         for (SpatialHashCell cell : occupiedCells) {
-            Set<Collider> cellColliders = new HashSet<>(physicsManager.colliders.get(cell));
-            for (Collider other : cellColliders) {
+            for (Collider other : physicsManager.colliders.get(cell)) {
                 if (this == other) {
                     continue;
                 }

@@ -1,10 +1,13 @@
 package com.mcquest.core.physics;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.util.MathUtility;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -15,11 +18,11 @@ public class PhysicsManager {
      */
     static final double CELL_SIZE = 256.0;
 
-    final Map<SpatialHashCell, Set<Collider>> colliders;
+    final SetMultimap<SpatialHashCell, Collider> colliders;
 
     @ApiStatus.Internal
     public PhysicsManager() {
-        colliders = new HashMap<>();
+        colliders = HashMultimap.create();
     }
 
     public void addCollider(Collider collider) {
@@ -30,8 +33,9 @@ public class PhysicsManager {
         collider.disable();
     }
 
-    public List<RaycastHit> raycastAll(Instance instance, Pos origin, Vec direction,
-                                       double maxDistance, Predicate<Collider> filter) {
+    public Collection<RaycastHit> raycastAll(Instance instance, Pos origin,
+                                             Vec direction, double maxDistance,
+                                             Predicate<Collider> filter) {
         if (!direction.isNormalized()) {
             direction = direction.normalize();
         }
@@ -60,9 +64,10 @@ public class PhysicsManager {
             }
         }
 
-        List<RaycastHit> hits = new ArrayList<>();
+        Collection<RaycastHit> hits = new ArrayList<>();
         for (Collider collider : nearbyColliders) {
-            Pos intersection = rayColliderIntersection(origin, direction, maxDistance, collider);
+            Pos intersection = rayColliderIntersection(origin, direction,
+                    maxDistance, collider);
             if (intersection != null) {
                 RaycastHit hit = new RaycastHit(collider, intersection);
                 hits.add(hit);
@@ -72,26 +77,25 @@ public class PhysicsManager {
         return hits;
     }
 
-    public RaycastHit raycast(Instance instance, Pos origin, Vec direction,
-                              double maxDistance, Predicate<Collider> filter) {
-        List<RaycastHit> hits = raycastAll(instance, origin, direction, maxDistance, filter);
+    public @Nullable RaycastHit raycast(Instance instance, Pos origin,
+                                        Vec direction, double maxDistance,
+                                        Predicate<Collider> filter) {
+        Collection<RaycastHit> hits = raycastAll(instance, origin, direction,
+                maxDistance, filter);
+
         if (hits.isEmpty()) {
             return null;
         }
-        RaycastHit closestHit = hits.get(0);
-        double minDistanceSquared = closestHit.getPosition().distanceSquared(origin);
-        for (int i = 1; i < hits.size(); i++) {
-            RaycastHit currentHit = hits.get(i);
-            double currentDistanceSquared = currentHit.getPosition().distanceSquared(origin);
-            if (currentDistanceSquared < minDistanceSquared) {
-                closestHit = currentHit;
-                minDistanceSquared = currentDistanceSquared;
-            }
-        }
-        return closestHit;
+
+        return hits.stream().min((h1, h2) -> {
+            double d1 = h1.getPosition().distanceSquared(origin);
+            double d2 = h2.getPosition().distanceSquared(origin);
+            return Double.compare(d1, d2);
+        }).get();
     }
 
-    private Pos rayColliderIntersection(Pos origin, Vec direction, double maxDistance, Collider collider) {
+    private Pos rayColliderIntersection(Pos origin, Vec direction,
+                                        double maxDistance, Collider collider) {
         double originX = origin.x();
         double originY = origin.y();
         double originZ = origin.z();
@@ -116,7 +120,7 @@ public class PhysicsManager {
         double tMin;
         double tMax;
 
-        // Intersections with x planes:
+        // Intersections with x planes.
         if (directionX >= 0.0) {
             tMin = (colliderMinX - originX) * divX;
             tMax = (colliderMaxX - originX) * divX;
@@ -125,7 +129,7 @@ public class PhysicsManager {
             tMax = (colliderMinX - originX) * divX;
         }
 
-        // Intersections with y planes:
+        // Intersections with y planes.
         double tyMin;
         double tyMax;
         if (directionY >= 0.0) {
@@ -145,7 +149,7 @@ public class PhysicsManager {
             tMax = tyMax;
         }
 
-        // Intersections with z planes:
+        // Intersections with z planes.
         double tzMin;
         double tzMax;
         if (directionZ >= 0.0) {
@@ -165,13 +169,13 @@ public class PhysicsManager {
             tMax = tzMax;
         }
 
-        // Intersections are behind the origin:
         if (tMax < 0.0) {
+            // Intersections are behind the origin.
             return null;
         }
 
-        // Intersections are too far away:
         if (tMin > maxDistance) {
+            // Intersections are too far away.
             return null;
         }
 

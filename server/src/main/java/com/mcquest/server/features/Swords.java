@@ -18,6 +18,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
 
+import java.util.Collection;
 import java.util.List;
 
 public class Swords implements Feature {
@@ -39,7 +40,7 @@ public class Swords implements Feature {
         Pos origin = pc.getEyePosition();
         Vec direction = pc.getLookDirection();
         double maxDistance = 5.0;
-        List<RaycastHit> hits = physicsManager.raycastAll(instance, origin,
+        Collection<RaycastHit> hits = physicsManager.raycastAll(instance, origin,
                 direction, maxDistance, c -> shouldDamage(pc, c));
         for (RaycastHit hit : hits) {
             CharacterHitbox hitbox = (CharacterHitbox) hit.getCollider();

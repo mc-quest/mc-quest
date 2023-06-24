@@ -1,3 +1,4 @@
 rootProject.name = 'mc-quest'
-include 'server'
 include 'core'
+include 'server'
+include 'gateway'

@@ -1,9 +1,5 @@
 package com.mcquest.core.character;
 
-import com.mcquest.core.persistence.PlayerCharacterData;
-import com.mcquest.core.playerclass.PlayerCharacterSkillManager;
-import com.mcquest.core.playerclass.PlayerClass;
-import com.mcquest.core.zone.Zone;
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.asset.Asset;
 import com.mcquest.core.audio.AudioManager;
@@ -17,12 +13,16 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.persistence.PersistentQuestObjectiveData;
+import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.core.playerclass.PlayerCharacterSkillManager;
+import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.quest.Quest;
 import com.mcquest.core.quest.QuestManager;
 import com.mcquest.core.quest.QuestTracker;
 import com.mcquest.core.social.Party;
 import com.mcquest.core.util.MathUtility;
+import com.mcquest.core.zone.Zone;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
@@ -33,8 +33,6 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.potion.Potion;
@@ -145,7 +143,6 @@ public final class PlayerCharacter extends Character {
     }
 
     private void initUi() {
-        // TODO: hidePlayerNameplate();
         updateActionBar();
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
@@ -541,13 +538,6 @@ public final class PlayerCharacter extends Character {
             return Attitude.FRIENDLY;
         }
         return other.getAttitude(this);
-    }
-
-    private void hidePlayerNameplate() {
-        Entity passenger = new Entity(EntityType.ARMOR_STAND);
-        passenger.setInvisible(true);
-        passenger.setInstance(getInstance()).join();
-        player.addPassenger(passenger);
     }
 
     public boolean canAct() {

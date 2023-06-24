@@ -10,8 +10,9 @@ public class Instance extends InstanceContainer {
     private final int id;
 
     private Instance(Builder builder) {
-        super(UUID.randomUUID(), builder.dimensionType, builder.loader);
+        super(UUID.randomUUID(), builder.dimensionType);
         this.id = builder.id;
+        setChunkLoader(builder.loader);
     }
 
     public int getId() {

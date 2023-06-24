@@ -1,5 +1,7 @@
 package com.mcquest.core.character;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.physics.SpatialHashCell;
@@ -9,9 +11,7 @@ import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class NonPlayerCharacterSpawner {
@@ -20,12 +20,12 @@ public class NonPlayerCharacterSpawner {
     private static final double DESPAWN_RADIUS = 85.0;
 
     private final Mmorpg mmorpg;
-    private final Map<SpatialHashCell, Set<NonPlayerCharacter>> npcs;
+    private final SetMultimap<SpatialHashCell, NonPlayerCharacter> npcs;
     private final Set<NonPlayerCharacter> spawnedNpcs;
 
     public NonPlayerCharacterSpawner(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-        npcs = new HashMap<>();
+        npcs = HashMultimap.create();
         spawnedNpcs = new HashSet<>();
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
         schedulerManager.buildTask(this::tick)
@@ -51,17 +51,14 @@ public class NonPlayerCharacterSpawner {
                 for (int y = minCell.getY(); y <= maxCell.getY(); y++) {
                     for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
                         SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
-                        Set<NonPlayerCharacter> cellNpcs = npcs.get(cell);
-                        if (cellNpcs != null) {
-                            for (NonPlayerCharacter npc : cellNpcs) {
-                                if (npc.getPosition().distanceSquared(pcPosition) <= SPAWN_RADIUS * SPAWN_RADIUS
-                                        && !npc.isSpawned() && npc.isAlive()) {
-                                    toSpawn.add(npc);
-                                }
-                                if (npc.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS
-                                        && npc.isSpawned()) {
-                                    toNotDespawn.add(npc);
-                                }
+                        for (NonPlayerCharacter npc : npcs.get(cell)) {
+                            if (npc.getPosition().distanceSquared(pcPosition) <= SPAWN_RADIUS * SPAWN_RADIUS
+                                    && !npc.isSpawned() && npc.isAlive()) {
+                                toSpawn.add(npc);
+                            }
+                            if (npc.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS
+                                    && npc.isSpawned()) {
+                                toNotDespawn.add(npc);
                             }
                         }
                     }
@@ -90,7 +87,7 @@ public class NonPlayerCharacterSpawner {
         Instance instance = npc.getInstance();
         Pos position = npc.getPosition();
         SpatialHashCell cell = SpatialHashCell.cellAt(instance, position, CELL_SIZE);
-        addToCell(cell, npc);
+        npcs.put(cell, npc);
     }
 
     public void remove(@NotNull NonPlayerCharacter npc) {
@@ -105,7 +102,7 @@ public class NonPlayerCharacterSpawner {
         Instance instance = npc.getInstance();
         Pos position = npc.getPosition();
         SpatialHashCell cell = SpatialHashCell.cellAt(instance, position, CELL_SIZE);
-        removeFromCell(cell, npc);
+        npcs.remove(cell, npc);
     }
 
     void updateCell(NonPlayerCharacter npc, Instance newInstance, Pos newPosition) {
@@ -114,28 +111,12 @@ public class NonPlayerCharacterSpawner {
         SpatialHashCell prevCell = SpatialHashCell.cellAt(prevInstance, prevPosition, CELL_SIZE);
         SpatialHashCell newCell = SpatialHashCell.cellAt(newInstance, newPosition, CELL_SIZE);
         if (!newCell.equals(prevCell)) {
-            removeFromCell(prevCell, npc);
-            addToCell(newCell, npc);
+            npcs.remove(prevCell, npc);
+            npcs.put(newCell, npc);
         }
     }
 
     void handleDeath(NonPlayerCharacter npc) {
         spawnedNpcs.remove(npc);
-    }
-
-    private void addToCell(SpatialHashCell cell, NonPlayerCharacter npc) {
-        if (!npcs.containsKey(cell)) {
-            npcs.put(cell, new HashSet<>());
-        }
-        Set<NonPlayerCharacter> cellNpcs = npcs.get(cell);
-        cellNpcs.add(npc);
-    }
-
-    private void removeFromCell(SpatialHashCell cell, NonPlayerCharacter npc) {
-        Set<NonPlayerCharacter> npcCells = npcs.get(cell);
-        npcCells.remove(npc);
-        if (npcCells.isEmpty()) {
-            npcs.remove(cell);
-        }
     }
 }

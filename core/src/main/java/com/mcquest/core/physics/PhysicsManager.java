@@ -53,11 +53,9 @@ public class PhysicsManager {
                 for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
                     SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
                     Set<Collider> cellColliders = colliders.get(cell);
-                    if (cellColliders != null) {
-                        for (Collider collider : cellColliders) {
-                            if (filter.test(collider)) {
-                                nearbyColliders.add(collider);
-                            }
+                    for (Collider collider : cellColliders) {
+                        if (filter.test(collider)) {
+                            nearbyColliders.add(collider);
                         }
                     }
                 }

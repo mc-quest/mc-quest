@@ -6,7 +6,7 @@ import com.mcquest.core.audio.AudioManager;
 import com.mcquest.core.audio.PlayerCharacterMusicPlayer;
 import com.mcquest.core.audio.Song;
 import com.mcquest.core.cartography.CardinalDirection;
-import com.mcquest.core.cartography.PlayerCharacterMapManager;
+import com.mcquest.core.cartography.MapViewer;
 import com.mcquest.core.cinema.CutscenePlayer;
 import com.mcquest.core.commerce.Money;
 import com.mcquest.core.instance.Instance;
@@ -61,7 +61,7 @@ public final class PlayerCharacter extends Character {
     private final PlayerCharacterInventory inventory;
     private final QuestTracker questTracker;
     private final PlayerCharacterMusicPlayer musicPlayer;
-    private final PlayerCharacterMapManager mapManager;
+    private final MapViewer mapViewer;
     private final CutscenePlayer cutscenePlayer;
     private final Hitbox hitbox;
     private Zone zone;
@@ -92,7 +92,7 @@ public final class PlayerCharacter extends Character {
         inventory = new PlayerCharacterInventory(this, mmorpg.getItemManager(), data);
         questTracker = initQuestTracker(data);
         musicPlayer = initMusic(data);
-        mapManager = new PlayerCharacterMapManager(this);
+        mapViewer = new MapViewer(this);
         cutscenePlayer = new CutscenePlayer(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
@@ -176,14 +176,11 @@ public final class PlayerCharacter extends Character {
     public void setInstance(@NotNull Instance instance) {
         super.setInstance(instance);
 
-        Instance prevInstance = (Instance) player.getInstance();
-        if (prevInstance != instance) {
-            // TODO: probably need to store when we're changing instances
-            player.setInstance(instance).thenRun(() -> {
-                prevInstance.getChunks().forEach(chunk -> chunk.removeViewer(player));
-            });
-            // TODO: need to update player's map
+        if (player.getInstance() != instance) {
+            player.setInstance(instance);
         }
+
+        mapViewer.render();
         hitbox.setInstance(instance);
     }
 
@@ -192,6 +189,7 @@ public final class PlayerCharacter extends Character {
      */
     void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
+        mapViewer.render();
         hitbox.setCenter(hitboxCenter());
         updateActionBar();
     }
@@ -250,8 +248,8 @@ public final class PlayerCharacter extends Character {
         return musicPlayer;
     }
 
-    public PlayerCharacterMapManager getMapManager() {
-        return mapManager;
+    public MapViewer getMapViewer() {
+        return mapViewer;
     }
 
     public CutscenePlayer getCutscenePlayer() {

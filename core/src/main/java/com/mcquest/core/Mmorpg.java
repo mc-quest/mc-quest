@@ -1,7 +1,7 @@
 package com.mcquest.core;
 
 import com.mcquest.core.audio.Song;
-import com.mcquest.core.cartography.AreaMap;
+import com.mcquest.core.cartography.Map;
 import com.mcquest.core.cartography.MapManager;
 import com.mcquest.core.character.CharacterEntityManager;
 import com.mcquest.core.character.NonPlayerCharacterSpawner;
@@ -34,6 +34,7 @@ import com.mcquest.core.ui.PlayerCharacterLogoutType;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.world.biomes.Biome;
 import team.unnamed.hephaestus.Model;
@@ -96,7 +97,7 @@ public class Mmorpg {
         for (Feature feature : features) {
             feature.hook(this);
         }
-        // MojangAuth.init();
+        MojangAuth.init();
         resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
     }
@@ -210,7 +211,7 @@ public class Mmorpg {
     }
 
     public interface MapsStep {
-        MountsStep maps(AreaMap... maps);
+        MountsStep maps(Map... maps);
     }
 
     public interface MountsStep {
@@ -263,7 +264,7 @@ public class Mmorpg {
         private Quest[] quests;
         private Zone[] zones;
         private Song[] music;
-        private AreaMap[] maps;
+        private Map[] maps;
         private Mount[] mounts;
         private Biome[] biomes;
         private Instance[] instances;
@@ -314,7 +315,7 @@ public class Mmorpg {
         }
 
         @Override
-        public MountsStep maps(AreaMap... maps) {
+        public MountsStep maps(Map... maps) {
             this.maps = maps.clone();
             return this;
         }

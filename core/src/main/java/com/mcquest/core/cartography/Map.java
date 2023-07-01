@@ -1,17 +1,12 @@
 package com.mcquest.core.cartography;
 
-import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.core.zone.Zone;
 import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetTypes;
+import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.quest.Quest;
 import com.mcquest.core.quest.QuestMarker;
 import com.mcquest.core.quest.QuestMarkerIcon;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Player;
-import net.minestom.server.map.framebuffers.Graphics2DFramebuffer;
-import net.minestom.server.network.packet.server.play.MapDataPacket;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -19,8 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class AreaMap {
-    static final int MAP_ID = 1;
+public class Map {
     private static final int MAP_WIDTH = 128;
     private static final double QUEST_MARKER_TOP_PADDING = 10.0;
     private static final double QUEST_MARKER_RIGHT_PADDING = 7.0;
@@ -32,7 +26,7 @@ public class AreaMap {
     private final BufferedImage image;
     private final Collection<QuestMarker> questMarkers;
 
-    public AreaMap(int id, Pos origin, Asset image) {
+    public Map(int id, Pos origin, Asset image) {
         this.id = id;
         this.origin = origin;
         image.requireType(AssetTypes.PNG);
@@ -48,18 +42,9 @@ public class AreaMap {
         questMarkers.add(questMarker);
     }
 
-    void render(PlayerCharacter pc) {
-        Graphics2DFramebuffer framebuffer = new Graphics2DFramebuffer();
-        Graphics2D renderer = framebuffer.getRenderer();
-
+    void render(PlayerCharacter pc, Graphics2D renderer) {
         renderMap(renderer, pc);
         renderQuestMarkers(renderer, pc);
-        renderZoneText(renderer, pc);
-
-        MapDataPacket packet = framebuffer.preparePacket(1);
-        packet = addCursor(packet, pc);
-        Player player = pc.getPlayer();
-        player.sendPacket(packet);
     }
 
     private void renderMap(Graphics2D renderer, PlayerCharacter pc) {
@@ -131,27 +116,5 @@ public class AreaMap {
         renderY += MAP_WIDTH / 2.0;
 
         renderer.drawString(questMarkerText, (int) renderX, (int) renderY);
-    }
-
-    private void renderZoneText(Graphics2D renderer, PlayerCharacter pc) {
-        Zone zone = pc.getZone();
-        renderer.setColor(zone.getType().getMapColor());
-        renderer.drawString(zone.getName(), 0, 10);
-    }
-
-    private MapDataPacket addCursor(MapDataPacket packet, PlayerCharacter pc) {
-        Vec lookDirection = pc.getLookDirection();
-        double theta = Math.atan2(lookDirection.z(), lookDirection.x()) - Math.PI / 2.0;
-        if (theta < 0.0) {
-            theta = 2.0 * Math.PI + theta;
-        }
-        byte cursorDirection = (byte) ((theta + Math.PI / 16.0) / (Math.PI / 8.0));
-        int playerCursorIcon = 0;
-        MapDataPacket.Icon cursor = new MapDataPacket.Icon(playerCursorIcon, (byte) 0, (byte) 0,
-                cursorDirection, null);
-        List<MapDataPacket.Icon> icons = List.of(cursor);
-        MapDataPacket withCursor = new MapDataPacket(packet.mapId(), packet.scale(),
-                packet.locked(), true, icons, packet.colorContent());
-        return withCursor;
     }
 }

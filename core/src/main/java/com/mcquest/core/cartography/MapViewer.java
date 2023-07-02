@@ -3,6 +3,7 @@ package com.mcquest.core.cartography;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.MapOpenEvent;
 import com.mcquest.core.event.MapCloseEvent;
+import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.zone.Zone;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Vec;
@@ -26,7 +27,8 @@ public class MapViewer {
     private Map map;
     private boolean open;
 
-    public MapViewer(PlayerCharacter pc) {
+    public MapViewer(PlayerCharacter pc, PlayerCharacterData data,
+                     MapManager mapManager) {
         this.pc = pc;
         map = null;
         open = false;
@@ -38,9 +40,6 @@ public class MapViewer {
 
     public void setMap(@Nullable Map map) {
         this.map = map;
-        if (isOpen()) {
-            render();
-        }
     }
 
     public boolean isOpen() {
@@ -62,8 +61,6 @@ public class MapViewer {
                 .build();
         inventory.setItemInMainHand(mapItemStack);
 
-        render();
-
         MapOpenEvent event = new MapOpenEvent(pc);
         MinecraftServer.getGlobalEventHandler().call(event);
 
@@ -84,14 +81,14 @@ public class MapViewer {
         open = false;
     }
 
-    @ApiStatus.Internal
-    public void render() {
+    void render() {
         Graphics2DFramebuffer framebuffer = new Graphics2DFramebuffer();
         Graphics2D renderer = framebuffer.getRenderer();
 
         if (map != null) {
             map.render(pc, renderer);
         }
+
         renderZoneText(renderer);
 
         MapDataPacket packet = framebuffer.preparePacket(MAP_ID);

@@ -2,6 +2,7 @@ package com.mcquest.core.playerclass;
 
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.SkillUnlockEvent;
+import com.mcquest.core.persistence.PlayerCharacterData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -23,29 +24,42 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class PlayerCharacterSkillManager {
+public class SkillTracker {
     private final PlayerCharacter pc;
     private int skillPoints;
     private final Set<Skill> unlockedSkills;
     private final Map<Integer, Duration> cooldowns;
 
-    public PlayerCharacterSkillManager(PlayerCharacter pc, int skillPoints) {
+    public SkillTracker(PlayerCharacter pc, PlayerCharacterData data,
+                        PlayerClassManager playerClassManager) {
         this.pc = pc;
-        this.skillPoints = skillPoints;
+        this.skillPoints = data.getSkillPoints();
         unlockedSkills = new HashSet<>();
         cooldowns = new HashMap<>();
+
+        Player player = pc.getPlayer();
+        player.getInventory().addInventoryCondition(this::handleInventoryClick);
+    }
+
+    private void handleInventoryClick(Player player, int slot, ClickType clickType,
+                                      InventoryConditionResult result) {
+        if (slot >= 6) {
+            return;
+        }
+
+        result.setClickedItem(ItemStack.AIR);
     }
 
     public boolean isUnlocked(@NotNull Skill skill) {
         return unlockedSkills.contains(skill);
     }
 
-    void startCooldown(ActiveSkill skill) {
-        cooldowns.put(skill.getId(), skill.getCooldown());
-    }
-
     public Duration getCooldown(@NotNull ActiveSkill skill) {
         return cooldowns.getOrDefault(skill.getId(), Duration.ZERO);
+    }
+
+    void startCooldown(ActiveSkill skill) {
+        cooldowns.put(skill.getId(), skill.getCooldown());
     }
 
     void tickSkillCooldowns() {
@@ -121,7 +135,7 @@ public class PlayerCharacterSkillManager {
     }
 
     private void handleLeftClick(Skill skill, InventoryConditionResult result) {
-        if (!(skill instanceof ActiveSkill)) {
+        if (!(skill instanceof ActiveSkill activeSkill)) {
             result.setCancel(true);
             return;
         }
@@ -143,7 +157,7 @@ public class PlayerCharacterSkillManager {
         // TODO: may want to add a hotbar itemstack to cursor instead of skill
         //  tree itemstack
 
-        result.setCursorItem(result.getClickedItem());
+        pc.getPlayer().getInventory().setItemStack(0, activeSkill.getHotbarItemStack(pc));
     }
 
     private void handleShiftClick(Skill skill, InventoryConditionResult result) {

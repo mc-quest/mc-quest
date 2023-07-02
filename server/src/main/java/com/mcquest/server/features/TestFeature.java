@@ -2,15 +2,16 @@ package com.mcquest.server.features;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.core.loot.*;
-import com.mcquest.server.constants.*;
 import com.mcquest.core.event.PlayerCharacterLoginEvent;
 import com.mcquest.core.event.PlayerCharacterMoveEvent;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.item.Item;
 import com.mcquest.core.item.PlayerCharacterInventory;
+import com.mcquest.core.loot.*;
 import com.mcquest.core.physics.Collider;
 import com.mcquest.core.util.Debug;
+import com.mcquest.server.constants.*;
+import com.mcquest.server.npc.Deer;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -26,6 +27,10 @@ import java.util.Map;
 public class TestFeature implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
+        for (int i = 0; i < 100; i++) {
+            Deer deer = new Deer(mmorpg, Instances.ELADRADOR, new Pos(i, 70, i));
+            mmorpg.getNonPlayerCharacterSpawner().add(deer);
+        }
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterMoveEvent.class, event -> {
             PlayerCharacter pc = event.getPlayerCharacter();
             PlayerCharacterInventory inventory = pc.getInventory();
@@ -46,7 +51,8 @@ public class TestFeature implements Feature {
         bulskanTrigger.onCollisionEnter(other -> {
             if (other instanceof PlayerCharacter.Hitbox hitbox) {
                 PlayerCharacter pc = hitbox.getCharacter();
-                pc.setPosition(new Pos(0, 69, 0));
+                pc.getMapViewer().setMap(Maps.MELCHER);
+                pc.setPosition(new Pos(10, 69, 0));
                 pc.setInstance(Instances.ELADRADOR);
                 pc.setZone(Zones.OAKSHIRE);
                 pc.getMusicPlayer().setSong(Music.WILDERNESS);
@@ -81,7 +87,7 @@ public class TestFeature implements Feature {
         mmorpg.getGlobalEventHandler().addListener(PlayerCharacterLoginEvent.class, event -> {
             PlayerCharacter pc = event.getPlayerCharacter();
             pc.getInventory().add(Items.TEST_ITEM);
-            pc.getMapManager().setMap(Maps.MELCHER);
+            pc.getMapViewer().setMap(Maps.MELCHER);
             Player player = pc.getPlayer();
             // player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(1);
             player.getAttribute(Attribute.FLYING_SPEED).setBaseValue(1);

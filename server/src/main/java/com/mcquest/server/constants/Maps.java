@@ -2,15 +2,15 @@ package com.mcquest.server.constants;
 
 import com.mcquest.server.Assets;
 import com.mcquest.core.asset.Asset;
-import com.mcquest.core.cartography.AreaMap;
+import com.mcquest.core.cartography.Map;
 import net.minestom.server.coordinate.Pos;
 
 public class Maps {
-    public static final AreaMap MELCHER = new AreaMap(
-            1, new Pos(0, 0, 0), image("MelcherTavernBasement"));
+    public static final Map MELCHER = new Map(1, new Pos(0, 0, 0),
+            image("MelcherTavernBasement"));
 
-    public static AreaMap[] all() {
-        return new AreaMap[]{
+    public static Map[] all() {
+        return new Map[]{
                 MELCHER
         };
     }

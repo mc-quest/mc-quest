@@ -83,7 +83,7 @@ public class PlayerClassManager {
         mmorpg.getGlobalEventHandler().call(event);
         if (!event.isCancelled()) {
             pc.removeMana(manaCost);
-            pc.getSkillManager().startCooldown(skill);
+            pc.getSkillTracker().startCooldown(skill);
         }
     }
 
@@ -115,7 +115,7 @@ public class PlayerClassManager {
     private void tickSkillCooldowns() {
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
         for (PlayerCharacter pc : pcManager.getPlayerCharacters()) {
-            PlayerCharacterSkillManager skillManager = pc.getSkillManager();
+            SkillTracker skillManager = pc.getSkillTracker();
             skillManager.tickSkillCooldowns();
         }
     }

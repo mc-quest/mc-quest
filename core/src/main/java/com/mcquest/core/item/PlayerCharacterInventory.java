@@ -30,8 +30,8 @@ public class PlayerCharacterInventory {
     private Weapon savedWeapon;
 
     @ApiStatus.Internal
-    public PlayerCharacterInventory(PlayerCharacter pc, ItemManager itemManager,
-                                    PlayerCharacterData data) {
+    public PlayerCharacterInventory(PlayerCharacter pc, PlayerCharacterData data,
+                                    ItemManager itemManager) {
         this.pc = pc;
         this.itemManager = itemManager;
         savedWeapon = null;

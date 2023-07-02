@@ -21,6 +21,8 @@ public class PlayerCharacterData {
     private double maxHealth;
     private double mana;
     private double maxMana;
+    private double healthRegenRate;
+    private double manaRegenRate;
     private double experiencePoints;
     private int skillPoints;
     private int money;
@@ -76,7 +78,7 @@ public class PlayerCharacterData {
         data.mana = pc.getMana();
         data.maxMana = pc.getMaxMana();
         data.experiencePoints = pc.getExperiencePoints();
-        data.skillPoints = pc.getSkillManager().getSkillPoints();
+        data.skillPoints = pc.getSkillTracker().getSkillPoints();
         data.money = pc.getMoney().getValue();
         Song song = pc.getMusicPlayer().getSong();
         data.songId = song == null ? null : song.getId();
@@ -84,8 +86,8 @@ public class PlayerCharacterData {
         return data;
     }
 
-    public static PlayerCharacter fromJson(String json) {
-        return JsonUtility.parse(json, PlayerCharacter.class);
+    public static PlayerCharacterData fromJson(String json) {
+        return JsonUtility.parse(json, PlayerCharacterData.class);
     }
 
     public String toJson() {
@@ -126,6 +128,14 @@ public class PlayerCharacterData {
 
     public double getMaxMana() {
         return maxMana;
+    }
+
+    public double getHealthRegenRate() {
+        return healthRegenRate;
+    }
+
+    public double getManaRegenRate() {
+        return manaRegenRate;
     }
 
     public double getExperiencePoints() {

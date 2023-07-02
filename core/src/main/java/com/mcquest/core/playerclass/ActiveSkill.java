@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ActiveSkill extends Skill {
-    private static final int COOLDOWN_DIVISIONS = 16;
-
     private final double manaCost;
     private final Duration cooldown;
     private final EventEmitter<ActiveSkillUseEvent> onUse;
@@ -55,7 +53,7 @@ public class ActiveSkill extends Skill {
     }
 
     public Duration getCooldown(PlayerCharacter pc) {
-        return pc.getSkillManager().getCooldown(this);
+        return pc.getSkillTracker().getCooldown(this);
     }
 
     @Override
@@ -90,12 +88,13 @@ public class ActiveSkill extends Skill {
 
     ItemStack getHotbarItemStack(PlayerCharacter pc) {
         int cooldownTexture = cooldownTexture(pc);
-        return getHotbarItemStack(cooldownTexture);
+        return getHotbarItemStack(cooldownTexture)
+                .withAmount(getCooldown(pc).toSecondsPart() + 1);
     }
 
     private int cooldownTexture(PlayerCharacter pc) {
-        return (int) Math.ceil(
-                getCooldown(pc).toMillis() / getCooldown().toMillis());
+        return (int) Math.ceil(Hotbar.COOLDOWN_TEXTURES *
+                (double) getCooldown(pc).toMillis() / getCooldown().toMillis());
     }
 
     private ItemStack getHotbarItemStack(int cooldownTexture) {
@@ -133,8 +132,14 @@ public class ActiveSkill extends Skill {
 
 
         // Cooldown textures.
-        for (int i = 1; i <= COOLDOWN_DIVISIONS; i++) {
-
+        for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
+            ResourcePackUtility.writeCooldownIcon(
+                    tree,
+                    getIcon(),
+                    Key.key(Namespaces.SKILLS, String.format("%d-%d-%d", playerClass.getId(), getId(), i)),
+                    i,
+                    overrides
+            );
         }
     }
 }

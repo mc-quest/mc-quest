@@ -1,18 +1,16 @@
 package com.mcquest.server.features;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.NonPlayerCharacterSpawner;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.*;
+import com.mcquest.core.feature.Feature;
+import com.mcquest.core.physics.Collider;
+import com.mcquest.core.physics.PhysicsManager;
 import com.mcquest.core.quest.*;
+import com.mcquest.core.ui.Tutorial;
 import com.mcquest.server.constants.Instances;
 import com.mcquest.server.constants.Maps;
 import com.mcquest.server.constants.Quests;
-import com.mcquest.core.feature.Feature;
-import com.mcquest.server.npc.Deer;
-import com.mcquest.core.physics.Collider;
-import com.mcquest.core.physics.PhysicsManager;
-import com.mcquest.core.ui.Tutorial;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
@@ -52,12 +50,7 @@ public class TutorialQuest implements Feature {
     }
 
     private void spawnTrainingDummies() {
-        NonPlayerCharacterSpawner npcSpawner = mmorpg.getNonPlayerCharacterSpawner();
-        for (int i = 0; i < 1000000; i++) {
-            Pos position = new Pos(Math.random() * 100000 - 50000, 80, Math.random() * 100000 - 50000);
-            Deer trainingDummy = new Deer(mmorpg, Instances.ELADRADOR, position);
-            npcSpawner.add(trainingDummy);
-        }
+        // TODO
     }
 
     private void createQuestMarkers() {

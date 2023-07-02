@@ -1,6 +1,8 @@
 package com.mcquest.core.quest;
 
 import com.mcquest.core.character.PlayerCharacter;
+import com.mcquest.core.persistence.PersistentQuestObjectiveData;
+import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.text.WordWrap;
 import com.mcquest.core.event.QuestCompleteEvent;
 import com.mcquest.core.event.QuestStartEvent;
@@ -31,13 +33,33 @@ public class QuestTracker {
     private final Collection<QuestObjective> recentlyCompletedObjectives;
 
     @ApiStatus.Internal
-    public QuestTracker(PlayerCharacter pc, Map<Quest, int[]> objectiveProgress,
-                        Set<Quest> completedQuests, List<Quest> trackedQuests) {
+    public QuestTracker(PlayerCharacter pc, PlayerCharacterData data,
+                        QuestManager questManager) {
         this.pc = pc;
-        this.objectiveProgress = objectiveProgress;
-        this.completedQuests = completedQuests;
-        this.trackedQuests = trackedQuests;
-        this.recentlyCompletedObjectives = new ArrayList<>();
+
+        objectiveProgress = new HashMap<>();
+        PersistentQuestObjectiveData[] objectiveData = data.getQuestObjectiveData();
+        for (PersistentQuestObjectiveData questData : objectiveData) {
+            Quest quest = questManager.getQuest(questData.getQuestId());
+            objectiveProgress.put(quest, questData.getObjectiveProgress());
+        }
+
+        completedQuests = new HashSet<>();
+        int[] completedQuestIds = data.getCompletedQuestIds();
+        for (int id : completedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            completedQuests.add(quest);
+        }
+
+        trackedQuests = new ArrayList<>();
+        int[] trackedQuestIds = data.getTrackedQuestIds();
+        for (int id : trackedQuestIds) {
+            Quest quest = questManager.getQuest(id);
+            trackedQuests.add(quest);
+        }
+
+        recentlyCompletedObjectives = new ArrayList<>();
+
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         scheduler.buildTask(this::updateSidebar).delay(TaskSchedule.nextTick()).schedule();
     }

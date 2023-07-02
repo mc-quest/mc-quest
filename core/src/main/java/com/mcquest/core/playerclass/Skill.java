@@ -82,7 +82,7 @@ public abstract class Skill {
     }
 
     public boolean isUnlocked(PlayerCharacter pc) {
-        return pc.getSkillManager().isUnlocked(this);
+        return pc.getSkillTracker().isUnlocked(this);
     }
 
     abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);

@@ -25,6 +25,19 @@ import java.util.*;
 public class ResourcePackUtility {
     private static final String TEXTURE_DATA_PREFIX = "data:image/png;base64,";
 
+    public static int gray(int rgb, double brightness) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >> 8) & 0xFF;
+        int b = rgb & 0xFF;
+        int gray = (r + g + b) / 3;
+        gray *= brightness;
+        int ret = 0xFF000000 & rgb;
+        ret |= gray;
+        ret |= gray << 8;
+        ret |= gray << 16;
+        return ret;
+    }
+
     public static int writeIcon(FileTree tree, Asset icon, Key key, Material material,
                                 ListMultimap<Material, ItemOverride> overrides) {
         return writeIcon(tree, icon, key, overrides.get(material));
@@ -34,58 +47,6 @@ public class ResourcePackUtility {
                                 List<ItemOverride> overrides) {
         return writeIcon(tree,
                 Writable.inputStream(icon::getStream), key, overrides);
-    }
-
-    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
-                                         int cooldownTexture, Material material,
-                                         ListMultimap<Material, ItemOverride> overrides) {
-        writeCooldownIcon(tree, icon, key, cooldownTexture, overrides.get(material));
-    }
-
-    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
-                                         int cooldownTexture,
-                                         List<ItemOverride> overrides) {
-        try {
-            double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
-            BufferedImage image = icon.readImage();
-            double cx = image.getWidth() / 2.0;
-            double cy = image.getHeight() / 2.0;
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
-                    if (theta < 0.0) {
-                        theta = 2.0 * Math.PI + theta;
-                    }
-                    if (theta < thetaMax) {
-                        int rgb = grayAndDarken(image.getRGB(x, y));
-                        image.setRGB(x, y, rgb);
-                    }
-                }
-            }
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", stream);
-            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
-    public static void writeLockedIcon(FileTree tree, Asset icon, Key key,
-                                       List<ItemOverride> overrides) {
-        try {
-            BufferedImage image = icon.readImage();
-            for (int x = 0; x < image.getWidth(); x++) {
-                for (int y = 0; y < image.getHeight(); y++) {
-                    int rgb = gray(image.getRGB(x, y));
-                    image.setRGB(x, y, rgb);
-                }
-            }
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", stream);
-            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
     }
 
     private static int writeIcon(FileTree tree, Writable icon,
@@ -111,6 +72,58 @@ public class ResourcePackUtility {
         return customModelData;
     }
 
+    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
+                                         int cooldownTexture, Material material,
+                                         ListMultimap<Material, ItemOverride> overrides) {
+        writeCooldownIcon(tree, icon, key, cooldownTexture, overrides.get(material));
+    }
+
+    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
+                                         int cooldownTexture,
+                                         List<ItemOverride> overrides) {
+        try {
+            double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
+            BufferedImage image = icon.readImage();
+            double cx = image.getWidth() / 2.0;
+            double cy = image.getHeight() / 2.0;
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
+                    if (theta < 0.0) {
+                        theta = 2.0 * Math.PI + theta;
+                    }
+                    if (theta < thetaMax) {
+                        int rgb = gray(image.getRGB(x, y), 0.25);
+                        image.setRGB(x, y, rgb);
+                    }
+                }
+            }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static void writeLockedIcon(FileTree tree, Asset icon, Key key,
+                                       List<ItemOverride> overrides) {
+        try {
+            BufferedImage image = icon.readImage();
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    int rgb = gray(image.getRGB(x, y), 1.0);
+                    image.setRGB(x, y, rgb);
+                }
+            }
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static void writeItemOverrides(FileTree tree,
                                           ListMultimap<Material, ItemOverride> overrides) {
         for (Material material : overrides.keySet()) {
@@ -130,32 +143,6 @@ public class ResourcePackUtility {
                 .overrides(overrides)
                 .build();
         tree.write(model);
-    }
-
-    public static int gray(int rgb) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = (rgb & 0xFF);
-        int gray = (r + g + b) / 3;
-        int ret = 0xFF000000 & rgb;
-        ret |= gray;
-        ret |= gray << 8;
-        ret |= gray << 16;
-        return ret;
-    }
-
-    public static int grayAndDarken(int rgb) {
-        int r = (rgb >> 16) & 0xFF;
-        int g = (rgb >> 8) & 0xFF;
-        int b = (rgb & 0xFF);
-        int gray = (r + g + b) / 3;
-        // Darken.
-        gray *= 0.25;
-        int ret = 0xFF000000 & rgb;
-        ret |= gray;
-        ret |= gray << 8;
-        ret |= gray << 16;
-        return ret;
     }
 
     public static int writeModel(FileTree tree, Asset bbmodel, Key key,
@@ -285,18 +272,19 @@ public class ResourcePackUtility {
     private static Element parseElement(JsonObject elementJson, int textureWidth, int textureHeight) {
         Vector3Float from = parseVec3(elementJson.get("from").getAsJsonArray());
         Vector3Float to = parseVec3(elementJson.get("to").getAsJsonArray());
-        JsonObject faces = elementJson.get("faces").getAsJsonObject();
-        return Element.builder()
+        Element.Builder builder = Element.builder()
                 .from(from)
                 .to(to)
-                .rotation(parseElementRotation(elementJson))
-                .face(CubeFace.NORTH, parseElementFace(faces.get("north").getAsJsonObject(), textureWidth, textureHeight))
-                .face(CubeFace.EAST, parseElementFace(faces.get("east").getAsJsonObject(), textureWidth, textureHeight))
-                .face(CubeFace.SOUTH, parseElementFace(faces.get("south").getAsJsonObject(), textureWidth, textureHeight))
-                .face(CubeFace.WEST, parseElementFace(faces.get("west").getAsJsonObject(), textureWidth, textureHeight))
-                .face(CubeFace.UP, parseElementFace(faces.get("up").getAsJsonObject(), textureWidth, textureHeight))
-                .face(CubeFace.DOWN, parseElementFace(faces.get("down").getAsJsonObject(), textureWidth, textureHeight))
-                .build();
+                .rotation(parseElementRotation(elementJson));
+
+        JsonObject faces = elementJson.get("faces").getAsJsonObject();
+        for (CubeFace type : CubeFace.values()) {
+            JsonObject elementFace = faces.get(type.name().toLowerCase())
+                    .getAsJsonObject();
+            builder.face(type, parseElementFace(elementFace, textureWidth, textureHeight));
+        }
+
+        return builder.build();
     }
 
     private static ElementRotation parseElementRotation(JsonObject element) {

@@ -1,7 +1,7 @@
 package com.mcquest.core.ui;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.cartography.PlayerCharacterMapManager;
+import com.mcquest.core.cartography.MapViewer;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.event.*;
@@ -120,7 +120,7 @@ public class InteractionHandler {
     private void openSkillTree(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new SkillTreeOpenEvent(pc));
-        pc.getSkillManager().openSkillTree();
+        pc.getSkillTracker().openSkillTree();
     }
 
     private void openQuestLog(PlayerCharacter pc) {
@@ -130,7 +130,7 @@ public class InteractionHandler {
     }
 
     private void openMap(PlayerCharacter pc) {
-        pc.getMapManager().openMap();
+        pc.getMapViewer().open();
         pc.getPlayer().closeInventory();
     }
 
@@ -182,9 +182,9 @@ public class InteractionHandler {
             return;
         }
 
-        PlayerCharacterMapManager mapManager = pc.getMapManager();
-        if (mapManager.isMapOpen()) {
-            mapManager.closeMap();
+        MapViewer mapManager = pc.getMapViewer();
+        if (mapManager.isOpen()) {
+            mapManager.close();
         }
 
         Weapon weapon = pc.getInventory().getWeapon();

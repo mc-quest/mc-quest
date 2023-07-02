@@ -2,9 +2,7 @@ package com.mcquest.core.character;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.asset.Asset;
-import com.mcquest.core.audio.AudioManager;
-import com.mcquest.core.audio.PlayerCharacterMusicPlayer;
-import com.mcquest.core.audio.Song;
+import com.mcquest.core.audio.MusicPlayer;
 import com.mcquest.core.cartography.CardinalDirection;
 import com.mcquest.core.cartography.MapViewer;
 import com.mcquest.core.cinema.CutscenePlayer;
@@ -12,15 +10,10 @@ import com.mcquest.core.commerce.Money;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.mount.Mount;
-import com.mcquest.core.persistence.PersistentQuestObjectiveData;
 import com.mcquest.core.persistence.PlayerCharacterData;
-import com.mcquest.core.physics.PhysicsManager;
-import com.mcquest.core.playerclass.PlayerCharacterSkillManager;
 import com.mcquest.core.playerclass.PlayerClass;
-import com.mcquest.core.quest.Quest;
-import com.mcquest.core.quest.QuestManager;
+import com.mcquest.core.playerclass.SkillTracker;
 import com.mcquest.core.quest.QuestTracker;
-import com.mcquest.core.social.Party;
 import com.mcquest.core.util.MathUtility;
 import com.mcquest.core.zone.Zone;
 import net.kyori.adventure.sound.Sound;
@@ -44,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Arrays;
 
 public final class PlayerCharacter extends Character {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
@@ -57,10 +50,10 @@ public final class PlayerCharacter extends Character {
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
-    private final PlayerCharacterSkillManager skillManager;
+    private final SkillTracker skillTracker;
     private final PlayerCharacterInventory inventory;
     private final QuestTracker questTracker;
-    private final PlayerCharacterMusicPlayer musicPlayer;
+    private final MusicPlayer musicPlayer;
     private final MapViewer mapViewer;
     private final CutscenePlayer cutscenePlayer;
     private final Hitbox hitbox;
@@ -86,26 +79,25 @@ public final class PlayerCharacter extends Character {
                 data.getPosition());
         this.mmorpg = mmorpg;
         this.player = player;
-        respawnPosition = data.getRespawnPosition();
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
-        skillManager = new PlayerCharacterSkillManager(this, data.getSkillPoints());
-        inventory = new PlayerCharacterInventory(this, mmorpg.getItemManager(), data);
-        questTracker = initQuestTracker(data);
-        musicPlayer = initMusic(data);
-        mapViewer = new MapViewer(this);
+        skillTracker = new SkillTracker(this, data, mmorpg.getPlayerClassManager());
+        inventory = new PlayerCharacterInventory(this, data, mmorpg.getItemManager());
+        questTracker = new QuestTracker(this, data, mmorpg.getQuestManager());
+        musicPlayer = new MusicPlayer(this, data, mmorpg.getAudioManager());
+        mapViewer = new MapViewer(this, data, mmorpg.getMapManager());
         cutscenePlayer = new CutscenePlayer(this);
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
         mana = data.getMana();
-        healthRegenRate = 1;
-        hitbox = initHitbox();
+        healthRegenRate = data.getHealthRegenRate();
+        manaRegenRate = data.getManaRegenRate();
+        hitbox = new Hitbox(this);
         zone = mmorpg.getZoneManager().getZone(data.getZoneId());
+        respawnPosition = data.getRespawnPosition();
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
-        initUi();
-        updateAttackSpeed();
         canMount = data.canMount();
         // TODO
         canAct = true;
@@ -113,33 +105,10 @@ public final class PlayerCharacter extends Character {
         money = new Money(data.getMoney());
 
         zone.addPlayerCharacter(this);
-    }
+        mmorpg.getPhysicsManager().addCollider(hitbox);
 
-    private QuestTracker initQuestTracker(PlayerCharacterData data) {
-        QuestManager questManager = mmorpg.getQuestManager();
-
-        Map<Quest, int[]> objectiveProgress = new HashMap<>();
-        PersistentQuestObjectiveData[] objectiveData = data.getQuestObjectiveData();
-        for (PersistentQuestObjectiveData questData : objectiveData) {
-            Quest quest = questManager.getQuest(questData.getQuestId());
-            objectiveProgress.put(quest, questData.getObjectiveProgress());
-        }
-
-        Set<Quest> completedQuests = new HashSet<>();
-        int[] completedQuestIds = data.getCompletedQuestIds();
-        for (int id : completedQuestIds) {
-            Quest quest = questManager.getQuest(id);
-            completedQuests.add(quest);
-        }
-
-        List<Quest> trackedQuests = new ArrayList<>();
-        int[] trackedQuestIds = data.getTrackedQuestIds();
-        for (int id : trackedQuestIds) {
-            Quest quest = questManager.getQuest(id);
-            trackedQuests.add(quest);
-        }
-
-        return new QuestTracker(this, objectiveProgress, completedQuests, trackedQuests);
+        initUi();
+        updateAttackSpeed();
     }
 
     private void initUi() {
@@ -154,24 +123,6 @@ public final class PlayerCharacter extends Character {
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
     }
 
-    private PlayerCharacterMusicPlayer initMusic(PlayerCharacterData data) {
-        AudioManager musicManager = mmorpg.getAudioManager();
-        PlayerCharacterMusicPlayer musicPlayer = new PlayerCharacterMusicPlayer(this);
-        Integer songId = data.getSongId();
-        if (songId != null) {
-            Song song = musicManager.getSong(songId);
-            musicPlayer.setSong(song);
-        }
-        return musicPlayer;
-    }
-
-    private Hitbox initHitbox() {
-        Hitbox hitbox = new PlayerCharacter.Hitbox(this);
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        physicsManager.addCollider(hitbox);
-        return hitbox;
-    }
-
     @Override
     public void setInstance(@NotNull Instance instance) {
         super.setInstance(instance);
@@ -180,7 +131,6 @@ public final class PlayerCharacter extends Character {
             player.setInstance(instance);
         }
 
-        mapViewer.render();
         hitbox.setInstance(instance);
     }
 
@@ -189,15 +139,14 @@ public final class PlayerCharacter extends Character {
      */
     void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
-        mapViewer.render();
         hitbox.setCenter(hitboxCenter());
         updateActionBar();
     }
 
     @Override
     public void setPosition(@NotNull Pos position) {
-        updatePosition(position);
         player.teleport(position);
+        updatePosition(position);
     }
 
     public Pos getRespawnPosition() {
@@ -244,7 +193,7 @@ public final class PlayerCharacter extends Character {
         return playerClass;
     }
 
-    public PlayerCharacterMusicPlayer getMusicPlayer() {
+    public MusicPlayer getMusicPlayer() {
         return musicPlayer;
     }
 
@@ -254,11 +203,6 @@ public final class PlayerCharacter extends Character {
 
     public CutscenePlayer getCutscenePlayer() {
         return cutscenePlayer;
-    }
-
-    public @Nullable Party getParty() {
-        // TODO
-        return null;
     }
 
     public double getMana() {
@@ -338,7 +282,6 @@ public final class PlayerCharacter extends Character {
                 0, MAX_EXPERIENCE_POINTS);
         checkForLevelUp();
         updateExperienceBar();
-        updateActionBar();
     }
 
     private void checkForLevelUp() {
@@ -352,7 +295,7 @@ public final class PlayerCharacter extends Character {
         int newLevel = getLevel() + 1;
         super.setLevel(newLevel);
         sendMessage(Component.text("Level increased to " + newLevel + "!", NamedTextColor.GREEN));
-        skillManager.grantSkillPoint();
+        skillTracker.grantSkillPoint();
         sendMessage(Component.text("Received 1 skill point!", NamedTextColor.GREEN));
     }
 
@@ -446,8 +389,8 @@ public final class PlayerCharacter extends Character {
         player.playSound(Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f));
     }
 
-    public PlayerCharacterSkillManager getSkillManager() {
-        return skillManager;
+    public SkillTracker getSkillTracker() {
+        return skillTracker;
     }
 
     public PlayerCharacterInventory getInventory() {

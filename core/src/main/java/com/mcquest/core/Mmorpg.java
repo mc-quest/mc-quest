@@ -73,7 +73,7 @@ public class Mmorpg {
         zoneManager = new ZoneManager(builder.zones);
         modelManager = new ModelManager(builder.models);
         audioManager = new AudioManager(builder.audio, builder.music);
-        mapManager = new MapManager(builder.maps);
+        mapManager = new MapManager(this, builder.maps);
         mountManager = new MountManager(this, builder.mounts);
         instanceManager = new InstanceManager(builder.instances, builder.biomes);
         pcManager = new PlayerCharacterManager(

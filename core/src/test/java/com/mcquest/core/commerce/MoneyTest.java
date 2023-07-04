@@ -1,4 +1,4 @@
-package com.mcquest.server.commerce;
+package com.mcquest.core.commerce;
 
 import com.mcquest.core.commerce.Money;
 import org.junit.jupiter.api.Test;

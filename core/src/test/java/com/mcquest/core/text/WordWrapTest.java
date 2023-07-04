@@ -1,4 +1,4 @@
-package com.mcquest.server.text;
+package com.mcquest.core.text;
 
 import com.mcquest.core.text.WordWrap;
 import net.kyori.adventure.text.Component;

@@ -38,6 +38,7 @@ class ResourcePackBuilder {
 
     private void writeResources(FileTree tree) {
         writeMetadata(tree);
+        writeGuiIcons(tree);
         writeBaseTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
@@ -55,6 +56,11 @@ class ResourcePackBuilder {
                 .build();
 
         tree.write(metadata);
+    }
+
+    private void writeGuiIcons(FileTree tree) {
+        List<ItemOverride> overrides = new ArrayList<>();
+        ResourcePackUtility.writeItemOverrides(tree, Materials.GUI, overrides);
     }
 
     private void writeBaseTextures(FileTree tree) {

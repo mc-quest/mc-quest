@@ -1,10 +1,10 @@
 package com.mcquest.core.playerclass;
 
 import com.mcquest.core.Mmorpg;
+import com.mcquest.core.audio.Sounds;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.event.ActiveSkillUseEvent;
-import com.mcquest.core.audio.Sounds;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -13,7 +13,6 @@ import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.tag.Tag;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,9 +26,6 @@ import java.util.Map;
  * The PlayerClassManager is used to register and retrieve PlayerClasses.
  */
 public class PlayerClassManager {
-    static final Tag<Integer> PLAYER_CLASS_ID_TAG = Tag.Integer("player_class_id");
-    static final Tag<Integer> SKILL_ID_TAG = Tag.Integer("skill_id");
-
     private final Mmorpg mmorpg;
     private final Map<Integer, PlayerClass> playerClassesById;
 
@@ -40,8 +36,10 @@ public class PlayerClassManager {
         for (PlayerClass playerClass : playerClasses) {
             registerPlayerClass(playerClass);
         }
+
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         scheduler.buildTask(this::tickSkillCooldowns).repeat(TaskSchedule.nextTick()).schedule();
     }
@@ -55,20 +53,30 @@ public class PlayerClassManager {
     }
 
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+        int slot = event.getSlot();
+        if (!(slot >= SkillManager.MIN_HOTBAR_SLOT && slot <= SkillManager.MAX_HOTBAR_SLOT)) {
+            return;
+        }
+
         Player player = event.getPlayer();
         PlayerInventory inventory = player.getInventory();
-        int slot = event.getSlot();
         ItemStack itemStack = inventory.getItemStack(slot);
-        ActiveSkill skill = getActiveSkill(itemStack);
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+        SkillManager skillManager = pc.getSkillManager();
+
+        ActiveSkill skill = (ActiveSkill) skillManager.getSkill(itemStack);
         if (skill == null) {
             return;
         }
-        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+
         handleUseSkill(pc, skill);
     }
 
     private void handleUseSkill(PlayerCharacter pc, ActiveSkill skill) {
         pc.playSound(Sounds.CLICK);
+
+        pc.getMapViewer().close();
+
         double manaCost = skill.getManaCost();
         if (pc.getMana() < skill.getManaCost()) {
             pc.sendMessage(Component.text("Not enough mana", NamedTextColor.RED));
@@ -83,7 +91,7 @@ public class PlayerClassManager {
         mmorpg.getGlobalEventHandler().call(event);
         if (!event.isCancelled()) {
             pc.removeMana(manaCost);
-            pc.getSkillTracker().startCooldown(skill);
+            pc.getSkillManager().startCooldown(skill);
         }
     }
 
@@ -98,24 +106,10 @@ public class PlayerClassManager {
         return Collections.unmodifiableCollection(playerClassesById.values());
     }
 
-    private ActiveSkill getActiveSkill(ItemStack hotbarItemStack) {
-        if (!hotbarItemStack.hasTag(PLAYER_CLASS_ID_TAG) ||
-                !hotbarItemStack.hasTag(SKILL_ID_TAG)) {
-            return null;
-        }
-        int playerClassId = hotbarItemStack.getTag(PLAYER_CLASS_ID_TAG);
-        PlayerClass playerClass = getPlayerClass(playerClassId);
-        if (playerClass == null) {
-            return null;
-        }
-        int skillId = hotbarItemStack.getTag(SKILL_ID_TAG);
-        return (ActiveSkill) playerClass.getSkill(skillId);
-    }
-
     private void tickSkillCooldowns() {
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
         for (PlayerCharacter pc : pcManager.getPlayerCharacters()) {
-            SkillTracker skillManager = pc.getSkillTracker();
+            SkillManager skillManager = pc.getSkillManager();
             skillManager.tickSkillCooldowns();
         }
     }

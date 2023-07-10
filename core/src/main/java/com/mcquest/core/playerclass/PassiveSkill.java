@@ -50,7 +50,10 @@ public class PassiveSkill extends Skill {
                 lore.add(Component.text("unlock", NamedTextColor.GREEN));
             }
         }
-        return ItemStackUtility.createItemStack(icon, displayName, lore);
+
+        return ItemStackUtility.create(icon, displayName, lore)
+                .meta(builder -> builder.customModelData(customModelDataStart))
+                .build();
     }
 
     @Override

@@ -7,8 +7,11 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
+import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
+import net.minestom.server.timer.SchedulerManager;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +35,8 @@ public class ItemManager {
         }
 
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerChangeHeldSlotEvent.class,
-                this::handleChangeHeldSlot);
+        eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
+        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
     }
 
     private void registerItem(Item item) {
@@ -64,6 +67,14 @@ public class ItemManager {
 
     public Collection<Item> getItems() {
         return Collections.unmodifiableCollection(itemsById.values());
+    }
+
+    private void handleLogin(PlayerLoginEvent event) {
+        Player player = event.getPlayer();
+        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
+        scheduler.buildTask(() -> player.setHeldItemSlot((byte) PlayerCharacterInventory.WEAPON_SLOT))
+                .delay(TaskSchedule.nextTick())
+                .schedule();
     }
 
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {

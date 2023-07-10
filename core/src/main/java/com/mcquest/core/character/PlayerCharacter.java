@@ -12,7 +12,7 @@ import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.playerclass.PlayerClass;
-import com.mcquest.core.playerclass.SkillTracker;
+import com.mcquest.core.playerclass.SkillManager;
 import com.mcquest.core.quest.QuestTracker;
 import com.mcquest.core.util.MathUtility;
 import com.mcquest.core.zone.Zone;
@@ -50,7 +50,7 @@ public final class PlayerCharacter extends Character {
     private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
-    private final SkillTracker skillTracker;
+    private final SkillManager skillManager;
     private final PlayerCharacterInventory inventory;
     private final QuestTracker questTracker;
     private final MusicPlayer musicPlayer;
@@ -80,7 +80,7 @@ public final class PlayerCharacter extends Character {
         this.mmorpg = mmorpg;
         this.player = player;
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
-        skillTracker = new SkillTracker(this, data, mmorpg.getPlayerClassManager());
+        skillManager = new SkillManager(this, data);
         inventory = new PlayerCharacterInventory(this, data, mmorpg.getItemManager());
         questTracker = new QuestTracker(this, data, mmorpg.getQuestManager());
         musicPlayer = new MusicPlayer(this, data, mmorpg.getAudioManager());
@@ -214,6 +214,7 @@ public final class PlayerCharacter extends Character {
             throw new IllegalArgumentException();
         }
         this.mana = mana;
+        updateManaBar();
         updateActionBar();
     }
 
@@ -295,7 +296,7 @@ public final class PlayerCharacter extends Character {
         int newLevel = getLevel() + 1;
         super.setLevel(newLevel);
         sendMessage(Component.text("Level increased to " + newLevel + "!", NamedTextColor.GREEN));
-        skillTracker.grantSkillPoint();
+        skillManager.grantSkillPoint();
         sendMessage(Component.text("Received 1 skill point!", NamedTextColor.GREEN));
     }
 
@@ -389,8 +390,8 @@ public final class PlayerCharacter extends Character {
         player.playSound(Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f));
     }
 
-    public SkillTracker getSkillTracker() {
-        return skillTracker;
+    public SkillManager getSkillManager() {
+        return skillManager;
     }
 
     public PlayerCharacterInventory getInventory() {

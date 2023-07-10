@@ -15,7 +15,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
@@ -23,6 +22,7 @@ import team.unnamed.creative.model.ItemOverride;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ActiveSkill extends Skill {
@@ -53,37 +53,65 @@ public class ActiveSkill extends Skill {
     }
 
     public Duration getCooldown(PlayerCharacter pc) {
-        return pc.getSkillTracker().getCooldown(this);
+        return pc.getSkillManager().getCooldown(this);
     }
 
     @Override
     ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? Materials.SKILL : Material.BARRIER;
+
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
+
         List<TextComponent> lore = new ArrayList<>();
+
         lore.add(Component.text("Active Skill", NamedTextColor.GRAY));
         lore.add(Component.text("Mana Cost: " + (int) Math.round(manaCost), NamedTextColor.AQUA));
         int cooldownSeconds = cooldown.toSecondsPart();
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
+
         lore.add(Component.empty());
         lore.addAll(WordWrap.wrap(getDescription()));
         lore.add(Component.empty());
+
         if (isUnlocked) {
             lore.add(Component.text("Left-click to add to", NamedTextColor.GREEN));
             lore.add(Component.text("hotbar", NamedTextColor.GREEN));
         } else {
+            boolean unlockable = true;
+
+            if (pc.getLevel() < getLevel()) {
+                unlockable = false;
+                lore.add(Component.text("Requires level " + getLevel(), NamedTextColor.RED));
+            }
+
             Skill prerequisite = getPrerequisite();
             if (prerequisite != null && !prerequisite.isUnlocked(pc)) {
+                unlockable = false;
                 lore.add(Component.text("Requires " + prerequisite.getName(), NamedTextColor.RED));
-            } else if (pc.getLevel() < getLevel()) {
-                lore.add(Component.text("Requires level " + getLevel(), NamedTextColor.RED));
-            } else {
+            }
+
+            if (unlockable) {
                 lore.add(Component.text("Shift-click to", NamedTextColor.GREEN));
                 lore.add(Component.text("unlock", NamedTextColor.GREEN));
             }
         }
-        return ItemStackUtility.createItemStack(icon, displayName, lore);
+
+        int customModelData = isUnlocked
+                ? customModelDataStart
+                : customModelDataStart + Hotbar.COOLDOWN_TEXTURES + 1;
+
+        return ItemStackUtility.create(Materials.SKILL, displayName, lore)
+                .set(SkillManager.SKILL_ID_TAG, getId())
+                .meta(builder -> builder.customModelData(customModelData))
+                .build();
+    }
+
+    ItemStack getCursorItemStack() {
+        Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
+        return ItemStackUtility.create(Materials.SKILL, displayName, Collections.emptyList())
+                .set(SkillManager.SKILL_ID_TAG, getId())
+                .meta(builder -> builder.customModelData(customModelDataStart))
+                .build();
     }
 
     ItemStack getHotbarItemStack(PlayerCharacter pc) {
@@ -107,10 +135,10 @@ public class ActiveSkill extends Skill {
         lore.add(Component.text("Cooldown: " + cooldownSeconds, NamedTextColor.GREEN));
         lore.add(Component.empty());
         lore.addAll(WordWrap.wrap(getDescription()));
-        return ItemStackUtility.createItemStack(Materials.SKILL, displayName, lore)
-                .withTag(PlayerClassManager.PLAYER_CLASS_ID_TAG, playerClass.getId())
-                .withTag(PlayerClassManager.SKILL_ID_TAG, getId())
-                .withMeta(builder -> builder.customModelData(customModelData));
+        return ItemStackUtility.create(Materials.SKILL, displayName, lore)
+                .set(SkillManager.SKILL_ID_TAG, getId())
+                .meta(builder -> builder.customModelData(customModelData))
+                .build();
     }
 
     private ItemStack getInsufficientManaHotbarItemStack() {
@@ -128,9 +156,6 @@ public class ActiveSkill extends Skill {
                 overrides
         );
 
-        // Locked texture.
-
-
         // Cooldown textures.
         for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
             ResourcePackUtility.writeCooldownIcon(
@@ -141,5 +166,13 @@ public class ActiveSkill extends Skill {
                     overrides
             );
         }
+
+        // Locked texture.
+        ResourcePackUtility.writeLockedIcon(
+                tree,
+                getIcon(),
+                Key.key(Namespaces.SKILLS, String.format("%d-%d-locked", playerClass.getId(), getId())),
+                overrides
+        );
     }
 }

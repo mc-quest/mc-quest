@@ -78,7 +78,7 @@ public class PlayerCharacterData {
         data.mana = pc.getMana();
         data.maxMana = pc.getMaxMana();
         data.experiencePoints = pc.getExperiencePoints();
-        data.skillPoints = pc.getSkillTracker().getSkillPoints();
+        data.skillPoints = pc.getSkillManager().getSkillPoints();
         data.money = pc.getMoney().getValue();
         Song song = pc.getMusicPlayer().getSong();
         data.songId = song == null ? null : song.getId();

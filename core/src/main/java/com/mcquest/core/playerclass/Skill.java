@@ -73,6 +73,10 @@ public abstract class Skill {
         return skillTreeColumn;
     }
 
+    int getSkillTreeSlot() {
+        return 9 * skillTreeRow + skillTreeColumn;
+    }
+
     public EventEmitter<SkillUnlockEvent> onUnlock() {
         return onUnlock;
     }
@@ -82,7 +86,7 @@ public abstract class Skill {
     }
 
     public boolean isUnlocked(PlayerCharacter pc) {
-        return pc.getSkillTracker().isUnlocked(this);
+        return pc.getSkillManager().isUnlocked(this);
     }
 
     abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);

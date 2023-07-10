@@ -6,14 +6,14 @@ import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.event.*;
 import com.mcquest.core.instance.Instance;
-import com.mcquest.core.physics.Collider;
-import com.mcquest.core.physics.PhysicsManager;
-import com.mcquest.core.physics.RaycastHit;
-import com.mcquest.core.util.ItemStackUtility;
 import com.mcquest.core.item.ConsumableItem;
 import com.mcquest.core.item.Item;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.item.Weapon;
+import com.mcquest.core.physics.Collider;
+import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.core.physics.RaycastHit;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
@@ -29,7 +29,6 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
-import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -42,18 +41,26 @@ public class InteractionHandler {
     private static final int MENU_MAP_SLOT = 5;
     private static final int MENU_LOGOUT_SLOT = 7;
     private static final Component CLICK_TO_OPEN = Component.text("Click to open", NamedTextColor.GRAY);
-    private static final ItemStack OPEN_SKILL_TREE = ItemStackUtility
-            .createItemStack(Material.IRON_SWORD, Component.text("Skill Tree", NamedTextColor.YELLOW),
-                    List.of(CLICK_TO_OPEN));
-    private static final ItemStack OPEN_MAP = ItemStackUtility
-            .createItemStack(Material.FILLED_MAP, Component.text("Map", NamedTextColor.YELLOW),
-                    List.of(CLICK_TO_OPEN));
-    private static final ItemStack OPEN_QUEST_LOG = ItemStackUtility
-            .createItemStack(Material.BOOK, Component.text("Quest Log", NamedTextColor.YELLOW),
-                    List.of(CLICK_TO_OPEN));
-    private static final ItemStack LOGOUT = ItemStackUtility.createItemStack(Material.BARRIER,
+    private static final ItemStack OPEN_SKILL_TREE = ItemStackUtility.create(
+            Material.IRON_SWORD,
+            Component.text("Skill Tree", NamedTextColor.YELLOW),
+            List.of(CLICK_TO_OPEN)
+    ).build();
+    private static final ItemStack OPEN_MAP = ItemStackUtility.create(
+            Material.FILLED_MAP,
+            Component.text("Map", NamedTextColor.YELLOW),
+            List.of(CLICK_TO_OPEN)
+    ).build();
+    private static final ItemStack OPEN_QUEST_LOG = ItemStackUtility.create(
+            Material.BOOK,
+            Component.text("Quest Log", NamedTextColor.YELLOW),
+            List.of(CLICK_TO_OPEN)
+    ).build();
+    private static final ItemStack LOGOUT = ItemStackUtility.create(
+            Material.BARRIER,
             Component.text("Logout", NamedTextColor.YELLOW),
-            List.of(Component.text("Click to logout", NamedTextColor.GRAY)));
+            List.of(Component.text("Click to logout", NamedTextColor.GRAY))
+    ).build();
 
     private final Mmorpg mmorpg;
 
@@ -63,7 +70,6 @@ public class InteractionHandler {
 
     public void registerListeners() {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handlePlayerCharacterLogin);
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
         eventHandler.addListener(PlayerSwapItemEvent.class, this::handleOpenMenu);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
@@ -72,22 +78,6 @@ public class InteractionHandler {
         eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerBlockInteractEvent.class, this::handleBlockInteract);
         eventHandler.addListener(ItemDropEvent.class, this::handleItemDrop);
-    }
-
-    private void handlePlayerCharacterLogin(PlayerCharacterLoginEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        Player player = pc.getPlayer();
-        // Must delay a tick, or it won't work.
-        mmorpg.getSchedulerManager()
-                .buildTask(() -> player.setHeldItemSlot((byte) PlayerCharacterInventory.WEAPON_SLOT))
-                .delay(TaskSchedule.nextTick())
-                .schedule();
-        PlayerInventory inventory = player.getInventory();
-        inventory.addInventoryCondition((p, slot, clickType, inventoryConditionResult) -> {
-            if (slot == PlayerCharacterInventory.WEAPON_SLOT || p.getOpenInventory() != null) {
-                inventoryConditionResult.setCancel(true);
-            }
-        });
     }
 
     private void handleOpenMenu(PlayerSwapItemEvent event) {
@@ -120,7 +110,7 @@ public class InteractionHandler {
     private void openSkillTree(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new SkillTreeOpenEvent(pc));
-        pc.getSkillTracker().openSkillTree();
+        pc.getSkillManager().openSkillTree();
     }
 
     private void openQuestLog(PlayerCharacter pc) {

@@ -32,7 +32,7 @@ public class TutorialQuest implements Feature {
         eventHandler.addListener(MenuOpenEvent.class, this::handleOpenMenu);
         eventHandler.addListener(SkillTreeOpenEvent.class, this::handleOpenSkillTree);
         eventHandler.addListener(SkillUnlockEvent.class, this::handleSkillUpgrade);
-        eventHandler.addListener(AddSkillToHotbarEvent.class, this::handleAddSkillToHotbar);
+        eventHandler.addListener(SkillAddToHotbarEvent.class, this::handleAddSkillToHotbar);
         eventHandler.addListener(ActiveSkillUseEvent.class, this::handleUseSkill);
         eventHandler.addListener(MapOpenEvent.class, this::handleOpenMap);
     }
@@ -116,7 +116,7 @@ public class TutorialQuest implements Feature {
         Quests.TUTORIAL.getObjective(3).setAccessible(pc, true);
     }
 
-    private void handleAddSkillToHotbar(AddSkillToHotbarEvent event) {
+    private void handleAddSkillToHotbar(SkillAddToHotbarEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         if (!tutorialObjectiveActive(pc, 3)) {
             return;

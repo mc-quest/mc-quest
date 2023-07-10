@@ -10,7 +10,7 @@
             "icon": "Bash.png",
             "description": "Damage enemies in front of you",
             "manaCost": 5,
-            "cooldown": 8,
+            "cooldown": 1,
             "skillTreeRow": 0,
             "skillTreeColumn": 4
         },

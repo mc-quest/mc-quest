@@ -112,7 +112,7 @@ public class ResourcePackUtility {
             BufferedImage image = icon.readImage();
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
-                    int rgb = gray(image.getRGB(x, y), 1.0);
+                    int rgb = gray(image.getRGB(x, y), 0.5);
                     image.setRGB(x, y, rgb);
                 }
             }

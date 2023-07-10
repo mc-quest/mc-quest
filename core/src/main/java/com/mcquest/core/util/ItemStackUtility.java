@@ -10,16 +10,12 @@ import net.minestom.server.item.Material;
 import java.util.List;
 
 public class ItemStackUtility {
-    public static ItemStack createItemStack(Material material, Component displayName,
-                                            List<? extends Component> lore) {
+    public static ItemStack.Builder create(Material material, Component displayName,
+                                           List<? extends Component> lore) {
         return ItemStack.builder(material)
-                .meta(builder -> builder.hideFlag(ItemHideFlag.HIDE_ENCHANTS,
-                        ItemHideFlag.HIDE_ATTRIBUTES, ItemHideFlag.HIDE_UNBREAKABLE,
-                        ItemHideFlag.HIDE_DESTROYS, ItemHideFlag.HIDE_PLACED_ON,
-                        ItemHideFlag.HIDE_POTION_EFFECTS, ItemHideFlag.HIDE_DYE))
+                .meta(builder -> builder.hideFlag(ItemHideFlag.values()))
                 .displayName(prepareComponent(displayName))
-                .lore(prepareLore(lore))
-                .build();
+                .lore(prepareLore(lore));
     }
 
     private static Component prepareComponent(Component component) {

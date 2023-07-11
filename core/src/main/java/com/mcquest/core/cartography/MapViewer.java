@@ -17,7 +17,7 @@ import net.minestom.server.network.packet.server.play.MapDataPacket;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.util.List;
 
 public class MapViewer {
@@ -115,7 +115,7 @@ public class MapViewer {
         int cursorIcon = 0;
         MapDataPacket.Icon cursor = new MapDataPacket.Icon(cursorIcon, (byte) 0,
                 (byte) 0, cursorDirection, null);
-        java.util.List<MapDataPacket.Icon> icons = List.of(cursor);
+        List<MapDataPacket.Icon> icons = List.of(cursor);
 
         return new MapDataPacket(packet.mapId(), packet.scale(),
                 packet.locked(), true, icons, packet.colorContent());

@@ -50,7 +50,7 @@ public class ArmorItem extends Item {
         slot = builder.slot;
         materialModel = builder.materialModel;
         color = builder.color;
-        bbmodel = builder.model;
+        bbmodel = builder.bbmodel;
         protections = builder.protections;
         onEquip = new EventEmitter<>();
         onUnequip = new EventEmitter<>();
@@ -195,7 +195,7 @@ public class ArmorItem extends Item {
         private String description;
         private Material materialModel;
         private Color color;
-        private Asset model;
+        private Asset bbmodel;
         private double protections;
 
         @Override
@@ -241,7 +241,7 @@ public class ArmorItem extends Item {
             }
 
             model.requireType(AssetTypes.BBMODEL);
-            this.model = model;
+            bbmodel = model;
             return this;
         }
 
@@ -251,7 +251,7 @@ public class ArmorItem extends Item {
                 throw new IllegalArgumentException();
             }
 
-            this.materialModel = model;
+            materialModel = model;
             return this;
         }
 

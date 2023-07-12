@@ -6,7 +6,6 @@ import com.mcquest.core.event.EventEmitter;
 import com.mcquest.core.event.SkillUnlockEvent;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
@@ -16,7 +15,7 @@ public abstract class Skill {
     private final int id;
     private final String name;
     private final int level;
-    private final @Nullable Integer prerequisiteId;
+    private final Integer prerequisiteId;
     private final Asset icon;
     private final String description;
     private final int skillTreeRow;
@@ -24,18 +23,16 @@ public abstract class Skill {
     private final EventEmitter<SkillUnlockEvent> onUnlock;
     PlayerClass playerClass;
 
-    Skill(int id, String name, int level, @Nullable Integer prerequisiteId,
-          Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
-        this.id = id;
-        this.name = name;
-        this.level = level;
-        this.prerequisiteId = prerequisiteId;
-        icon.requireType("png");
-        this.icon = icon;
-        this.description = description;
-        this.skillTreeRow = skillTreeRow;
-        this.skillTreeColumn = skillTreeColumn;
-        this.onUnlock = new EventEmitter<>();
+    Skill(Builder builder) {
+        id = builder.id;
+        name = builder.name;
+        level = builder.level;
+        prerequisiteId = builder.prerequisiteId;
+        icon = builder.icon;
+        description = builder.description;
+        skillTreeRow = builder.skillTreeRow;
+        skillTreeColumn = builder.skillTreeColumn;
+        onUnlock = new EventEmitter<>();
     }
 
     public int getId() {
@@ -50,7 +47,7 @@ public abstract class Skill {
         return level;
     }
 
-    public @Nullable Skill getPrerequisite() {
+    public Skill getPrerequisite() {
         if (prerequisiteId == null) {
             return null;
         }
@@ -93,4 +90,15 @@ public abstract class Skill {
 
     @ApiStatus.Internal
     public abstract void writeResources(FileTree tree, List<ItemOverride> overrides);
+
+    static class Builder {
+        int id;
+        String name;
+        int level;
+        Asset icon;
+        String description;
+        int skillTreeRow;
+        int skillTreeColumn;
+        int prerequisiteId;
+    }
 }

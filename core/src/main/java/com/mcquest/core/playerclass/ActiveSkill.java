@@ -1,6 +1,7 @@
 package com.mcquest.core.playerclass;
 
 import com.mcquest.core.asset.Asset;
+import com.mcquest.core.asset.AssetTypes;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.ActiveSkillUseEvent;
 import com.mcquest.core.event.EventEmitter;
@@ -16,7 +17,6 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
@@ -31,12 +31,10 @@ public class ActiveSkill extends Skill {
     private final EventEmitter<ActiveSkillUseEvent> onUse;
     int customModelDataStart;
 
-    ActiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                Asset icon, String description, int skillTreeRow,
-                int skillTreeColumn, double manaCost, Duration cooldown) {
-        super(id, name, level, prerequisiteId, icon, description, skillTreeRow, skillTreeColumn);
-        this.manaCost = manaCost;
-        this.cooldown = cooldown;
+    private ActiveSkill(Builder builder) {
+        super(builder);
+        this.manaCost = builder.manaCost;
+        this.cooldown = builder.cooldown;
         this.onUse = new EventEmitter<>();
     }
 
@@ -98,7 +96,7 @@ public class ActiveSkill extends Skill {
 
         int customModelData = isUnlocked
                 ? customModelDataStart
-                : customModelDataStart + Hotbar.COOLDOWN_TEXTURES + 1;
+                : customModelDataStart + 2 * Hotbar.COOLDOWN_TEXTURES + 1;
 
         return ItemStackUtility.create(Materials.SKILL, displayName, lore)
                 .set(SkillManager.SKILL_ID_TAG, getId())
@@ -141,10 +139,6 @@ public class ActiveSkill extends Skill {
                 .build();
     }
 
-    private ItemStack getInsufficientManaHotbarItemStack() {
-        return getHotbarItemStack(Hotbar.COOLDOWN_TEXTURES);
-    }
-
     @Override
     @ApiStatus.Internal
     public void writeResources(FileTree tree, List<ItemOverride> overrides) {
@@ -167,6 +161,17 @@ public class ActiveSkill extends Skill {
             );
         }
 
+        // Unusable cooldown textures.
+        for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
+            ResourcePackUtility.writeCooldownIconUnusable(
+                    tree,
+                    getIcon(),
+                    Key.key(Namespaces.SKILLS, String.format("%d-%d-%d-unusable", playerClass.getId(), getId(), i)),
+                    i,
+                    overrides
+            );
+        }
+
         // Locked texture.
         ResourcePackUtility.writeLockedIcon(
                 tree,
@@ -174,5 +179,119 @@ public class ActiveSkill extends Skill {
                 Key.key(Namespaces.SKILLS, String.format("%d-%d-locked", playerClass.getId(), getId())),
                 overrides
         );
+    }
+
+
+    public interface IdStep {
+        NameStep id(int id);
+    }
+
+    public interface NameStep {
+        LevelStep name(String name);
+    }
+
+    public interface LevelStep {
+        IconStep level(int level);
+    }
+
+    public interface IconStep {
+        DescriptionStep icon(Asset icon);
+    }
+
+    public interface DescriptionStep {
+        SkillTreePositionStep description(String description);
+    }
+
+    public interface SkillTreePositionStep {
+        ManaCostStep skillTreePosition(int row, int column);
+    }
+
+    public interface ManaCostStep {
+        CooldownStep manaCost(double manaCost);
+    }
+
+    public interface CooldownStep {
+        BuildStep cooldown(Duration cooldown);
+    }
+
+    public interface BuildStep {
+        BuildStep prerequisite(int id);
+
+        PlayerClass.Builder build();
+    }
+
+    static class Builder extends Skill.Builder implements IdStep, NameStep,
+            LevelStep, IconStep, DescriptionStep, SkillTreePositionStep,
+            ManaCostStep, CooldownStep, BuildStep {
+        private final PlayerClass.Builder playerClassBuilder;
+        private double manaCost;
+        private Duration cooldown;
+
+        Builder(PlayerClass.Builder playerClassBuilder) {
+            this.playerClassBuilder = playerClassBuilder;
+        }
+
+        @Override
+        public NameStep id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        @Override
+        public LevelStep name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        @Override
+        public IconStep level(int level) {
+            this.level = level;
+            return this;
+        }
+
+        @Override
+        public DescriptionStep icon(Asset icon) {
+            icon.requireType(AssetTypes.PNG);
+            this.icon = icon;
+            return this;
+        }
+
+        @Override
+        public SkillTreePositionStep description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        @Override
+        public ManaCostStep skillTreePosition(int row, int column) {
+            this.skillTreeRow = row;
+            this.skillTreeColumn = column;
+            return this;
+        }
+
+        @Override
+        public CooldownStep manaCost(double manaCost) {
+            this.manaCost = manaCost;
+            return this;
+        }
+
+        @Override
+        public BuildStep cooldown(Duration cooldown) {
+            this.cooldown = cooldown;
+            return this;
+        }
+
+        @Override
+        public BuildStep prerequisite(int id) {
+            this.prerequisiteId = id;
+            return this;
+        }
+
+        @Override
+        public PlayerClass.Builder build() {
+            ActiveSkill skill = new ActiveSkill(this);
+            playerClassBuilder.skills.add(skill);
+            return playerClassBuilder;
+        }
     }
 }

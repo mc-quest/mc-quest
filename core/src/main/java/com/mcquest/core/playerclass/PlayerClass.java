@@ -1,9 +1,5 @@
 package com.mcquest.core.playerclass;
 
-import com.mcquest.core.asset.Asset;
-import org.jetbrains.annotations.Nullable;
-
-import java.time.Duration;
 import java.util.*;
 
 /**
@@ -45,9 +41,9 @@ public final class PlayerClass {
     }
 
     public static class Builder {
-        final int id;
-        final String name;
-        final List<Skill> skills;
+        private final int id;
+        private final String name;
+        final Collection<Skill> skills;
 
         private Builder(int id, String name) {
             this.id = id;
@@ -55,21 +51,12 @@ public final class PlayerClass {
             this.skills = new ArrayList<>();
         }
 
-        public Builder activeSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                   Asset icon, String description, int skillTreeRow,
-                                   int skillTreeColumn, double manaCost, Duration cooldown) {
-            ActiveSkill skill = new ActiveSkill(id, name, level, prerequisiteId, icon,
-                    description, skillTreeRow, skillTreeColumn, manaCost, cooldown);
-            skills.add(skill);
-            return this;
+        public ActiveSkill.IdStep activeSkill() {
+            return new ActiveSkill.Builder(this);
         }
 
-        public Builder passiveSkill(int id, String name, int level, @Nullable Integer prerequisiteId,
-                                    Asset icon, String description, int skillTreeRow, int skillTreeColumn) {
-            PassiveSkill skill = new PassiveSkill(id, name, level, prerequisiteId, icon,
-                    description, skillTreeRow, skillTreeColumn);
-            skills.add(skill);
-            return this;
+        public PassiveSkill.IdStep passiveSkill() {
+            return new PassiveSkill.Builder(this);
         }
 
         public PlayerClass build() {

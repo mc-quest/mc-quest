@@ -3,16 +3,16 @@
     "name": "Mage",
     "skills": [
         {
+            "type": "ACTIVE",
             "id": 1,
             "name": "Fireball",
             "level": 1,
-            "prerequisiteId": null,
-            "icon": "Fireball.png",
+            "icon": "fireball.png",
             "description": "TODO",
-            "manaCost": 5,
-            "cooldown": 6,
             "skillTreeRow": 0,
-            "skillTreeColumn": 4
+            "skillTreeColumn": 4,
+            "manaCost": 5,
+            "cooldown": 6
         }
     ]
 }

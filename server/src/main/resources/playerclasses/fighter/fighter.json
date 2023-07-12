@@ -3,11 +3,11 @@
     "name": "Fighter",
     "skills": [
         {
+            "type": "ACTIVE",
             "id": 1,
             "name": "Bash",
             "level": 1,
-            "prerequisiteId": null,
-            "icon": "Bash.png",
+            "icon": "bash.png",
             "description": "Damage enemies in front of you",
             "manaCost": 5,
             "cooldown": 1,
@@ -15,16 +15,17 @@
             "skillTreeColumn": 4
         },
         {
+            "type": "ACTIVE",
             "id": 2,
             "name": "Self Heal",
             "level": 2,
-            "prerequisiteId": 1,
-            "icon": "SelfHeal.png",
-            "manaCost": 5,
-            "cooldown": 20,
+            "icon": "self_heal.png",
             "description": "Heal yourself",
             "skillTreeRow": 1,
-            "skillTreeColumn": 4
+            "skillTreeColumn": 4,
+            "manaCost": 5,
+            "cooldown": 20,
+            "prerequisiteId": 1
         }
     ]
 }

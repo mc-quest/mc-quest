@@ -1,5 +1,6 @@
 package com.mcquest.core.resourcepack;
 
+
 import com.google.common.collect.ListMultimap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -15,6 +16,7 @@ import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;
 
 import javax.imageio.ImageIO;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,22 +86,75 @@ public class ResourcePackUtility {
         try {
             double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
             BufferedImage image = icon.readImage();
+
             double cx = image.getWidth() / 2.0;
             double cy = image.getHeight() / 2.0;
+
             for (int x = 0; x < image.getWidth(); x++) {
                 for (int y = 0; y < image.getHeight(); y++) {
                     double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
                     if (theta < 0.0) {
                         theta = 2.0 * Math.PI + theta;
                     }
+
                     if (theta < thetaMax) {
-                        int rgb = gray(image.getRGB(x, y), 0.25);
-                        image.setRGB(x, y, rgb);
+                        Color color = new Color(image.getRGB(x, y), true);
+                        int gray = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
+                        gray *= 0.25;
+                        int a = color.getAlpha();
+                        Color cooldownColor = new Color(gray, gray, gray, a);
+                        image.setRGB(x, y, cooldownColor.getRGB());
                     }
                 }
             }
+
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", stream);
+
+            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
+    public static void writeCooldownIconUnusable(FileTree tree, Asset icon, Key key,
+                                                 int cooldownTexture,
+                                                 List<ItemOverride> overrides) {
+        try {
+            double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
+            BufferedImage image = icon.readImage();
+
+            double cx = image.getWidth() / 2.0;
+            double cy = image.getHeight() / 2.0;
+
+            for (int x = 0; x < image.getWidth(); x++) {
+                for (int y = 0; y < image.getHeight(); y++) {
+                    double theta = Math.atan2(cy - y, x - cx) - Math.PI / 2.0;
+                    if (theta < 0.0) {
+                        theta = 2.0 * Math.PI + theta;
+                    }
+
+                    Color color = new Color(image.getRGB(x, y), true);
+                    if (theta < thetaMax) {
+                        int gray = (color.getRed() + color.getGreen() + color.getBlue()) / 3;
+                        gray *= 0.25;
+                        int a = color.getAlpha();
+                        Color cooldownColor = new Color(gray, gray, gray, a);
+                        image.setRGB(x, y, cooldownColor.getRGB());
+                    } else {
+                        if (color.getTransparency() != Color.BITMASK) {
+                            float[] hsv = Color.RGBtoHSB(color.getRed(),
+                                    color.getGreen(), color.getBlue(), null);
+                            float hue = 0.0f;
+                            image.setRGB(x, y, Color.HSBtoRGB(hue, hsv[1], hsv[2]));
+                        }
+                    }
+                }
+            }
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", stream);
+
             writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
         } catch (IOException e) {
             throw new UncheckedIOException(e);

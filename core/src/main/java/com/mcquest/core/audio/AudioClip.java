@@ -1,6 +1,7 @@
 package com.mcquest.core.audio;
 
 import com.mcquest.core.asset.Asset;
+import com.mcquest.core.asset.AssetTypes;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.resourcepack.Namespaces;
@@ -27,7 +28,7 @@ public class AudioClip {
     private Key key;
 
     public AudioClip(Asset audio) {
-        audio.requireType("ogg");
+        audio.requireType(AssetTypes.OGG);
         this.audio = audio;
         duration = computeDuration(audio);
     }

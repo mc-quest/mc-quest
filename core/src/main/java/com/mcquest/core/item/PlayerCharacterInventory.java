@@ -51,10 +51,10 @@ public class PlayerCharacterInventory {
 
     public @Nullable ArmorItem getArmor(@NotNull ArmorSlot slot) {
         int inventorySlot = switch (slot) {
-            case FEET -> 36;
-            case LEGS -> 37;
-            case CHEST -> 38;
-            case HEAD -> 39;
+            case FEET -> 44;
+            case LEGS -> 43;
+            case CHEST -> 42;
+            case HEAD -> 41;
         };
 
         return (ArmorItem) getItem(inventorySlot);

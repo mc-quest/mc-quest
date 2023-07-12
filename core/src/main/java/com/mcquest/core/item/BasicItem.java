@@ -35,7 +35,7 @@ public class BasicItem extends Item {
     }
 
     @Override
-    ItemStack getItemStack() {
+    public ItemStack getItemStack() {
         return ItemStack.builder(Materials.ITEM_DEFAULT)
                 .set(ID_TAG, getId())
                 .displayName(getDisplayName())

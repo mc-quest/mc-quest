@@ -108,6 +108,11 @@ public class PlayerCharacterManager {
     private void handlePlayerMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
+
+        if (pc.getCutscenePlayer().getPlayingCutscene() != null) {
+            return;
+        }
+
         PlayerCharacterMoveEvent pcMoveEvent = new PlayerCharacterMoveEvent(pc, event);
         MinecraftServer.getGlobalEventHandler().call(pcMoveEvent);
         if (!pcMoveEvent.isCancelled()) {

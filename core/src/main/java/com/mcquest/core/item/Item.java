@@ -66,7 +66,7 @@ public abstract class Item {
 
     public abstract int getStackSize();
 
-    abstract ItemStack getItemStack();
+    public abstract ItemStack getItemStack();
 
     @ApiStatus.Internal
     public abstract void writeResources(FileTree tree,

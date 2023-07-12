@@ -94,10 +94,10 @@ public class Mmorpg {
     }
 
     private void start(String address, int port, int resourcePackServerPort) {
+        MojangAuth.init();
         for (Feature feature : features) {
             feature.hook(this);
         }
-        MojangAuth.init();
         resourcePackManager.startServer(address, resourcePackServerPort);
         server.start(address, port);
     }

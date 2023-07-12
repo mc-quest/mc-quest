@@ -101,6 +101,7 @@ class ResourcePackBuilder {
     private void writeModelResources(FileTree tree) {
         Collection<Model> models = mmorpg.getModelManager().getModels();
         ModelWriter.resource(Namespaces.MODELS).write(tree, models);
+        models.forEach(Model::discardResourcePackData);
     }
 
     private void writeAudioResources(FileTree tree) {

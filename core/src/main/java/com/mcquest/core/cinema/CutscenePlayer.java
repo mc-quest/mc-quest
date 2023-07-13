@@ -40,6 +40,10 @@ public class CutscenePlayer {
     }
 
     public void play(@NotNull Cutscene cutscene) {
+        if (this.cutscene != null) {
+            completeCutscene();
+        }
+
         this.cutscene = cutscene;
         pcPosition = pc.getPosition();
         placeholder = createPlaceholder();

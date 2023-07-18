@@ -5,6 +5,7 @@ import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetTypes;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
@@ -36,24 +37,25 @@ public class BasicItem extends Item {
 
     @Override
     public ItemStack getItemStack() {
-        return ItemStack.builder(Materials.ITEM_DEFAULT)
+        return ItemStackUtility
+                .create(Materials.ITEM_DEFAULT, getDisplayName(), itemStackLore())
                 .set(ID_TAG, getId())
-                .displayName(getDisplayName())
-                .lore(lore())
                 .meta(builder -> builder.customModelData(customModelData))
                 .build();
     }
 
-    private List<Component> lore() {
+    private List<Component> itemStackLore() {
         ItemQuality quality = getQuality();
         String description = getDescription();
 
         List<Component> lore = new ArrayList<>();
         lore.add(ItemUtility.qualityText(quality, "Item"));
+
         if (description != null) {
             lore.add(Component.empty());
             lore.addAll(ItemUtility.descriptionText(description));
         }
+
         return lore;
     }
 

@@ -2,19 +2,24 @@ package com.mcquest.core.item;
 
 import com.google.common.collect.ListMultimap;
 import com.mcquest.core.asset.Asset;
+import com.mcquest.core.asset.AssetTypes;
 import com.mcquest.core.event.AutoAttackEvent;
 import com.mcquest.core.event.EventEmitter;
 import com.mcquest.core.event.WeaponEquipEvent;
 import com.mcquest.core.event.WeaponUnequipEvent;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
-import com.mcquest.core.asset.AssetTypes;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Weapon is an Item that can be equipped by a PlayerCharacter to damage
@@ -82,11 +87,32 @@ public class Weapon extends Item {
 
     @Override
     public ItemStack getItemStack() {
-        return ItemStack.builder(Materials.WEAPON)
+        return ItemStackUtility
+                .create(Materials.WEAPON, getDisplayName(), itemStackLore())
                 .set(ID_TAG, getId())
-                .displayName(getDisplayName())
                 .meta(builder -> builder.customModelData(customModelData))
                 .build();
+    }
+
+    private List<Component> itemStackLore() {
+        List<Component> lore = new ArrayList<>();
+
+        lore.add(ItemUtility.qualityText(getQuality(), type.getText()));
+        lore.add(ItemUtility.levelText(level));
+
+        lore.add(Component.empty());
+
+        if (physicalDamage != 0.0) {
+            lore.add(ItemUtility.statText("Physical Damage", physicalDamage));
+        }
+
+        String description = getDescription();
+        if (description != null) {
+            lore.add(Component.empty());
+            lore.addAll(ItemUtility.descriptionText(description));
+        }
+
+        return lore;
     }
 
     @ApiStatus.Internal

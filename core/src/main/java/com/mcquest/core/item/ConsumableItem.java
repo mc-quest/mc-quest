@@ -8,6 +8,7 @@ import com.mcquest.core.event.ItemConsumeEvent;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
 import com.mcquest.core.ui.Hotbar;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -54,27 +55,35 @@ public class ConsumableItem extends Item {
 
     @Override
     public ItemStack getItemStack() {
-        return ItemStack.builder(Materials.ITEM_DEFAULT)
-                .set(ID_TAG, getId())
-                .displayName(getDisplayName())
-                .lore(lore())
-                .meta(builder -> builder.customModelData(customModelDataStart))
-                .build();
+        return getItemStack(customModelDataStart);
     }
 
     ItemStack getHotbarItemStack(int cooldownTexture) {
         int customModelData = customModelDataStart + cooldownTexture;
+        return getItemStack(customModelData);
+    }
 
-        return ItemStack.builder(Materials.ITEM_DEFAULT)
+    private ItemStack getItemStack(int customModelData) {
+        return ItemStackUtility
+                .create(Materials.ITEM_DEFAULT, getDisplayName(), itemStackLore())
                 .set(ID_TAG, getId())
-                .displayName(getDisplayName())
-                .lore(lore())
                 .meta(builder -> builder.customModelData(customModelData))
                 .build();
     }
 
-    private List<Component> lore() {
+    private List<Component> itemStackLore() {
+        ItemQuality quality = getQuality();
+        String description = getDescription();
+
         List<Component> lore = new ArrayList<>();
+        lore.add(ItemUtility.qualityText(quality, "Consumable"));
+        lore.add(ItemUtility.levelText(level));
+
+        if (description != null) {
+            lore.add(Component.empty());
+            lore.addAll(ItemUtility.descriptionText(description));
+        }
+
         return lore;
     }
 

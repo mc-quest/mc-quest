@@ -27,11 +27,6 @@ class ItemUtility {
         return Component.text(((int) Math.round(stat)) + " " + statName, NamedTextColor.YELLOW);
     }
 
-    static TextComponent equipText() {
-        return Component.text("Shift-click to equip",
-                NamedTextColor.GRAY, TextDecoration.ITALIC);
-    }
-
     static TextComponent consumeText() {
         return Component.text("Shift-click to use",
                 NamedTextColor.GRAY, TextDecoration.ITALIC);

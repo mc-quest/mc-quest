@@ -8,6 +8,7 @@ import com.mcquest.core.event.EventEmitter;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
 import com.mcquest.core.asset.AssetTypes;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.color.Color;
@@ -87,7 +88,8 @@ public class ArmorItem extends Item {
 
     @Override
     public ItemStack getItemStack() {
-        ItemStack.Builder builder = ItemStack.builder(material());
+        ItemStack.Builder builder = ItemStackUtility
+                .create(material(), getDisplayName(), itemStackLore());
 
         if (bbmodel != null) {
             builder.meta(meta -> meta.customModelData(customModelData));
@@ -99,25 +101,28 @@ public class ArmorItem extends Item {
                     .build());
         }
 
-        return builder.set(ID_TAG, getId())
-                .displayName(getDisplayName())
-                .lore(lore())
-                .build();
+        return builder.set(ID_TAG, getId()).build();
     }
 
-    private List<Component> lore() {
+    private List<Component> itemStackLore() {
         ItemQuality quality = getQuality();
         String description = getDescription();
 
         List<Component> lore = new ArrayList<>();
         lore.add(ItemUtility.qualityText(quality, type.getText() + " Armor"));
         lore.add(ItemUtility.levelText(level));
+
         lore.add(Component.empty());
-        lore.add(ItemUtility.statText("Protections", protections));
+
+        if (protections != 0.0) {
+            lore.add(ItemUtility.statText("Protections", protections));
+        }
+
         if (description != null) {
             lore.add(Component.empty());
             lore.addAll(ItemUtility.descriptionText(description));
         }
+
         return lore;
     }
 

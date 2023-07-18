@@ -15,6 +15,7 @@ import com.mcquest.core.loot.LootChestManager;
 import com.mcquest.core.model.ModelManager;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.mount.MountManager;
+import com.mcquest.core.object.ObjectManager;
 import com.mcquest.core.particle.ParticleManager;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.physics.PhysicsManager;
@@ -57,6 +58,7 @@ public class Mmorpg {
     private final PlayerCharacterManager pcManager;
     private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
+    private final ObjectManager objectManager;
     private final PhysicsManager physicsManager;
     private final ParticleManager particleManager;
     private final LootChestManager lootChestManager;
@@ -83,6 +85,7 @@ public class Mmorpg {
         );
         npcSpawner = new NonPlayerCharacterSpawner(this);
         characterEntityManager = new CharacterEntityManager();
+        objectManager = new ObjectManager(this);
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
         lootChestManager = new LootChestManager(this);
@@ -152,6 +155,10 @@ public class Mmorpg {
 
     public CharacterEntityManager getCharacterEntityManager() {
         return characterEntityManager;
+    }
+
+    public ObjectManager getObjectManager() {
+        return objectManager;
     }
 
     public PhysicsManager getPhysicsManager() {

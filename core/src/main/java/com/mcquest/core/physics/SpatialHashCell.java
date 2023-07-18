@@ -4,8 +4,9 @@ import com.mcquest.core.instance.Instance;
 import net.minestom.server.coordinate.Pos;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class SpatialHashCell {
+public final class SpatialHashCell {
     private final Instance instance;
     private final int x;
     private final int y;
@@ -39,6 +40,20 @@ public class SpatialHashCell {
 
     public int getZ() {
         return z;
+    }
+
+    public static void forAllInRange(SpatialHashCell min, SpatialHashCell max, Consumer<SpatialHashCell> consumer) {
+        if (min.instance != max.instance) {
+            throw new IllegalArgumentException();
+        }
+
+        for (int x = min.getX(); x <= max.getX(); x++) {
+            for (int y = min.getY(); y <= max.getY(); y++) {
+                for (int z = min.getZ(); z <= max.getZ(); z++) {
+                    consumer.accept(new SpatialHashCell(min.instance, x, y, z));
+                }
+            }
+        }
     }
 
     @Override

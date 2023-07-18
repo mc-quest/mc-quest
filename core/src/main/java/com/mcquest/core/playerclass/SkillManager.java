@@ -5,6 +5,7 @@ import com.mcquest.core.event.SkillAddToHotbarEvent;
 import com.mcquest.core.event.SkillRemoveFromHotbarEvent;
 import com.mcquest.core.event.SkillUnlockEvent;
 import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -25,10 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SkillManager {
     static final Tag<Integer> SKILL_ID_TAG = Tag.Integer("skill_id");
@@ -78,12 +76,9 @@ public class SkillManager {
 
     private ItemStack hotbarSkillPlaceholder(int slot, boolean flashing) {
         String nameContent = String.format("Active Skill Slot %d", slot + 1);
-        TextComponent name = Component.text(nameContent, NamedTextColor.YELLOW);
-
-        return ItemStack.builder(Material.BARRIER)
-                .displayName(name)
-                .lore(Component.text("Active skills go here"))
-                .build();
+        TextComponent displayName = Component.text(nameContent, NamedTextColor.YELLOW);
+        List<TextComponent> lore = List.of(Component.text("Active skills go here"));
+        return ItemStackUtility.create(Material.BARRIER, displayName, lore).build();
     }
 
     private void handleInventoryClick(Player player, int slot, ClickType clickType,

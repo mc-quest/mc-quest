@@ -50,6 +50,29 @@ public class ObjectManager {
         }
     }
 
+    public Collection<Object> getNearbyObjects(Instance instance, Pos position, double radius) {
+        if (radius < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        double diameter = 2.0 * radius;
+
+        Collection<SpatialHashCell> cells =
+                cellsFor(instance, position, new Vec(diameter, diameter, diameter));
+
+        Set<Object> objects = new HashSet<>();
+
+        for (SpatialHashCell cell : cells) {
+            for (Object object : objectsByCell.get(cell)) {
+                if (object.getPosition().distanceSquared(position) <= radius * radius) {
+                    objects.add(object);
+                }
+            }
+        }
+
+        return objects;
+    }
+
     private void tick() {
         Set<Object> toSpawn = new HashSet<>();
         Set<Object> toNotDespawn = new HashSet<>();

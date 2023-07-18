@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Map {
@@ -23,19 +24,33 @@ public class Map {
 
     private final int id;
     private final Pos origin;
-    private final BufferedImage image;
+    private final Asset image;
+    private final BufferedImage bufferedImage;
     private final Collection<QuestMarker> questMarkers;
 
     public Map(int id, Pos origin, Asset image) {
         this.id = id;
         this.origin = origin;
         image.requireType(AssetTypes.PNG);
-        this.image = image.readImage();
+        this.image = image;
+        this.bufferedImage = image.readImage();
         this.questMarkers = new ArrayList<>();
     }
 
     public int getId() {
         return id;
+    }
+
+    public Pos getOrigin() {
+        return origin;
+    }
+
+    public Asset getImage() {
+        return image;
+    }
+
+    public Collection<QuestMarker> getQuestMarkers() {
+        return Collections.unmodifiableCollection(questMarkers);
     }
 
     public void addQuestMarker(QuestMarker questMarker) {
@@ -51,10 +66,10 @@ public class Map {
         Pos position = pc.getPosition();
         int imageStartX = Math.max(0, (int) (position.x() - origin.x() - MAP_WIDTH / 2.0));
         int imageStartY = Math.max(0, (int) (position.z() - origin.z() - MAP_WIDTH / 2.0));
-        if (imageStartX < image.getWidth() && imageStartY < image.getHeight()) {
-            int width = Math.min(image.getWidth() - imageStartX, MAP_WIDTH);
-            int height = Math.min(image.getHeight() - imageStartY, MAP_WIDTH);
-            BufferedImage subimage = image.getSubimage(imageStartX, imageStartY, width, height);
+        if (imageStartX < bufferedImage.getWidth() && imageStartY < bufferedImage.getHeight()) {
+            int width = Math.min(bufferedImage.getWidth() - imageStartX, MAP_WIDTH);
+            int height = Math.min(bufferedImage.getHeight() - imageStartY, MAP_WIDTH);
+            BufferedImage subimage = bufferedImage.getSubimage(imageStartX, imageStartY, width, height);
             int renderX = Math.max(0, (int) (origin.x() - position.x() + MAP_WIDTH / 2.0));
             int renderY = Math.max(0, (int) (origin.z() - position.z() + MAP_WIDTH / 2.0));
             renderer.drawImage(subimage, renderX, renderY, null);

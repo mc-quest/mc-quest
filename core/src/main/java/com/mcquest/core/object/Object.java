@@ -99,4 +99,8 @@ public class Object {
 
         removed = true;
     }
+
+    void setObjectManager(ObjectManager objectManager) {
+        this.objectManager = objectManager;
+    }
 }

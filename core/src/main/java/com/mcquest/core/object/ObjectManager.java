@@ -21,8 +21,8 @@ import java.util.Set;
 
 public class ObjectManager {
     private static final double CELL_SIZE = 256.0;
-    private static final double SPAWN_RADIUS = 75.0;
-    private static final double DESPAWN_RADIUS = 85.0;
+    public static final double SPAWN_RADIUS = 75.0;
+    public static final double DESPAWN_RADIUS = 85.0;
 
     private final Mmorpg mmorpg;
     private final SetMultimap<SpatialHashCell, Object> objectsByCell;
@@ -42,6 +42,8 @@ public class ObjectManager {
         if (object.isRemoved()) {
             throw new IllegalArgumentException();
         }
+
+        object.setObjectManager(this);
 
         Instance instance = object.getInstance();
         Pos position = object.getPosition();
@@ -167,6 +169,8 @@ public class ObjectManager {
         for (SpatialHashCell cell : cells) {
             objectsByCell.remove(cell, object);
         }
+
+        spawnedObjects.remove(object);
     }
 
     private Collection<SpatialHashCell> cellsFor(Instance instance, Pos position,

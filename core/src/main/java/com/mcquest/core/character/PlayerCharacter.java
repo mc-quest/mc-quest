@@ -73,12 +73,11 @@ public final class PlayerCharacter extends Character {
     private boolean removed;
 
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
-        super(Component.text(player.getUsername(), NamedTextColor.GREEN),
-                levelForExperiencePoints(data.getExperiencePoints()),
-                mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
+        super(mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
                 data.getPosition());
         this.mmorpg = mmorpg;
         this.player = player;
+        setName(player.getUsername());
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
         skillManager = new SkillManager(this, data);
         inventory = new PlayerCharacterInventory(this, data, mmorpg.getItemManager());
@@ -86,6 +85,7 @@ public final class PlayerCharacter extends Character {
         musicPlayer = new MusicPlayer(this, data, mmorpg.getAudioManager());
         mapViewer = new MapViewer(this, data, mmorpg.getMapManager());
         cutscenePlayer = new CutscenePlayer(this);
+        super.setLevel(levelForExperiencePoints(data.getExperiencePoints()));
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
@@ -153,8 +153,8 @@ public final class PlayerCharacter extends Character {
         return respawnPosition;
     }
 
-    public void setRespawnPosition(@NotNull Pos position) {
-        this.respawnPosition = position;
+    public void setRespawnPosition(@NotNull Pos respawnPosition) {
+        this.respawnPosition = respawnPosition;
     }
 
     private Pos hitboxCenter() {
@@ -493,10 +493,6 @@ public final class PlayerCharacter extends Character {
 
     public boolean isRemoved() {
         return removed;
-    }
-
-    void remove() {
-        removed = true;
     }
 
     public static class Hitbox extends CharacterHitbox {

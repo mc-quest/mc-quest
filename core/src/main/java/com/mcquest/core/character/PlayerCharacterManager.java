@@ -6,6 +6,7 @@ import com.mcquest.core.event.PlayerCharacterLoginEvent;
 import com.mcquest.core.event.PlayerCharacterLogoutEvent;
 import com.mcquest.core.event.PlayerCharacterMoveEvent;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.Object;
 import com.mcquest.core.object.ObjectManager;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.resourcepack.ResourcePackManager;
@@ -49,6 +50,7 @@ public class PlayerCharacterManager {
         eventHandler.addListener(EntityDamageEvent.class, this::handleDamage);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
+        scheduler.buildTask(this::updateNameplates).repeat(TaskSchedule.nextTick()).schedule();
     }
 
     public Collection<PlayerCharacter> getPlayerCharacters() {
@@ -137,6 +139,24 @@ public class PlayerCharacterManager {
         for (PlayerCharacter pc : pcs.values()) {
             pc.heal(pc, pc.getHealthRegenRate());
             pc.addMana(pc.getManaRegenRate());
+        }
+    }
+
+    private void updateNameplates() {
+        ObjectManager objectManager = mmorpg.getObjectManager();
+
+        for (PlayerCharacter pc : pcs.values()) {
+            Collection<Object> nearbyObjects = objectManager.getNearbyObjects(
+                    pc.getInstance(),
+                    pc.getPosition(),
+                    ObjectManager.SPAWN_RADIUS
+            );
+
+            for (Object object : nearbyObjects) {
+                if (object instanceof Character character) {
+                    character.getNameplate().updateViewer(pc);
+                }
+            }
         }
     }
 }

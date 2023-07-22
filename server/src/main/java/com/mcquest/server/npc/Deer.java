@@ -1,26 +1,28 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.*;
-import com.mcquest.core.character.Character;
-import com.mcquest.server.constants.Models;
+import com.mcquest.core.character.CharacterEntityManager;
+import com.mcquest.core.character.CharacterHitbox;
+import com.mcquest.core.character.DamageSource;
+import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.physics.Collider;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
+import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.server.constants.Models;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
+import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.timer.SchedulerManager;
+import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
-import java.time.Duration;
-
 public class Deer extends NonPlayerCharacter {
-    private static final Component DISPLAY_NAME = Component.text("Deer", NamedTextColor.GREEN);
-    private static final Vec SIZE = new Vec(1.5, 3.75, 1.5);
+    private static final Vec SIZE = new Vec(1, 1.25, 1);
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
@@ -28,17 +30,18 @@ public class Deer extends NonPlayerCharacter {
     private Entity entity;
 
     public Deer(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
-        super(DISPLAY_NAME, 2, instance, spawnPosition);
+        super(instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
         this.hitbox = new CharacterHitbox(this, instance, hitboxPosition(), SIZE);
+        setName("Deer");
         setHeight(SIZE.y());
         setMaxHealth(10);
         setHealth(getMaxHealth());
     }
 
     @Override
-    public void spawn() {
+    protected void spawn() {
         super.spawn();
         entity = new Entity(this);
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
@@ -48,50 +51,68 @@ public class Deer extends NonPlayerCharacter {
     }
 
     @Override
-    public void despawn() {
+    protected void despawn() {
         super.despawn();
+
         CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
+        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+
         characterEntityManager.unbind(entity);
         entity.remove();
+
         setPosition(spawnPosition);
-        mmorpg.getPhysicsManager().removeCollider(hitbox);
+
+        physicsManager.removeCollider(hitbox);
     }
 
-    public void updatePosition(@NotNull Pos position) {
+    @Override
+    public boolean isDamageable(DamageSource source) {
+        return true;
+    }
+
+    private void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
         hitbox.setCenter(hitboxPosition());
     }
 
     private Pos hitboxPosition() {
-        return getPosition().add(0.0, SIZE.y() / 2.0, 0.0);
+        return getPosition().withY(y -> y + SIZE.y() / 2.0);
     }
 
     @Override
-    public void damage(@NotNull DamageSource source, double amount) {
-        super.damage(source, amount);
-        if (!isAlive()) {
-            if (source instanceof PlayerCharacter pc) {
-                pc.grantExperiencePoints(50);
-            }
-            mmorpg.getSchedulerManager().buildTask(this::respawn).delay(Duration.ofSeconds(5)).schedule();
-        }
+    protected void onDamage(DamageSource source, double amount) {
+        Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_HURT, Sound.Source.NEUTRAL, 1f, 1f);
+        getInstance().playSound(sound, getPosition());
+    }
+
+    @Override
+    protected void onDeath(DamageSource killer) {
+        Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
+        getInstance().playSound(sound, getPosition());
+
+        ModelEntity deathModel = new ModelEntity(Models.DEER);
+        deathModel.playAnimation("walk");
+        deathModel.setInstance(getInstance(), getPosition());
+
+        SchedulerManager scheduler = mmorpg.getSchedulerManager();
+
+        scheduler.buildTask(deathModel::remove).delay(TaskSchedule.millis(2000)).schedule();
+        scheduler.buildTask(this::respawn).delay(TaskSchedule.seconds(3)).schedule();
     }
 
     private void respawn() {
-        setHealth(getMaxHealth());
-    }
-
-    @Override
-    public Attitude getAttitude(@NotNull Character character) {
-        return Attitude.HOSTILE;
+        Deer deer = new Deer(mmorpg, getInstance(), spawnPosition);
+        mmorpg.getObjectManager().add(deer);
     }
 
     public static class Entity extends ModelEntity {
         private final Deer deer;
 
         private Entity(Deer deer) {
-            super(Models.UNDEAD_KNIGHT);
+            super(Models.DEER);
             this.deer = deer;
+            playAnimation("walk");
+            setBoundingBox(SIZE.x(), SIZE.y(), SIZE.z());
             getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.05f);
             addAIGroup(new EntityAIGroupBuilder()
                     .addGoalSelector(new RandomStrollGoal(this, 10))
@@ -99,8 +120,8 @@ public class Deer extends NonPlayerCharacter {
         }
 
         @Override
-        public void tick(long time) {
-            super.tick(time);
+        public void update(long time) {
+            super.update(time);
             if (deer.isSpawned()) {
                 deer.updatePosition(getPosition());
             }

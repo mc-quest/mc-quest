@@ -39,7 +39,7 @@ public class FighterPlayerClass implements Feature {
                 return;
             }
             Character character = characterHitbox.getCharacter();
-            if (character.getAttitude(pc) == Attitude.FRIENDLY) {
+            if (!character.isDamageable(pc)) {
                 return;
             }
             hitOccurred[0] = true;

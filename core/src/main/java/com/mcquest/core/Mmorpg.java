@@ -4,7 +4,6 @@ import com.mcquest.core.audio.Song;
 import com.mcquest.core.cartography.Map;
 import com.mcquest.core.cartography.MapManager;
 import com.mcquest.core.character.CharacterEntityManager;
-import com.mcquest.core.character.NonPlayerCharacterSpawner;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.cinema.CutsceneManager;
@@ -56,7 +55,6 @@ public class Mmorpg {
     private final MountManager mountManager;
     private final InstanceManager instanceManager;
     private final PlayerCharacterManager pcManager;
-    private final NonPlayerCharacterSpawner npcSpawner;
     private final CharacterEntityManager characterEntityManager;
     private final ObjectManager objectManager;
     private final PhysicsManager physicsManager;
@@ -83,7 +81,6 @@ public class Mmorpg {
                 builder.pcDataProvider,
                 builder.pcLogoutHandler
         );
-        npcSpawner = new NonPlayerCharacterSpawner(this);
         characterEntityManager = new CharacterEntityManager();
         objectManager = new ObjectManager(this);
         physicsManager = new PhysicsManager();
@@ -147,10 +144,6 @@ public class Mmorpg {
 
     public PlayerCharacterManager getPlayerCharacterManager() {
         return pcManager;
-    }
-
-    public NonPlayerCharacterSpawner getNonPlayerCharacterSpawner() {
-        return npcSpawner;
     }
 
     public CharacterEntityManager getCharacterEntityManager() {

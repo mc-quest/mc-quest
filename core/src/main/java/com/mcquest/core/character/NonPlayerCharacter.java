@@ -1,67 +1,48 @@
 package com.mcquest.core.character;
 
 import com.mcquest.core.instance.Instance;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
 public class NonPlayerCharacter extends Character {
-    private boolean isSpawned;
-    NonPlayerCharacterSpawner spawner;
-
-    public NonPlayerCharacter(@NotNull Component displayName, int level,
-                              @NotNull Instance instance, @NotNull Pos position) {
-        super(displayName, level, instance, position);
-        isSpawned = false;
-        spawner = null;
+    public NonPlayerCharacter(@NotNull Instance instance, @NotNull Pos position) {
+        super(instance, position);
     }
 
-    @MustBeInvokedByOverriders
     @Override
-    public void setInstance(Instance instance) {
-        if (spawner != null) {
-            spawner.updateCell(this, instance, getPosition());
-        }
-        super.setInstance(instance);
-    }
+    public final void damage(@NotNull DamageSource source, double amount) {
+        double oldHealth = getHealth();
 
-    @MustBeInvokedByOverriders
-    @Override
-    public void setPosition(Pos position) {
-        if (spawner != null) {
-            spawner.updateCell(this, getInstance(), position);
-        }
-        super.setPosition(position);
-    }
-
-    @MustBeInvokedByOverriders
-    @Override
-    public void damage(@NotNull DamageSource source, double amount) {
-        double prevHealth = getHealth();
         super.damage(source, amount);
+
         double newHealth = getHealth();
-        if (prevHealth != newHealth && newHealth == 0.0) {
-            if (isSpawned) {
-                despawn();
-                spawner.handleDeath(this);
-            }
+
+        if (newHealth != 0) {
+            onDamage(source, amount);
+        }
+
+        if (newHealth != oldHealth && newHealth == 0.0) {
+            onDeath(source);
+            remove();
         }
     }
 
-    public final boolean isSpawned() {
-        return isSpawned;
+    /**
+     * Invoked when this NonPlayerCharacter is healed.
+     */
+    protected void onHeal(DamageSource source, double amount) {
     }
 
-    @MustBeInvokedByOverriders
-    protected void spawn() {
-        isSpawned = true;
-        showNameplateAndHealthBar();
+    /**
+     * Invoked when this NonPlayerCharacter takes damage but does not die as a
+     * result.
+     */
+    protected void onDamage(DamageSource source, double amount) {
     }
 
-    @MustBeInvokedByOverriders
-    protected void despawn() {
-        isSpawned = false;
-        hideNameplateAndHealthBar();
+    /**
+     * Invoked when this NonPlayerCharacter takes damage and dies as a result.
+     */
+    protected void onDeath(DamageSource killer) {
     }
 }

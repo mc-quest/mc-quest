@@ -1,11 +1,9 @@
 package com.mcquest.core.character;
 
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.Object;
 import com.mcquest.core.util.MathUtility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.hologram.Hologram;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,49 +11,47 @@ import org.jetbrains.annotations.NotNull;
  * A Character represents an MMORPG character. Character is the superclass of
  * PlayerCharacter and NonPlayerCharacter.
  */
-public class Character implements DamageSource {
-    private Component displayName;
+public class Character extends Object implements DamageSource {
+    private String name;
     private int level;
-    private double health;
     private double maxHealth;
-    private Instance instance;
-    private Pos position;
+    private double health;
     private double height;
-    private Hologram nameplate;
-    private Hologram healthBar;
+    private final Nameplate nameplate;
 
-    Character(@NotNull Component displayName, int level,
-              @NotNull Instance instance, @NotNull Pos position) {
-        if (level < 1) {
-            throw new IllegalArgumentException();
-        }
-        this.displayName = displayName;
-        this.level = level;
-        this.maxHealth = 1.0;
-        this.health = maxHealth;
-        this.instance = instance;
-        this.position = position;
+    Character(@NotNull Instance instance, @NotNull Pos position) {
+        super(instance, position);
+        name = "";
+        level = 1;
+        maxHealth = 1.0;
+        health = maxHealth;
         // Default is humanoid height.
         height = 2.0;
-        nameplate = null;
-        healthBar = null;
+        nameplate = new Nameplate(this);
     }
 
-    /**
-     * Returns the name of this Character.
-     */
     @Override
-    public final @NotNull Component getDisplayName() {
-        return displayName;
+    protected void spawn() {
+        super.spawn();
+        nameplate.spawn();
     }
 
-    /**
-     * Sets the name of this Character.
-     */
-    @MustBeInvokedByOverriders
-    public void setDisplayName(@NotNull Component displayName) {
-        this.displayName = displayName;
-        updateNameplateText();
+    @Override
+    protected void despawn() {
+        super.despawn();
+        nameplate.despawn();
+    }
+
+    public final String getName() {
+        return name;
+    }
+
+    public final void setName(@NotNull String name) {
+        this.name = name;
+
+        if (isSpawned()) {
+            nameplate.updateNameText();
+        }
     }
 
     /**
@@ -71,58 +67,30 @@ public class Character implements DamageSource {
     @MustBeInvokedByOverriders
     public void setLevel(int level) {
         this.level = level;
+
+        if (isSpawned()) {
+            nameplate.updateNameText();
+        }
     }
 
-    public final Instance getInstance() {
-        return instance;
-    }
-
+    @Override
     @MustBeInvokedByOverriders
     public void setInstance(@NotNull Instance instance) {
-        if (instance == this.instance) {
-            return;
-        }
+        super.setInstance(instance);
 
-        // Update nameplate and health bar instance.
-        boolean nameplateAndHealthBarVisible = nameplateAndHealthBarVisible();
-        if (nameplateAndHealthBarVisible) {
-            hideNameplateAndHealthBar();
-        }
-
-        this.instance = instance;
-
-        if (nameplateAndHealthBarVisible) {
-            showNameplateAndHealthBar();
+        if (isSpawned()) {
+            nameplate.updateInstance();
         }
     }
 
-    public final Pos getPosition() {
-        return position;
-    }
-
+    @Override
     @MustBeInvokedByOverriders
     public void setPosition(@NotNull Pos position) {
-        this.position = position;
-        updateNameplateAndHealthBarPosition();
-    }
+        super.setPosition(position);
 
-    /**
-     * Returns the current health of this Character.
-     */
-    public final double getHealth() {
-        return health;
-    }
-
-    /**
-     * Sets the current health of this Character.
-     */
-    @MustBeInvokedByOverriders
-    public void setHealth(double health) {
-        if (health < 0.0 || health > maxHealth) {
-            throw new IllegalArgumentException();
+        if (isSpawned()) {
+            nameplate.updatePosition();
         }
-        this.health = health;
-        updateHealthBarText();
     }
 
     /**
@@ -140,8 +108,35 @@ public class Character implements DamageSource {
         if (maxHealth <= 0.0) {
             throw new IllegalArgumentException();
         }
+
         this.maxHealth = maxHealth;
-        updateHealthBarText();
+
+        if (isSpawned()) {
+            nameplate.updateHealthBarText();
+        }
+    }
+
+    /**
+     * Returns the current health of this Character.
+     */
+    public final double getHealth() {
+        return health;
+    }
+
+    /**
+     * Sets the current health of this Character.
+     */
+    @MustBeInvokedByOverriders
+    public void setHealth(double health) {
+        if (health < 0.0 || health > maxHealth) {
+            throw new IllegalArgumentException();
+        }
+
+        this.health = health;
+
+        if (isSpawned()) {
+            nameplate.updateHealthBarText();
+        }
     }
 
     public final boolean isAlive() {
@@ -153,6 +148,7 @@ public class Character implements DamageSource {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
+
         double newHealth = MathUtility.clamp(health - amount, 0.0, maxHealth);
         setHealth(newHealth);
     }
@@ -162,6 +158,7 @@ public class Character implements DamageSource {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
+
         double newHealth = MathUtility.clamp(health + amount, 0.0, maxHealth);
         setHealth(newHealth);
     }
@@ -170,74 +167,23 @@ public class Character implements DamageSource {
         return height;
     }
 
-    @MustBeInvokedByOverriders
-    public void setHeight(double height) {
+    public final void setHeight(double height) {
         this.height = height;
-        updateNameplateAndHealthBarPosition();
+
+        if (isSpawned()) {
+            nameplate.updatePosition();
+        }
     }
 
     public Attitude getAttitude(@NotNull Character other) {
         return Attitude.FRIENDLY;
     }
 
-    boolean nameplateAndHealthBarVisible() {
-        return healthBar != null;
+    public boolean isDamageable(@NotNull DamageSource source) {
+        return false;
     }
 
-    void showNameplateAndHealthBar() {
-        nameplate = new Hologram(instance, nameplatePosition(), nameplateText());
-        healthBar = new Hologram(instance, healthBarPosition(), healthBarText());
-    }
-
-    void hideNameplateAndHealthBar() {
-        nameplate.remove();
-        healthBar.remove();
-        nameplate = null;
-        healthBar = null;
-    }
-
-    private void updateNameplateAndHealthBarPosition() {
-        if (nameplateAndHealthBarVisible()) {
-            nameplate.setPosition(nameplatePosition());
-            healthBar.setPosition(healthBarPosition());
-        }
-    }
-
-    private Pos nameplatePosition() {
-        return position.add(0.0, height + 0.25, 0.0);
-    }
-
-    private Pos healthBarPosition() {
-        return position.add(0.0, height, 0.0);
-    }
-
-    private void updateNameplateText() {
-        if (nameplateAndHealthBarVisible()) {
-            nameplate.setText(nameplateText());
-        }
-    }
-
-    private void updateHealthBarText() {
-        if (nameplateAndHealthBarVisible()) {
-            healthBar.setText(healthBarText());
-        }
-    }
-
-    private Component nameplateText() {
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("Lv. " + level, NamedTextColor.GOLD))
-                .append(Component.text("] ", NamedTextColor.GRAY))
-                .append(this.displayName);
-    }
-
-    private Component healthBarText() {
-        int numBars = 20;
-        double ratio = health / maxHealth;
-        int numRedBars = (int) Math.ceil(numBars * ratio);
-        int numGrayBars = numBars - numRedBars;
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("|".repeat(numRedBars), NamedTextColor.RED))
-                .append(Component.text("|".repeat(numGrayBars), NamedTextColor.GRAY))
-                .append(Component.text("]", NamedTextColor.GRAY));
+    Nameplate getNameplate() {
+        return nameplate;
     }
 }

@@ -55,6 +55,6 @@ public class Swords implements Feature {
             return false;
         }
         Character character = hitbox.getCharacter();
-        return character.getAttitude(pc) != Attitude.FRIENDLY;
+        return character.isDamageable(pc);
     }
 }

@@ -1,13 +1,14 @@
 package com.mcquest.core.character;
 
-import com.mcquest.core.persistence.PlayerCharacterData;
-import com.mcquest.core.resourcepack.ResourcePackManager;
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.event.ClickMenuLogoutEvent;
 import com.mcquest.core.event.PlayerCharacterLoginEvent;
 import com.mcquest.core.event.PlayerCharacterLogoutEvent;
 import com.mcquest.core.event.PlayerCharacterMoveEvent;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.ObjectManager;
+import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.resourcepack.ResourcePackManager;
 import com.mcquest.core.ui.PlayerCharacterLogoutType;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -18,7 +19,6 @@ import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.instance.EntityTracker;
 import net.minestom.server.resourcepack.ResourcePack;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
@@ -59,11 +59,18 @@ public class PlayerCharacterManager {
         return pcs.get(player);
     }
 
-    public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double range) {
-        List<Player> nearbyPlayers = new ArrayList<>();
-        instance.getEntityTracker().nearbyEntities(position, range,
-                EntityTracker.Target.PLAYERS, nearbyPlayers::add);
-        return nearbyPlayers.stream().map(this::getPlayerCharacter).toList();
+    public Collection<PlayerCharacter> getNearbyPlayerCharacters(Instance instance, Pos position, double radius) {
+        ObjectManager objectManager = mmorpg.getObjectManager();
+
+        Collection<PlayerCharacter> pcs = new ArrayList<>();
+
+        for (Object object : objectManager.getNearbyObjects(instance, position, radius)) {
+            if (object instanceof PlayerCharacter pc) {
+                pcs.add(pc);
+            }
+        }
+
+        return pcs;
     }
 
     private void handlePlayerLogin(PlayerLoginEvent event) {

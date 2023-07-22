@@ -37,6 +37,14 @@ public class CharacterEntityManager {
      * exists.
      */
     public Character getCharacter(Entity entity) {
-        return bindings.get(entity);
+        Character character = bindings.get(entity);
+
+        if (character instanceof PlayerCharacter pc) {
+            if (pc.getCutscenePlayer().getPlayingCutscene() != null) {
+                return null;
+            }
+        }
+
+        return character;
     }
 }

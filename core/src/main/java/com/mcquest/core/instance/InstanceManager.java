@@ -1,21 +1,19 @@
 package com.mcquest.core.instance;
 
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerChunkLoadEvent;
-import net.minestom.server.event.player.PlayerChunkUnloadEvent;
 import net.minestom.server.instance.Chunk;
 import net.minestom.server.timer.SchedulerManager;
-import net.minestom.server.timer.Task;
+import net.minestom.server.timer.TaskSchedule;
+import net.minestom.server.utils.time.Tick;
 import net.minestom.server.world.biomes.Biome;
 import net.minestom.server.world.biomes.BiomeManager;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class InstanceManager {
     /**
@@ -25,7 +23,10 @@ public class InstanceManager {
     private static final Duration CHUNK_UNLOAD_DELAY = Duration.ofSeconds(3);
 
     private final Map<Integer, Instance> instancesById;
-    private final Map<ChunkAddress, Task> chunkUnloadTasks;
+    /**
+     * Maps chunks to remaining time until unload.
+     */
+    private final Map<ChunkAddress, Duration> chunksToUnload;
 
     @ApiStatus.Internal
     public InstanceManager(Instance[] instances, Biome[] biomes) {
@@ -34,10 +35,10 @@ public class InstanceManager {
             registerInstance(instance);
         }
 
-        chunkUnloadTasks = new HashMap<>();
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerChunkLoadEvent.class, this::handlePlayerChunkLoad);
-        eventHandler.addListener(PlayerChunkUnloadEvent.class, this::handlePlayerChunkUnload);
+        chunksToUnload = new HashMap<>();
+
+        SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
+        scheduler.buildTask(this::tick).repeat(TaskSchedule.nextTick()).schedule();
 
         BiomeManager biomeManager = MinecraftServer.getBiomeManager();
         for (Biome biome : biomes) {
@@ -58,43 +59,32 @@ public class InstanceManager {
         return instancesById.get(id);
     }
 
-    private void handlePlayerChunkLoad(PlayerChunkLoadEvent event) {
-        Instance instance = (Instance) event.getInstance();
-        int x = event.getChunkX();
-        int z = event.getChunkZ();
-        ChunkAddress chunkAddress = new ChunkAddress(instance, x, z);
+    private void tick() {
+        for (Instance instance : instancesById.values()) {
+            Collection<Chunk> toUnloadNow = new ArrayList<>();
 
-        if (chunkUnloadTasks.containsKey(chunkAddress)) {
-            chunkUnloadTasks.remove(chunkAddress).cancel();
-        }
-    }
+            for (Chunk chunk : instance.getChunks()) {
+                ChunkAddress address = ChunkAddress.forChunk(chunk);
+                if (chunk.getViewers().isEmpty()) {
+                    if (chunksToUnload.containsKey(address)) {
+                        Duration untilUnload = chunksToUnload.get(address).minus(Tick.server(1));
+                        if (untilUnload.isZero()) {
+                            toUnloadNow.add(chunk);
+                            chunksToUnload.remove(address);
+                        } else {
+                            chunksToUnload.put(address, untilUnload);
+                        }
+                    } else {
+                        chunksToUnload.put(address, CHUNK_UNLOAD_DELAY);
+                    }
+                } else {
+                    chunksToUnload.remove(address);
+                }
+            }
 
-    private void handlePlayerChunkUnload(PlayerChunkUnloadEvent event) {
-        Player player = event.getPlayer();
-        Instance instance = (Instance) event.getInstance();
-        int x = event.getChunkX();
-        int z = event.getChunkZ();
-        ChunkAddress chunkAddress = new ChunkAddress(instance, x, z);
-
-        // Duplicate PlayerChunkUnloadEvents can be fired when a player
-        // leaves a chunk and changes instances, so check if we already
-        // scheduled unloading.
-        if (chunkUnloadTasks.containsKey(chunkAddress)) {
-            return;
-        }
-
-        Chunk chunk = instance.getChunk(x, z);
-        if (chunk == null) {
-            return;
-        }
-
-        Set<Player> viewers = chunk.getViewers();
-        if (viewers.isEmpty() || viewers.equals(Set.of(player))) {
-            SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
-            Task unloadTask = scheduler.buildTask(() -> instance.unloadChunk(x, z))
-                    .delay(CHUNK_UNLOAD_DELAY)
-                    .schedule();
-            chunkUnloadTasks.put(chunkAddress, unloadTask);
+            for (Chunk chunk : toUnloadNow) {
+                instance.unloadChunk(chunk);
+            }
         }
     }
 }

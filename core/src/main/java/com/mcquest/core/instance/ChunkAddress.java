@@ -1,6 +1,7 @@
 package com.mcquest.core.instance;
 
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.instance.Chunk;
 
 import java.util.Objects;
 
@@ -17,6 +18,11 @@ public class ChunkAddress {
 
     public static ChunkAddress forPosition(Instance instance, Pos position) {
         return new ChunkAddress(instance, position.chunkX(), position.chunkZ());
+    }
+
+    public static ChunkAddress forChunk(Chunk chunk) {
+        return new ChunkAddress((Instance) chunk.getInstance(),
+                chunk.getChunkX(), chunk.getChunkZ());
     }
 
     public Instance getInstance() {

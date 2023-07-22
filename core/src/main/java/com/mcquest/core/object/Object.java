@@ -10,6 +10,7 @@ public class Object {
     private Pos position;
     private Vec boundingBox;
     private boolean spawned;
+    private boolean removed;
     private ObjectManager objectManager;
 
     public Object(Instance instance, Pos position) {
@@ -17,6 +18,7 @@ public class Object {
         this.position = position;
         this.boundingBox = Vec.ZERO;
         spawned = false;
+        removed = false;
     }
 
     public final Instance getInstance() {
@@ -77,12 +79,24 @@ public class Object {
         spawned = false;
     }
 
+    public boolean isRemoved() {
+        return removed;
+    }
+
     public final void remove() {
+        if (removed) {
+            return;
+        }
+
         if (isSpawned()) {
             despawn();
         }
 
-        objectManager.remove(this);
-        objectManager = null;
+        if (objectManager != null) {
+            objectManager.remove(this);
+            objectManager = null;
+        }
+
+        removed = true;
     }
 }

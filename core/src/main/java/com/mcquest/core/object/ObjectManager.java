@@ -39,6 +39,10 @@ public class ObjectManager {
     }
 
     public void add(Object object) {
+        if (object.isRemoved()) {
+            throw new IllegalArgumentException();
+        }
+
         Instance instance = object.getInstance();
         Pos position = object.getPosition();
         Vec boundingBox = object.getBoundingBox();

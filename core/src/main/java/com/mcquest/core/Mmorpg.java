@@ -10,7 +10,7 @@ import com.mcquest.core.cinema.CutsceneManager;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.instance.InstanceManager;
-import com.mcquest.core.loot.LootChestManager;
+import com.mcquest.core.loot.LootManager;
 import com.mcquest.core.model.ModelManager;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.mount.MountManager;
@@ -59,7 +59,7 @@ public class Mmorpg {
     private final ObjectManager objectManager;
     private final PhysicsManager physicsManager;
     private final ParticleManager particleManager;
-    private final LootChestManager lootChestManager;
+    private final LootManager lootManager;
     private final CutsceneManager cutsceneManager;
     private final ResourcePackManager resourcePackManager;
     private final Feature[] features;
@@ -85,7 +85,7 @@ public class Mmorpg {
         objectManager = new ObjectManager(this);
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
-        lootChestManager = new LootChestManager(this);
+        lootManager = new LootManager(this);
         cutsceneManager = new CutsceneManager(this);
         resourcePackManager = new ResourcePackManager(this);
         features = builder.features;
@@ -162,8 +162,8 @@ public class Mmorpg {
         return particleManager;
     }
 
-    public LootChestManager getLootChestManager() {
-        return lootChestManager;
+    public LootManager getLootManager() {
+        return lootManager;
     }
 
     public CutsceneManager getCutsceneManager() {

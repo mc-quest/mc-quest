@@ -10,7 +10,9 @@ public class AudioManager {
 
     @ApiStatus.Internal
     public AudioManager(AudioClip[] audioClips, Song[] songs) {
-        this.audioClips = Arrays.asList(audioClips);
+        this.audioClips = new ArrayList<>();
+        this.audioClips.addAll(Arrays.asList(CoreAudio.all()));
+        this.audioClips.addAll(Arrays.asList(audioClips));
 
         songsById = new HashMap<>();
         for (Song song : songs) {

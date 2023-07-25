@@ -5,13 +5,11 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.hologram.Hologram;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Predicate;
 
 class Nameplate {
     private final Character character;
@@ -33,7 +31,7 @@ class Nameplate {
             names.put(attitude, name);
         }
 
-        healthBar = new Hologram(instance, namePosition, healthBarText());
+        healthBar = new Hologram(instance, healthBarPosition(), healthBarText());
     }
 
     void despawn() {

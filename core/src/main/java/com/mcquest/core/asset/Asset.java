@@ -2,10 +2,10 @@ package com.mcquest.core.asset;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.mcquest.core.model.ModelReader;
 import com.mcquest.core.util.JsonUtility;
 import org.jetbrains.annotations.Nullable;
 import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.reader.ModelReader;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -71,9 +71,9 @@ public class Asset {
         }
     }
 
-    public Model readModel(ModelReader reader) {
+    public Model readModel() {
         try (InputStream stream = getStream()) {
-            return reader.read(stream);
+            return ModelReader.read(stream);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

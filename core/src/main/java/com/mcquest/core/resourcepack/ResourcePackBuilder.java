@@ -2,13 +2,13 @@ package com.mcquest.core.resourcepack;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.mcquest.core.playerclass.PlayerClass;
-import com.mcquest.core.playerclass.Skill;
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetDirectory;
 import com.mcquest.core.audio.AudioClip;
 import com.mcquest.core.item.Item;
+import com.mcquest.core.playerclass.PlayerClass;
+import com.mcquest.core.playerclass.Skill;
 import net.minestom.server.item.Material;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;

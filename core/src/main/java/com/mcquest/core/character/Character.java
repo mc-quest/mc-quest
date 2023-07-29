@@ -31,12 +31,14 @@ public class Character extends Object implements DamageSource {
     }
 
     @Override
+    @MustBeInvokedByOverriders
     protected void spawn() {
         super.spawn();
         nameplate.spawn();
     }
 
     @Override
+    @MustBeInvokedByOverriders
     protected void despawn() {
         super.despawn();
         nameplate.despawn();
@@ -64,8 +66,7 @@ public class Character extends Object implements DamageSource {
     /**
      * Sets the level of this Character.
      */
-    @MustBeInvokedByOverriders
-    public void setLevel(int level) {
+    void setLevel(int level) {
         this.level = level;
 
         if (isSpawned()) {
@@ -183,7 +184,7 @@ public class Character extends Object implements DamageSource {
         return false;
     }
 
-    Nameplate getNameplate() {
+    final Nameplate getNameplate() {
         return nameplate;
     }
 }

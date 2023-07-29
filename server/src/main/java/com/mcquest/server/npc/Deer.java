@@ -1,13 +1,11 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.CharacterEntityManager;
 import com.mcquest.core.character.CharacterHitbox;
 import com.mcquest.core.character.DamageSource;
 import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.physics.Collider;
-import com.mcquest.core.physics.PhysicsManager;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.attribute.Attribute;
@@ -33,7 +31,7 @@ public class Deer extends NonPlayerCharacter {
         super(instance, spawnPosition);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;
-        this.hitbox = new CharacterHitbox(this, instance, hitboxPosition(), SIZE);
+        this.hitbox = new CharacterHitbox(this, instance, hitboxCenter(), SIZE);
         setName("Deer");
         setHeight(SIZE.y());
         setMaxHealth(10);
@@ -43,10 +41,11 @@ public class Deer extends NonPlayerCharacter {
     @Override
     protected void spawn() {
         super.spawn();
+
         entity = new Entity(this);
-        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
-        characterEntityManager.bind(entity, this);
+        mmorpg.getCharacterEntityManager().bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
+
         mmorpg.getPhysicsManager().addCollider(hitbox);
     }
 
@@ -54,15 +53,14 @@ public class Deer extends NonPlayerCharacter {
     protected void despawn() {
         super.despawn();
 
-        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        if (isAlive()) {
+            mmorpg.getCharacterEntityManager().unbind(entity);
+            mmorpg.getPhysicsManager().removeCollider(hitbox);
+        }
 
-        characterEntityManager.unbind(entity);
         entity.remove();
 
         setPosition(spawnPosition);
-
-        physicsManager.removeCollider(hitbox);
     }
 
     @Override
@@ -72,31 +70,33 @@ public class Deer extends NonPlayerCharacter {
 
     private void updatePosition(@NotNull Pos position) {
         super.setPosition(position);
-        hitbox.setCenter(hitboxPosition());
+        hitbox.setCenter(hitboxCenter());
     }
 
-    private Pos hitboxPosition() {
+    private Pos hitboxCenter() {
         return getPosition().withY(y -> y + SIZE.y() / 2.0);
     }
 
     @Override
-    protected void onDamage(DamageSource source, double amount) {
+    protected void onDamage(DamageSource source) {
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_HURT, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
+        mmorpg.getCharacterEntityManager().unbind(entity);
+        mmorpg.getPhysicsManager().removeCollider(hitbox);
+
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
 
-        ModelEntity deathModel = new ModelEntity(Models.DEER);
-        deathModel.playAnimation("walk");
-        deathModel.setInstance(getInstance(), getPosition());
+        entity.getAIGroups().clear();
+        entity.getNavigator().setPathTo(null);
 
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
 
-        scheduler.buildTask(deathModel::remove).delay(TaskSchedule.millis(2000)).schedule();
+        scheduler.buildTask(this::remove).delay(TaskSchedule.millis(2000)).schedule();
         scheduler.buildTask(this::respawn).delay(TaskSchedule.seconds(3)).schedule();
     }
 

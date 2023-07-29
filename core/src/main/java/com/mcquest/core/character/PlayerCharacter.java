@@ -85,7 +85,7 @@ public final class PlayerCharacter extends Character {
         musicPlayer = new MusicPlayer(this, data, mmorpg.getAudioManager());
         mapViewer = new MapViewer(this, data, mmorpg.getMapManager());
         cutscenePlayer = new CutscenePlayer(this);
-        super.setLevel(levelForExperiencePoints(data.getExperiencePoints()));
+        setLevel(levelForExperiencePoints(data.getExperiencePoints()));
         setMaxHealth(data.getMaxHealth());
         setHealth(data.getHealth());
         maxMana = data.getMaxMana();
@@ -294,16 +294,10 @@ public final class PlayerCharacter extends Character {
 
     private void levelUp() {
         int newLevel = getLevel() + 1;
-        super.setLevel(newLevel);
+        setLevel(newLevel);
         sendMessage(Component.text("Level increased to " + newLevel + "!", NamedTextColor.GREEN));
         skillManager.grantSkillPoint();
         sendMessage(Component.text("Received 1 skill point!", NamedTextColor.GREEN));
-    }
-
-    @Override
-    public void setLevel(int level) {
-        // Don't set PlayerCharacter level explicitly.
-        throw new UnsupportedOperationException();
     }
 
     private void updateExperienceBar() {

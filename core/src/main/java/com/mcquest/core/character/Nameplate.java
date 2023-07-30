@@ -80,11 +80,11 @@ class Nameplate {
     }
 
     private Pos namePosition() {
-        return character.getPosition().withY(y -> y + character.getHeight() + 0.25);
+        return character.getPosition().withY(y -> y + character.getHeight());
     }
 
     private Pos healthBarPosition() {
-        return character.getPosition().withY(y -> y + character.getHeight());
+        return character.getPosition().withY(y -> y + character.getHeight() - 0.25);
     }
 
     private TextComponent nameText(Attitude attitude) {

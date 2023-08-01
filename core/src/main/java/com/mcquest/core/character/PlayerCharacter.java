@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Arrays;
 
-public final class PlayerCharacter extends Character {
+public final class PlayerCharacter extends Character implements Displaceable {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),
             "experience_points_per_level.json"
@@ -476,6 +476,11 @@ public final class PlayerCharacter extends Character {
         return other.getAttitude(this);
     }
 
+    @Override
+    public boolean isDamageable(DamageSource source) {
+        return !(source instanceof PlayerCharacter);
+    }
+
     public boolean canAct() {
         return canAct;
     }
@@ -483,6 +488,12 @@ public final class PlayerCharacter extends Character {
     public void setCanAct(boolean canAct) {
         this.canAct = canAct;
         // TODO: disable skills, consumables, and basic attacks
+    }
+
+    @Override
+    public void applyImpulse(Vec impulse) {
+        double weightKg = 70.0;
+        player.setVelocity(player.getVelocity().add(impulse.div(weightKg)));
     }
 
     public boolean isRemoved() {

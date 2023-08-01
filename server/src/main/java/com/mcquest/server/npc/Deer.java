@@ -91,8 +91,7 @@ public class Deer extends NonPlayerCharacter {
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
 
-        entity.getAIGroups().clear();
-        entity.getNavigator().setPathTo(null);
+        entity.kill();
 
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
 

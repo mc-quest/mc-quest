@@ -9,6 +9,7 @@ import com.mcquest.core.audio.AudioClip;
 import com.mcquest.core.item.Item;
 import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.playerclass.Skill;
+import net.kyori.adventure.key.Key;
 import net.minestom.server.item.Material;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;
@@ -59,7 +60,21 @@ class ResourcePackBuilder {
     }
 
     private void writeGuiIcons(FileTree tree) {
+        String[] icons = {
+                "hotbar_skill_placeholder",
+                "hotbar_skill_placeholder_flashing",
+                "hotbar_consumable_placeholder",
+                "hotbar_consumable_placeholder_flashing"
+        };
+
         List<ItemOverride> overrides = new ArrayList<>();
+
+        for (String icon : icons) {
+            Asset asset = new Asset(getClass().getClassLoader(), String.format("%s.png", icon));
+            Key key = Key.key(Namespaces.GUI, icon);
+            ResourcePackUtility.writeIcon(tree, asset, key, overrides);
+        }
+
         ResourcePackUtility.writeItemOverrides(tree, Materials.GUI, overrides);
     }
 

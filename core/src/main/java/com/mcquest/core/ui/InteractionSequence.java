@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class InteractionSequence {
-    static final Duration DEFAULT_AUTO_ADVANCE_DURATION = Duration.ofSeconds(5);
+    public static final Duration DEFAULT_AUTO_ADVANCE_DURATION = Duration.ofSeconds(5);
 
     private final Interaction[] interactions;
     private final Map<PlayerCharacter, InteractionSequenceData> pcData;
@@ -25,18 +25,23 @@ public class InteractionSequence {
 
     public void advance(PlayerCharacter pc) {
         if (pc.isRemoved()) {
+            pcData.remove(pc);
             return;
         }
+
         if (!pcData.containsKey(pc)) {
             pcData.put(pc, new InteractionSequenceData());
         }
+
         InteractionSequenceData data = pcData.get(pc);
         if (data.autoAdvanceTask != null) {
             data.autoAdvanceTask.cancel();
         }
+
         Interaction interaction = interactions[data.interactionIndex];
         interaction.onInteract.accept(pc);
         data.interactionIndex++;
+
         if (data.interactionIndex < interactions.length) {
             SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
             data.autoAdvanceTask = scheduler.buildTask(() -> {

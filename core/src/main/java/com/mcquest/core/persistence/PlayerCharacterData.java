@@ -87,11 +87,11 @@ public class PlayerCharacterData {
     }
 
     public static PlayerCharacterData fromJson(String json) {
-        return JsonUtility.parse(json, PlayerCharacterData.class);
+        return JsonUtility.fromJson(json, PlayerCharacterData.class);
     }
 
     public String toJson() {
-        return JsonUtility.stringify(this);
+        return JsonUtility.toJson(this);
     }
 
     public int getPlayerClassId() {

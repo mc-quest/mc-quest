@@ -69,11 +69,10 @@ public class TutorialQuest implements Feature {
 
     private void handleLogin(PlayerCharacterLoginEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        if (!Quests.TUTORIAL.compareStatus(pc, QuestStatus.NOT_STARTED)) {
+        if (Quests.TUTORIAL.getStatus(pc) != QuestStatus.NOT_STARTED) {
             return;
         }
         Quests.TUTORIAL.start(pc);
-        Quests.TUTORIAL.getObjective(0).setAccessible(pc, true);
         Tutorial.message(pc,
                 Component.text("Open your menu by pressing ")
                         .append(Component.text("[", NamedTextColor.GRAY))
@@ -88,8 +87,7 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 0)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(0).complete(pc);
-        Quests.TUTORIAL.getObjective(1).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(0).addProgress(pc);
         Tutorial.message(pc,
                 Component.text("Open your skill tree to unlock powerful abilities!"),
                 Duration.ofSeconds(2));
@@ -100,8 +98,7 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 1)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(1).complete(pc);
-        Quests.TUTORIAL.getObjective(2).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(1).addProgress(pc);
         Tutorial.message(pc,
                 Component.text("Shift click a skill to unlock it!"),
                 Duration.ofSeconds(2));
@@ -112,8 +109,7 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 2)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(2).complete(pc);
-        Quests.TUTORIAL.getObjective(3).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(2).addProgress(pc);
     }
 
     private void handleAddSkillToHotbar(SkillAddToHotbarEvent event) {
@@ -121,8 +117,7 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 3)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(3).complete(pc);
-        Quests.TUTORIAL.getObjective(4).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(3).addProgress(pc);
     }
 
     private void handleUseSkill(ActiveSkillUseEvent event) {
@@ -130,8 +125,7 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 4)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(4).complete(pc);
-        Quests.TUTORIAL.getObjective(5).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(4).addProgress(pc);
     }
 
     private void handleOpenMap(MapOpenEvent event) {
@@ -139,15 +133,13 @@ public class TutorialQuest implements Feature {
         if (!tutorialObjectiveActive(pc, 5)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(5).complete(pc);
-        Quests.TUTORIAL.getObjective(6).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(5).addProgress(pc);
     }
 
     private void handleEnterTrainingGrounds(PlayerCharacter pc) {
         if (!tutorialObjectiveActive(pc, 6)) {
             return;
         }
-        Quests.TUTORIAL.getObjective(6).complete(pc);
-        Quests.TUTORIAL.getObjective(7).setAccessible(pc, true);
+        Quests.TUTORIAL.getObjective(6).addProgress(pc);
     }
 }

@@ -52,10 +52,6 @@ public final class Quest {
         return pc.getQuestTracker().getStatus(this);
     }
 
-    public boolean compareStatus(PlayerCharacter pc, QuestStatus status) {
-        return pc.getQuestTracker().compareStatus(this, status);
-    }
-
     public void start(PlayerCharacter pc) {
         pc.getQuestTracker().startQuest(this);
     }
@@ -85,8 +81,8 @@ public final class Quest {
             this.objectives = new ArrayList<>();
         }
 
-        public Builder objective(String description, int goal) {
-            objectives.add(new QuestObjective(objectives.size(), description, goal));
+        public Builder objective(String description, int goal, int... prerequisites) {
+            objectives.add(new QuestObjective(objectives.size(), description, goal, prerequisites.clone()));
             return this;
         }
 

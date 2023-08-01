@@ -5,7 +5,11 @@ import com.mcquest.core.event.ItemReceiveEvent;
 import com.mcquest.core.event.ItemRemoveEvent;
 import com.mcquest.core.persistence.PersistentItem;
 import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.resourcepack.CustomModelData;
+import com.mcquest.core.resourcepack.Materials;
+import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.inventory.PlayerInventory;
@@ -15,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayerCharacterInventory {
@@ -335,6 +340,17 @@ public class PlayerCharacterInventory {
         }
 
         // TODO other slots (weapon, armor, consumables)
+        inventory.setItemStack(6, hotbarConsumablePlaceholder(0, false));
+        inventory.setItemStack(7, hotbarConsumablePlaceholder(1, false));
+    }
+
+     private ItemStack hotbarConsumablePlaceholder(int slot, boolean flashing) {
+        String nameContent = String.format("Consumable Slot %d", slot + 1);
+        TextComponent displayName = Component.text(nameContent, NamedTextColor.YELLOW);
+        List<TextComponent> lore = List.of(Component.text("Consumable items go here"));
+        return ItemStackUtility.create(Materials.GUI, displayName, lore)
+                .meta(builder -> builder.customModelData(CustomModelData.HOTBAR_CONSUMABLE_PLACEHOLDER))
+                .build();
     }
 
     private Item getItem(int slot) {

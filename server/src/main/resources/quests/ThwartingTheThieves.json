@@ -5,11 +5,12 @@
     "objectives": [
         {
             "description": "Thieves slain",
-            "goal": 10
+            "goal": 5
         },
         {
-            "description": "Speak with mayor of Oakshire",
-            "goal": 1
+            "description": "Speak with Guard Thomas",
+            "goal": 1,
+            "prerequisites": [0]
         }
     ]
 }

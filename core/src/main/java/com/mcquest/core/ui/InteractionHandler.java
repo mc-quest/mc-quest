@@ -74,7 +74,6 @@ public class InteractionHandler {
         eventHandler.addListener(PlayerSwapItemEvent.class, this::handleOpenMenu);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
         eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
-        eventHandler.addListener(PlayerEntityInteractEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerBlockInteractEvent.class, this::handleBlockInteract);
         eventHandler.addListener(ItemDropEvent.class, this::handleItemDrop);
@@ -181,13 +180,6 @@ public class InteractionHandler {
         AutoAttackEvent basicAttackEvent = new AutoAttackEvent(pc, weapon);
         weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
-    }
-
-    private void handleInteract(PlayerEntityInteractEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
-        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
-        handleInteract(pc);
     }
 
     private void handleInteract(PlayerUseItemEvent event) {

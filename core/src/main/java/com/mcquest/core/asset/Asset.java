@@ -57,7 +57,7 @@ public class Asset {
 
     public <T> T readJson(Class<T> classOfT) {
         try (InputStreamReader reader = new InputStreamReader(getStream())) {
-            return JsonUtility.parse(reader, classOfT);
+            return JsonUtility.fromJson(reader, classOfT);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }

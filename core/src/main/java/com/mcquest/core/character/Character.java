@@ -3,9 +3,14 @@ package com.mcquest.core.character;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import com.mcquest.core.util.MathUtility;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 /**
  * A Character represents an MMORPG character. Character is the superclass of
@@ -174,6 +179,25 @@ public class Character extends Object implements DamageSource {
         if (isSpawned()) {
             nameplate.updatePosition();
         }
+    }
+
+    public final void speak(Collection<PlayerCharacter> pcs, Component message) {
+        for (PlayerCharacter pc : pcs) {
+            speak(pc, message);
+        }
+    }
+
+    @MustBeInvokedByOverriders
+    public void speak(PlayerCharacter pc, Component message) {
+        pc.sendMessage(formatMessage(pc, message));
+    }
+
+    private TextComponent formatMessage(PlayerCharacter pc, Component message) {
+        return Component.empty()
+                .append(Component.text("[", NamedTextColor.GRAY))
+                .append(Component.text(name, getAttitude(pc).getColor()))
+                .append(Component.text("]: ", NamedTextColor.GRAY))
+                .append(message);
     }
 
     public Attitude getAttitude(@NotNull Character other) {

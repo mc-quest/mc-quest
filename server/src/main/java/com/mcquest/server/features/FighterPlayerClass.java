@@ -1,19 +1,20 @@
 package com.mcquest.server.features;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.Attitude;
 import com.mcquest.core.character.Character;
 import com.mcquest.core.character.CharacterHitbox;
 import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.server.constants.FighterSkills;
 import com.mcquest.core.event.ActiveSkillUseEvent;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.physics.Collider;
 import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.server.constants.FighterSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 public class FighterPlayerClass implements Feature {
@@ -30,7 +31,7 @@ public class FighterPlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.5));
-        Vec hitboxSize = new Vec(1.5, 1.5, 1.5);
+        Vec hitboxSize = new Vec(2.5, 2.5, 2.5);
         Collider hitbox = new Collider(instance, hitboxCenter, hitboxSize);
         boolean[] hitOccurred = {false};
 
@@ -51,6 +52,9 @@ public class FighterPlayerClass implements Feature {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         physicsManager.addCollider(hitbox);
         physicsManager.removeCollider(hitbox);
+
+        ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
+
         if (!hitOccurred[0]) {
             Sound missSound = Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1.5f);
             instance.playSound(missSound);

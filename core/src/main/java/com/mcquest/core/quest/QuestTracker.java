@@ -8,12 +8,10 @@ import com.mcquest.core.event.QuestCompleteEvent;
 import com.mcquest.core.event.QuestStartEvent;
 import com.mcquest.core.text.ChatColor;
 import com.mcquest.core.text.TextSerializer;
-import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
@@ -24,11 +22,8 @@ import java.util.*;
 
 public class QuestTracker {
     private final PlayerCharacter pc;
-    /**
-     * Internally, progress of -1 indicates that objective is inaccessible.
-     */
     private final Map<Quest, int[]> objectiveProgress;
-    private final Set<Quest> completedQuests;
+    private final Collection<Quest> completedQuests;
     private final List<Quest> trackedQuests;
     private final Collection<QuestObjective> recentlyCompletedObjectives;
 
@@ -64,12 +59,12 @@ public class QuestTracker {
         scheduler.buildTask(this::updateSidebar).delay(TaskSchedule.nextTick()).schedule();
     }
 
-    public Set<Quest> getInProgressQuests() {
-        return Collections.unmodifiableSet(objectiveProgress.keySet());
+    public Collection<Quest> getInProgressQuests() {
+        return Collections.unmodifiableCollection(objectiveProgress.keySet());
     }
 
-    public Set<Quest> getCompletedQuests() {
-        return Collections.unmodifiableSet(completedQuests);
+    public Collection<Quest> getCompletedQuests() {
+        return Collections.unmodifiableCollection(completedQuests);
     }
 
     public List<Quest> getTrackedQuests() {
@@ -80,160 +75,144 @@ public class QuestTracker {
         if (completedQuests.contains(quest)) {
             return QuestStatus.COMPLETED;
         }
+
         if (objectiveProgress.containsKey(quest)) {
             return QuestStatus.IN_PROGRESS;
         }
-        return QuestStatus.NOT_STARTED;
-    }
 
-    public boolean compareStatus(Quest quest, QuestStatus status) {
-        return getStatus(quest) == status;
+        return QuestStatus.NOT_STARTED;
     }
 
     public void startQuest(Quest quest) {
         if (objectiveProgress.containsKey(quest) || completedQuests.contains(quest)) {
             return;
         }
-        int objectiveCount = quest.getObjectiveCount();
-        int[] initialProgress = new int[objectiveCount];
-        for (int i = 0; i < objectiveCount; i++) {
-            initialProgress[i] = -1;
-        }
-        objectiveProgress.put(quest, initialProgress);
+
+        objectiveProgress.put(quest, new int[quest.getObjectiveCount()]);
         trackedQuests.add(quest);
+
+        pc.sendMessage(questStartedMessage(quest));
         updateSidebar();
-        pc.sendMessage(Component.text("Quest started: " + quest.getName(), NamedTextColor.YELLOW));
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.call(new QuestStartEvent(pc, quest));
+
+        QuestStartEvent event = new QuestStartEvent(pc, quest);
+        quest.onStart().emit(event);
+        MinecraftServer.getGlobalEventHandler().call(event);
+    }
+
+    public boolean isAvailable(QuestObjective objective) {
+        Quest quest = objective.getQuest();
+
+        if (getStatus(quest) != QuestStatus.IN_PROGRESS) {
+            return false;
+        }
+
+        for (QuestObjective prerequisite : objective.getPrerequisites()) {
+            if (!isComplete(prerequisite)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public int getProgress(QuestObjective objective) {
         Quest quest = objective.getQuest();
+
         if (completedQuests.contains(quest)) {
             return objective.getGoal();
         }
-        if (!objectiveProgress.containsKey(quest)) {
-            return 0;
-        }
-        int progress = objectiveProgress.get(quest)[objective.getIndex()];
-        if (progress == -1) {
-            return 0;
-        }
-        return progress;
-    }
 
-    public void setProgress(QuestObjective objective, int progress) {
-        Quest quest = objective.getQuest();
         if (!objectiveProgress.containsKey(quest)) {
-            return;
+            return 0;
         }
-        int[] currentProgress = objectiveProgress.get(quest);
-        int objectiveIndex = objective.getIndex();
-        if (currentProgress[objectiveIndex] == -1) {
-            // Inaccessible.
-            return;
-        }
-        int goal = objective.getGoal();
-        progress = MathUtility.clamp(progress, 0, goal);
-        if (currentProgress[objectiveIndex] == progress) {
-            return;
-        }
-        currentProgress[objectiveIndex] = progress;
-        if (progress == goal) {
-            pc.sendMessage(Component.empty()
-                    .append(Component.text(goal + "/" + goal + " ", NamedTextColor.GREEN))
-                    .append(TextSerializer.deserialize(objective.getDescription()))
-                    .append(Component.text(" complete!", NamedTextColor.GREEN)));
-            recentlyCompletedObjectives.add(objective);
-            SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
-            scheduler.buildTask(() -> {
-                recentlyCompletedObjectives.remove(objective);
-                updateSidebar();
-            }).delay(Duration.ofSeconds(3)).schedule();
-            if (!checkForCompletion(quest)) {
-                // If quest is complete, the sidebar will be updated elsewhere.
-                updateSidebar();
-            }
-        } else {
-            // In case objective was completed, and immediately uncompleted.
-            recentlyCompletedObjectives.remove(objective);
-            updateSidebar();
-        }
+
+        return objectiveProgress.get(quest)[objective.getIndex()];
     }
 
     public void addProgress(QuestObjective objective, int progress) {
-        setProgress(objective, getProgress(objective) + progress);
-    }
-
-    public boolean isComplete(QuestObjective objective) {
-        return getProgress(objective) == objective.getGoal();
-    }
-
-    public void complete(QuestObjective objective) {
-        setProgress(objective, objective.getGoal());
-    }
-
-    private boolean checkForCompletion(Quest quest) {
-        if (allObjectivesComplete(quest)) {
-            complete(quest);
-            return true;
+        if (progress < 0) {
+            throw new IllegalArgumentException();
         }
-        return false;
+
+        if (progress == 0) {
+            return;
+        }
+
+        Quest quest = objective.getQuest();
+
+        if (!objectiveProgress.containsKey(quest)) {
+            return;
+        }
+
+        for (QuestObjective prerequisite : objective.getPrerequisites()) {
+            if (!prerequisite.isComplete(pc)) {
+                return;
+            }
+        }
+
+        int objectiveIndex = objective.getIndex();
+        int goal = objective.getGoal();
+        int[] currentProgress = objectiveProgress.get(quest);
+
+        if (currentProgress[objectiveIndex] == goal) {
+            return;
+        }
+
+        int newProgress = Math.min(
+                currentProgress[objectiveIndex] + progress,
+                objective.getGoal()
+        );
+        currentProgress[objectiveIndex] = newProgress;
+
+        if (newProgress == goal) {
+            pc.sendMessage(objectiveCompleteMessage(objective));
+
+            recentlyCompletedObjectives.add(objective);
+            MinecraftServer.getSchedulerManager().buildTask(() -> {
+                recentlyCompletedObjectives.remove(objective);
+                updateSidebar();
+            }).delay(Duration.ofSeconds(3)).schedule();
+
+            if (allObjectivesComplete(quest)) {
+                completeQuest(quest);
+            }
+        }
+
+        updateSidebar();
     }
 
     private boolean allObjectivesComplete(Quest quest) {
         int[] progress = objectiveProgress.get(quest);
+
         for (int i = 0; i < quest.getObjectiveCount(); i++) {
-            QuestObjective objective = quest.getObjective(i);
-            if (progress[i] != objective.getGoal()) {
+            if (progress[i] != quest.getObjective(i).getGoal()) {
                 return false;
             }
         }
+
         return true;
     }
 
-    private void complete(Quest quest) {
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+    private void completeQuest(Quest quest) {
         objectiveProgress.remove(quest);
         completedQuests.add(quest);
-        trackedQuests.remove(quest);
-        pc.sendMessage(Component.text("Quest completed: " + quest.getName(), NamedTextColor.YELLOW));
-        eventHandler.call(new QuestCompleteEvent(pc, quest));
-        updateSidebar();
+        MinecraftServer.getSchedulerManager()
+                .buildTask(() -> {
+                    trackedQuests.remove(quest);
+                    updateSidebar();
+                })
+                .delay(Duration.ofSeconds(3))
+                .schedule();
+
+        pc.sendMessage(questCompletedMessage(quest));
+
+        QuestCompleteEvent event = new QuestCompleteEvent(pc, quest);
+        quest.onComplete().emit(event);
+        MinecraftServer.getGlobalEventHandler().call(event);
     }
 
-    /**
-     * Returns whether the objective is accessible to the player character. An
-     * objective is accessible if it has been made accessible and the quest has
-     * not yet been completed.
-     */
-    public boolean isAccessible(QuestObjective objective) {
-        Quest quest = objective.getQuest();
-        int index = objective.getIndex();
-        int[] progress = objectiveProgress.get(quest);
-        if (progress == null) {
-            return false;
-        }
-        return progress[index] != -1;
-    }
-
-    public void setAccessible(QuestObjective objective, boolean accessible) {
-        Quest quest = objective.getQuest();
-        int index = objective.getIndex();
-        int[] progress = objectiveProgress.get(quest);
-        if (progress == null) {
-            return;
-        }
-        if (accessible) {
-            if (progress[index] == -1) {
-                progress[index] = 0;
-            }
-        } else {
-            progress[index] = -1;
-            // In case objective was completed, and immediately made inaccessible.
-            recentlyCompletedObjectives.remove(objective);
-        }
-        updateSidebar();
+    public boolean isComplete(QuestObjective objective) {
+        return getProgress(objective) == objective.getGoal();
     }
 
     private void updateSidebar() {
@@ -255,13 +234,19 @@ public class QuestTracker {
         StringBuilder text = new StringBuilder();
         for (int i = 0; i < trackedQuests.size(); i++) {
             Quest quest = trackedQuests.get(i);
-            text.append(ChatColor.YELLOW);
+            ChatColor questColor;
+            if (quest.getStatus(pc) == QuestStatus.COMPLETED) {
+                questColor = ChatColor.GREEN;
+            } else {
+                questColor = ChatColor.YELLOW;
+            }
+            text.append(questColor);
             text.append('(');
             text.append(ChatColor.BOLD);
             int questNum = i + 1;
             text.append(questNum);
             text.append(ChatColor.RESET);
-            text.append(ChatColor.YELLOW);
+            text.append(questColor);
             text.append(')');
             text.append(' ');
             text.append(quest.getName());
@@ -270,7 +255,7 @@ public class QuestTracker {
             for (int j = 0; j < quest.getObjectiveCount(); j++) {
                 QuestObjective objective = quest.getObjective(j);
                 boolean recentlyCompleted = recentlyCompletedObjectives.contains(objective);
-                if (recentlyCompleted || (isAccessible(objective) && !isComplete(objective))) {
+                if (recentlyCompleted || (isAvailable(objective) && !isComplete(objective))) {
                     if (recentlyCompleted) {
                         text.append(ChatColor.GREEN);
                     } else {
@@ -290,13 +275,32 @@ public class QuestTracker {
                     text.append('\n');
                 }
             }
+            text.append('\n');
         }
 
-        if (!text.isEmpty()) {
-            // Remove last new line.
+        while (!text.isEmpty() && text.charAt(text.length() - 1) == '\n') {
             text.deleteCharAt(text.length() - 1);
         }
 
         return WordWrap.wrap(text.toString());
+    }
+
+    private static TextComponent questStartedMessage(Quest quest) {
+        String content = String.format("Quest started: %s", quest.getName());
+        return Component.text(content, NamedTextColor.YELLOW);
+    }
+
+    private static TextComponent questCompletedMessage(Quest quest) {
+        String content = String.format("Quest completed: %s", quest.getName());
+        return Component.text(content, NamedTextColor.YELLOW);
+    }
+
+    private static TextComponent objectiveCompleteMessage(QuestObjective objective) {
+        int goal = objective.getGoal();
+
+        return Component.empty()
+                .append(Component.text(goal + "/" + goal + " ", NamedTextColor.GREEN))
+                .append(TextSerializer.deserialize(objective.getDescription()))
+                .append(Component.text(" complete!", NamedTextColor.GREEN));
     }
 }

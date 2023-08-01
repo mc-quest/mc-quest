@@ -1,8 +1,10 @@
 package com.mcquest.server.constants;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcquest.core.util.JsonUtility;
 import com.mcquest.server.Assets;
 import com.mcquest.core.quest.Quest;
 
@@ -29,7 +31,13 @@ public class Quests {
             JsonObject objectiveObject = objective.getAsJsonObject();
             String description = objectiveObject.get("description").getAsString();
             int goal = objectiveObject.get("goal").getAsInt();
-            builder.objective(description, goal);
+            int[] prerequisites;
+            if (objectiveObject.has("prerequisites")) {
+                prerequisites = JsonUtility.fromJson(objectiveObject.get("prerequisites"), int[].class);
+            } else {
+                prerequisites = new int[0];
+            }
+            builder.objective(description, goal, prerequisites);
         }
         return builder.build();
     }

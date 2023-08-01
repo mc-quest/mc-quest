@@ -1,19 +1,21 @@
-package com.mcquest.core.character;
+package com.mcquest.core.entity;
 
+import com.mcquest.core.character.Character;
+import com.mcquest.core.character.PlayerCharacter;
 import net.minestom.server.entity.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The CharacterEntityManager provides a standard way to associate Entities
- * with Characters.
+ * Provides a standard way to bind entities with characters, enabling the use of
+ * TargetSelectors to target characters.
  */
 public class CharacterEntityManager {
     private final Map<Entity, Character> bindings = new HashMap<>();
 
     /**
-     * Associates the given Entity with the given Character.
+     * Binds the given entity with the given character.
      */
     public void bind(Entity entity, Character character) {
         if (bindings.containsKey(entity)) {
@@ -23,7 +25,7 @@ public class CharacterEntityManager {
     }
 
     /**
-     * Unassociates the given entity with a previously-associated Character.
+     * Unbinds the given entity with a previously-bound character.
      */
     public void unbind(Entity entity) {
         if (!bindings.containsKey(entity)) {
@@ -33,8 +35,7 @@ public class CharacterEntityManager {
     }
 
     /**
-     * Returns the Character associated with the given Entity, or null if none
-     * exists.
+     * Returns the character bound to the given entity, or null if none exists.
      */
     public Character getCharacter(Entity entity) {
         Character character = bindings.get(entity);

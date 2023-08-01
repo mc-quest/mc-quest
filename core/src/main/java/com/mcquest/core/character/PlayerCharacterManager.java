@@ -11,12 +11,14 @@ import com.mcquest.core.object.ObjectManager;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.resourcepack.ResourcePackManager;
 import com.mcquest.core.ui.PlayerCharacterLogoutType;
+import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityDamageEvent;
+import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
@@ -48,6 +50,7 @@ public class PlayerCharacterManager {
         eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
         eventHandler.addListener(EntityDamageEvent.class, this::handleDamage);
+        eventHandler.addListener(PlayerChatEvent.class, this::handleChat);
         SchedulerManager scheduler = mmorpg.getSchedulerManager();
         scheduler.buildTask(this::regeneratePlayerCharacters).repeat(TaskSchedule.seconds(1)).schedule();
         scheduler.buildTask(this::updateNameplates).repeat(TaskSchedule.nextTick()).schedule();
@@ -88,8 +91,8 @@ public class PlayerCharacterManager {
         player.setResourcePack(resourcePack);
         PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
         pcs.put(player, pc);
-        CharacterEntityManager characterEntityManager = mmorpg.getCharacterEntityManager();
-        characterEntityManager.bind(player, pc);
+        mmorpg.getObjectManager().add(pc);
+        mmorpg.getCharacterEntityManager().bind(player, pc);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new PlayerCharacterLoginEvent(pc));
     }
@@ -135,6 +138,23 @@ public class PlayerCharacterManager {
         }
     }
 
+    private void handleChat(PlayerChatEvent event) {
+        event.setCancelled(true);
+
+        Player player = event.getPlayer();
+        PlayerCharacter pc = getPlayerCharacter(player);
+
+        Instance instance = pc.getInstance();
+        Pos position = pc.getPosition();
+        Collection<PlayerCharacter> nearbyPcs = getNearbyPlayerCharacters(instance, position, 50.0);
+
+        String message = event.getMessage();
+
+        for (PlayerCharacter nearbyPc : nearbyPcs) {
+            pc.speak(nearbyPc, Component.text(message));
+        }
+    }
+
     private void regeneratePlayerCharacters() {
         for (PlayerCharacter pc : pcs.values()) {
             pc.heal(pc, pc.getHealthRegenRate());
@@ -153,7 +173,7 @@ public class PlayerCharacterManager {
             );
 
             for (Object object : nearbyObjects) {
-                if (object instanceof Character character) {
+                if (object instanceof Character character && character.isSpawned()) {
                     character.getNameplate().updateViewer(pc);
                 }
             }

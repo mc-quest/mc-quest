@@ -32,6 +32,7 @@ class Nameplate {
         }
 
         healthBar = new Hologram(instance, healthBarPosition(), healthBarText());
+        healthBar.getEntity().setAutoViewable(false);
     }
 
     void despawn() {
@@ -45,6 +46,10 @@ class Nameplate {
     }
 
     void updateViewer(PlayerCharacter pc) {
+        if (pc == character) {
+            return;
+        }
+
         Attitude attitude = character.getAttitude(pc);
         Player player = pc.getPlayer();
         names.forEach((att, name) -> {
@@ -54,6 +59,8 @@ class Nameplate {
                 name.removeViewer(player);
             }
         });
+
+        healthBar.addViewer(player);
     }
 
     void updateInstance() {

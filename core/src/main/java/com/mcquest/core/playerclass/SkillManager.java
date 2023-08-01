@@ -5,6 +5,8 @@ import com.mcquest.core.event.SkillAddToHotbarEvent;
 import com.mcquest.core.event.SkillRemoveFromHotbarEvent;
 import com.mcquest.core.event.SkillUnlockEvent;
 import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.resourcepack.CustomModelData;
+import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -78,7 +80,9 @@ public class SkillManager {
         String nameContent = String.format("Active Skill Slot %d", slot + 1);
         TextComponent displayName = Component.text(nameContent, NamedTextColor.YELLOW);
         List<TextComponent> lore = List.of(Component.text("Active skills go here"));
-        return ItemStackUtility.create(Material.BARRIER, displayName, lore).build();
+        return ItemStackUtility.create(Materials.GUI, displayName, lore)
+                .meta(builder -> builder.customModelData(CustomModelData.HOTBAR_SKILL_PLACEHOLDER))
+                .build();
     }
 
     private void handleInventoryClick(Player player, int slot, ClickType clickType,

@@ -4,8 +4,8 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import net.minestom.server.coordinate.Pos;
 import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.animation.AnimationController;
 import team.unnamed.hephaestus.minestom.ModelEntity;
+import team.unnamed.hephaestus.view.animation.AnimationController;
 
 public final class ModelObject extends Object {
     private final Model model;

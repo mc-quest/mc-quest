@@ -104,7 +104,7 @@ public class WordWrap {
 
     private static void removeTrailingSpace(StringBuilder line) {
         int trailingSpaceCount = 0;
-        while (line.charAt(line.length() - 1 - trailingSpaceCount) == ' ') {
+        while (!line.isEmpty() && line.charAt(line.length() - 1 - trailingSpaceCount) == ' ') {
             trailingSpaceCount++;
         }
         line.setLength(line.length() - trailingSpaceCount);

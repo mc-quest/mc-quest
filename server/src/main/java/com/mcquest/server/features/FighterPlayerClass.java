@@ -9,13 +9,15 @@ import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.physics.Collider;
-import com.mcquest.core.physics.PhysicsManager;
 import com.mcquest.server.constants.FighterSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+
+import java.util.Collection;
+import java.util.function.Predicate;
 
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -32,30 +34,21 @@ public class FighterPlayerClass implements Feature {
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.5));
         Vec hitboxSize = new Vec(2.5, 2.5, 2.5);
-        Collider hitbox = new Collider(instance, hitboxCenter, hitboxSize);
-        boolean[] hitOccurred = {false};
+        Collection<Collider> hits = mmorpg.getPhysicsManager()
+                .overlapBox(instance, hitboxCenter, hitboxSize, damageableBy(pc));
 
-        hitbox.onCollisionEnter(other -> {
-            if (!(other instanceof CharacterHitbox characterHitbox)) {
-                return;
-            }
-            Character character = characterHitbox.getCharacter();
-            if (!character.isDamageable(pc)) {
-                return;
-            }
-            hitOccurred[0] = true;
+        hits.forEach(hit -> {
+            CharacterHitbox hitbox = (CharacterHitbox) hit;
+            Character character = hitbox.getCharacter();
             double damageAmount = 5.0;
             character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
-            instance.playSound(hitSound, other.getCenter());
+            instance.playSound(hitSound, hitbox.getCenter());
         });
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        physicsManager.addCollider(hitbox);
-        physicsManager.removeCollider(hitbox);
 
         ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
 
-        if (!hitOccurred[0]) {
+        if (hits.isEmpty()) {
             Sound missSound = Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1.5f);
             instance.playSound(missSound);
         }
@@ -64,5 +57,11 @@ public class FighterPlayerClass implements Feature {
     private void useSelfHeal(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.heal(pc, 10.0);
+    }
+
+    private Predicate<Collider> damageableBy(PlayerCharacter pc) {
+        return collider ->
+                collider instanceof CharacterHitbox hitbox
+                        && hitbox.getCharacter().isDamageable(pc);
     }
 }

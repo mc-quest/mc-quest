@@ -1,7 +1,7 @@
-package com.mcquest.core.physics;
+package com.mcquest.core.object;
 
 import com.mcquest.core.instance.Instance;
-import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Point;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ public final class SpatialHashCell {
         this.z = z;
     }
 
-    public static SpatialHashCell cellAt(Instance instance, Pos position, double cellSize) {
+    public static SpatialHashCell cellAt(Instance instance, Point position, double cellSize) {
         int x = (int) Math.floor(position.x() / cellSize);
         int y = (int) Math.floor(position.y() / cellSize);
         int z = (int) Math.floor(position.z() / cellSize);
@@ -57,7 +57,7 @@ public final class SpatialHashCell {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(java.lang.Object o) {
         if (o == this) {
             return true;
         }

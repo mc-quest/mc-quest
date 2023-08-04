@@ -24,8 +24,8 @@ public class Deer extends NonPlayerCharacter {
 
     private final Mmorpg mmorpg;
     private final Pos spawnPosition;
-    private final Collider hitbox;
     private Entity entity;
+    private Collider hitbox;
 
     public Deer(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
         super(instance, spawnPosition);
@@ -55,10 +55,12 @@ public class Deer extends NonPlayerCharacter {
 
         if (isAlive()) {
             mmorpg.getCharacterEntityManager().unbind(entity);
-            mmorpg.getPhysicsManager().removeCollider(hitbox);
-        }
+            entity.remove();
+            entity = null;
 
-        entity.remove();
+            hitbox.remove();
+            hitbox = null;
+        }
 
         setPosition(spawnPosition);
     }
@@ -86,7 +88,7 @@ public class Deer extends NonPlayerCharacter {
     @Override
     protected void onDeath(DamageSource killer) {
         mmorpg.getCharacterEntityManager().unbind(entity);
-        mmorpg.getPhysicsManager().removeCollider(hitbox);
+        hitbox.remove();
 
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());

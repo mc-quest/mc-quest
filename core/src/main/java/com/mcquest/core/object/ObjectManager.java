@@ -6,7 +6,6 @@ import com.mcquest.core.Mmorpg;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.instance.Instance;
-import com.mcquest.core.physics.SpatialHashCell;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;

@@ -3,6 +3,7 @@ package com.mcquest.core.physics;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.SpatialHashCell;
 import com.mcquest.core.util.MathUtility;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -29,8 +30,23 @@ public class PhysicsManager {
         collider.enable(this);
     }
 
-    public void removeCollider(Collider collider) {
-        collider.disable();
+    public Collection<Collider> overlapBox(Instance instance, Pos min, Pos max,
+                                           Predicate<Collider> filter) {
+        return collidersInRange(instance, min, max).stream()
+                .filter(collider -> collider.overlapsBox(min, max))
+                .filter(filter)
+                .toList();
+    }
+
+    public Collection<Collider> overlapBox(Instance instance, Pos center, Vec extents,
+                                           Predicate<Collider> filter) {
+        Vec halfExtents = extents.mul(0.5);
+        return overlapBox(
+                instance,
+                center.sub(halfExtents),
+                center.add(halfExtents),
+                filter
+        );
     }
 
     public Collection<RaycastHit> raycastAll(Instance instance, Pos origin,
@@ -44,28 +60,13 @@ public class PhysicsManager {
         Pos min = MathUtility.min(origin, end);
         Pos max = MathUtility.max(origin, end);
 
-        SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, CELL_SIZE);
-        SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, CELL_SIZE);
-
-        Set<Collider> nearbyColliders = new HashSet<>();
-        for (int x = minCell.getX(); x <= maxCell.getX(); x++) {
-            for (int y = minCell.getY(); y <= maxCell.getY(); y++) {
-                for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
-                    SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
-                    Set<Collider> cellColliders = colliders.get(cell);
-                    for (Collider collider : cellColliders) {
-                        if (filter.test(collider)) {
-                            nearbyColliders.add(collider);
-                        }
-                    }
-                }
-            }
-        }
-
         Collection<RaycastHit> hits = new ArrayList<>();
-        for (Collider collider : nearbyColliders) {
-            Pos intersection = rayColliderIntersection(origin, direction,
-                    maxDistance, collider);
+        for (Collider collider : collidersInRange(instance, min, max)) {
+            if (!filter.test(collider)) {
+                continue;
+            }
+
+            Pos intersection = rayColliderIntersection(origin, direction, maxDistance, collider);
             if (intersection != null) {
                 RaycastHit hit = new RaycastHit(collider, intersection);
                 hits.add(hit);
@@ -78,18 +79,28 @@ public class PhysicsManager {
     public @Nullable RaycastHit raycast(Instance instance, Pos origin,
                                         Vec direction, double maxDistance,
                                         Predicate<Collider> filter) {
-        Collection<RaycastHit> hits = raycastAll(instance, origin, direction,
-                maxDistance, filter);
+        return raycastAll(instance, origin, direction, maxDistance, filter)
+                .stream()
+                .min((h1, h2) -> {
+                    double d1 = h1.getPosition().distanceSquared(origin);
+                    double d2 = h2.getPosition().distanceSquared(origin);
+                    return Double.compare(d1, d2);
+                })
+                .orElse(null);
+    }
 
-        if (hits.isEmpty()) {
-            return null;
-        }
+    private SpatialHashCell cell(Instance instance, Pos position) {
+        return SpatialHashCell.cellAt(instance, position, CELL_SIZE);
+    }
 
-        return hits.stream().min((h1, h2) -> {
-            double d1 = h1.getPosition().distanceSquared(origin);
-            double d2 = h2.getPosition().distanceSquared(origin);
-            return Double.compare(d1, d2);
-        }).get();
+    private Collection<Collider> collidersInRange(Instance instance, Pos min, Pos max) {
+        return collidersInRange(cell(instance, min), cell(instance, max));
+    }
+
+    private Collection<Collider> collidersInRange(SpatialHashCell min, SpatialHashCell max) {
+        Set<Collider> colliders = new HashSet<>();
+        SpatialHashCell.forAllInRange(min, max, cell -> colliders.addAll(this.colliders.get(cell)));
+        return colliders;
     }
 
     private Pos rayColliderIntersection(Pos origin, Vec direction,

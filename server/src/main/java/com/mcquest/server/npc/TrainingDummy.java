@@ -47,7 +47,7 @@ public class TrainingDummy extends NonPlayerCharacter {
 
         if (isAlive()) {
             mmorpg.getCharacterEntityManager().unbind(entity);
-            mmorpg.getPhysicsManager().removeCollider(hitbox);
+            hitbox.remove();
         }
 
         entity.remove();
@@ -78,9 +78,9 @@ public class TrainingDummy extends NonPlayerCharacter {
     @Override
     protected void onDeath(DamageSource killer) {
         mmorpg.getCharacterEntityManager().unbind(entity);
-        mmorpg.getPhysicsManager().removeCollider(hitbox);
+        hitbox.remove();
 
-        Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_FALL, Sound.Source.NEUTRAL, 1f, 1f);
+        Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
 
         entity.playAnimation("death");

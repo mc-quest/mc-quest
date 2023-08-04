@@ -1,6 +1,7 @@
 package com.mcquest.core.physics;
 
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.SpatialHashCell;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ public class Collider {
     private final Set<SpatialHashCell> occupiedCells;
     private final Set<Collider> contacts;
     private PhysicsManager physicsManager;
+    private boolean removed;
 
     public Collider(@NotNull Instance instance, @NotNull Pos min, @NotNull Pos max) {
         validateBounds(min, max);
@@ -32,10 +34,11 @@ public class Collider {
         occupiedCells = new HashSet<>();
         contacts = new HashSet<>();
         physicsManager = null;
+        removed = false;
     }
 
-    public Collider(@NotNull Instance instance, @NotNull Pos center, @NotNull Vec size) {
-        this(instance, center.sub(size.mul(0.5)), center.add(size.mul(0.5)));
+    public Collider(@NotNull Instance instance, @NotNull Pos center, @NotNull Vec extents) {
+        this(instance, center.sub(extents.mul(0.5)), center.add(extents.mul(0.5)));
     }
 
     public final @NotNull Instance getInstance() {
@@ -67,32 +70,29 @@ public class Collider {
         handleChange();
     }
 
-    /**
-     * Returns the center position of this Collider.
-     */
     public final @NotNull Pos getCenter() {
         return min.add(max).mul(0.5);
     }
 
     public final void setCenter(@NotNull Pos center) {
-        Vec semiSize = getSize().mul(0.5);
-        Pos min = center.sub(semiSize);
-        Pos max = center.add(semiSize);
+        Vec halfExtents = getExtents().mul(0.5);
+        Pos min = center.sub(halfExtents);
+        Pos max = center.add(halfExtents);
         validateBounds(min, max);
         this.min = min;
         this.max = max;
         handleChange();
     }
 
-    public final @NotNull Vec getSize() {
+    public final @NotNull Vec getExtents() {
         return max.sub(min).asVec();
     }
 
-    public final void setSize(@NotNull Vec size) {
+    public final void setExtents(@NotNull Vec extents) {
         Pos center = getCenter();
-        Vec semiSize = size.mul(0.5);
-        Pos min = center.sub(semiSize);
-        Pos max = center.add(semiSize);
+        Vec halfExtents = extents.mul(0.5);
+        Pos min = center.sub(halfExtents);
+        Pos max = center.add(halfExtents);
         validateBounds(min, max);
         this.min = min;
         this.max = max;
@@ -107,42 +107,44 @@ public class Collider {
         this.onCollisionExit = onCollisionExit;
     }
 
-    void enable(PhysicsManager physicsManager) {
-        if (this.physicsManager == physicsManager) {
+    public final boolean isRemoved() {
+        return removed;
+    }
+
+    public final void remove() {
+        if (removed) {
             return;
         }
 
-        if (this.physicsManager != null) {
-            disable();
+        if (physicsManager != null) {
+            for (SpatialHashCell cell : occupiedCells) {
+                physicsManager.colliders.remove(cell, this);
+            }
+            occupiedCells.clear();
+
+            Set<Collider> oldContacts = new HashSet<>(contacts);
+            contacts.clear();
+
+            for (Collider other : oldContacts) {
+                other.contacts.remove(this);
+            }
+
+            for (Collider other : oldContacts) {
+                handleCollisionExit(other);
+            }
+        }
+
+        removed = true;
+    }
+
+    void enable(PhysicsManager physicsManager) {
+        if (this.physicsManager != null || removed) {
+            throw new IllegalStateException();
         }
 
         this.physicsManager = physicsManager;
         updateOccupiedCells();
         checkForCollisions();
-    }
-
-    void disable() {
-        if (physicsManager == null) {
-            // Already disabled.
-            return;
-        }
-
-        for (SpatialHashCell cell : occupiedCells) {
-            physicsManager.colliders.remove(cell, this);
-        }
-        occupiedCells.clear();
-
-        Set<Collider> oldContacts = new HashSet<>(contacts);
-        contacts.clear();
-        for (Collider other : oldContacts) {
-            other.contacts.remove(this);
-        }
-
-        for (Collider other : oldContacts) {
-            handleCollisionExit(other);
-        }
-
-        this.physicsManager = null;
     }
 
     private static void validateBounds(Pos min, Pos max) {
@@ -219,15 +221,18 @@ public class Collider {
         for (Collider other : enteringColliders) {
             handleCollisionEnter(other);
         }
+
         for (Collider other : exitingColliders) {
             handleCollisionExit(other);
         }
     }
 
     private boolean overlaps(Collider other) {
-        return this.instance == other.instance &&
-                geq(this.max, other.min) &&
-                geq(other.max, this.min);
+        return overlapsBox(other.min, other.max);
+    }
+
+    boolean overlapsBox(Pos min, Pos max) {
+        return geq(this.max, min) && geq(max, this.min);
     }
 
     private void handleCollisionEnter(Collider other) {

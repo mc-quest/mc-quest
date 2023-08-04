@@ -46,7 +46,7 @@ public class MagePlayerClass implements Feature {
                 setVelocity(fireballVelocity);
                 if (getPosition().distanceSquared(startPosition) > maxDistance * maxDistance) {
                     remove();
-                    physicsManager.removeCollider(hitbox);
+                    hitbox.remove();
                 }
             }
         };
@@ -62,7 +62,7 @@ public class MagePlayerClass implements Feature {
             character.damage(pc, damageAmount);
             if (!fireballEntity.isRemoved()) {
                 fireballEntity.remove();
-                physicsManager.removeCollider(hitbox);
+                hitbox.remove();
             }
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound);

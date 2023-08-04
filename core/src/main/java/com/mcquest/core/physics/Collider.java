@@ -120,20 +120,14 @@ public class Collider {
             for (SpatialHashCell cell : occupiedCells) {
                 physicsManager.colliders.remove(cell, this);
             }
-            occupiedCells.clear();
 
-            Set<Collider> oldContacts = new HashSet<>(contacts);
-            contacts.clear();
-
-            for (Collider other : oldContacts) {
-                other.contacts.remove(this);
-            }
-
-            for (Collider other : oldContacts) {
+            for (Collider other : contacts) {
                 handleCollisionExit(other);
+                other.contacts.remove(this);
             }
         }
 
+        physicsManager = null;
         removed = true;
     }
 
@@ -169,18 +163,13 @@ public class Collider {
         // Compute new cells.
         Set<SpatialHashCell> newOccupiedCells = new HashSet<>();
 
-        SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, PhysicsManager.CELL_SIZE);
-        SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, PhysicsManager.CELL_SIZE);
+        SpatialHashCell minCell = physicsManager.cell(instance, max);
+        SpatialHashCell maxCell = physicsManager.cell(instance, max);
 
-        for (int x = minCell.getX(); x <= maxCell.getX(); x++) {
-            for (int y = minCell.getY(); y <= maxCell.getY(); y++) {
-                for (int z = minCell.getZ(); z <= maxCell.getZ(); z++) {
-                    SpatialHashCell cell = new SpatialHashCell(instance, x, y, z);
-                    newOccupiedCells.add(cell);
-                    physicsManager.colliders.put(cell, this);
-                }
-            }
-        }
+        SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {
+            newOccupiedCells.add(cell);
+            physicsManager.colliders.put(cell, this);
+        });
 
         // Remove from old cells.
         for (SpatialHashCell oldCell : occupiedCells) {

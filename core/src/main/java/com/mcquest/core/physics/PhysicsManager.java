@@ -17,7 +17,7 @@ public class PhysicsManager {
     /**
      * The lengths, widths, and heights of collider cells in the spatial hash.
      */
-    static final double CELL_SIZE = 256.0;
+    private static final double CELL_SIZE = 256.0;
 
     final SetMultimap<SpatialHashCell, Collider> colliders;
 
@@ -89,7 +89,7 @@ public class PhysicsManager {
                 .orElse(null);
     }
 
-    private SpatialHashCell cell(Instance instance, Pos position) {
+    SpatialHashCell cell(Instance instance, Pos position) {
         return SpatialHashCell.cellAt(instance, position, CELL_SIZE);
     }
 

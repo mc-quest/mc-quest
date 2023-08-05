@@ -10,7 +10,7 @@ subprojects {
     dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-        implementation 'com.github.Minestom:Minestom:1.19-SNAPSHOT'
+        implementation 'com.github.minestom.minestom:Minestom:e0427a36f3'
         implementation 'com.google.guava:guava:32.0.1-jre'
         implementation 'com.google.code.gson:gson:2.10'
         implementation 'team.unnamed:creative-api:0.5.0-SNAPSHOT'

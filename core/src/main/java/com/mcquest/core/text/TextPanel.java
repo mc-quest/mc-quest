@@ -26,14 +26,8 @@ public final class TextPanel extends Object {
     }
 
     @Override
-    public void setInstance(@NotNull Instance instance) {
-        Instance oldInstance = getInstance();
-
-        super.setInstance(instance);
-
-        if (instance == oldInstance) {
-            return;
-        }
+    public void setInstance(@NotNull Instance instance, Pos position) {
+        super.setInstance(instance, position);
 
         if (!isSpawned()) {
             return;

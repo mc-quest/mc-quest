@@ -21,10 +21,10 @@ public final class ModelObject extends Object {
     }
 
     @Override
-    public void setInstance(Instance instance) {
-        super.setInstance(instance);
+    public void setInstance(Instance instance, Pos position) {
+        super.setInstance(instance, position);
         if (isSpawned()) {
-            entity.setInstance(instance);
+            entity.setInstance(instance, position);
         }
     }
 

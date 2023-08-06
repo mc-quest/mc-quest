@@ -121,10 +121,11 @@ public class ObjectManager {
         spawnedObjects.addAll(toSpawn);
     }
 
-    void updateInstance(Object object, Instance oldInstance, Instance newInstance) {
+    void updateInstance(Object object, Instance oldInstance, Pos oldPosition,
+                        Instance newInstance, Pos newPosition) {
         update(object,
                 oldInstance, newInstance,
-                object.getPosition(), object.getPosition(),
+                oldPosition, newPosition,
                 object.getBoundingBox(), object.getBoundingBox());
     }
 

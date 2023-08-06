@@ -81,8 +81,8 @@ public class Character extends Object implements DamageSource {
 
     @Override
     @MustBeInvokedByOverriders
-    public void setInstance(@NotNull Instance instance) {
-        super.setInstance(instance);
+    public void setInstance(@NotNull Instance instance, Pos position) {
+        super.setInstance(instance, position);
 
         if (isSpawned()) {
             nameplate.updateInstance();

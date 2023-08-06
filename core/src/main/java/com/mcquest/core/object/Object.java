@@ -26,13 +26,17 @@ public class Object {
     }
 
     @MustBeInvokedByOverriders
-    public void setInstance(Instance instance) {
+    public void setInstance(Instance instance, Pos position) {
         Instance oldInstance = this.instance;
+        Pos oldPosition = this.position;
 
         this.instance = instance;
+        this.position = position;
 
         if (objectManager != null) {
-            objectManager.updateInstance(this, oldInstance, instance);
+            objectManager.updateInstance(this,
+                    oldInstance, oldPosition,
+                    instance, position);
         }
     }
 

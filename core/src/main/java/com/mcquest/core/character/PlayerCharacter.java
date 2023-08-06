@@ -124,11 +124,13 @@ public final class PlayerCharacter extends Character implements Displaceable {
     }
 
     @Override
-    public void setInstance(@NotNull Instance instance) {
-        super.setInstance(instance);
+    public void setInstance(@NotNull Instance instance, Pos position) {
+        super.setInstance(instance, position);
 
-        if (player.getInstance() != instance) {
-            player.setInstance(instance);
+        if (player.getInstance() == instance) {
+            player.teleport(position);
+        } else {
+            player.setInstance(instance, position);
         }
 
         hitbox.setInstance(instance);

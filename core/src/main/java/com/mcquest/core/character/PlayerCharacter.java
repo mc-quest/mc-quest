@@ -177,13 +177,13 @@ public final class PlayerCharacter extends Character implements Displaceable {
 
     public Pos getEyePosition() {
         Pos position = getPosition();
-        return position.withY(position.y() + 1.6);
+        return position.withY(position.y() + player.getEyeHeight());
     }
 
     public Pos getHandPosition() {
         Pos position = getPosition();
         Vec lookDirection = position.direction();
-        return position.withY(position.y() + 1.0)
+        return position.withY(position.y() + (player.isSneaking() ? 0.65 : 1.0))
                 .add(lookDirection.rotateAroundY(-Math.PI / 4.0).mul(0.5));
     }
 

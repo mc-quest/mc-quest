@@ -15,6 +15,7 @@ public class PlayerCharacterData {
     private int playerClassId;
     private int instanceId;
     private Pos position;
+    private int respawnInstanceId;
     private Pos respawnPosition;
     private int zoneId;
     private double health;
@@ -46,6 +47,7 @@ public class PlayerCharacterData {
         data.playerClassId = playerClass.getId();
         data.instanceId = instance.getId();
         data.position = position;
+        data.respawnInstanceId = instance.getId();
         data.respawnPosition = position;
         data.zoneId = zone.getId();
         data.health = 1;
@@ -104,6 +106,10 @@ public class PlayerCharacterData {
 
     public Pos getPosition() {
         return position;
+    }
+
+    public int getRespawnInstanceId() {
+        return respawnInstanceId;
     }
 
     public Pos getRespawnPosition() {

@@ -58,6 +58,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
     private final CutscenePlayer cutscenePlayer;
     private final Hitbox hitbox;
     private Zone zone;
+    private Instance respawnInstance;
     private Pos respawnPosition;
     private double mana;
     private double maxMana;
@@ -95,6 +96,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
         manaRegenRate = data.getManaRegenRate();
         hitbox = new Hitbox(this);
         zone = mmorpg.getZoneManager().getZone(data.getZoneId());
+        respawnInstance = mmorpg.getInstanceManager().getInstance(data.getRespawnInstanceId());
         respawnPosition = data.getRespawnPosition();
         isDisarmed = false;
         undisarmTask = null;
@@ -163,12 +165,17 @@ public final class PlayerCharacter extends Character implements Displaceable {
         teleporting = false;
     }
 
+    public Instance getRespawnInstance() {
+        return respawnInstance;
+    }
+
     public Pos getRespawnPosition() {
         return respawnPosition;
     }
 
-    public void setRespawnPosition(@NotNull Pos respawnPosition) {
-        this.respawnPosition = respawnPosition;
+    public void setRespawnPoint(@NotNull Instance instance, @NotNull Pos position) {
+        this.respawnInstance = instance;
+        this.respawnPosition = position;
     }
 
     private Pos hitboxCenter() {
@@ -390,7 +397,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
 
     private void die() {
         setHealth(getMaxHealth());
-        setPosition(respawnPosition);
+        setInstance(respawnInstance, respawnPosition);
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
         player.showTitle(Title.title(Component.text("YOU DIED", NamedTextColor.RED),
                 Component.text("Respawning...", NamedTextColor.GRAY),

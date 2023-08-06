@@ -46,6 +46,7 @@ public class Deer extends NonPlayerCharacter {
         mmorpg.getCharacterEntityManager().bind(entity, this);
         entity.setInstance(getInstance(), getPosition());
 
+        hitbox = new CharacterHitbox(this, getInstance(), hitboxCenter(), SIZE);
         mmorpg.getPhysicsManager().addCollider(hitbox);
     }
 
@@ -56,11 +57,11 @@ public class Deer extends NonPlayerCharacter {
         if (isAlive()) {
             mmorpg.getCharacterEntityManager().unbind(entity);
             entity.remove();
-            entity = null;
-
             hitbox.remove();
-            hitbox = null;
         }
+
+        entity = null;
+        hitbox = null;
 
         setPosition(spawnPosition);
     }

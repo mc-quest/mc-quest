@@ -121,6 +121,11 @@ public class PlayerCharacterManager {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
 
+        if (pc.isTeleporting()) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (pc.getCutscenePlayer().getPlayingCutscene() != null) {
             return;
         }

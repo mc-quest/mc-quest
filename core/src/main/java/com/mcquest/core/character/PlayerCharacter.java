@@ -70,6 +70,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
     private boolean isDisarmed;
     private Task undisarmTask;
     private long undisarmTime;
+    private boolean teleporting;
     private boolean removed;
 
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
@@ -101,6 +102,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
         canMount = data.canMount();
         // TODO
         canAct = true;
+        teleporting = false;
         removed = false;
         money = new Money(data.getMoney());
 
@@ -127,10 +129,11 @@ public final class PlayerCharacter extends Character implements Displaceable {
     public void setInstance(@NotNull Instance instance, Pos position) {
         super.setInstance(instance, position);
 
+        teleporting = true;
         if (player.getInstance() == instance) {
-            player.teleport(position);
+            player.teleport(position).thenRun(this::completeTeleport);
         } else {
-            player.setInstance(instance, position);
+            player.setInstance(instance, position).thenRun(this::completeTeleport);
         }
 
         hitbox.setInstance(instance);
@@ -147,8 +150,17 @@ public final class PlayerCharacter extends Character implements Displaceable {
 
     @Override
     public void setPosition(@NotNull Pos position) {
-        player.teleport(position);
+        teleporting = true;
+        player.teleport(position).thenRun(this::completeTeleport);
         updatePosition(position);
+    }
+
+    boolean isTeleporting() {
+        return teleporting;
+    }
+
+    private void completeTeleport() {
+        teleporting = false;
     }
 
     public Pos getRespawnPosition() {

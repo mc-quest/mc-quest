@@ -95,11 +95,11 @@ public class ItemManager {
         }
 
         ItemStack itemStack = player.getInventory().getItemStack(slot);
-        if (itemStack.isAir()) { // TODO: will need to instead check if placeholder
+        ConsumableItem item = (ConsumableItem) getItem(itemStack);
+        if (item == null) {
             return;
         }
 
-        ConsumableItem item = (ConsumableItem) getItem(itemStack);
         ItemConsumeEvent consumeEvent = new ItemConsumeEvent(pc, item);
         item.onConsume().emit(consumeEvent);
         MinecraftServer.getGlobalEventHandler().call(consumeEvent);

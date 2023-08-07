@@ -1,6 +1,9 @@
 package com.mcquest.core.resourcepack;
 
 import com.mcquest.core.Mmorpg;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerLoginEvent;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.server.ResourcePackServer;
@@ -13,34 +16,35 @@ import java.io.UncheckedIOException;
 public class ResourcePackManager {
     private final ResourcePack resourcePack;
     private ResourcePackServer server;
-    private String resourcePackUrl;
+    private net.minestom.server.resourcepack.ResourcePack playerResourcePack;
 
     @ApiStatus.Internal
     public ResourcePackManager(Mmorpg mmorpg) {
         ResourcePackBuilder builder = new ResourcePackBuilder(mmorpg);
         resourcePack = builder.build();
+
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
     }
 
     @ApiStatus.Internal
     public void startServer(String address, int port) {
         try {
-            resourcePackUrl = String.format("http://%s:%d", address, port);
             server = ResourcePackServer.builder()
                     .pack(resourcePack)
                     .address(address, port)
                     .build();
             server.start();
+
+            // TODO: URL must be updated in production.
+            String resourcePackUrl = String.format("http://%s:%d#%s", address, port, resourcePack.hash());
+            playerResourcePack = net.minestom.server.resourcepack.ResourcePack.forced(
+                    resourcePackUrl,
+                    resourcePack.hash()
+            );
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-    }
-
-    public String getResourcePackHash() {
-        return resourcePack.hash();
-    }
-
-    public String getResourcePackUrl() {
-        return resourcePackUrl;
     }
 
     /**
@@ -52,5 +56,9 @@ public class ResourcePackManager {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private void handleLogin(PlayerLoginEvent event) {
+        event.getPlayer().setResourcePack(playerResourcePack);
     }
 }

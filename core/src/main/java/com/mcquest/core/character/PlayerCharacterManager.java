@@ -9,7 +9,6 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import com.mcquest.core.object.ObjectManager;
 import com.mcquest.core.persistence.PlayerCharacterData;
-import com.mcquest.core.resourcepack.ResourcePackManager;
 import com.mcquest.core.ui.PlayerCharacterLogoutType;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
@@ -22,7 +21,6 @@ import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.resourcepack.ResourcePack;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -85,10 +83,6 @@ public class PlayerCharacterManager {
         event.setSpawningInstance(instance);
         player.setRespawnPoint(data.getPosition());
         player.setGameMode(GameMode.ADVENTURE);
-        ResourcePackManager resourcePackManager = mmorpg.getResourcePackManager();
-        ResourcePack resourcePack = ResourcePack.forced(resourcePackManager.getResourcePackUrl(),
-                resourcePackManager.getResourcePackHash());
-        player.setResourcePack(resourcePack);
         PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
         pcs.put(player, pc);
         mmorpg.getObjectManager().add(pc);

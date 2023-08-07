@@ -1,9 +1,6 @@
 package com.mcquest.core.character;
 
 import com.mcquest.core.instance.Instance;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.hologram.Hologram;
@@ -26,12 +23,12 @@ class Nameplate {
         Pos namePosition = namePosition();
 
         for (Attitude attitude : Attitude.values()) {
-            Hologram name = new Hologram(instance, namePosition, nameText(attitude));
+            Hologram name = new Hologram(instance, namePosition, character.nameText(attitude));
             name.getEntity().setAutoViewable(false);
             names.put(attitude, name);
         }
 
-        healthBar = new Hologram(instance, healthBarPosition(), healthBarText());
+        healthBar = new Hologram(instance, healthBarPosition(), character.healthBarText());
         healthBar.getEntity().setAutoViewable(false);
     }
 
@@ -78,12 +75,12 @@ class Nameplate {
 
     void updateNameText() {
         names.forEach((attitude, name) -> {
-            name.setText(nameText(attitude));
+            name.setText(character.nameText(attitude));
         });
     }
 
     void updateHealthBarText() {
-        healthBar.setText(healthBarText());
+        healthBar.setText(character.healthBarText());
     }
 
     private Pos namePosition() {
@@ -92,23 +89,5 @@ class Nameplate {
 
     private Pos healthBarPosition() {
         return character.getPosition().withY(y -> y + character.getHeight() - 0.25);
-    }
-
-    private TextComponent nameText(Attitude attitude) {
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("Lv. " + character.getLevel(), NamedTextColor.GOLD))
-                .append(Component.text("] ", NamedTextColor.GRAY))
-                .append(Component.text(character.getName(), attitude.getColor()));
-    }
-
-    private TextComponent healthBarText() {
-        int numBars = 20;
-        double ratio = character.getHealth() / character.getMaxHealth();
-        int numRedBars = (int) Math.ceil(numBars * ratio);
-        int numGrayBars = numBars - numRedBars;
-        return Component.text("[", NamedTextColor.GRAY)
-                .append(Component.text("|".repeat(numRedBars), NamedTextColor.RED))
-                .append(Component.text("|".repeat(numGrayBars), NamedTextColor.GRAY))
-                .append(Component.text("]", NamedTextColor.GRAY));
     }
 }

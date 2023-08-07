@@ -72,7 +72,6 @@ public final class PlayerCharacter extends Character implements Displaceable {
     private Task undisarmTask;
     private long undisarmTime;
     private boolean teleporting;
-    private boolean removed;
 
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
         super(mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
@@ -105,7 +104,6 @@ public final class PlayerCharacter extends Character implements Displaceable {
         // TODO
         canAct = true;
         teleporting = false;
-        removed = false;
         money = new Money(data.getMoney());
 
         zone.addPlayerCharacter(this);
@@ -517,8 +515,8 @@ public final class PlayerCharacter extends Character implements Displaceable {
         player.setVelocity(player.getVelocity().add(impulse.div(weightKg)));
     }
 
-    public boolean isRemoved() {
-        return removed;
+    void preRemove() {
+        hitbox.remove();
     }
 
     public static class Hitbox extends CharacterHitbox {

@@ -23,6 +23,7 @@ public class Character extends Object implements DamageSource {
     private double health;
     private double height;
     private final Nameplate nameplate;
+    private BossHealthBar bossHealthBar;
 
     Character(@NotNull Instance instance, @NotNull Pos position) {
         super(instance, position);
@@ -33,12 +34,14 @@ public class Character extends Object implements DamageSource {
         // Default is humanoid height.
         height = 2.0;
         nameplate = new Nameplate(this);
+        bossHealthBar = null;
     }
 
     @Override
     @MustBeInvokedByOverriders
     protected void spawn() {
         super.spawn();
+
         nameplate.spawn();
     }
 
@@ -46,6 +49,7 @@ public class Character extends Object implements DamageSource {
     @MustBeInvokedByOverriders
     protected void despawn() {
         super.despawn();
+
         nameplate.despawn();
     }
 
@@ -58,6 +62,10 @@ public class Character extends Object implements DamageSource {
 
         if (isSpawned()) {
             nameplate.updateNameText();
+        }
+
+        if (bossHealthBar != null) {
+            bossHealthBar.updateText();
         }
     }
 
@@ -76,6 +84,10 @@ public class Character extends Object implements DamageSource {
 
         if (isSpawned()) {
             nameplate.updateNameText();
+        }
+
+        if (bossHealthBar != null) {
+            bossHealthBar.updateText();
         }
     }
 
@@ -120,6 +132,10 @@ public class Character extends Object implements DamageSource {
         if (isSpawned()) {
             nameplate.updateHealthBarText();
         }
+
+        if (bossHealthBar != null) {
+            bossHealthBar.updateHealth();
+        }
     }
 
     /**
@@ -142,6 +158,10 @@ public class Character extends Object implements DamageSource {
 
         if (isSpawned()) {
             nameplate.updateHealthBarText();
+        }
+
+        if (bossHealthBar != null) {
+            bossHealthBar.updateHealth();
         }
     }
 
@@ -181,6 +201,14 @@ public class Character extends Object implements DamageSource {
         }
     }
 
+    public BossHealthBar getBossHealthBar() {
+        if (bossHealthBar == null) {
+            bossHealthBar = new BossHealthBar(this);
+        }
+
+        return bossHealthBar;
+    }
+
     public final void speak(Collection<PlayerCharacter> pcs, Component message) {
         for (PlayerCharacter pc : pcs) {
             speak(pc, message);
@@ -210,5 +238,23 @@ public class Character extends Object implements DamageSource {
 
     final Nameplate getNameplate() {
         return nameplate;
+    }
+
+    TextComponent nameText(Attitude attitude) {
+        return Component.text("[", NamedTextColor.GRAY)
+                .append(Component.text("Lv. " + level, NamedTextColor.GOLD))
+                .append(Component.text("] ", NamedTextColor.GRAY))
+                .append(Component.text(name, attitude.getColor()));
+    }
+
+    TextComponent healthBarText() {
+        int numBars = 20;
+        double ratio = health / maxHealth;
+        int numRedBars = (int) Math.ceil(numBars * ratio);
+        int numGrayBars = numBars - numRedBars;
+        return Component.text("[", NamedTextColor.GRAY)
+                .append(Component.text("|".repeat(numRedBars), NamedTextColor.RED))
+                .append(Component.text("|".repeat(numGrayBars), NamedTextColor.GRAY))
+                .append(Component.text("]", NamedTextColor.GRAY));
     }
 }

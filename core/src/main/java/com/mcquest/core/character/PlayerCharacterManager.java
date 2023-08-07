@@ -103,6 +103,7 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
+        pc.preRemove();
         logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);

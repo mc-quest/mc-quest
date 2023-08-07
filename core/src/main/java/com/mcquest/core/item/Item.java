@@ -2,9 +2,11 @@ package com.mcquest.core.item;
 
 import com.google.common.collect.ListMultimap;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.ItemEntity;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
@@ -62,6 +64,11 @@ public abstract class Item {
         drop.setCustomName(getDisplayName());
         drop.setCustomNameVisible(true);
         drop.setInstance(instance, position);
+        drop.setVelocity(new Vec(randomSpeed(), 5.0, randomSpeed()));
+    }
+
+    private double randomSpeed() {
+        return MathUtility.randomRange(-1.0, 1.0);
     }
 
     public abstract int getStackSize();

@@ -61,4 +61,8 @@ public class MathUtility {
     public static int randomRange(int min, int max) {
         return random.nextInt(min, max + 1);
     }
+
+    public static double randomRange(double min, double max) {
+        return min + (max - min) * random.nextDouble();
+    }
 }

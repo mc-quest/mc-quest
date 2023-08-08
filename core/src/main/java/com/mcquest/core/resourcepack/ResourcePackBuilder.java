@@ -7,6 +7,7 @@ import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetDirectory;
 import com.mcquest.core.audio.AudioClip;
 import com.mcquest.core.item.Item;
+import com.mcquest.core.music.Song;
 import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.playerclass.Skill;
 import net.kyori.adventure.key.Key;
@@ -43,6 +44,7 @@ class ResourcePackBuilder {
         writeBaseTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
+        writeMusicResources(tree);
         writeModelResources(tree);
         writeAudioResources(tree);
         disableBackgroundMusic(tree);
@@ -113,6 +115,18 @@ class ResourcePackBuilder {
         ResourcePackUtility.writeItemOverrides(tree, overrides);
     }
 
+    private void writeMusicResources(FileTree tree) {
+        Collection<Song> music = mmorpg.getMusicManager().getMusic();
+        Map<String, SoundEvent> sounds = new HashMap<>();
+
+        for (Song song : music) {
+            song.writeResources(tree, sounds);
+        }
+
+        SoundRegistry soundRegistry = SoundRegistry.of(Namespaces.MUSIC, sounds);
+        tree.write(soundRegistry);
+    }
+
     private void writeModelResources(FileTree tree) {
         Collection<Model> models = mmorpg.getModelManager().getModels();
         ModelWriter.resource(Namespaces.MODELS).write(tree, models);
@@ -120,14 +134,13 @@ class ResourcePackBuilder {
     }
 
     private void writeAudioResources(FileTree tree) {
-        AudioClip[] audio = mmorpg.getAudioManager()
-                .getAudioClips().toArray(new AudioClip[0]);
+        Collection<AudioClip> audioClips = mmorpg.getAudioManager().getAudioClips();
         Map<String, SoundEvent> sounds = new HashMap<>();
 
-        for (int i = 0; i < audio.length; i++) {
-            AudioClip audioClip = audio[i];
-            int id = i + 1;
+        int id = 1;
+        for (AudioClip audioClip : audioClips) {
             audioClip.writeResources(tree, id, sounds);
+            id++;
         }
 
         SoundRegistry soundRegistry = SoundRegistry.of(Namespaces.AUDIO, sounds);

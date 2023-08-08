@@ -5,7 +5,7 @@ import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.item.Weapon;
-import com.mcquest.core.audio.Song;
+import com.mcquest.core.music.Song;
 import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.util.JsonUtility;
 import net.minestom.server.coordinate.Pos;

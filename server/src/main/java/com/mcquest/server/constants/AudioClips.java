@@ -5,20 +5,16 @@ import com.mcquest.core.asset.Asset;
 import com.mcquest.core.audio.AudioClip;
 
 public class AudioClips {
-    public static final AudioClip WILDERNESS = loadAudioClip("Wilderness");
-    public static final AudioClip DUNGEON = loadAudioClip("Dungeon");
-    public static final AudioClip PORTCULLIS_CLOSE = loadAudioClip("PortcullisClose");
+    public static final AudioClip PORTCULLIS_CLOSE = loadAudioClip("portcullis_close");
 
     public static AudioClip[] all() {
         return new AudioClip[]{
-                WILDERNESS,
-                DUNGEON,
                 PORTCULLIS_CLOSE
         };
     }
 
     private static AudioClip loadAudioClip(String name) {
-        String path = "audio/" + name + ".ogg";
+        String path = "audioclips/" + name + ".ogg";
         Asset audio = Assets.asset(path);
         return new AudioClip(audio);
     }

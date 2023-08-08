@@ -1,8 +1,9 @@
-package com.mcquest.core.audio;
+package com.mcquest.core.music;
 
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
@@ -14,14 +15,14 @@ public class MusicPlayer {
     private Task repeatTask;
 
     public MusicPlayer(PlayerCharacter pc, PlayerCharacterData data,
-                       AudioManager audioManager) {
+                       MusicManager musicManager) {
         this.pc = pc;
         Integer songId = data.getSongId();
         if (songId == null) {
             song = null;
             repeatTask = null;
         } else {
-            song = audioManager.getSong(songId);
+            song = musicManager.getSong(songId);
             playSong();
         }
     }
@@ -46,15 +47,17 @@ public class MusicPlayer {
     }
 
     private void stopSong() {
-        song.getAudioClip().stop(pc);
+        pc.stopSound(SoundStop.named(song.getKey()));
         repeatTask.cancel();
     }
 
     private void playSong() {
+        Sound sound = Sound.sound(song.getKey(), Sound.Source.MUSIC, 1f, 1f);
+        pc.playSound(sound);
+
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
-        song.getAudioClip().play(pc, Sound.Source.MUSIC);
         repeatTask = scheduler.buildTask(this::playSong)
-                .delay(song.getAudioClip().getDuration())
+                .delay(song.getDuration())
                 .schedule();
     }
 }

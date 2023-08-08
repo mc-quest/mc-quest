@@ -1,6 +1,7 @@
 package com.mcquest.core;
 
-import com.mcquest.core.audio.Song;
+import com.mcquest.core.music.MusicManager;
+import com.mcquest.core.music.Song;
 import com.mcquest.core.cartography.Map;
 import com.mcquest.core.cartography.MapManager;
 import com.mcquest.core.entity.CharacterEntityManager;
@@ -49,6 +50,7 @@ public class Mmorpg {
     private final ItemManager itemManager;
     private final QuestManager questManager;
     private final ZoneManager zoneManager;
+    private final MusicManager musicManager;
     private final ModelManager modelManager;
     private final AudioManager audioManager;
     private final MapManager mapManager;
@@ -71,8 +73,9 @@ public class Mmorpg {
         itemManager = new ItemManager(this, builder.items);
         questManager = new QuestManager(builder.quests);
         zoneManager = new ZoneManager(builder.zones);
+        musicManager = new MusicManager(builder.music);
         modelManager = new ModelManager(builder.models);
-        audioManager = new AudioManager(builder.audio, builder.music);
+        audioManager = new AudioManager(builder.audio);
         mapManager = new MapManager(this, builder.maps);
         mountManager = new MountManager(this, builder.mounts);
         instanceManager = new InstanceManager(builder.instances, builder.biomes);
@@ -120,6 +123,10 @@ public class Mmorpg {
 
     public ZoneManager getZoneManager() {
         return zoneManager;
+    }
+
+    public MusicManager getMusicManager() {
+        return musicManager;
     }
 
     public ModelManager getModelManager() {

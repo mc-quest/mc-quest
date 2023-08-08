@@ -2,7 +2,7 @@ package com.mcquest.core.character;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.asset.Asset;
-import com.mcquest.core.audio.MusicPlayer;
+import com.mcquest.core.music.MusicPlayer;
 import com.mcquest.core.cartography.CardinalDirection;
 import com.mcquest.core.cartography.MapViewer;
 import com.mcquest.core.cinema.CutscenePlayer;
@@ -83,7 +83,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
         skillManager = new SkillManager(this, data);
         inventory = new PlayerCharacterInventory(this, data, mmorpg.getItemManager());
         questTracker = new QuestTracker(this, data, mmorpg.getQuestManager());
-        musicPlayer = new MusicPlayer(this, data, mmorpg.getAudioManager());
+        musicPlayer = new MusicPlayer(this, data, mmorpg.getMusicManager());
         mapViewer = new MapViewer(this, data, mmorpg.getMapManager());
         cutscenePlayer = new CutscenePlayer(this);
         setLevel(levelForExperiencePoints(data.getExperiencePoints()));

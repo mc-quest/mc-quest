@@ -22,7 +22,7 @@ public class Character extends Object implements DamageSource {
     private double maxHealth;
     private double health;
     private double height;
-    private final Nameplate nameplate;
+    private Nameplate nameplate;
     private BossHealthBar bossHealthBar;
 
     Character(@NotNull Instance instance, @NotNull Pos position) {
@@ -33,8 +33,6 @@ public class Character extends Object implements DamageSource {
         health = maxHealth;
         // Default is humanoid height.
         height = 2.0;
-        nameplate = new Nameplate(this);
-        bossHealthBar = null;
     }
 
     @Override
@@ -42,6 +40,7 @@ public class Character extends Object implements DamageSource {
     protected void spawn() {
         super.spawn();
 
+        nameplate = new Nameplate(this);
         nameplate.spawn();
     }
 
@@ -51,6 +50,7 @@ public class Character extends Object implements DamageSource {
         super.despawn();
 
         nameplate.despawn();
+        nameplate = null;
     }
 
     public final String getName() {

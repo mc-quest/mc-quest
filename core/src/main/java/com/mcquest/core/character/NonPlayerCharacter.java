@@ -43,7 +43,7 @@ public class NonPlayerCharacter extends Character {
     }
 
     /**
-     * Convenience method Invoked when this NonPlayerCharacter is healed.
+     * Convenience method invoked when this NonPlayerCharacter is healed.
      */
     protected void onHeal(DamageSource source) {
     }

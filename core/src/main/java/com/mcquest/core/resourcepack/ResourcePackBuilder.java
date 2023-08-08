@@ -39,15 +39,24 @@ class ResourcePackBuilder {
     }
 
     private void writeResources(FileTree tree) {
+        writeBaseResourcePack(tree);
         writeMetadata(tree);
         writeGuiIcons(tree);
-        writeBaseTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
         writeMusicResources(tree);
         writeModelResources(tree);
         writeAudioResources(tree);
         disableBackgroundMusic(tree);
+    }
+
+    private void writeBaseResourcePack(FileTree tree) {
+        String path = "resourcepack";
+        AssetDirectory resourcePackDir = new AssetDirectory(classLoader(), path);
+        for (Asset asset : resourcePackDir.getAssets()) {
+            String subPath = asset.getPath().substring(path.length() + 1);
+            tree.write(subPath, Writable.inputStream(asset::getStream));
+        }
     }
 
     private void writeMetadata(FileTree tree) {
@@ -72,22 +81,12 @@ class ResourcePackBuilder {
         List<ItemOverride> overrides = new ArrayList<>();
 
         for (String icon : icons) {
-            Asset asset = new Asset(getClass().getClassLoader(), String.format("%s.png", icon));
+            Asset asset = new Asset(classLoader(), String.format("%s.png", icon));
             Key key = Key.key(Namespaces.GUI, icon);
             ResourcePackUtility.writeIcon(tree, asset, key, overrides);
         }
 
         ResourcePackUtility.writeItemOverrides(tree, Materials.GUI, overrides);
-    }
-
-    private void writeBaseTextures(FileTree tree) {
-        AssetDirectory resourcePackDir =
-                new AssetDirectory(getClass().getClassLoader(), "textures");
-        List<Asset> assets = resourcePackDir.getAssets();
-        for (Asset asset : assets) {
-            tree.write("assets/minecraft/" + asset.getPath(),
-                    Writable.inputStream(asset::getStream));
-        }
     }
 
     private void writeSkillResources(FileTree tree) {
@@ -148,8 +147,8 @@ class ResourcePackBuilder {
     }
 
     private void disableBackgroundMusic(FileTree tree) {
-        String[] backgroundMusic = new Asset(ResourcePackBuilder.class.getClassLoader(),
-                "minecraft_music.json").readJson(String[].class);
+        String[] backgroundMusic = new Asset(classLoader(), "minecraft_music.json")
+                .readJson(String[].class);
         Map<String, SoundEvent> sounds = new HashMap<>();
 
         for (String backgroundSong : backgroundMusic) {
@@ -159,5 +158,9 @@ class ResourcePackBuilder {
 
         SoundRegistry soundRegistry = SoundRegistry.of("minecraft", sounds);
         tree.write(soundRegistry);
+    }
+
+    private ClassLoader classLoader() {
+        return getClass().getClassLoader();
     }
 }

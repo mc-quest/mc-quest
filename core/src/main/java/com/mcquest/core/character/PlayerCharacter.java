@@ -42,7 +42,7 @@ import java.util.Arrays;
 public final class PlayerCharacter extends Character implements Displaceable {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),
-            "experience_points_per_level.json"
+            "data/experience_points_per_level.json"
     ).readJson(double[].class);
     private static final double MAX_EXPERIENCE_POINTS =
             Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();

@@ -41,7 +41,7 @@ class ResourcePackBuilder {
     private void writeResources(FileTree tree) {
         writeBaseResourcePack(tree);
         writeMetadata(tree);
-        writeGuiIcons(tree);
+        writeTextures(tree);
         writeSkillResources(tree);
         writeItemResources(tree);
         writeMusicResources(tree);
@@ -70,7 +70,7 @@ class ResourcePackBuilder {
         tree.write(metadata);
     }
 
-    private void writeGuiIcons(FileTree tree) {
+    private void writeTextures(FileTree tree) {
         String[] icons = {
                 "hotbar_skill_placeholder",
                 "hotbar_skill_placeholder_flashing",
@@ -81,7 +81,7 @@ class ResourcePackBuilder {
         List<ItemOverride> overrides = new ArrayList<>();
 
         for (String icon : icons) {
-            Asset asset = new Asset(classLoader(), String.format("%s.png", icon));
+            Asset asset = new Asset(classLoader(), String.format("textures/%s.png", icon));
             Key key = Key.key(Namespaces.GUI, icon);
             ResourcePackUtility.writeIcon(tree, asset, key, overrides);
         }
@@ -147,7 +147,7 @@ class ResourcePackBuilder {
     }
 
     private void disableBackgroundMusic(FileTree tree) {
-        String[] backgroundMusic = new Asset(classLoader(), "minecraft_music.json")
+        String[] backgroundMusic = new Asset(classLoader(), "data/minecraft_music.json")
                 .readJson(String[].class);
         Map<String, SoundEvent> sounds = new HashMap<>();
 

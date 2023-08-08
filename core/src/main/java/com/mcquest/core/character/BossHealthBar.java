@@ -1,6 +1,8 @@
 package com.mcquest.core.character;
 
 import net.kyori.adventure.bossbar.BossBar;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.adventure.bossbar.BossBarManager;
 
 import java.util.Collections;
 
@@ -20,6 +22,10 @@ public class BossHealthBar {
 
     public void removeViewer(PlayerCharacter pc) {
         pc.getPlayer().hideBossBar(bossBar);
+        BossBarManager bossBarManager = MinecraftServer.getBossBarManager();
+        if (bossBarManager.getBossBarViewers(bossBar).isEmpty()) {
+            bossBarManager.destroyBossBar(bossBar);
+        }
     }
 
     void updateText() {

@@ -282,6 +282,7 @@ public class Mmorpg {
         private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> pcLogoutHandler;
 
         private Builder() {
+            System.setProperty("minestom.chunk-view-distance", String.valueOf(10));
             server = MinecraftServer.init();
         }
 

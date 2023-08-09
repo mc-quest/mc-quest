@@ -14,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.hologram.Hologram;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.particle.Particle;
@@ -27,7 +28,7 @@ import java.time.Duration;
 import java.util.Collection;
 
 public class LootChest extends Object {
-    private static final Duration EMIT_PARTICLE_PERIOD = Duration.ofMillis(500);
+    private static final Vec SIZE = new Vec(1.0, 1.0, 1.0);
 
     private final LootTable lootTable;
     private final EventEmitter<LootChestOpenEvent> onOpen;
@@ -39,7 +40,7 @@ public class LootChest extends Object {
     private Task particleEmitter;
 
     public LootChest(Instance instance, Pos position, LootTable lootTable) {
-        super(instance, position);
+        super(instance, position, SIZE);
         this.lootTable = lootTable;
         this.onOpen = new EventEmitter<>();
         this.onRespawn = new EventEmitter<>();
@@ -48,7 +49,7 @@ public class LootChest extends Object {
     }
 
     LootChest(LootChest lootChest) {
-        super(lootChest.getInstance(), lootChest.getPosition());
+        super(lootChest.getInstance(), lootChest.getPosition(), lootChest.getBoundingBox());
         lootTable = lootChest.lootTable;
         onOpen = lootChest.onOpen;
         onRespawn = lootChest.onRespawn;
@@ -123,7 +124,7 @@ public class LootChest extends Object {
 
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         particleEmitter = scheduler.buildTask(this::emitParticles)
-                .repeat(EMIT_PARTICLE_PERIOD).schedule();
+                .repeat(Duration.ofMillis(500)).schedule();
     }
 
     private Hologram createText() {

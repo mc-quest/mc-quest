@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,18 +22,16 @@ public class Character extends Object implements DamageSource {
     private int level;
     private double maxHealth;
     private double health;
-    private double height;
     private Nameplate nameplate;
     private BossHealthBar bossHealthBar;
 
-    Character(@NotNull Instance instance, @NotNull Pos position) {
-        super(instance, position);
+    Character(@NotNull Instance instance, @NotNull Pos position,
+              @NotNull Vec boundingBox) {
+        super(instance, position, boundingBox);
         name = "";
         level = 1;
         maxHealth = 1.0;
         health = maxHealth;
-        // Default is humanoid height.
-        height = 2.0;
     }
 
     @Override
@@ -189,12 +188,8 @@ public class Character extends Object implements DamageSource {
         setHealth(newHealth);
     }
 
-    public final double getHeight() {
-        return height;
-    }
-
-    public final void setHeight(double height) {
-        this.height = height;
+    public void setBoundingBox(Vec boundingBox) {
+        super.setBoundingBox(boundingBox);
 
         if (isSpawned()) {
             nameplate.updatePosition();

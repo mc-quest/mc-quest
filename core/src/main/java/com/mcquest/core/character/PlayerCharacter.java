@@ -40,6 +40,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 public final class PlayerCharacter extends Character implements Displaceable {
+    private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),
             "data/experience_points_per_level.json"
@@ -74,8 +75,7 @@ public final class PlayerCharacter extends Character implements Displaceable {
     private boolean teleporting;
 
     PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
-        super(mmorpg.getInstanceManager().getInstance(data.getInstanceId()),
-                data.getPosition());
+        super(mmorpg.getInstanceManager().getInstance(data.getInstanceId()), data.getPosition(), SIZE);
         this.mmorpg = mmorpg;
         this.player = player;
         setName(player.getUsername());
@@ -520,8 +520,6 @@ public final class PlayerCharacter extends Character implements Displaceable {
     }
 
     public static class Hitbox extends CharacterHitbox {
-        private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
-
         private Hitbox(PlayerCharacter pc) {
             super(pc, pc.getInstance(), pc.hitboxCenter(), SIZE);
         }

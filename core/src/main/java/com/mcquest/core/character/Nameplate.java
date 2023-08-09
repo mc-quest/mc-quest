@@ -84,10 +84,10 @@ class Nameplate {
     }
 
     private Pos namePosition() {
-        return character.getPosition().withY(y -> y + character.getHeight());
+        return character.getPosition().withY(y -> y + character.getBoundingBox().y());
     }
 
     private Pos healthBarPosition() {
-        return character.getPosition().withY(y -> y + character.getHeight() - 0.25);
+        return character.getPosition().withY(y -> y + character.getBoundingBox().y() - 0.25);
     }
 }

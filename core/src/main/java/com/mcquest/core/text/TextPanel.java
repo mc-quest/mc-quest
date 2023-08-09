@@ -4,6 +4,7 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.hologram.Hologram;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +20,7 @@ public final class TextPanel extends Object {
     private final List<Hologram> holograms;
 
     public TextPanel(Instance instance, Pos position) {
-        super(instance, position);
+        super(instance, position, Vec.ZERO);
         text = Collections.emptyList();
         lineHeight = DEFAULT_LINE_HEIGHT;
         holograms = new ArrayList<>();

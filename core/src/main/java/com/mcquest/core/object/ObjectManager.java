@@ -175,10 +175,11 @@ public class ObjectManager {
 
     private Collection<SpatialHashCell> cellsFor(Instance instance, Pos position,
                                                  Vec boundingBox) {
-        Vec halfBoundingBox = boundingBox.mul(0.5);
+        double halfExtentX = boundingBox.x() / 2.0;
+        double halfExtentZ = boundingBox.z() / 2.0;
 
-        Pos min = position.sub(halfBoundingBox);
-        Pos max = position.add(halfBoundingBox);
+        Pos min = position.sub(halfExtentX, 0, halfExtentZ);
+        Pos max = position.add(halfExtentX, boundingBox.y(), halfExtentZ);
 
         SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, CELL_SIZE);
         SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, CELL_SIZE);

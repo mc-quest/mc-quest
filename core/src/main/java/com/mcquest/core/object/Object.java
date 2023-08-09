@@ -13,10 +13,10 @@ public class Object {
     private boolean removed;
     private ObjectManager objectManager;
 
-    public Object(Instance instance, Pos position) {
+    public Object(Instance instance, Pos position, Vec boundingBox) {
         this.instance = instance;
         this.position = position;
-        this.boundingBox = Vec.ZERO;
+        this.boundingBox = boundingBox;
         spawned = false;
         removed = false;
     }
@@ -59,7 +59,8 @@ public class Object {
         return boundingBox;
     }
 
-    public final void setBoundingBox(Vec boundingBox) {
+    @MustBeInvokedByOverriders
+    public void setBoundingBox(Vec boundingBox) {
         Vec oldBoundingBox = this.boundingBox;
 
         this.boundingBox = boundingBox;

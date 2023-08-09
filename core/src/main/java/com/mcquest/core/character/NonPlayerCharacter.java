@@ -2,12 +2,14 @@ package com.mcquest.core.character;
 
 import com.mcquest.core.instance.Instance;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
 public class NonPlayerCharacter extends Character {
-    public NonPlayerCharacter(@NotNull Instance instance, @NotNull Pos position) {
-        super(instance, position);
+    public NonPlayerCharacter(@NotNull Instance instance, @NotNull Pos position,
+                              @NotNull Vec boundingBox) {
+        super(instance, position, boundingBox);
     }
 
     @MustBeInvokedByOverriders

@@ -1,83 +1,34 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.CharacterHitbox;
 import com.mcquest.core.character.DamageSource;
-import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.instance.Instance;
-import com.mcquest.core.physics.Collider;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.ai.EntityAIGroupBuilder;
 import net.minestom.server.entity.ai.goal.RandomStrollGoal;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
-import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
-public class Deer extends NonPlayerCharacter {
+public class Deer extends DamageableEntityCharacter {
     private static final Vec SIZE = new Vec(1, 1.25, 1);
 
-    private final Mmorpg mmorpg;
-    private final Pos spawnPosition;
-    private Entity entity;
-    private Collider hitbox;
-
     public Deer(Mmorpg mmorpg, Instance instance, Pos spawnPosition) {
-        super(instance, spawnPosition);
-        this.mmorpg = mmorpg;
-        this.spawnPosition = spawnPosition;
-        this.hitbox = new CharacterHitbox(this, instance, hitboxCenter(), SIZE);
+        super(mmorpg, instance, spawnPosition, SIZE);
+        setBoundingBox(SIZE);
         setName("Deer");
-        setHeight(SIZE.y());
         setMaxHealth(10);
         setHealth(getMaxHealth());
     }
 
     @Override
-    protected void spawn() {
-        super.spawn();
-
-        entity = new Entity(this);
-        mmorpg.getCharacterEntityManager().bind(entity, this);
-        entity.setInstance(getInstance(), getPosition());
-
-        hitbox = new CharacterHitbox(this, getInstance(), hitboxCenter(), SIZE);
-        mmorpg.getPhysicsManager().addCollider(hitbox);
-    }
-
-    @Override
-    protected void despawn() {
-        super.despawn();
-
-        if (isAlive()) {
-            mmorpg.getCharacterEntityManager().unbind(entity);
-            entity.remove();
-            hitbox.remove();
-        }
-
-        entity = null;
-        hitbox = null;
-
-        setPosition(spawnPosition);
-    }
-
-    @Override
     public boolean isDamageable(DamageSource source) {
         return true;
-    }
-
-    private void updatePosition(@NotNull Pos position) {
-        super.setPosition(position);
-        hitbox.setCenter(hitboxCenter());
-    }
-
-    private Pos hitboxCenter() {
-        return getPosition().withY(y -> y + SIZE.y() / 2.0);
     }
 
     @Override
@@ -88,18 +39,13 @@ public class Deer extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource killer) {
-        mmorpg.getCharacterEntityManager().unbind(entity);
-        hitbox.remove();
+        super.onDeath(killer);
 
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_DEATH, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
 
-        entity.kill();
-
-        SchedulerManager scheduler = mmorpg.getSchedulerManager();
-
-        scheduler.buildTask(this::remove).delay(TaskSchedule.millis(2000)).schedule();
-        scheduler.buildTask(this::respawn).delay(TaskSchedule.seconds(3)).schedule();
+        mmorpg.getSchedulerManager().buildTask(this::respawn)
+                .delay(TaskSchedule.seconds(3)).schedule();
     }
 
     private void respawn() {
@@ -107,12 +53,14 @@ public class Deer extends NonPlayerCharacter {
         mmorpg.getObjectManager().add(deer);
     }
 
-    public static class Entity extends ModelEntity {
-        private final Deer deer;
+    @Override
+    protected EntityCreature createEntity() {
+        return new DeerEntity();
+    }
 
-        private Entity(Deer deer) {
+    private class DeerEntity extends ModelEntity {
+        private DeerEntity() {
             super(Models.DEER);
-            this.deer = deer;
             playAnimation("walk");
             setBoundingBox(SIZE.x(), SIZE.y(), SIZE.z());
             getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.05f);
@@ -124,9 +72,7 @@ public class Deer extends NonPlayerCharacter {
         @Override
         public void update(long time) {
             super.update(time);
-            if (deer.isSpawned()) {
-                deer.updatePosition(getPosition());
-            }
+            Deer.this.updatePosition(getPosition());
         }
     }
 }

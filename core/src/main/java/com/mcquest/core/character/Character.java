@@ -110,6 +110,16 @@ public class Character extends Object implements DamageSource {
         }
     }
 
+    @Override
+    @MustBeInvokedByOverriders
+    public void setBoundingBox(Vec boundingBox) {
+        super.setBoundingBox(boundingBox);
+
+        if (isSpawned()) {
+            nameplate.updatePosition();
+        }
+    }
+
     /**
      * Returns the maximum health of this Character.
      */
@@ -188,12 +198,10 @@ public class Character extends Object implements DamageSource {
         setHealth(newHealth);
     }
 
-    public void setBoundingBox(Vec boundingBox) {
-        super.setBoundingBox(boundingBox);
-
-        if (isSpawned()) {
-            nameplate.updatePosition();
-        }
+    /**
+     * @param impulse the impulse in kg m/s
+     */
+    public void applyImpulse(Vec impulse) {
     }
 
     public BossHealthBar getBossHealthBar() {

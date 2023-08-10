@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Duration;
 import java.util.Arrays;
 
-public final class PlayerCharacter extends Character implements Displaceable {
+public final class PlayerCharacter extends Character {
     private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),

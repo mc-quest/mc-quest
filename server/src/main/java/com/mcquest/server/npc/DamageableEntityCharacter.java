@@ -35,7 +35,9 @@ public abstract class DamageableEntityCharacter extends EntityCharacter {
     @MustBeInvokedByOverriders
     protected void onDeath(DamageSource killer) {
         super.onDeath(killer);
-        hitbox.remove();
+        if (isSpawned()) {
+            hitbox.remove();
+        }
     }
 
     @Override

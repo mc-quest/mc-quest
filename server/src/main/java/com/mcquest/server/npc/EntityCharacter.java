@@ -46,13 +46,15 @@ public abstract class EntityCharacter extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource source) {
-        mmorpg.getCharacterEntityManager().unbind(entity);
-        entity.kill();
-        mmorpg.getSchedulerManager().buildTask(this::remove)
-                .delay(Duration.ofMillis(entity.getRemovalAnimationDelay()))
-                .schedule();
+        if (isSpawned()) {
+            mmorpg.getCharacterEntityManager().unbind(entity);
+            entity.kill();
+            mmorpg.getSchedulerManager().buildTask(this::remove)
+                    .delay(Duration.ofMillis(entity.getRemovalAnimationDelay()))
+                    .schedule();
+        }
     }
-    
+
     @MustBeInvokedByOverriders
     protected void updatePosition(Pos position) {
         if (isSpawned()) {

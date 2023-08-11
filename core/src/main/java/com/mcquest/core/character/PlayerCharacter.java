@@ -394,12 +394,21 @@ public final class PlayerCharacter extends Character {
     }
 
     private void die() {
-        setHealth(getMaxHealth());
         setInstance(respawnInstance, respawnPosition);
+        setHealth(getMaxHealth());
+        setMana(maxMana);
+
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
+
+        player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.0f);
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f);
+        }).delay(TaskSchedule.millis(2500)).schedule();
+
         player.showTitle(Title.title(Component.text("YOU DIED", NamedTextColor.RED),
                 Component.text("Respawning...", NamedTextColor.GRAY),
                 Title.Times.times(Duration.ofMillis(500), Duration.ofMillis(2000), Duration.ofMillis(500))));
+
         player.playSound(Sound.sound(SoundEvent.ENTITY_WITHER_SPAWN, Sound.Source.MASTER, 1f, 1f));
     }
 
@@ -469,7 +478,7 @@ public final class PlayerCharacter extends Character {
             }
         }
         undisarmTime = System.currentTimeMillis() + duration.toMillis();
-        undisarmTask = mmorpg.getSchedulerManager().buildTask(() -> {
+        undisarmTask = MinecraftServer.getSchedulerManager().buildTask(() -> {
             isDisarmed = false;
             undisarmTask = null;
         }).delay(duration).schedule();

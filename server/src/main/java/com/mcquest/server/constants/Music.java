@@ -7,11 +7,13 @@ import com.mcquest.server.Assets;
 public class Music {
     public static final Song WILDERNESS = new Song(1, audio("wilderness"));
     public static final Song DUNGEON = new Song(2, audio("dungeon"));
+    public static final Song BROODMOTHER_LAIR = new Song(3, audio("broodmother_lair"));
 
     public static Song[] all() {
         return new Song[]{
                 WILDERNESS,
-                DUNGEON
+                DUNGEON,
+                BROODMOTHER_LAIR
         };
     }
 

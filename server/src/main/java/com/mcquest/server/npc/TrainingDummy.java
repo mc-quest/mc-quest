@@ -36,6 +36,8 @@ public class TrainingDummy extends DamageableEntityCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
+        super.onDamage(source);
+
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
         ((ModelEntity) entity).playAnimation("hit");
@@ -48,7 +50,9 @@ public class TrainingDummy extends DamageableEntityCharacter {
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
 
-        ((ModelEntity) entity).playAnimation("death");
+        if (isSpawned()) {
+            ((ModelEntity) entity).playAnimation("death");
+        }
 
         mmorpg.getSchedulerManager().buildTask(this::respawn)
                 .delay(TaskSchedule.seconds(5)).schedule();

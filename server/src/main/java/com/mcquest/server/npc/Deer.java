@@ -33,6 +33,8 @@ public class Deer extends DamageableEntityCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
+        super.onDamage(source);
+
         Sound sound = Sound.sound(SoundEvent.ENTITY_DONKEY_HURT, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
     }

@@ -3,9 +3,12 @@ package com.mcquest.core.entity;
 import com.mcquest.core.character.Character;
 import com.mcquest.core.character.PlayerCharacter;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.event.entity.EntityAttackEvent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Provides a standard way to bind entities with characters, enabling the use of
@@ -47,5 +50,28 @@ public class CharacterEntityManager {
         }
 
         return character;
+    }
+
+    public Predicate<Entity> entityPredicate(Predicate<Character> characterPredicate) {
+        return entity -> {
+            Character character = getCharacter(entity);
+            return character != null && characterPredicate.test(character);
+        };
+    }
+
+    public Consumer<EntityAttackEvent> entityAttackListener(
+            Character character, Consumer<Character> characterAttackListener) {
+        return event -> {
+            if (!character.isAlive()) {
+                return;
+            }
+
+            Character target = getCharacter(event.getTarget());
+            if (target == null) {
+                return;
+            }
+
+            characterAttackListener.accept(target);
+        };
     }
 }

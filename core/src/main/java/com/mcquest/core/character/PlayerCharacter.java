@@ -2,7 +2,6 @@ package com.mcquest.core.character;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.asset.Asset;
-import com.mcquest.core.music.MusicPlayer;
 import com.mcquest.core.cartography.CardinalDirection;
 import com.mcquest.core.cartography.MapViewer;
 import com.mcquest.core.cinema.CutscenePlayer;
@@ -10,6 +9,7 @@ import com.mcquest.core.commerce.Money;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.mount.Mount;
+import com.mcquest.core.music.MusicPlayer;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.playerclass.SkillManager;
@@ -129,7 +129,7 @@ public final class PlayerCharacter extends Character {
     public void setInstance(@NotNull Instance instance, Pos position) {
         super.setInstance(instance, position);
 
-        teleporting = true;
+        beginTeleport();
         if (player.getInstance() == instance) {
             player.teleport(position).thenRun(this::completeTeleport);
         } else {
@@ -150,7 +150,7 @@ public final class PlayerCharacter extends Character {
 
     @Override
     public void setPosition(@NotNull Pos position) {
-        teleporting = true;
+        beginTeleport();
         player.teleport(position).thenRun(this::completeTeleport);
         updatePosition(position);
     }
@@ -159,8 +159,16 @@ public final class PlayerCharacter extends Character {
         return teleporting;
     }
 
+    private void beginTeleport() {
+        teleporting = true;
+        player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.0f);
+        player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, Integer.MAX_VALUE));
+    }
+
     private void completeTeleport() {
         teleporting = false;
+        player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f);
+        player.removeEffect(PotionEffect.BLINDNESS);
     }
 
     public Instance getRespawnInstance() {
@@ -177,7 +185,7 @@ public final class PlayerCharacter extends Character {
     }
 
     private Pos hitboxCenter() {
-        return getPosition().add(0.0, 1.0, 0.0);
+        return getPosition().withY(y -> y + SIZE.y() / 2.0);
     }
 
     public Pos getEyePosition() {

@@ -21,7 +21,7 @@ public abstract class EntityCharacter extends NonPlayerCharacter {
     protected EntityCreature entity;
     private Task unred;
 
-    public EntityCharacter(Mmorpg mmorpg, Instance instance, Pos spawnPosition, Vec boundingBox) {
+    protected EntityCharacter(Mmorpg mmorpg, Instance instance, Pos spawnPosition, Vec boundingBox) {
         super(instance, spawnPosition, boundingBox);
         this.mmorpg = mmorpg;
         this.spawnPosition = spawnPosition;

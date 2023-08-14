@@ -30,28 +30,23 @@ public class PhysicsManager {
         collider.enable(this);
     }
 
-    public Collection<Collider> overlapBox(Instance instance, Pos min, Pos max,
-                                           Predicate<Collider> filter) {
+    public Collection<Collider> overlapBox(Instance instance, Pos min, Pos max) {
         return collidersInRange(instance, min, max).stream()
                 .filter(collider -> collider.overlapsBox(min, max))
-                .filter(filter)
                 .toList();
     }
 
-    public Collection<Collider> overlapBox(Instance instance, Pos center, Vec extents,
-                                           Predicate<Collider> filter) {
+    public Collection<Collider> overlapBox(Instance instance, Pos center, Vec extents) {
         Vec halfExtents = extents.mul(0.5);
         return overlapBox(
                 instance,
                 center.sub(halfExtents),
-                center.add(halfExtents),
-                filter
+                center.add(halfExtents)
         );
     }
 
     public Collection<RaycastHit> raycastAll(Instance instance, Pos origin,
-                                             Vec direction, double maxDistance,
-                                             Predicate<Collider> filter) {
+                                             Vec direction, double maxDistance) {
         if (!direction.isNormalized()) {
             direction = direction.normalize();
         }
@@ -62,10 +57,6 @@ public class PhysicsManager {
 
         Collection<RaycastHit> hits = new ArrayList<>();
         for (Collider collider : collidersInRange(instance, min, max)) {
-            if (!filter.test(collider)) {
-                continue;
-            }
-
             Pos intersection = rayColliderIntersection(origin, direction, maxDistance, collider);
             if (intersection != null) {
                 RaycastHit hit = new RaycastHit(collider, intersection);
@@ -79,8 +70,9 @@ public class PhysicsManager {
     public @Nullable RaycastHit raycast(Instance instance, Pos origin,
                                         Vec direction, double maxDistance,
                                         Predicate<Collider> filter) {
-        return raycastAll(instance, origin, direction, maxDistance, filter)
+        return raycastAll(instance, origin, direction, maxDistance)
                 .stream()
+                .filter(hit -> filter.test(hit.getCollider()))
                 .min((h1, h2) -> {
                     double d1 = h1.getPosition().distanceSquared(origin);
                     double d2 = h2.getPosition().distanceSquared(origin);

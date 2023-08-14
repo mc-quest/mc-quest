@@ -2,13 +2,13 @@ package com.mcquest.server.features;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.character.Character;
-import com.mcquest.core.character.CharacterHitbox;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.ActiveSkillUseEvent;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.physics.Collider;
+import com.mcquest.core.physics.Triggers;
 import com.mcquest.server.constants.FighterSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -17,7 +17,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.util.Collection;
-import java.util.function.Predicate;
+import java.util.function.Consumer;
 
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -31,20 +31,24 @@ public class FighterPlayerClass implements Feature {
 
     private void useBash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        Instance instance = pc.getInstance();
-        Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.5));
-        Vec hitboxSize = new Vec(2.5, 2.5, 2.5);
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize, damageableBy(pc));
 
-        hits.forEach(hit -> {
-            CharacterHitbox hitbox = (CharacterHitbox) hit;
-            Character character = hitbox.getCharacter();
+        Instance instance = pc.getInstance();
+        Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
+        Vec hitboxSize = new Vec(3.5, 3.5, 3.5);
+
+        Consumer<Character> bashHit = character -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
             double damageAmount = 5.0;
             character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
-            instance.playSound(hitSound, hitbox.getCenter());
-        });
+            instance.playSound(hitSound, character.getPosition());
+        };
+
+        Collection<Collider> hits = mmorpg.getPhysicsManager()
+                .overlapBox(instance, hitboxCenter, hitboxSize);
+        hits.forEach(Triggers.character(bashHit));
 
         ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
 
@@ -57,11 +61,5 @@ public class FighterPlayerClass implements Feature {
     private void useSelfHeal(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.heal(pc, 10.0);
-    }
-
-    private Predicate<Collider> damageableBy(PlayerCharacter pc) {
-        return collider ->
-                collider instanceof CharacterHitbox hitbox
-                        && hitbox.getCharacter().isDamageable(pc);
     }
 }

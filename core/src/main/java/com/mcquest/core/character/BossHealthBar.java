@@ -10,7 +10,7 @@ public class BossHealthBar {
     private final Character boss;
     private final BossBar bossBar;
 
-    public BossHealthBar(Character boss) {
+    BossHealthBar(Character boss) {
         this.boss = boss;
         bossBar = BossBar.bossBar(boss.nameText(Attitude.HOSTILE), progress(),
                 BossBar.Color.RED, BossBar.Overlay.NOTCHED_12, Collections.emptySet());

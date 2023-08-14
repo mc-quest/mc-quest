@@ -11,8 +11,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 public abstract class DamageableEntityCharacter extends EntityCharacter {
     private CharacterHitbox hitbox;
 
-    public DamageableEntityCharacter(Mmorpg mmorpg, Instance instance, Pos position, Vec boundingBox) {
-        super(mmorpg, instance, position, boundingBox);
+    protected DamageableEntityCharacter(Mmorpg mmorpg, Instance instance,
+                                        Pos spawnPosition, Vec boundingBox) {
+        super(mmorpg, instance, spawnPosition, boundingBox);
     }
 
     @Override

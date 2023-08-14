@@ -28,8 +28,11 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
+import net.minestom.server.scoreboard.Team;
+import net.minestom.server.scoreboard.TeamBuilder;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
@@ -110,6 +113,7 @@ public final class PlayerCharacter extends Character {
         mmorpg.getPhysicsManager().addCollider(hitbox);
 
         initUi();
+        hidePlayerNameplates();
         updateAttackSpeed();
     }
 
@@ -118,6 +122,13 @@ public final class PlayerCharacter extends Character {
         // Updating experience bar must be delayed to work properly.
         MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
                 .delay(TaskSchedule.nextTick()).schedule();
+    }
+
+    private void hidePlayerNameplates() {
+        Team team = new TeamBuilder("", MinecraftServer.getTeamManager())
+                .nameTagVisibility(TeamsPacket.NameTagVisibility.NEVER)
+                .build();
+        player.setTeam(team);
     }
 
     private void updateAttackSpeed() {

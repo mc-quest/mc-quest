@@ -1,12 +1,11 @@
 package com.mcquest.server.constants;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mcquest.core.quest.Quest;
 import com.mcquest.core.util.JsonUtility;
 import com.mcquest.server.Assets;
-import com.mcquest.core.quest.Quest;
 
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");

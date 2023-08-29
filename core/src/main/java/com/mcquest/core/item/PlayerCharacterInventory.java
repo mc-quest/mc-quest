@@ -1,17 +1,16 @@
 package com.mcquest.core.item;
 
+import com.google.common.base.Predicates;
 import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.core.event.ItemReceiveEvent;
-import com.mcquest.core.event.ItemRemoveEvent;
 import com.mcquest.core.persistence.PersistentItem;
 import com.mcquest.core.persistence.PlayerCharacterData;
+import com.mcquest.core.quest.QuestObjective;
 import com.mcquest.core.resourcepack.CustomModelData;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -73,18 +72,8 @@ public class PlayerCharacterInventory {
         return (ConsumableItem) getItem(HOTBAR_CONSUMABLE_SLOT_2);
     }
 
-    public boolean contains(@NotNull Item item) {
-        return count(item) > 0;
-    }
-
-    /**
-     * Returns how much of the item is in this inventory. Equipped weapons,
-     * equipped armor, hotbar consumables, and items on the cursor are not
-     * counted.
-     */
-    public int count(@NotNull Item item) {
+    public boolean contains(@NotNull KeyItem item) {
         PlayerInventory inventory = inventory();
-        int count = 0;
 
         for (int slot = MIN_SLOT; slot <= MAX_SLOT; slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
@@ -93,11 +82,11 @@ public class PlayerCharacterInventory {
             }
 
             if (itemManager.getItem(itemStack) == item) {
-                count += itemStack.amount();
+                return true;
             }
         }
 
-        return count;
+        return false;
     }
 
     /**
@@ -113,7 +102,10 @@ public class PlayerCharacterInventory {
         PlayerInventory inventory = inventory();
         Map<Item, Integer> remaining = new HashMap<>(items);
 
-        // First remove entries whose amount is 0.
+        // Quest items do not occupy inventory space.
+        remaining.keySet().removeIf(Predicates.instanceOf(QuestItem.class));
+
+        // Remove entries whose amount is 0.
         remaining.entrySet().removeIf(e -> e.getValue() == 0);
 
         // Check occupied slots first.
@@ -166,6 +158,14 @@ public class PlayerCharacterInventory {
             throw new IllegalArgumentException();
         }
 
+        if (item instanceof QuestItem questItem) {
+            QuestObjective objective = questItem.getObjective();
+            if (objective != null) {
+                objective.addProgress(pc, amount);
+            }
+            return amount;
+        }
+
         PlayerInventory inventory = inventory();
         int added = 0;
 
@@ -201,112 +201,7 @@ public class PlayerCharacterInventory {
             added += add;
         }
 
-        if (added > 0) {
-            pc.sendMessage(addedItemsMessage(item, added));
-            ItemReceiveEvent event = new ItemReceiveEvent(pc, item, added);
-            MinecraftServer.getGlobalEventHandler().call(event);
-        }
-
         return added;
-    }
-
-    public boolean canRemove(@NotNull Map<@NotNull Item, @NotNull Integer> items) {
-        for (Integer amount : items.values()) {
-            if (amount < 0) {
-                throw new IllegalArgumentException();
-            }
-        }
-
-        PlayerInventory inventory = inventory();
-        Map<Item, Integer> remaining = new HashMap<>(items);
-
-        // First remove entries whose amount is 0.
-        remaining.entrySet().removeIf(e -> e.getValue() == 0);
-
-        for (int slot = MIN_SLOT; slot <= MAX_SLOT && !remaining.isEmpty(); slot++) {
-            ItemStack itemStack = inventory.getItemStack(slot);
-            if (itemStack.isAir()) {
-                continue;
-            }
-
-            Item item = itemManager.getItem(itemStack);
-            if (!remaining.containsKey(item)) {
-                continue;
-            }
-
-            int amount = remaining.get(item);
-            if (itemStack.amount() < amount) {
-                remaining.put(item, amount - itemStack.amount());
-            } else {
-                remaining.remove(item);
-            }
-        }
-
-        return remaining.isEmpty();
-    }
-
-    public boolean remove(Item item) {
-        return remove(item, 1) == 1;
-    }
-
-    public int remove(Item item, int amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        PlayerInventory inventory = inventory();
-        int removed = 0;
-
-        for (int slot = MIN_SLOT; slot <= MAX_SLOT && removed < amount; slot++) {
-            ItemStack itemStack = inventory.getItemStack(slot);
-            if (itemStack.isAir()) {
-                continue;
-            }
-
-            if (itemManager.getItem(itemStack) != item) {
-                continue;
-            }
-
-            int remove = Math.min(itemStack.amount(), amount - removed);
-            inventory.setItemStack(slot, itemStack.withAmount(
-                    itemStack.amount() - remove));
-            removed += remove;
-        }
-
-        if (removed > 0) {
-            pc.sendMessage(removedItemsMessage(item, removed));
-            ItemRemoveEvent event = new ItemRemoveEvent(pc, item, removed);
-            MinecraftServer.getGlobalEventHandler().call(event);
-        }
-
-        return removed;
-    }
-
-    public int removeAll(Item item) {
-        PlayerInventory inventory = inventory();
-        int removed = 0;
-
-        for (int slot = MIN_SLOT; slot <= MAX_SLOT; slot++) {
-            ItemStack itemStack = inventory.getItemStack(slot);
-            if (itemStack.isAir()) {
-                continue;
-            }
-
-            if (itemManager.getItem(itemStack) != item) {
-                continue;
-            }
-
-            removed += itemStack.amount();
-            inventory.setItemStack(slot, ItemStack.AIR);
-        }
-
-        if (removed > 0) {
-            pc.sendMessage(removedItemsMessage(item, removed));
-            ItemRemoveEvent event = new ItemRemoveEvent(pc, item, removed);
-            MinecraftServer.getGlobalEventHandler().call(event);
-        }
-
-        return removed;
     }
 
     @ApiStatus.Internal
@@ -344,7 +239,7 @@ public class PlayerCharacterInventory {
         inventory.setItemStack(7, hotbarConsumablePlaceholder(1, false));
     }
 
-     private ItemStack hotbarConsumablePlaceholder(int slot, boolean flashing) {
+    private ItemStack hotbarConsumablePlaceholder(int slot, boolean flashing) {
         String nameContent = String.format("Consumable Slot %d", slot + 1);
         TextComponent displayName = Component.text(nameContent, NamedTextColor.YELLOW);
         List<TextComponent> lore = List.of(Component.text("Consumable items go here"));
@@ -360,25 +255,5 @@ public class PlayerCharacterInventory {
         }
 
         return itemManager.getItem(itemStack);
-    }
-
-    private Component addedItemsMessage(Item item, int added) {
-        if (added == 1) {
-            return Component.text("Received ", NamedTextColor.GRAY)
-                    .append(item.getDisplayName());
-        }
-
-        return Component.text("Received " + added + " ", NamedTextColor.GRAY)
-                .append(item.getDisplayName());
-    }
-
-    private Component removedItemsMessage(Item item, int removed) {
-        if (removed == 1) {
-            return Component.text("Removed ", NamedTextColor.GRAY)
-                    .append(item.getDisplayName());
-        }
-
-        return Component.text("Removed " + removed + " ", NamedTextColor.GRAY)
-                .append(item.getDisplayName());
     }
 }

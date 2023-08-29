@@ -176,6 +176,8 @@ public class QuestTracker {
             if (allObjectivesComplete(quest)) {
                 completeQuest(quest);
             }
+        } else {
+            pc.sendMessage(objectiveProgressMessage(objective, newProgress));
         }
 
         updateSidebar();
@@ -290,9 +292,12 @@ public class QuestTracker {
         return Component.text(content, NamedTextColor.YELLOW);
     }
 
-    private static TextComponent questCompletedMessage(Quest quest) {
-        String content = String.format("Quest completed: %s", quest.getName());
-        return Component.text(content, NamedTextColor.YELLOW);
+    private static TextComponent objectiveProgressMessage(QuestObjective objective, int newProgress) {
+        int goal = objective.getGoal();
+
+        return Component.empty()
+                .append(Component.text(newProgress + "/" + goal + " ", NamedTextColor.YELLOW))
+                .append(TextSerializer.deserialize(objective.getDescription()));
     }
 
     private static TextComponent objectiveCompleteMessage(QuestObjective objective) {
@@ -300,7 +305,11 @@ public class QuestTracker {
 
         return Component.empty()
                 .append(Component.text(goal + "/" + goal + " ", NamedTextColor.GREEN))
-                .append(TextSerializer.deserialize(objective.getDescription()))
-                .append(Component.text(" complete!", NamedTextColor.GREEN));
+                .append(TextSerializer.deserialize(objective.getDescription()));
+    }
+
+    private static TextComponent questCompletedMessage(Quest quest) {
+        String content = String.format("Quest completed: %s", quest.getName());
+        return Component.text(content, NamedTextColor.YELLOW);
     }
 }

@@ -30,7 +30,7 @@ public class ConsumableItem extends Item {
     private int customModelDataStart;
 
     ConsumableItem(Builder builder) {
-        super(builder.id, builder.name, builder.quality, builder.description);
+        super(builder);
         level = builder.level;
         icon = builder.icon;
         onConsume = new EventEmitter<>();
@@ -87,8 +87,8 @@ public class ConsumableItem extends Item {
         return lore;
     }
 
-    @ApiStatus.Internal
     @Override
+    @ApiStatus.Internal
     public void writeResources(FileTree tree,
                                ListMultimap<Material, ItemOverride> overrides) {
         Material material = Materials.ITEM_DEFAULT;
@@ -144,14 +144,10 @@ public class ConsumableItem extends Item {
         ConsumableItem build();
     }
 
-    private static class Builder implements IdStep, NameStep, QualityStep,
-            LevelStep, IconStep, BuildStep {
-        private int id;
-        private String name;
-        private ItemQuality quality;
+    private static class Builder extends Item.Builder
+            implements IdStep, NameStep, QualityStep, LevelStep, IconStep, BuildStep {
         private int level;
         private Asset icon;
-        private String description;
 
         @Override
         public NameStep id(int id) {

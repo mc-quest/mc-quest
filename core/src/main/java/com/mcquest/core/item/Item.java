@@ -1,6 +1,7 @@
 package com.mcquest.core.item;
 
 import com.google.common.collect.ListMultimap;
+import com.mcquest.core.commerce.Money;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
@@ -24,11 +25,11 @@ public abstract class Item {
     private final ItemQuality quality;
     private final String description;
 
-    Item(int id, String name, ItemQuality quality, String description) {
-        this.id = id;
-        this.name = name;
-        this.quality = quality;
-        this.description = description;
+    Item(Builder builder) {
+        id = builder.id;
+        name = builder.name;
+        quality = builder.quality;
+        description = builder.description;
     }
 
     public int getId() {
@@ -78,4 +79,11 @@ public abstract class Item {
     @ApiStatus.Internal
     public abstract void writeResources(FileTree tree,
                                         ListMultimap<Material, ItemOverride> overrides);
+
+    static class Builder {
+        int id;
+        String name;
+        ItemQuality quality;
+        String description;
+    }
 }

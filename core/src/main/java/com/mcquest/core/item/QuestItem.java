@@ -3,70 +3,63 @@ package com.mcquest.core.item;
 import com.google.common.collect.ListMultimap;
 import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetTypes;
+import com.mcquest.core.quest.QuestObjective;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
 import com.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 
-public class BasicItem extends Item {
+public class QuestItem extends Item {
     private final Asset icon;
+    private QuestObjective objective;
     private int customModelData;
 
-    public BasicItem(Builder builder) {
+    private QuestItem(Builder builder) {
         super(builder);
         icon = builder.icon;
     }
 
-    public Asset getIcon() {
-        return icon;
+    public QuestObjective getObjective() {
+        return objective;
+    }
+
+    public void registerObjective(QuestObjective objective) {
+        if (this.objective != null) {
+            throw new IllegalStateException();
+        }
+
+        this.objective = objective;
     }
 
     @Override
     public int getStackSize() {
-        return 64;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ItemStack getItemStack() {
         return ItemStackUtility
-                .create(Materials.ITEM_DEFAULT, getDisplayName(), itemStackLore())
+                .create(Materials.ITEM_DEFAULT, getDisplayName(), Collections.emptyList())
                 .set(ID_TAG, getId())
                 .meta(builder -> builder.customModelData(customModelData))
                 .build();
     }
 
-    private List<Component> itemStackLore() {
-        ItemQuality quality = getQuality();
-        String description = getDescription();
-
-        List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.qualityText(quality, "Item"));
-
-        if (description != null) {
-            lore.add(Component.empty());
-            lore.addAll(ItemUtility.descriptionText(description));
-        }
-
-        return lore;
-    }
-
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree,
-                               ListMultimap<Material, ItemOverride> overrides) {
+    public void writeResources(FileTree tree, ListMultimap<Material, ItemOverride> overrides) {
         Key key = ItemUtility.resourcePackKey(this);
         customModelData = ResourcePackUtility
                 .writeIcon(tree, icon, key, Materials.ITEM_DEFAULT, overrides);
     }
+
 
     public static IdStep builder() {
         return new Builder();
@@ -85,13 +78,13 @@ public class BasicItem extends Item {
     }
 
     public interface IconStep {
-        BuildStep icon(Asset icon);
+        BuildStep icon(Asset model);
     }
 
     public interface BuildStep {
         BuildStep description(String description);
 
-        BasicItem build();
+        QuestItem build();
     }
 
     private static class Builder extends Item.Builder
@@ -130,8 +123,8 @@ public class BasicItem extends Item {
         }
 
         @Override
-        public BasicItem build() {
-            return new BasicItem(this);
+        public QuestItem build() {
+            return new QuestItem(this);
         }
     }
 }

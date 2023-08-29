@@ -37,7 +37,7 @@ public class Weapon extends Item {
     private int customModelData;
 
     Weapon(Builder builder) {
-        super(builder.id, builder.name, builder.quality, builder.description);
+        super(builder);
         level = builder.level;
         type = builder.type;
         model = builder.model;
@@ -115,8 +115,8 @@ public class Weapon extends Item {
         return lore;
     }
 
-    @ApiStatus.Internal
     @Override
+    @ApiStatus.Internal
     public void writeResources(FileTree tree,
                                ListMultimap<Material, ItemOverride> overrides) {
         Key key = ItemUtility.resourcePackKey(this);
@@ -164,17 +164,14 @@ public class Weapon extends Item {
         Weapon build();
     }
 
-    private static class Builder implements IdStep, NameStep, QualityStep,
-            LevelStep, TypeStep, ModelStep, AttackSpeedStep, BuildStep {
-        private int id;
-        private String name;
-        private ItemQuality quality;
+    private static class Builder extends Item.Builder
+            implements IdStep, NameStep, QualityStep, LevelStep, TypeStep,
+            ModelStep, AttackSpeedStep, BuildStep {
         private int level;
         private WeaponType type;
         private Asset model;
         private double attackSpeed;
         private double physicalDamage;
-        private String description;
 
         @Override
         public NameStep id(int id) {

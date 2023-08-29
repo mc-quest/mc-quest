@@ -6,6 +6,7 @@ import com.mcquest.core.event.ItemConsumeEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.inventory.PlayerInventory;
@@ -37,6 +38,7 @@ public class ItemManager {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+        eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
     }
 
     private void registerItem(Item item) {
@@ -100,6 +102,8 @@ public class ItemManager {
             return;
         }
 
+        pc.sendMessage(ItemUtility.useItemText(item));
+
         ItemConsumeEvent consumeEvent = new ItemConsumeEvent(pc, item);
         item.onConsume().emit(consumeEvent);
         MinecraftServer.getGlobalEventHandler().call(consumeEvent);
@@ -111,5 +115,23 @@ public class ItemManager {
         } else {
             inventory.setItemStack(slot, itemStack.withAmount(itemStack.amount() - 1));
         }
+    }
+
+    private void handlePickupItem(PickupItemEvent event) {
+        if (!(event.getEntity() instanceof Player player)) {
+            event.setCancelled(true);
+            return;
+        }
+
+        ItemStack itemStack = event.getItemStack();
+        Item item = getItem(itemStack);
+
+        if (item == null) {
+            event.setCancelled(true);
+            return;
+        }
+
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+        pc.getInventory().add(item);
     }
 }

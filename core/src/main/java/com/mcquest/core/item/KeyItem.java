@@ -3,6 +3,7 @@ package com.mcquest.core.item;
 import com.google.common.collect.ListMultimap;
 import com.mcquest.core.asset.Asset;
 import com.mcquest.core.asset.AssetTypes;
+import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.resourcepack.Materials;
 import com.mcquest.core.resourcepack.ResourcePackUtility;
 import com.mcquest.core.util.ItemStackUtility;
@@ -17,22 +18,22 @@ import team.unnamed.creative.model.ItemOverride;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BasicItem extends Item {
+public class KeyItem extends Item {
     private final Asset icon;
     private int customModelData;
 
-    public BasicItem(Builder builder) {
+    private KeyItem(Builder builder) {
         super(builder);
-        icon = builder.icon;
+        this.icon = builder.icon;
     }
 
-    public Asset getIcon() {
-        return icon;
+    public void use(PlayerCharacter pc) {
+        pc.sendMessage(ItemUtility.useItemText(this));
     }
 
     @Override
     public int getStackSize() {
-        return 64;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -49,7 +50,7 @@ public class BasicItem extends Item {
         String description = getDescription();
 
         List<Component> lore = new ArrayList<>();
-        lore.add(ItemUtility.qualityText(quality, "Item"));
+        lore.add(ItemUtility.qualityText(quality, "Key Item"));
 
         if (description != null) {
             lore.add(Component.empty());
@@ -61,12 +62,12 @@ public class BasicItem extends Item {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree,
-                               ListMultimap<Material, ItemOverride> overrides) {
+    public void writeResources(FileTree tree, ListMultimap<Material, ItemOverride> overrides) {
         Key key = ItemUtility.resourcePackKey(this);
         customModelData = ResourcePackUtility
                 .writeIcon(tree, icon, key, Materials.ITEM_DEFAULT, overrides);
     }
+
 
     public static IdStep builder() {
         return new Builder();
@@ -85,13 +86,13 @@ public class BasicItem extends Item {
     }
 
     public interface IconStep {
-        BuildStep icon(Asset icon);
+        BuildStep icon(Asset model);
     }
 
     public interface BuildStep {
         BuildStep description(String description);
 
-        BasicItem build();
+        KeyItem build();
     }
 
     private static class Builder extends Item.Builder
@@ -130,8 +131,8 @@ public class BasicItem extends Item {
         }
 
         @Override
-        public BasicItem build() {
-            return new BasicItem(this);
+        public KeyItem build() {
+            return new KeyItem(this);
         }
     }
 }

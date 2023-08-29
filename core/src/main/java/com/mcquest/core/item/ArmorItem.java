@@ -45,7 +45,7 @@ public class ArmorItem extends Item {
     private int customModelData;
 
     ArmorItem(Builder builder) {
-        super(builder.id, builder.name, builder.quality, builder.description);
+        super(builder);
         level = builder.level;
         type = builder.type;
         slot = builder.slot;
@@ -126,8 +126,8 @@ public class ArmorItem extends Item {
         return lore;
     }
 
-    @ApiStatus.Internal
     @Override
+    @ApiStatus.Internal
     public void writeResources(FileTree tree,
                                ListMultimap<Material, ItemOverride> overrides) {
         if (bbmodel != null) {
@@ -189,15 +189,12 @@ public class ArmorItem extends Item {
         ArmorItem build();
     }
 
-    private static class Builder implements IdStep, NameStep, QualityStep,
+    private static class Builder extends Item.Builder
+            implements IdStep, NameStep, QualityStep,
             LevelStep, TypeStep, SlotStep, ModelStep, BuildStep {
-        private int id;
-        private String name;
-        private ItemQuality quality;
         private int level;
         private ArmorType type;
         private ArmorSlot slot;
-        private String description;
         private Material materialModel;
         private Color color;
         private Asset bbmodel;

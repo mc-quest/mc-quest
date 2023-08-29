@@ -32,6 +32,10 @@ class ItemUtility {
                 NamedTextColor.GRAY, TextDecoration.ITALIC);
     }
 
+    static TextComponent useItemText(Item item) {
+        return Component.text("Used ", NamedTextColor.GRAY).append(item.getDisplayName());
+    }
+
     static Key resourcePackKey(Item item) {
         return Key.key(Namespaces.ITEMS, String.valueOf(item.getId()));
     }

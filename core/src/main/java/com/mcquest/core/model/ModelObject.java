@@ -4,17 +4,19 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.creative.base.Vector2Float;
 import team.unnamed.hephaestus.Model;
 import team.unnamed.hephaestus.minestom.ModelEntity;
-import team.unnamed.hephaestus.view.animation.AnimationController;
 
 public final class ModelObject extends Object {
     private final Model model;
+    private String animation;
     private ModelEntity entity;
 
     public ModelObject(Instance instance, Pos position, Model model) {
         super(instance, position, boundingBox(model));
+        this.animation = null;
         this.model = model;
     }
 
@@ -23,8 +25,15 @@ public final class ModelObject extends Object {
         return new Vec(boundingBox.x(), boundingBox.y(), boundingBox.x());
     }
 
-    public AnimationController getAnimationController() {
-        return entity.animationController();
+    public void playAnimation(@Nullable String animation) {
+        this.animation = animation;
+        if (isSpawned()) {
+            if (animation == null) {
+                entity.animationController().clearQueue();
+            } else {
+                entity.playAnimation(animation);
+            }
+        }
     }
 
     @Override
@@ -49,6 +58,9 @@ public final class ModelObject extends Object {
         entity = new ModelEntity(model);
         entity.setNoGravity(true);
         entity.setInstance(getInstance(), getPosition());
+        if (animation != null) {
+            entity.playAnimation(animation);
+        }
     }
 
     @Override

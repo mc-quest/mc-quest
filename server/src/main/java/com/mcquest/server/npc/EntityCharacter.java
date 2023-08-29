@@ -52,8 +52,6 @@ public abstract class EntityCharacter extends NonPlayerCharacter {
     @Override
     @MustBeInvokedByOverriders
     protected void onDamage(DamageSource source) {
-        super.onDamage(source);
-
         if (isSpawned()) {
             if (entity instanceof ModelEntity modelEntity) {
                 red(modelEntity);

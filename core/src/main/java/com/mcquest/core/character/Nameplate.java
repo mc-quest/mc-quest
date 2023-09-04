@@ -48,7 +48,7 @@ class Nameplate {
         }
 
         Attitude attitude = character.getAttitude(pc);
-        Player player = pc.getPlayer();
+        Player player = pc.getEntity();
         names.forEach((att, name) -> {
             if (att == attitude) {
                 name.addViewer(player);
@@ -70,7 +70,9 @@ class Nameplate {
             name.setPosition(namePosition());
         }
 
-        healthBar.setPosition(healthBarPosition());
+        if (healthBar != null) {
+            healthBar.setPosition(healthBarPosition());
+        }
     }
 
     void updateNameText() {
@@ -80,14 +82,20 @@ class Nameplate {
     }
 
     void updateHealthBarText() {
-        healthBar.setText(character.healthBarText());
+        if (healthBar != null) {
+            healthBar.setText(character.healthBarText());
+        }
     }
 
     private Pos namePosition() {
-        return character.getPosition().withY(y -> y + character.getBoundingBox().y());
+        return character.getPosition().withY(y -> y + height() + 0.25);
     }
 
     private Pos healthBarPosition() {
-        return character.getPosition().withY(y -> y + character.getBoundingBox().y() - 0.25);
+        return character.getPosition().withY(y -> y + height());
+    }
+
+    private double height() {
+        return character.getHitbox().getExtents().y();
     }
 }

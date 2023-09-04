@@ -54,7 +54,7 @@ public class MapViewer {
 
         pc.getInventory().saveWeapon();
 
-        Player player = pc.getPlayer();
+        Player player = pc.getEntity();
         PlayerInventory inventory = player.getInventory();
         ItemStack mapItemStack = ItemStack.builder(Material.FILLED_MAP)
                 .meta(new MapMeta.Builder().mapId(MAP_ID).build())
@@ -94,7 +94,7 @@ public class MapViewer {
         MapDataPacket packet = framebuffer.preparePacket(MAP_ID);
         packet = addCursor(packet);
 
-        Player player = pc.getPlayer();
+        Player player = pc.getEntity();
         player.sendPacket(packet);
     }
 

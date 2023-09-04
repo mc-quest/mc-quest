@@ -1,24 +1,31 @@
 package com.mcquest.core.object;
 
+import com.mcquest.core.Mmorpg;
 import com.mcquest.core.instance.Instance;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-public class Object {
+public abstract class Object {
+    private final Mmorpg mmorpg;
+    private final ObjectSpawner spawner;
     private Instance instance;
     private Pos position;
-    private Vec boundingBox;
-    private boolean spawned;
     private boolean removed;
-    private ObjectManager objectManager;
 
-    public Object(Instance instance, Pos position, Vec boundingBox) {
-        this.instance = instance;
-        this.position = position;
-        this.boundingBox = boundingBox;
-        spawned = false;
+    public Object(Mmorpg mmorpg, ObjectSpawner spawner) {
+        this.mmorpg = mmorpg;
+        this.spawner = spawner;
+        this.instance = spawner.getInstance();
+        this.position = spawner.getPosition();
         removed = false;
+    }
+
+    public final Mmorpg getMmorpg() {
+        return mmorpg;
+    }
+
+    public final ObjectSpawner getSpawner() {
+        return spawner;
     }
 
     public final Instance getInstance() {
@@ -33,11 +40,9 @@ public class Object {
         this.instance = instance;
         this.position = position;
 
-        if (objectManager != null) {
-            objectManager.updateInstance(this,
-                    oldInstance, oldPosition,
-                    instance, position);
-        }
+        mmorpg.getObjectManager().updateInstance(this,
+                oldInstance, oldPosition,
+                instance, position);
     }
 
     public final Pos getPosition() {
@@ -47,44 +52,11 @@ public class Object {
     @MustBeInvokedByOverriders
     public void setPosition(Pos position) {
         Pos oldPosition = this.position;
-
         this.position = position;
-
-        if (objectManager != null) {
-            objectManager.updatePosition(this, oldPosition, position);
-        }
+        mmorpg.getObjectManager().updatePosition(this, oldPosition, position);
     }
 
-    public final Vec getBoundingBox() {
-        return boundingBox;
-    }
-
-    @MustBeInvokedByOverriders
-    public void setBoundingBox(Vec boundingBox) {
-        Vec oldBoundingBox = this.boundingBox;
-
-        this.boundingBox = boundingBox;
-
-        if (objectManager != null) {
-            objectManager.updateBoundingBox(this, oldBoundingBox, boundingBox);
-        }
-    }
-
-    public boolean isSpawned() {
-        return spawned;
-    }
-
-    @MustBeInvokedByOverriders
-    protected void spawn() {
-        spawned = true;
-    }
-
-    @MustBeInvokedByOverriders
-    protected void despawn() {
-        spawned = false;
-    }
-
-    public boolean isRemoved() {
+    public final boolean isRemoved() {
         return removed;
     }
 
@@ -93,19 +65,13 @@ public class Object {
             return;
         }
 
-        if (isSpawned()) {
-            despawn();
-        }
-
-        if (objectManager != null) {
-            objectManager.remove(this);
-            objectManager = null;
-        }
-
+        despawn();
+        mmorpg.getObjectManager().removeFromHash(this);
+        getSpawner().disownObject();
         removed = true;
     }
 
-    void setObjectManager(ObjectManager objectManager) {
-        this.objectManager = objectManager;
-    }
+    protected abstract void spawn();
+
+    protected abstract void despawn();
 }

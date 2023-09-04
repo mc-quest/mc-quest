@@ -1,17 +1,18 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.CharacterModel;
+import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.core.instance.Instance;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.server.constants.Skins;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
-import net.minestom.server.coordinate.Pos;
 import net.minestom.server.sound.SoundEvent;
 
-public class GuardThomas extends StaticHuman {
-    public GuardThomas(Mmorpg mmorpg, Instance instance, Pos position) {
-        super(mmorpg, instance, position, Skins.GUARD_MALE);
+public class GuardThomas extends NonPlayerCharacter {
+    public GuardThomas(Mmorpg mmorpg, ObjectSpawner spawner) {
+        super(mmorpg, spawner, CharacterModel.of(Skins.GUARD_MALE));
         setName("Guard Thomas");
         setLevel(10);
     }
@@ -22,8 +23,7 @@ public class GuardThomas extends StaticHuman {
     }
 
     @Override
-    public void speak(PlayerCharacter pc, Component message) {
-        super.speak(pc, message);
+    public void onSpeak(PlayerCharacter pc) {
         Sound sound = Sound.sound(SoundEvent.ENTITY_VILLAGER_AMBIENT, Sound.Source.MASTER, 1f, 0.75f);
         pc.playSound(sound);
     }

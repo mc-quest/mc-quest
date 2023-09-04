@@ -1,20 +1,20 @@
 package com.mcquest.core.loot;
 
+import com.mcquest.core.Mmorpg;
 import com.mcquest.core.audio.Sounds;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.event.EventEmitter;
 import com.mcquest.core.event.LootChestOpenEvent;
-import com.mcquest.core.event.LootChestRespawnEvent;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.model.CoreModels;
 import com.mcquest.core.object.Object;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.hologram.Hologram;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.particle.Particle;
@@ -28,42 +28,25 @@ import java.time.Duration;
 import java.util.Collection;
 
 public class LootChest extends Object {
-    private static final Vec SIZE = new Vec(1.0, 1.0, 1.0);
-
     private final LootTable lootTable;
     private final EventEmitter<LootChestOpenEvent> onOpen;
-    private final EventEmitter<LootChestRespawnEvent> onRespawn;
     private Duration respawnDuration;
     private boolean opened;
     private Entity entity;
     private Hologram text;
     private Task particleEmitter;
 
-    public LootChest(Instance instance, Pos position, LootTable lootTable) {
-        super(instance, position, SIZE);
+    public LootChest(Mmorpg mmorpg, ObjectSpawner spawner, LootTable lootTable) {
+        super(mmorpg, spawner);
         this.lootTable = lootTable;
-        this.onOpen = new EventEmitter<>();
-        this.onRespawn = new EventEmitter<>();
+        onOpen = new EventEmitter<>();
         respawnDuration = null;
-        opened = false;
-    }
-
-    LootChest(LootChest lootChest) {
-        super(lootChest.getInstance(), lootChest.getPosition(), lootChest.getBoundingBox());
-        lootTable = lootChest.lootTable;
-        onOpen = lootChest.onOpen;
-        onRespawn = lootChest.onRespawn;
-        respawnDuration = lootChest.respawnDuration;
         opened = false;
     }
 
     @Override
     public void setInstance(Instance instance, Pos position) {
         super.setInstance(instance, position);
-
-        if (!isSpawned()) {
-            return;
-        }
 
         entity.setInstance(instance, position);
 
@@ -74,10 +57,6 @@ public class LootChest extends Object {
     @Override
     public void setPosition(Pos position) {
         super.setPosition(position);
-
-        if (!isSpawned()) {
-            return;
-        }
 
         entity.teleport(position);
 
@@ -90,10 +69,6 @@ public class LootChest extends Object {
 
     public EventEmitter<LootChestOpenEvent> onOpen() {
         return onOpen;
-    }
-
-    public EventEmitter<LootChestRespawnEvent> onRespawn() {
-        return onRespawn;
     }
 
     public Duration getRespawnDuration() {
@@ -110,8 +85,6 @@ public class LootChest extends Object {
 
     @Override
     protected void spawn() {
-        super.spawn();
-
         Instance instance = getInstance();
         Pos position = getPosition();
 
@@ -140,12 +113,9 @@ public class LootChest extends Object {
 
     @Override
     protected void despawn() {
-        super.despawn();
         entity.remove();
-        entity = null;
 
         text.remove();
-        text = null;
 
         particleEmitter.cancel();
     }
@@ -188,6 +158,8 @@ public class LootChest extends Object {
             poof();
             remove();
         }).delay(TaskSchedule.millis(2000)).schedule();
+
+        // TODO: respawn
     }
 
     private Pos lootPosition() {

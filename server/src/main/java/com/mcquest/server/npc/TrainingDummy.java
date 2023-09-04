@@ -1,27 +1,24 @@
 package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.Attitude;
 import com.mcquest.core.character.Character;
-import com.mcquest.core.character.DamageSource;
-import com.mcquest.core.instance.Instance;
+import com.mcquest.core.character.*;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.sound.SoundEvent;
-import net.minestom.server.timer.TaskSchedule;
-import team.unnamed.hephaestus.minestom.ModelEntity;
 
-public class TrainingDummy extends DamageableEntityCharacter {
-    private static final Vec SIZE = new Vec(1, 2, 1);
+import java.time.Duration;
 
-    public TrainingDummy(Mmorpg mmorpg, Instance instance, Pos position) {
-        super(mmorpg, instance, position, SIZE);
+public class TrainingDummy extends NonPlayerCharacter {
+    public TrainingDummy(Mmorpg mmorpg, ObjectSpawner spawner) {
+        super(mmorpg, spawner, CharacterModel.of(Models.TRAINING_DUMMY));
         setName("Training Dummy");
+        setLevel(1);
         setMaxHealth(10);
-        setHealth(getMaxHealth());
+        setRemovalDelay(Duration.ofMillis(1500));
+        setRespawnDuration(Duration.ofSeconds(5));
+        getNavigator().setAvian(true);
     }
 
     @Override
@@ -36,38 +33,17 @@ public class TrainingDummy extends DamageableEntityCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
-        super.onDamage(source);
-
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
-        ((ModelEntity) entity).playAnimation("hit");
+        //playAnimation("hit");
+        getNavigator().setPathTo(((PlayerCharacter) source).getPosition());
+        getBossHealthBar().addViewer((PlayerCharacter) source);
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
-        super.onDeath(killer);
-
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
-
-        if (isSpawned()) {
-            ((ModelEntity) entity).playAnimation("death");
-        }
-
-        mmorpg.getSchedulerManager().buildTask(this::respawn)
-                .delay(TaskSchedule.seconds(5)).schedule();
-    }
-
-    @Override
-    protected EntityCreature createEntity() {
-        ModelEntity entity = new ModelEntity(Models.TRAINING_DUMMY);
-        entity.setBoundingBox(SIZE.x(), SIZE.y(), SIZE.z());
-        entity.setRemovalAnimationDelay(1500);
-        return entity;
-    }
-
-    private void respawn() {
-        TrainingDummy trainingDummy = new TrainingDummy(mmorpg, getInstance(), getPosition());
-        mmorpg.getObjectManager().add(trainingDummy);
+        //playAnimation("death");
     }
 }

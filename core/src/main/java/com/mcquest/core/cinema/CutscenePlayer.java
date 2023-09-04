@@ -51,7 +51,7 @@ public class CutscenePlayer {
         shotIndex = 0;
         keyFrameIndex = 0;
         now = Duration.ZERO;
-        pc.getPlayer().setGameMode(GameMode.SPECTATOR);
+        pc.getEntity().setGameMode(GameMode.SPECTATOR);
     }
 
     public void stopCutscene() {
@@ -98,13 +98,13 @@ public class CutscenePlayer {
         double s = to.getInterpolation().interpolate(t);
 
         Pos newPosition = MathUtility.lerp(fromPosition, toPosition, s);
-        pc.getPlayer().teleport(newPosition);
+        pc.getEntity().teleport(newPosition);
 
         now = now.plus(Tick.server(1));
     }
 
     private EntityHuman createPlaceholder() {
-        Player player = pc.getPlayer();
+        Player player = pc.getEntity();
         PlayerSkin skin = PlayerSkin.fromUuid(player.getUuid().toString());
         EntityHuman placeholder = new EntityHuman(skin);
 
@@ -157,6 +157,6 @@ public class CutscenePlayer {
         cutscene = null;
         placeholder.remove();
         pc.setPosition(pcPosition);
-        pc.getPlayer().setGameMode(GameMode.ADVENTURE);
+        pc.getEntity().setGameMode(GameMode.ADVENTURE);
     }
 }

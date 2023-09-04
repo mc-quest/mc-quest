@@ -22,11 +22,11 @@ public class Triggers {
     }
 
     public static Consumer<Collider> playerCharacter(Consumer<PlayerCharacter> onTrigger) {
-        return collider -> {
-            if (collider instanceof PlayerCharacter.Hitbox hitbox) {
-                onTrigger.accept(hitbox.getCharacter());
+        return character(character -> {
+            if (character instanceof PlayerCharacter pc) {
+                onTrigger.accept(pc);
             }
-        };
+        });
     }
 
     public static Consumer<RaycastHit> character(BiConsumer<Pos, Character> onHit) {

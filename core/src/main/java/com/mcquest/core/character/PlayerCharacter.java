@@ -10,6 +10,7 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.item.PlayerCharacterInventory;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.music.MusicPlayer;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.playerclass.PlayerClass;
 import com.mcquest.core.playerclass.SkillManager;
@@ -43,7 +44,6 @@ import java.time.Duration;
 import java.util.Arrays;
 
 public final class PlayerCharacter extends Character {
-    private static final Vec SIZE = new Vec(1.0, 2.0, 1.0);
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
             PlayerCharacter.class.getClassLoader(),
             "data/experience_points_per_level.json"
@@ -51,7 +51,6 @@ public final class PlayerCharacter extends Character {
     private static final double MAX_EXPERIENCE_POINTS =
             Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
 
-    private final Mmorpg mmorpg;
     private final Player player;
     private final PlayerClass playerClass;
     private final SkillManager skillManager;
@@ -60,7 +59,6 @@ public final class PlayerCharacter extends Character {
     private final MusicPlayer musicPlayer;
     private final MapViewer mapViewer;
     private final CutscenePlayer cutscenePlayer;
-    private final Hitbox hitbox;
     private Zone zone;
     private Instance respawnInstance;
     private Pos respawnPosition;
@@ -77,9 +75,8 @@ public final class PlayerCharacter extends Character {
     private long undisarmTime;
     private boolean teleporting;
 
-    PlayerCharacter(@NotNull Mmorpg mmorpg, @NotNull Player player, @NotNull PlayerCharacterData data) {
-        super(mmorpg.getInstanceManager().getInstance(data.getInstanceId()), data.getPosition(), SIZE);
-        this.mmorpg = mmorpg;
+    PlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, Player player, PlayerCharacterData data) {
+        super(mmorpg, spawner);
         this.player = player;
         setName(player.getUsername());
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
@@ -96,7 +93,6 @@ public final class PlayerCharacter extends Character {
         mana = data.getMana();
         healthRegenRate = data.getHealthRegenRate();
         manaRegenRate = data.getManaRegenRate();
-        hitbox = new Hitbox(this);
         zone = mmorpg.getZoneManager().getZone(data.getZoneId());
         respawnInstance = mmorpg.getInstanceManager().getInstance(data.getRespawnInstanceId());
         respawnPosition = data.getRespawnPosition();
@@ -110,7 +106,6 @@ public final class PlayerCharacter extends Character {
         money = new Money(data.getMoney());
 
         zone.addPlayerCharacter(this);
-        mmorpg.getPhysicsManager().addCollider(hitbox);
 
         initUi();
         hidePlayerNameplates();
@@ -147,15 +142,12 @@ public final class PlayerCharacter extends Character {
             player.setInstance(instance, position).thenRun(this::completeTeleport);
         }
 
-        hitbox.setInstance(instance);
+        getHitbox().setInstance(instance);
     }
 
-    /**
-     * Updates the position without teleporting the player.
-     */
+    @Override
     void updatePosition(@NotNull Pos position) {
-        super.setPosition(position);
-        hitbox.setCenter(hitboxCenter());
+        super.updatePosition(position);
         updateActionBar();
     }
 
@@ -196,7 +188,7 @@ public final class PlayerCharacter extends Character {
     }
 
     private Pos hitboxCenter() {
-        return getPosition().withY(y -> y + SIZE.y() / 2.0);
+        return getPosition().withY(y -> y + 0.9);
     }
 
     public Pos getEyePosition() {
@@ -223,7 +215,8 @@ public final class PlayerCharacter extends Character {
         return getPosition().direction();
     }
 
-    public Player getPlayer() {
+    @Override
+    public Player getEntity() {
         return player;
     }
 
@@ -535,26 +528,5 @@ public final class PlayerCharacter extends Character {
     public void setCanAct(boolean canAct) {
         this.canAct = canAct;
         // TODO: disable skills, consumables, and basic attacks
-    }
-
-    @Override
-    public void applyImpulse(Vec impulse) {
-        double weightKg = 70.0;
-        player.setVelocity(player.getVelocity().add(impulse.div(weightKg)));
-    }
-
-    void preRemove() {
-        hitbox.remove();
-    }
-
-    public static class Hitbox extends CharacterHitbox {
-        private Hitbox(PlayerCharacter pc) {
-            super(pc, pc.getInstance(), pc.hitboxCenter(), SIZE);
-        }
-
-        @Override
-        public PlayerCharacter getCharacter() {
-            return (PlayerCharacter) super.getCharacter();
-        }
     }
 }

@@ -83,10 +83,10 @@ public class Zone {
         Duration fadeOut = Duration.ofSeconds(1);
         Title.Times times = Title.Times.times(fadeIn, stay, fadeOut);
         Title title = Title.title(zoneText, levelText, times);
-        pc.getPlayer().showTitle(title);
+        pc.getEntity().showTitle(title);
     }
 
     private void sendWeatherPackets(PlayerCharacter pc) {
-        pc.getPlayer().sendPackets(weather.getPackets());
+        pc.getEntity().sendPackets(weather.getPackets());
     }
 }

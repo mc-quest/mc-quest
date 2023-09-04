@@ -1,13 +1,17 @@
 package com.mcquest.core.character;
 
+import com.mcquest.core.Mmorpg;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.Entity;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,39 +21,39 @@ import java.util.Collection;
  * A Character represents an MMORPG character. Character is the superclass of
  * PlayerCharacter and NonPlayerCharacter.
  */
-public class Character extends Object implements DamageSource {
+public abstract class Character extends Object implements DamageSource {
+    private final CharacterHitbox hitbox;
+    private final Nameplate nameplate;
     private String name;
     private int level;
     private double maxHealth;
     private double health;
-    private Nameplate nameplate;
+    private double mass;
     private BossHealthBar bossHealthBar;
 
-    Character(@NotNull Instance instance, @NotNull Pos position,
-              @NotNull Vec boundingBox) {
-        super(instance, position, boundingBox);
+    Character(Mmorpg mmorpg, ObjectSpawner spawner) {
+        super(mmorpg, spawner);
+        nameplate = new Nameplate(this);
+        hitbox = new CharacterHitbox(this, getInstance(), Pos.ZERO, Vec.ZERO);
         name = "";
         level = 1;
         maxHealth = 1.0;
-        health = maxHealth;
+        mass = 70;
     }
 
     @Override
     @MustBeInvokedByOverriders
     protected void spawn() {
-        super.spawn();
-
-        nameplate = new Nameplate(this);
         nameplate.spawn();
+        hitbox.setExtents(hitboxExtents());
+        getMmorpg().getPhysicsManager().addCollider(hitbox);
     }
 
     @Override
     @MustBeInvokedByOverriders
     protected void despawn() {
-        super.despawn();
-
         nameplate.despawn();
-        nameplate = null;
+        hitbox.remove();
     }
 
     public final String getName() {
@@ -59,9 +63,7 @@ public class Character extends Object implements DamageSource {
     public final void setName(@NotNull String name) {
         this.name = name;
 
-        if (isSpawned()) {
-            nameplate.updateNameText();
-        }
+        nameplate.updateNameText();
 
         if (bossHealthBar != null) {
             bossHealthBar.updateText();
@@ -81,9 +83,7 @@ public class Character extends Object implements DamageSource {
     void setLevel(int level) {
         this.level = level;
 
-        if (isSpawned()) {
-            nameplate.updateNameText();
-        }
+        nameplate.updateNameText();
 
         if (bossHealthBar != null) {
             bossHealthBar.updateText();
@@ -95,29 +95,23 @@ public class Character extends Object implements DamageSource {
     public void setInstance(@NotNull Instance instance, Pos position) {
         super.setInstance(instance, position);
 
-        if (isSpawned()) {
-            nameplate.updateInstance();
-        }
+        nameplate.updateInstance();
     }
 
     @Override
-    @MustBeInvokedByOverriders
     public void setPosition(@NotNull Pos position) {
+        // TODO: fix PlayerCharacter implementation
+        updatePosition(position);
+
+        getEntity().teleport(position);
+    }
+
+    void updatePosition(Pos position) {
         super.setPosition(position);
 
-        if (isSpawned()) {
-            nameplate.updatePosition();
-        }
-    }
+        hitbox.setCenter(hitboxCenter());
 
-    @Override
-    @MustBeInvokedByOverriders
-    public void setBoundingBox(Vec boundingBox) {
-        super.setBoundingBox(boundingBox);
-
-        if (isSpawned()) {
-            nameplate.updatePosition();
-        }
+        nameplate.updatePosition();
     }
 
     /**
@@ -138,9 +132,7 @@ public class Character extends Object implements DamageSource {
 
         this.maxHealth = maxHealth;
 
-        if (isSpawned()) {
-            nameplate.updateHealthBarText();
-        }
+        nameplate.updateHealthBarText();
 
         if (bossHealthBar != null) {
             bossHealthBar.updateHealth();
@@ -165,9 +157,7 @@ public class Character extends Object implements DamageSource {
 
         this.health = health;
 
-        if (isSpawned()) {
-            nameplate.updateHealthBarText();
-        }
+        nameplate.updateHealthBarText();
 
         if (bossHealthBar != null) {
             bossHealthBar.updateHealth();
@@ -198,10 +188,19 @@ public class Character extends Object implements DamageSource {
         setHealth(newHealth);
     }
 
+    public final double getMass() {
+        return mass;
+    }
+
+    public final void setMass(double mass) {
+        this.mass = mass;
+    }
+
     /**
      * @param impulse the impulse in kg m/s
      */
     public void applyImpulse(Vec impulse) {
+        getEntity().setVelocity(impulse.div(mass));
     }
 
     public BossHealthBar getBossHealthBar() {
@@ -217,6 +216,8 @@ public class Character extends Object implements DamageSource {
             speak(pc, message);
         }
     }
+
+    public abstract Entity getEntity();
 
     @MustBeInvokedByOverriders
     public void speak(PlayerCharacter pc, Component message) {
@@ -237,6 +238,21 @@ public class Character extends Object implements DamageSource {
 
     public boolean isDamageable(@NotNull DamageSource source) {
         return false;
+    }
+
+    final CharacterHitbox getHitbox() {
+        return hitbox;
+    }
+
+    private Pos hitboxCenter() {
+        return getPosition().withY(y -> y + hitboxExtents().y() / 2.0);
+    }
+
+    private Vec hitboxExtents() {
+        BoundingBox boundingBox = getEntity().getBoundingBox();
+        return new Vec(boundingBox.maxX() - boundingBox.minX(),
+                boundingBox.maxY() - boundingBox.minY(),
+                boundingBox.maxZ() - boundingBox.minZ());
     }
 
     final Nameplate getNameplate() {

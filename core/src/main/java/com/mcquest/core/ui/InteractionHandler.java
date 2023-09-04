@@ -101,7 +101,7 @@ public class InteractionHandler {
             }
             inventoryConditionResult.setCancel(true);
         });
-        pc.getPlayer().openInventory(menu);
+        pc.getEntity().openInventory(menu);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new MenuOpenEvent(pc));
     }
@@ -120,7 +120,7 @@ public class InteractionHandler {
 
     private void openMap(PlayerCharacter pc) {
         pc.getMapViewer().open();
-        pc.getPlayer().closeInventory();
+        pc.getEntity().closeInventory();
     }
 
     private void handleLogoutClick(PlayerCharacter pc) {

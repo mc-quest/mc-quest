@@ -6,6 +6,7 @@ import com.mcquest.core.event.*;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.physics.Collider;
 import com.mcquest.core.physics.PhysicsManager;
+import com.mcquest.core.physics.Triggers;
 import com.mcquest.core.quest.*;
 import com.mcquest.core.ui.Tutorial;
 import com.mcquest.server.constants.Instances;
@@ -40,12 +41,7 @@ public class TutorialQuest implements Feature {
     private void createTrainingGroundsBounds() {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         Collider trainingGroundsBounds = new Collider(Instances.ELADRADOR, Pos.ZERO, Pos.ZERO);
-        trainingGroundsBounds.onCollisionEnter(other -> {
-            if (other instanceof PlayerCharacter.Hitbox hitbox) {
-                PlayerCharacter pc = hitbox.getCharacter();
-                handleEnterTrainingGrounds(pc);
-            }
-        });
+        trainingGroundsBounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnterTrainingGrounds));
         physicsManager.addCollider(trainingGroundsBounds);
     }
 

@@ -20,7 +20,6 @@ import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.inventory.click.ClickType;
 import net.minestom.server.inventory.condition.InventoryConditionResult;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
 import net.minestom.server.utils.time.Tick;
 import org.jetbrains.annotations.ApiStatus;
@@ -58,7 +57,7 @@ public class SkillManager {
             cooldowns.put(skill, Duration.ofMillis(0));
         }
 
-        PlayerInventory inventory = pc.getPlayer().getInventory();
+        PlayerInventory inventory = pc.getEntity().getInventory();
 
         Integer[] hotbarSkillIds = new Integer[MAX_HOTBAR_SLOT - MIN_HOTBAR_SLOT + 1]; // TODO data.getHotbarSkills()
         for (int slot = MIN_HOTBAR_SLOT; slot <= MAX_HOTBAR_SLOT; slot++) {
@@ -169,7 +168,7 @@ public class SkillManager {
     }
 
     private void updateHotbar() {
-        PlayerInventory inventory = pc.getPlayer().getInventory();
+        PlayerInventory inventory = pc.getEntity().getInventory();
         for (int slot = MIN_HOTBAR_SLOT; slot <= MAX_HOTBAR_SLOT; slot++) {
             ItemStack itemStack = inventory.getItemStack(slot);
             ActiveSkill skill = (ActiveSkill) getSkill(itemStack);
@@ -198,7 +197,7 @@ public class SkillManager {
     }
 
     public void openSkillTree() {
-        pc.getPlayer().openInventory(new SkillTreeMenu());
+        pc.getEntity().openInventory(new SkillTreeMenu());
     }
 
     private @Nullable ActiveSkill getHotbarSkill(int slot) {
@@ -206,7 +205,7 @@ public class SkillManager {
             throw new IllegalArgumentException();
         }
 
-        PlayerInventory inventory = pc.getPlayer().getInventory();
+        PlayerInventory inventory = pc.getEntity().getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
         return (ActiveSkill) getSkill(itemStack);
     }

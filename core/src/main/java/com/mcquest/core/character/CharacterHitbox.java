@@ -5,11 +5,11 @@ import com.mcquest.core.physics.Collider;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 
-public class CharacterHitbox extends Collider {
+public final class CharacterHitbox extends Collider {
     private final Character character;
 
-    public CharacterHitbox(Character character, Instance instance, Pos center, Vec size) {
-        super(instance, center, size);
+    CharacterHitbox(Character character, Instance instance, Pos center, Vec extents) {
+        super(instance, center, extents);
         this.character = character;
     }
 

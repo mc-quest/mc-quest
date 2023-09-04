@@ -229,7 +229,7 @@ public class QuestTracker {
             int line = numLines - i - 1;
             sidebar.createLine(new Sidebar.ScoreboardLine(String.valueOf(i), text, line));
         }
-        sidebar.addViewer(pc.getPlayer());
+        sidebar.addViewer(pc.getEntity());
     }
 
     private List<TextComponent> sidebarText() {

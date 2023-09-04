@@ -216,7 +216,7 @@ public class PlayerCharacterInventory {
     }
 
     private PlayerInventory inventory() {
-        return pc.getPlayer().getInventory();
+        return pc.getEntity().getInventory();
     }
 
     private void loadItems(PersistentItem[] items) {

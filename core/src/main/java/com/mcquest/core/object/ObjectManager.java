@@ -8,7 +8,6 @@ import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.instance.Instance;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.coordinate.Vec;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -24,35 +23,30 @@ public class ObjectManager {
     public static final double DESPAWN_RADIUS = 85.0;
 
     private final Mmorpg mmorpg;
+    private final SetMultimap<SpatialHashCell, ObjectSpawner> spawnersByCell;
     private final SetMultimap<SpatialHashCell, Object> objectsByCell;
-    private final Set<Object> spawnedObjects;
 
     @ApiStatus.Internal
     public ObjectManager(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
+        spawnersByCell = HashMultimap.create();
         objectsByCell = HashMultimap.create();
-        spawnedObjects = new HashSet<>();
 
         SchedulerManager scheduler = MinecraftServer.getSchedulerManager();
         scheduler.buildTask(this::tick).repeat(TaskSchedule.nextTick()).schedule();
     }
 
-    public void add(Object object) {
-        if (object.isRemoved()) {
-            throw new IllegalArgumentException();
-        }
+    public void add(ObjectSpawner spawner) {
+        SpatialHashCell cell = cellFor(spawner.getInstance(), spawner.getPosition());
+        spawnersByCell.put(cell, spawner);
+        spawner.setObjectManager(this);
+    }
 
-        object.setObjectManager(this);
-
-        Instance instance = object.getInstance();
-        Pos position = object.getPosition();
-        Vec boundingBox = object.getBoundingBox();
-
-        Collection<SpatialHashCell> cells = cellsFor(instance, position, boundingBox);
-
-        for (SpatialHashCell cell : cells) {
-            objectsByCell.put(cell, object);
-        }
+    public Object spawn(ObjectSpawner spawner) {
+        SpatialHashCell cell = cellFor(spawner.getInstance(), spawner.getPosition());
+        Object object = spawner.spawn(mmorpg);
+        objectsByCell.put(cell, object);
+        return object;
     }
 
     public Collection<Object> getNearbyObjects(Instance instance, Pos position, double radius) {
@@ -60,10 +54,7 @@ public class ObjectManager {
             throw new IllegalArgumentException();
         }
 
-        double diameter = 2.0 * radius;
-
-        Collection<SpatialHashCell> cells =
-                cellsFor(instance, position, new Vec(diameter, diameter, diameter));
+        Collection<SpatialHashCell> cells = cellsFor(instance, position, radius);
 
         Set<Object> objects = new HashSet<>();
 
@@ -79,7 +70,7 @@ public class ObjectManager {
     }
 
     private void tick() {
-        Set<Object> toSpawn = new HashSet<>();
+        SetMultimap<SpatialHashCell, ObjectSpawner> toSpawn = HashMultimap.create();
         Set<Object> toNotDespawn = new HashSet<>();
 
         PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
@@ -90,96 +81,79 @@ public class ObjectManager {
             Pos objectMin = pcPosition.sub(DESPAWN_RADIUS);
             Pos objectMax = pcPosition.add(DESPAWN_RADIUS);
 
-            SpatialHashCell minCell = SpatialHashCell.cellAt(instance, objectMin, CELL_SIZE);
-            SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, objectMax, CELL_SIZE);
+            SpatialHashCell minCell = cellFor(instance, objectMin);
+            SpatialHashCell maxCell = cellFor(instance, objectMax);
 
             SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {
-                for (Object object : objectsByCell.get(cell)) {
-                    if (object.getPosition().distanceSquared(pcPosition) <= SPAWN_RADIUS * SPAWN_RADIUS
-                            && !object.isSpawned()) {
-                        toSpawn.add(object);
+                for (ObjectSpawner spawner : spawnersByCell.get(cell)) {
+                    if (!spawner.isSpawned() && spawner.getPosition().distanceSquared(pcPosition)
+                            <= SPAWN_RADIUS * SPAWN_RADIUS) {
+                        toSpawn.put(cell, spawner);
                     }
+                }
 
-                    if (object.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS
-                            && object.isSpawned()) {
+                for (Object object : objectsByCell.get(cell)) {
+                    if (object.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS) {
                         toNotDespawn.add(object);
                     }
                 }
             });
         }
 
-        for (Object object : spawnedObjects) {
+        for (Object object : objectsByCell.values()) {
             if (!toNotDespawn.contains(object)) {
-                object.despawn();
+                object.remove();
             }
         }
-        spawnedObjects.retainAll(toNotDespawn);
+        objectsByCell.values().retainAll(toNotDespawn);
 
-        for (Object object : toSpawn) {
+        toSpawn.forEach((cell, spawner) -> {
+            Object object = spawner.spawn(mmorpg);
             object.spawn();
-        }
-        spawnedObjects.addAll(toSpawn);
+            objectsByCell.put(cell, object);
+        });
     }
 
     void updateInstance(Object object, Instance oldInstance, Pos oldPosition,
                         Instance newInstance, Pos newPosition) {
         update(object,
                 oldInstance, newInstance,
-                oldPosition, newPosition,
-                object.getBoundingBox(), object.getBoundingBox());
+                oldPosition, newPosition);
     }
 
     void updatePosition(Object object, Pos oldPosition, Pos newPosition) {
         update(object,
                 object.getInstance(), object.getInstance(),
-                oldPosition, newPosition,
-                object.getBoundingBox(), object.getBoundingBox());
-    }
-
-    void updateBoundingBox(Object object, Vec oldBoundingBox, Vec newBoundingBox) {
-        update(object,
-                object.getInstance(), object.getInstance(),
-                object.getPosition(), object.getPosition(),
-                oldBoundingBox, newBoundingBox);
+                oldPosition, newPosition);
     }
 
     private void update(Object object,
                         Instance oldInstance, Instance newInstance,
-                        Pos oldPosition, Pos newPosition,
-                        Vec oldBoundingBox, Vec newBoundingBox) {
-        Collection<SpatialHashCell> oldCells = cellsFor(oldInstance, oldPosition, oldBoundingBox);
-        Collection<SpatialHashCell> newCells = cellsFor(newInstance, newPosition, newBoundingBox);
+                        Pos oldPosition, Pos newPosition) {
+        SpatialHashCell oldCell = cellFor(oldInstance, oldPosition);
+        SpatialHashCell newCell = cellFor(newInstance, newPosition);
 
-        for (SpatialHashCell cell : oldCells) {
-            objectsByCell.remove(cell, object);
-        }
-
-        for (SpatialHashCell cell : newCells) {
-            objectsByCell.put(cell, object);
-        }
+        objectsByCell.remove(oldCell, object);
+        objectsByCell.put(newCell, object);
     }
 
-    void remove(Object object) {
-        Instance instance = object.getInstance();
-        Pos position = object.getPosition();
-        Vec boundingBox = object.getBoundingBox();
-
-        Collection<SpatialHashCell> cells = cellsFor(instance, position, boundingBox);
-
-        for (SpatialHashCell cell : cells) {
-            objectsByCell.remove(cell, object);
-        }
-
-        spawnedObjects.remove(object);
+    void removeFromHash(ObjectSpawner spawner) {
+        SpatialHashCell cell = cellFor(spawner.getInstance(), spawner.getPosition());
+        spawnersByCell.remove(cell, spawner);
     }
 
-    private Collection<SpatialHashCell> cellsFor(Instance instance, Pos position,
-                                                 Vec boundingBox) {
-        double halfExtentX = boundingBox.x() / 2.0;
-        double halfExtentZ = boundingBox.z() / 2.0;
+    void removeFromHash(Object object) {
+        SpatialHashCell cell = cellFor(object.getInstance(), object.getPosition());
+        objectsByCell.remove(cell, object);
+    }
 
-        Pos min = position.sub(halfExtentX, 0, halfExtentZ);
-        Pos max = position.add(halfExtentX, boundingBox.y(), halfExtentZ);
+    private SpatialHashCell cellFor(Instance instance, Pos position) {
+        return SpatialHashCell.cellAt(instance, position, CELL_SIZE);
+    }
+
+    private Collection<SpatialHashCell> cellsFor(Instance instance, Pos position, double radius) {
+        Pos min = position.sub(radius, radius, radius);
+        Pos max = position.add(radius, radius, radius);
 
         SpatialHashCell minCell = SpatialHashCell.cellAt(instance, min, CELL_SIZE);
         SpatialHashCell maxCell = SpatialHashCell.cellAt(instance, max, CELL_SIZE);

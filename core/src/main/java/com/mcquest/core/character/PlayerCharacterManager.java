@@ -8,6 +8,8 @@ import com.mcquest.core.event.PlayerCharacterMoveEvent;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.object.Object;
 import com.mcquest.core.object.ObjectManager;
+import com.mcquest.core.object.ObjectProvider;
+import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.persistence.PlayerCharacterData;
 import com.mcquest.core.ui.PlayerCharacterLogoutType;
 import net.kyori.adventure.text.Component;
@@ -80,15 +82,24 @@ public class PlayerCharacterManager {
         Player player = event.getPlayer();
         PlayerCharacterData data = dataProvider.apply(player);
         Instance instance = mmorpg.getInstanceManager().getInstance(data.getInstanceId());
+        Pos position = data.getPosition();
         event.setSpawningInstance(instance);
-        player.setRespawnPoint(data.getPosition());
+        player.setRespawnPoint(position);
         player.setGameMode(GameMode.ADVENTURE);
-        PlayerCharacter pc = new PlayerCharacter(mmorpg, player, data);
+        ObjectSpawner spawner = pcSpawner(instance, position, player, data);
+        PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
         pcs.put(player, pc);
-        mmorpg.getObjectManager().add(pc);
-        mmorpg.getCharacterEntityManager().bind(player, pc);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.call(new PlayerCharacterLoginEvent(pc));
+    }
+
+    private ObjectSpawner pcSpawner(Instance instance, Pos position,
+                                    Player player, PlayerCharacterData data) {
+        return new ObjectSpawner(instance, position, pcProvider(player, data));
+    }
+
+    private ObjectProvider pcProvider(Player player, PlayerCharacterData data) {
+        return (mmorpg, spawner) -> new PlayerCharacter(mmorpg, spawner, player, data);
     }
 
     private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
@@ -103,13 +114,12 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
-        pc.preRemove();
         logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
         eventHandler.call(event);
         pc.remove();
-        pcs.remove(pc.getPlayer());
+        pcs.remove(pc.getEntity());
     }
 
     private void handlePlayerMove(PlayerMoveEvent event) {
@@ -173,7 +183,7 @@ public class PlayerCharacterManager {
             );
 
             for (Object object : nearbyObjects) {
-                if (object instanceof Character character && character.isSpawned()) {
+                if (object instanceof Character character) {
                     character.getNameplate().updateViewer(pc);
                 }
             }

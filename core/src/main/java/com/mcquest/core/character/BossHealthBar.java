@@ -17,11 +17,11 @@ public class BossHealthBar {
     }
 
     public void addViewer(PlayerCharacter pc) {
-        pc.getPlayer().showBossBar(bossBar);
+        pc.getEntity().showBossBar(bossBar);
     }
 
     public void removeViewer(PlayerCharacter pc) {
-        pc.getPlayer().hideBossBar(bossBar);
+        pc.getEntity().hideBossBar(bossBar);
         BossBarManager bossBarManager = MinecraftServer.getBossBarManager();
         if (bossBarManager.getBossBarViewers(bossBar).isEmpty()) {
             bossBarManager.destroyBossBar(bossBar);

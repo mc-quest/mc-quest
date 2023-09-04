@@ -1,20 +1,23 @@
 package com.mcquest.core;
 
-import com.mcquest.core.music.MusicManager;
-import com.mcquest.core.music.Song;
+import com.mcquest.core.audio.AudioClip;
+import com.mcquest.core.audio.AudioManager;
 import com.mcquest.core.cartography.Map;
 import com.mcquest.core.cartography.MapManager;
-import com.mcquest.core.entity.CharacterEntityManager;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.cinema.CutsceneManager;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.instance.InstanceManager;
+import com.mcquest.core.item.Item;
+import com.mcquest.core.item.ItemManager;
 import com.mcquest.core.loot.LootManager;
 import com.mcquest.core.model.ModelManager;
 import com.mcquest.core.mount.Mount;
 import com.mcquest.core.mount.MountManager;
+import com.mcquest.core.music.MusicManager;
+import com.mcquest.core.music.Song;
 import com.mcquest.core.object.ObjectManager;
 import com.mcquest.core.particle.ParticleManager;
 import com.mcquest.core.persistence.PlayerCharacterData;
@@ -24,14 +27,10 @@ import com.mcquest.core.playerclass.PlayerClassManager;
 import com.mcquest.core.quest.Quest;
 import com.mcquest.core.quest.QuestManager;
 import com.mcquest.core.resourcepack.ResourcePackManager;
-import com.mcquest.core.zone.Zone;
-import com.mcquest.core.zone.ZoneManager;
-import com.mcquest.core.audio.AudioClip;
-import com.mcquest.core.audio.AudioManager;
-import com.mcquest.core.item.Item;
-import com.mcquest.core.item.ItemManager;
 import com.mcquest.core.ui.InteractionHandler;
 import com.mcquest.core.ui.PlayerCharacterLogoutType;
+import com.mcquest.core.zone.Zone;
+import com.mcquest.core.zone.ZoneManager;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
@@ -57,7 +56,6 @@ public class Mmorpg {
     private final MountManager mountManager;
     private final InstanceManager instanceManager;
     private final PlayerCharacterManager pcManager;
-    private final CharacterEntityManager characterEntityManager;
     private final ObjectManager objectManager;
     private final PhysicsManager physicsManager;
     private final ParticleManager particleManager;
@@ -84,7 +82,6 @@ public class Mmorpg {
                 builder.pcDataProvider,
                 builder.pcLogoutHandler
         );
-        characterEntityManager = new CharacterEntityManager();
         objectManager = new ObjectManager(this);
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
@@ -151,10 +148,6 @@ public class Mmorpg {
 
     public PlayerCharacterManager getPlayerCharacterManager() {
         return pcManager;
-    }
-
-    public CharacterEntityManager getCharacterEntityManager() {
-        return characterEntityManager;
     }
 
     public ObjectManager getObjectManager() {

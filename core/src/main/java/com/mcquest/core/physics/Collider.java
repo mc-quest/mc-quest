@@ -163,7 +163,7 @@ public class Collider {
         // Compute new cells.
         Set<SpatialHashCell> newOccupiedCells = new HashSet<>();
 
-        SpatialHashCell minCell = physicsManager.cell(instance, max);
+        SpatialHashCell minCell = physicsManager.cell(instance, min);
         SpatialHashCell maxCell = physicsManager.cell(instance, max);
 
         SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {

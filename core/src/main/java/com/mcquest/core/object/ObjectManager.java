@@ -3,11 +3,10 @@ package com.mcquest.core.object;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.instance.Instance;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Player;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
@@ -46,6 +45,7 @@ public class ObjectManager {
         SpatialHashCell cell = cellFor(spawner.getInstance(), spawner.getPosition());
         Object object = spawner.spawn(mmorpg);
         objectsByCell.put(cell, object);
+        object.spawn();
         return object;
     }
 
@@ -73,31 +73,32 @@ public class ObjectManager {
         SetMultimap<SpatialHashCell, ObjectSpawner> toSpawn = HashMultimap.create();
         Set<Object> toNotDespawn = new HashSet<>();
 
-        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
-        for (PlayerCharacter pc : pcManager.getPlayerCharacters()) {
-            Instance instance = pc.getInstance();
-            Pos pcPosition = pc.getPosition();
+        for (Instance instance : mmorpg.getInstanceManager().getInstances()) {
+            for (Player player : instance.getPlayers()) {
+                Pos playerPosition = player.getPosition();
 
-            Pos objectMin = pcPosition.sub(DESPAWN_RADIUS);
-            Pos objectMax = pcPosition.add(DESPAWN_RADIUS);
+                Pos objectMin = playerPosition.sub(DESPAWN_RADIUS);
+                Pos objectMax = playerPosition.add(DESPAWN_RADIUS);
 
-            SpatialHashCell minCell = cellFor(instance, objectMin);
-            SpatialHashCell maxCell = cellFor(instance, objectMax);
+                SpatialHashCell minCell = cellFor(instance, objectMin);
+                SpatialHashCell maxCell = cellFor(instance, objectMax);
 
-            SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {
-                for (ObjectSpawner spawner : spawnersByCell.get(cell)) {
-                    if (!spawner.isSpawned() && spawner.getPosition().distanceSquared(pcPosition)
-                            <= SPAWN_RADIUS * SPAWN_RADIUS) {
-                        toSpawn.put(cell, spawner);
+                SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {
+                    for (ObjectSpawner spawner : spawnersByCell.get(cell)) {
+                        if (!spawner.isSpawned() && spawner.getPosition().distanceSquared(playerPosition)
+                                <= SPAWN_RADIUS * SPAWN_RADIUS) {
+                            toSpawn.put(cell, spawner);
+                        }
                     }
-                }
 
-                for (Object object : objectsByCell.get(cell)) {
-                    if (object.getPosition().distanceSquared(pcPosition) <= DESPAWN_RADIUS * DESPAWN_RADIUS) {
-                        toNotDespawn.add(object);
+                    for (Object object : objectsByCell.get(cell)) {
+                        if (object.getPosition().distanceSquared(playerPosition)
+                                <= DESPAWN_RADIUS * DESPAWN_RADIUS) {
+                            toNotDespawn.add(object);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         for (Object object : objectsByCell.values()) {
@@ -109,8 +110,8 @@ public class ObjectManager {
 
         toSpawn.forEach((cell, spawner) -> {
             Object object = spawner.spawn(mmorpg);
-            object.spawn();
             objectsByCell.put(cell, object);
+            object.spawn();
         });
     }
 

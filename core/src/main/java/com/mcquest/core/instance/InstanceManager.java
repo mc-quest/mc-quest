@@ -10,10 +10,7 @@ import net.minestom.server.world.biomes.BiomeManager;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class InstanceManager {
     /**
@@ -57,6 +54,10 @@ public class InstanceManager {
 
     public Instance getInstance(int id) {
         return instancesById.get(id);
+    }
+
+    public Collection<Instance> getInstances() {
+        return Collections.unmodifiableCollection(instancesById.values());
     }
 
     private void tick() {

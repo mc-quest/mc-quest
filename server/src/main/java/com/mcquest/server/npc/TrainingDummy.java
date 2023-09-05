@@ -35,15 +35,13 @@ public class TrainingDummy extends NonPlayerCharacter {
     protected void onDamage(DamageSource source) {
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
-        //playAnimation("hit");
-        getNavigator().setPathTo(((PlayerCharacter) source).getPosition());
-        getBossHealthBar().addViewer((PlayerCharacter) source);
+        playAnimation("hit");
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
         Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f);
         getInstance().playSound(sound, getPosition());
-        //playAnimation("death");
+        playAnimation("death");
     }
 }

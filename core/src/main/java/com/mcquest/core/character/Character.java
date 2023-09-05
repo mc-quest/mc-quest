@@ -53,7 +53,12 @@ public abstract class Character extends Object implements DamageSource {
     @MustBeInvokedByOverriders
     protected void despawn() {
         nameplate.despawn();
+
         hitbox.remove();
+
+        if (bossHealthBar != null) {
+            bossHealthBar.remove();
+        }
     }
 
     public final String getName() {

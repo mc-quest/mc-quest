@@ -24,7 +24,7 @@ public class BossHealthBar {
         pc.getEntity().hideBossBar(bossBar);
         BossBarManager bossBarManager = MinecraftServer.getBossBarManager();
         if (bossBarManager.getBossBarViewers(bossBar).isEmpty()) {
-            bossBarManager.destroyBossBar(bossBar);
+            remove();
         }
     }
 
@@ -34,6 +34,10 @@ public class BossHealthBar {
 
     void updateHealth() {
         bossBar.progress(progress());
+    }
+
+    void remove() {
+        MinecraftServer.getBossBarManager().destroyBossBar(bossBar);
     }
 
     private float progress() {

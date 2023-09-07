@@ -3,6 +3,7 @@ package com.mcquest.core.object;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import com.mcquest.core.Mmorpg;
+import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.instance.Instance;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
@@ -71,7 +72,7 @@ public class ObjectManager {
 
     private void tick() {
         SetMultimap<SpatialHashCell, ObjectSpawner> toSpawn = HashMultimap.create();
-        Set<Object> toNotDespawn = new HashSet<>();
+        Set<Object> toNotRemove = new HashSet<>();
 
         for (Instance instance : mmorpg.getInstanceManager().getInstances()) {
             for (Player player : instance.getPlayers()) {
@@ -94,19 +95,23 @@ public class ObjectManager {
                     for (Object object : objectsByCell.get(cell)) {
                         if (object.getPosition().distanceSquared(playerPosition)
                                 <= DESPAWN_RADIUS * DESPAWN_RADIUS) {
-                            toNotDespawn.add(object);
+                            toNotRemove.add(object);
                         }
                     }
                 });
             }
         }
 
+        Set<Object> toRemove = new HashSet<>();
         for (Object object : objectsByCell.values()) {
-            if (!toNotDespawn.contains(object)) {
-                object.remove();
+            if (!toNotRemove.contains(object) && !(object instanceof PlayerCharacter)) {
+                toRemove.add(object);
             }
         }
-        objectsByCell.values().retainAll(toNotDespawn);
+
+        for (Object object : toRemove) {
+            object.remove();
+        }
 
         toSpawn.forEach((cell, spawner) -> {
             Object object = spawner.spawn(mmorpg);

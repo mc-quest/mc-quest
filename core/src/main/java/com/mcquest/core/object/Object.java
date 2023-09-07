@@ -40,9 +40,11 @@ public abstract class Object {
         this.instance = instance;
         this.position = position;
 
-        mmorpg.getObjectManager().updateInstance(this,
-                oldInstance, oldPosition,
-                instance, position);
+        if (!removed) {
+            mmorpg.getObjectManager().updateInstance(this,
+                    oldInstance, oldPosition,
+                    instance, position);
+        }
     }
 
     public final Pos getPosition() {
@@ -52,8 +54,12 @@ public abstract class Object {
     @MustBeInvokedByOverriders
     public void setPosition(Pos position) {
         Pos oldPosition = this.position;
+
         this.position = position;
-        mmorpg.getObjectManager().updatePosition(this, oldPosition, position);
+
+        if (!removed) {
+            mmorpg.getObjectManager().updatePosition(this, oldPosition, position);
+        }
     }
 
     public final boolean isRemoved() {

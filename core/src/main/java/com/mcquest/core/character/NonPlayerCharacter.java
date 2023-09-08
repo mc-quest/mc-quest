@@ -1,7 +1,8 @@
 package com.mcquest.core.character;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.ai.BehaviorNode;
+import com.mcquest.core.ai.Behavior;
+import com.mcquest.core.ai.BehaviorTree;
 import com.mcquest.core.ai.Navigator;
 import com.mcquest.core.object.ObjectSpawner;
 import net.minestom.server.coordinate.Pos;
@@ -18,7 +19,7 @@ import java.time.Duration;
 public class NonPlayerCharacter extends Character {
     private final EntityCreature entity;
     private final Navigator navigator;
-    private BehaviorNode brain;
+    private final BehaviorTree brain;
     private Duration respawnDuration;
     private Task endDamageTint;
 
@@ -26,6 +27,7 @@ public class NonPlayerCharacter extends Character {
         super(mmorpg, spawner);
         entity = model.createEntity(this);
         navigator = new Navigator(this);
+        brain = new BehaviorTree(this);
     }
 
     public final void setLevel(int level) {
@@ -41,8 +43,8 @@ public class NonPlayerCharacter extends Character {
         return navigator;
     }
 
-    public final void setBrain(BehaviorNode brain) {
-        this.brain = brain;
+    public final void setBrain(Behavior root) {
+        brain.setRoot(root);
     }
 
     public Duration getRemovalDelay() {
@@ -71,11 +73,11 @@ public class NonPlayerCharacter extends Character {
     }
 
     void tick(long time) {
-        if (brain != null) {
+        updatePosition(entity.getPosition());
+
+        if (isAlive()) {
             brain.tick(time);
         }
-
-        updatePosition(entity.getPosition());
     }
 
     @Override

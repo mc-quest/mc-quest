@@ -8,7 +8,7 @@ public class BlackboardKey<T> {
     }
 
     public static <T> BlackboardKey<T> of(String key) {
-        return new BlackboardKey<T>(key);
+        return new BlackboardKey<>(key);
     }
 
     public String getKey() {

@@ -7,13 +7,14 @@ import net.minestom.server.coordinate.Pos;
 public class TaskFollowTarget extends Task {
     private static final long PATH_UPDATE_PERIOD = 500;
 
-    private final BlackboardKey<Character> target;
+    private final BlackboardKey<Character> targetKey;
     private final double acceptanceRadius;
     private final double followDistance;
     private long lastPathUpdate;
 
-    public TaskFollowTarget(BlackboardKey<Character> target, double acceptanceRadius, double followDistance) {
-        this.target = target;
+    public TaskFollowTarget(BlackboardKey<Character> targetKey,
+                            double acceptanceRadius, double followDistance) {
+        this.targetKey = targetKey;
         this.acceptanceRadius = acceptanceRadius;
         this.followDistance = followDistance;
         lastPathUpdate = 0;
@@ -22,7 +23,7 @@ public class TaskFollowTarget extends Task {
     @Override
     public BehaviorStatus update(long time) {
         NonPlayerCharacter character = getCharacter();
-        Character target = getBlackboard().get(this.target);
+        Character target = getBlackboard().get(targetKey);
         if (target == null) {
             // No target is set.
             return BehaviorStatus.FAILURE;

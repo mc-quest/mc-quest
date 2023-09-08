@@ -9,11 +9,11 @@ import com.mcquest.core.object.ObjectManager;
 import net.minestom.server.coordinate.Pos;
 
 public class TaskFindClosestTarget extends Task {
-    private final BlackboardKey<Character> target;
+    private final BlackboardKey<Character> targetKey;
     private final double radius;
 
-    public TaskFindClosestTarget(BlackboardKey<Character> target, double radius) {
-        this.target = target;
+    public TaskFindClosestTarget(BlackboardKey<Character> targetKey, double radius) {
+        this.targetKey = targetKey;
         this.radius = radius;
     }
 
@@ -30,7 +30,7 @@ public class TaskFindClosestTarget extends Task {
                 .filter(this::shouldTarget)
                 .min(this::compareTargetsByDistance)
                 .orElse(null);
-        getBlackboard().set(this.target, target);
+        getBlackboard().set(targetKey, target);
         return target == null ? BehaviorStatus.FAILURE : BehaviorStatus.SUCCESS;
     }
 

@@ -17,4 +17,8 @@ public class Blackboard {
     public <T> void set(BlackboardKey<T> key, T value) {
         map.put(key.getKey(), value);
     }
+
+    public <T> void remove(BlackboardKey<T> key) {
+        map.remove(key.getKey());
+    }
 }

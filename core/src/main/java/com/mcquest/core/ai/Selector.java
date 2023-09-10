@@ -26,4 +26,14 @@ public final class Selector extends Composite {
 
         return BehaviorStatus.FAILURE;
     }
+
+    @Override
+    public void stop(long time) {
+        if (currentChild < children.length) {
+            Behavior child = children[currentChild];
+            if (child.getStatus() == BehaviorStatus.RUNNING) {
+                child.abort(time);
+            }
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.mcquest.core.ai.Behavior;
 import com.mcquest.core.ai.BehaviorTree;
 import com.mcquest.core.ai.Navigator;
 import com.mcquest.core.object.ObjectSpawner;
+import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.damage.DamageType;
@@ -125,10 +126,14 @@ public class NonPlayerCharacter extends Character {
         }
 
         if (!modelEntity.model().animations().containsKey(animation)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("No such animation: " + animation);
         }
 
         modelEntity.playAnimation(animation);
+    }
+
+    public void playSound(Sound sound) {
+        getInstance().playSound(sound, getPosition());
     }
 
     /**

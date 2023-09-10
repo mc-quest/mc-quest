@@ -33,14 +33,12 @@ public class TaskFollowTarget extends Task {
         Pos targetPosition = target.getPosition();
         if (character.getPosition().distanceSquared(targetPosition) <= acceptanceRadius * acceptanceRadius) {
             // Character is close enough to target.
-            navigator.setPathTo(null);
             character.lookAt(target);
             return BehaviorStatus.SUCCESS;
         }
 
         if (character.getPosition().distanceSquared(targetPosition) > followDistance * followDistance) {
             // Target is too far away.
-            navigator.setPathTo(null);
             return BehaviorStatus.FAILURE;
         }
 
@@ -57,5 +55,10 @@ public class TaskFollowTarget extends Task {
 
         // Character is en route to target.
         return BehaviorStatus.RUNNING;
+    }
+
+    @Override
+    public void stop(long time) {
+        getCharacter().getNavigator().setPathTo(null);
     }
 }

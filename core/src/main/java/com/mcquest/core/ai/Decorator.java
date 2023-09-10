@@ -13,4 +13,11 @@ public abstract class Decorator extends Behavior {
 
         child.initialize(tree);
     }
+
+    @Override
+    public void stop(long time) {
+        if (child.getStatus() == BehaviorStatus.RUNNING) {
+            child.abort(time);
+        }
+    }
 }

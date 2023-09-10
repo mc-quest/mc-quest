@@ -1,9 +1,11 @@
 package com.mcquest.core.ai;
 
 import com.mcquest.core.character.NonPlayerCharacter;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.pathfinding.PFPathingEntity;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 public final class Navigator {
     private final NonPlayerCharacter character;
@@ -13,8 +15,13 @@ public final class Navigator {
         this.character = character;
     }
 
-    public void setPathTo(Pos position) {
-        navigator().setPathTo(position);
+    public @Nullable Pos getPathPosition() {
+        Point position = navigator().getPathPosition();
+        return position == null ? null : Pos.fromPoint(position);
+    }
+
+    public boolean setPathTo(Pos position) {
+        return navigator().setPathTo(position);
     }
 
     public void jump(double height) {

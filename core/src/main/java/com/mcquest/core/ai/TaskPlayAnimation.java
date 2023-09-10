@@ -11,9 +11,4 @@ public class TaskPlayAnimation extends Task {
     public void start(long time) {
         getCharacter().playAnimation(animation);
     }
-
-    @Override
-    public void stop(long time) {
-        getCharacter().playAnimation(null);
-    }
 }

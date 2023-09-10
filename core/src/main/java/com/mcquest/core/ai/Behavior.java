@@ -39,6 +39,11 @@ public class Behavior {
         return status;
     }
 
+    final void abort(long time) {
+        status = BehaviorStatus.FAILURE;
+        stop(time);
+    }
+
     protected void start(long time) {
     }
 

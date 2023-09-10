@@ -42,6 +42,7 @@ public class Swords implements Feature {
             }
 
             character.damage(pc, event.getWeapon().getPhysicalDamage());
+            character.applyImpulse(direction.mul(100));
             Sound hitSound =
                     Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.MASTER, 0.5f, 1f);
             instance.playSound(hitSound);

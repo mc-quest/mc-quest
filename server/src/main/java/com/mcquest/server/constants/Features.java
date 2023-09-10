@@ -9,6 +9,7 @@ public class Features {
     public static final Feature MAGE_PLAYER_CLASS = new MagePlayerClass();
     public static final Feature SWORDS = new Swords();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
+    public static final Feature BROODMOTHER_LAIR = new BroodmotherLair();
 
     public static Feature[] all() {
         return new Feature[]{
@@ -16,7 +17,8 @@ public class Features {
                 FIGHTER_PLAYER_CLASS,
                 MAGE_PLAYER_CLASS,
                 SWORDS,
-                TUTORIAL_QUEST
+                TUTORIAL_QUEST,
+                BROODMOTHER_LAIR
         };
     }
 }

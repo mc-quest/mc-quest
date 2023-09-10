@@ -95,7 +95,7 @@ public class PlayerCharacterManager {
 
     private ObjectSpawner pcSpawner(Instance instance, Pos position,
                                     Player player, PlayerCharacterData data) {
-        return new ObjectSpawner(instance, position, pcProvider(player, data));
+        return ObjectSpawner.of(instance, position, pcProvider(player, data));
     }
 
     private ObjectProvider pcProvider(Player player, PlayerCharacterData data) {

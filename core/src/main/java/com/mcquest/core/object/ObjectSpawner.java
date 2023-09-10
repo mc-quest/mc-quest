@@ -12,12 +12,16 @@ public final class ObjectSpawner {
     private @Nullable Object object;
     private ObjectManager objectManager;
 
-    public ObjectSpawner(Instance instance, Pos position, ObjectProvider objectProvider) {
+    private ObjectSpawner(Instance instance, Pos position, ObjectProvider objectProvider) {
         this.instance = instance;
         this.position = position;
         this.objectProvider = objectProvider;
         object = null;
         objectManager = null;
+    }
+
+    public static ObjectSpawner of(Instance instance, Pos position, ObjectProvider objectProvider) {
+        return new ObjectSpawner(instance, position, objectProvider);
     }
 
     public Instance getInstance() {

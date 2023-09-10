@@ -27,7 +27,7 @@ import team.unnamed.hephaestus.minestom.ModelEntity;
 import java.time.Duration;
 import java.util.Collection;
 
-public class LootChest extends Object {
+public final class LootChest extends Object {
     private final LootTable lootTable;
     private final EventEmitter<LootChestOpenEvent> onOpen;
     private Duration respawnDuration;

@@ -14,11 +14,9 @@ public class TrainingDummy extends NonPlayerCharacter {
     public TrainingDummy(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Models.TRAINING_DUMMY));
         setName("Training Dummy");
-        setLevel(1);
         setMaxHealth(10);
         setRemovalDelay(Duration.ofMillis(1500));
-        setRespawnDuration(Duration.ofSeconds(5));
-        getNavigator().setAvian(true);
+        setRespawnDuration(Duration.ofSeconds(30));
     }
 
     @Override
@@ -33,15 +31,13 @@ public class TrainingDummy extends NonPlayerCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
-        Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f);
-        getInstance().playSound(sound, getPosition());
+        playSound(Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f));
         playAnimation("hit");
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
-        Sound sound = Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f);
-        getInstance().playSound(sound, getPosition());
+        playSound(Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f));
         playAnimation("death");
     }
 }

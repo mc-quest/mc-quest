@@ -6,7 +6,9 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.entity.hologram.Hologram;
 
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 class Nameplate {
     private final Character character;
@@ -34,11 +36,11 @@ class Nameplate {
 
     void despawn() {
         for (Hologram name : names.values()) {
-            name.remove();
+            remove(name);
         }
-        healthBar.remove();
-
         names.clear();
+
+        remove(healthBar);
         healthBar = null;
     }
 
@@ -67,11 +69,11 @@ class Nameplate {
 
     void updatePosition() {
         for (Hologram name : names.values()) {
-            name.setPosition(namePosition());
+            setPosition(name, namePosition());
         }
 
         if (healthBar != null) {
-            healthBar.setPosition(healthBarPosition());
+            setPosition(healthBar, healthBarPosition());
         }
     }
 
@@ -97,5 +99,22 @@ class Nameplate {
 
     private double height() {
         return character.getHitbox().getExtents().y();
+    }
+
+    private void setPosition(Hologram hologram, Pos position) {
+        // Workaround for Minestom bug.
+        if (hologram.getEntity().getChunk() == null) {
+            return;
+        }
+
+        hologram.setPosition(position);
+    }
+
+    private void remove(Hologram hologram) {
+        // Workaround for Minestom bug.
+        Set<Player> viewers = new HashSet<>(hologram.getViewers());
+        viewers.forEach(hologram::removeViewer);
+
+        hologram.remove();
     }
 }

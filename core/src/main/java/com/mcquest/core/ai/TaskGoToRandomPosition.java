@@ -52,7 +52,7 @@ public class TaskGoToRandomPosition extends Task {
     }
 
     private static List<Vec> getOffsets(int radius) {
-        List<Vec> offsets = new ArrayList();
+        List<Vec> offsets = new ArrayList<>();
 
         for (int x = -radius; x <= radius; ++x) {
             for (int y = -radius; y <= radius; ++y) {

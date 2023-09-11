@@ -32,12 +32,12 @@ public class TrainingDummy extends NonPlayerCharacter {
     @Override
     protected void onDamage(DamageSource source) {
         playSound(Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_HIT, Sound.Source.NEUTRAL, 1f, 1f));
-        playAnimation("hit");
+        playAnimation(CharacterAnimation.named("hit"));
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
         playSound(Sound.sound(SoundEvent.ENTITY_ARMOR_STAND_BREAK, Sound.Source.NEUTRAL, 1f, 1f));
-        playAnimation("death");
+        playAnimation(CharacterAnimation.named("death"));
     }
 }

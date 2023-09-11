@@ -2,6 +2,7 @@ package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.ai.*;
+import com.mcquest.core.character.CharacterAnimation;
 import com.mcquest.core.character.CharacterModel;
 import com.mcquest.core.character.DamageSource;
 import com.mcquest.core.character.NonPlayerCharacter;
@@ -31,7 +32,7 @@ public class Deer extends NonPlayerCharacter {
                 // Run if panicking.
                 new Sequence(
                         new TaskAction(this::isPanicking),
-                        new TaskPlayAnimation("run"),
+                        new TaskPlayAnimation(CharacterAnimation.named("run")),
                         new Parallel(
                                 Parallel.Policy.REQUIRE_ONE,
                                 Parallel.Policy.REQUIRE_ONE,
@@ -46,7 +47,7 @@ public class Deer extends NonPlayerCharacter {
                 ),
                 // Forage.
                 new Sequence(
-                        new TaskPlayAnimation("walk"),
+                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
                         new Parallel(
                                 Parallel.Policy.REQUIRE_ONE,
                                 Parallel.Policy.REQUIRE_ONE,
@@ -57,9 +58,9 @@ public class Deer extends NonPlayerCharacter {
                                         new TaskWait(Duration.ofMillis(750))
                                 ))
                         ),
-                        new TaskPlayAnimation("idle"),
+                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation("eat"),
+                        new TaskPlayAnimation(CharacterAnimation.named("eat")),
                         new TaskWait(Duration.ofMillis(1500)),
                         new LoopNTimes(9, new Sequence(
                                 new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.AMBIENT,
@@ -67,7 +68,7 @@ public class Deer extends NonPlayerCharacter {
                                 new TaskWait(Duration.ofMillis(500))
                         )),
                         new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation("idle"),
+                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2))
                 )
         ));
@@ -88,7 +89,7 @@ public class Deer extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource killer) {
-        playAnimation("death");
+        playAnimation(CharacterAnimation.named("death"));
         playSound(Sound.sound(SoundEvent.ENTITY_MULE_DEATH, Sound.Source.AMBIENT, 1f, 1f));
     }
 

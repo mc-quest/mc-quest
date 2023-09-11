@@ -4,8 +4,12 @@ import com.mcquest.core.Mmorpg;
 import com.mcquest.core.ai.*;
 import com.mcquest.core.character.Character;
 import com.mcquest.core.character.*;
+import com.mcquest.core.loot.ItemPoolEntry;
+import com.mcquest.core.loot.LootTable;
+import com.mcquest.core.loot.Pool;
 import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.physics.Triggers;
+import com.mcquest.server.constants.Items;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -23,12 +27,18 @@ public class Spider extends NonPlayerCharacter {
         setMass(20);
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(45));
+        setExperiencePoints(10);
+        setLootTable(LootTable.builder()
+                .pool(Pool.builder()
+                        .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
+                        .build())
+                .build());
 
         BlackboardKey<Character> targetKey = BlackboardKey.of("target");
         setBrain(new ActiveSelector(
                 new Sequence(
                         new TaskFindClosestTarget(targetKey, 10.0),
-                        new TaskPlayAnimation("walk"),
+                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
                         new Parallel(
                                 Parallel.Policy.REQUIRE_ONE,
                                 Parallel.Policy.REQUIRE_ONE,
@@ -41,16 +51,25 @@ public class Spider extends NonPlayerCharacter {
                         ),
                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK, Sound.Source.HOSTILE, 1f
                                 , 1f)),
-                        new TaskPlayAnimation("attack"),
+                        new TaskPlayAnimation(CharacterAnimation.named("attack")),
                         new TaskWait(Duration.ofMillis(500)),
                         new TaskAction(this::attack),
                         new TaskWait(Duration.ofMillis(800))
                 ),
                 new Sequence(
-                        new TaskPlayAnimation("idle"),
+                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation("walk"),
-                        new TaskGoToRandomPosition(10)
+                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
+                        new Parallel(
+                                Parallel.Policy.REQUIRE_ONE,
+                                Parallel.Policy.REQUIRE_ONE,
+                                new TaskGoToRandomPosition(10),
+                                new LoopForever(new Sequence(
+                                        new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
+                                                Sound.Source.HOSTILE, 0.75f, 1.5f)),
+                                        new TaskWait(Duration.ofMillis(500))
+                                ))
+                        )
                 )
         ));
     }
@@ -72,11 +91,6 @@ public class Spider extends NonPlayerCharacter {
     @Override
     protected void onDeath(DamageSource source) {
         playSound(Sound.sound(SoundEvent.ENTITY_SPIDER_DEATH, Sound.Source.HOSTILE, 1f, 1f));
-        if (source instanceof PlayerCharacter pc) {
-            pc.setMaxMana(100);
-            pc.setMana(100);
-            pc.grantExperiencePoints(100);
-        }
     }
 
     private boolean attack(long time) {

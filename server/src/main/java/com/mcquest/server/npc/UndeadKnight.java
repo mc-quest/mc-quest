@@ -31,7 +31,7 @@ public class UndeadKnight extends NonPlayerCharacter {
         setBrain(new ActiveSelector(
                 new Sequence(
                         new TaskFindClosestTarget(targetKey, 15.0),
-                        new TaskPlayAnimation("walk"),
+                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
                         new Parallel(
                                 Parallel.Policy.REQUIRE_ONE,
                                 Parallel.Policy.REQUIRE_ONE,
@@ -42,7 +42,7 @@ public class UndeadKnight extends NonPlayerCharacter {
                                                 Sound.Source.HOSTILE, 1f, 1f))
                                 ))
                         ),
-                        new TaskPlayAnimation("attack_sword"),
+                        new TaskPlayAnimation(CharacterAnimation.named("attack_sword")),
                         new TaskWait(Duration.ofMillis(700)),
                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.HOSTILE, 1f
                                 , 0.75f)),
@@ -50,9 +50,9 @@ public class UndeadKnight extends NonPlayerCharacter {
                         new TaskWait(Duration.ofMillis(800))
                 ),
                 new Sequence(
-                        new TaskPlayAnimation("idle"),
+                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation("walk"),
+                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
                         new TaskGoToRandomPosition(10)
                 )
         ));
@@ -79,7 +79,7 @@ public class UndeadKnight extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource source) {
-        playAnimation("death");
+        playAnimation(CharacterAnimation.named("death"));
         getMmorpg().getSchedulerManager()
                 .buildTask(() -> playSound(Sound.sound(SoundEvent.ENTITY_GENERIC_BIG_FALL, Sound.Source.HOSTILE, 1f,
                         1f)))

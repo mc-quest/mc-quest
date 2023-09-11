@@ -4,7 +4,9 @@ import com.mcquest.core.Mmorpg;
 import com.mcquest.core.ai.Behavior;
 import com.mcquest.core.ai.BehaviorTree;
 import com.mcquest.core.ai.Navigator;
+import com.mcquest.core.loot.LootTable;
 import com.mcquest.core.object.ObjectSpawner;
+import com.mcquest.core.quest.QuestObjective;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
@@ -12,15 +14,19 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 import java.time.Duration;
+import java.util.*;
 
 public class NonPlayerCharacter extends Character {
     private final EntityCreature entity;
     private final Navigator navigator;
     private final BehaviorTree brain;
+    private final Set<PlayerCharacter> attackers;
+    private final Collection<QuestObjective> slayQuestObjectives;
+    private double experiencePoints;
+    private LootTable lootTable;
     private Duration respawnDuration;
     private Task endDamageTint;
 
@@ -29,10 +35,38 @@ public class NonPlayerCharacter extends Character {
         entity = model.createEntity(this);
         navigator = new Navigator(this);
         brain = new BehaviorTree(this);
+        attackers = new HashSet<>();
+        experiencePoints = 0.0;
+        lootTable = null;
+        slayQuestObjectives = new ArrayList<>();
     }
 
     public final void setLevel(int level) {
         super.setLevel(level);
+    }
+
+    public double getExperiencePoints() {
+        return experiencePoints;
+    }
+
+    public void setExperiencePoints(double experiencePoints) {
+        this.experiencePoints = experiencePoints;
+    }
+
+    public LootTable getLootTable() {
+        return lootTable;
+    }
+
+    public void setLootTable(LootTable lootTable) {
+        this.lootTable = lootTable;
+    }
+
+    public Collection<QuestObjective> getSlayQuestObjectives() {
+        return slayQuestObjectives;
+    }
+
+    public void addSlayQuestObjective(QuestObjective objective) {
+        slayQuestObjectives.add(objective);
     }
 
     @Override
@@ -60,6 +94,10 @@ public class NonPlayerCharacter extends Character {
         this.respawnDuration = respawnDuration;
     }
 
+    public Set<PlayerCharacter> getAttackers() {
+        return Collections.unmodifiableSet(attackers);
+    }
+
     @Override
     protected final void spawn() {
         setHealth(getMaxHealth());
@@ -85,6 +123,10 @@ public class NonPlayerCharacter extends Character {
     public final void damage(@NotNull DamageSource source, double amount) {
         super.damage(source, amount);
 
+        if (source instanceof PlayerCharacter pc) {
+            attackers.add(pc);
+        }
+
         if (getHealth() == 0.0) {
             die(source);
         } else {
@@ -107,29 +149,8 @@ public class NonPlayerCharacter extends Character {
         entity.lookAt(character.getEntity());
     }
 
-    public final void swingMainHand() {
-        entity.swingMainHand();
-    }
-
-    public final void swingOffHand() {
-        entity.swingOffHand();
-    }
-
-    public final void playAnimation(@Nullable String animation) {
-        if (!(entity instanceof ModelEntity modelEntity)) {
-            throw new IllegalStateException();
-        }
-
-        if (animation == null) {
-            modelEntity.animationController().clearQueue();
-            return;
-        }
-
-        if (!modelEntity.model().animations().containsKey(animation)) {
-            throw new IllegalArgumentException("No such animation: " + animation);
-        }
-
-        modelEntity.playAnimation(animation);
+    public final void playAnimation(@NotNull CharacterAnimation animation) {
+        animation.play(entity);
     }
 
     public void playSound(Sound sound) {
@@ -176,12 +197,21 @@ public class NonPlayerCharacter extends Character {
 
     private void die(DamageSource killer) {
         deathEffect();
-        entity.kill();
         onDeath(killer);
-        SchedulerManager scheduler = getMmorpg().getSchedulerManager();
+
+        for (PlayerCharacter attacker : attackers) {
+            attacker.grantExperiencePoints(experiencePoints / attackers.size());
+            for (QuestObjective objective : slayQuestObjectives) {
+                objective.addProgress(attacker);
+            }
+        }
+
         getSpawner().remove();
         getHitbox().remove();
+
+        SchedulerManager scheduler = getMmorpg().getSchedulerManager();
         scheduler.buildTask(this::remove).delay(getRemovalDelay()).schedule();
+
         if (respawnDuration != null) {
             scheduler.buildTask(this::respawn)
                     .delay(respawnDuration.plus(getRemovalDelay()))
@@ -200,9 +230,8 @@ public class NonPlayerCharacter extends Character {
     private void deathEffect() {
         if (entity instanceof ModelEntity modelEntity) {
             modelDamageTint(modelEntity);
-        } else {
-            entity.kill();
         }
+        entity.kill();
     }
 
     private void modelDamageTint(ModelEntity modelEntity) {

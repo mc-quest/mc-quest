@@ -308,6 +308,10 @@ public final class PlayerCharacter extends Character {
     }
 
     public void grantExperiencePoints(double experiencePoints) {
+        if (experiencePoints == 0.0) {
+            return;
+        }
+
         sendMessage(Component.text("+" + (int) Math.round(experiencePoints) + " XP",
                 NamedTextColor.GREEN));
         this.experiencePoints = MathUtility.clamp(this.experiencePoints + experiencePoints,

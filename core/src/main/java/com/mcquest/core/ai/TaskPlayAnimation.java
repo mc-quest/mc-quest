@@ -1,9 +1,11 @@
 package com.mcquest.core.ai;
 
-public class TaskPlayAnimation extends Task {
-    private final String animation;
+import com.mcquest.core.character.CharacterAnimation;
 
-    public TaskPlayAnimation(String animation) {
+public class TaskPlayAnimation extends Task {
+    private final CharacterAnimation animation;
+
+    public TaskPlayAnimation(CharacterAnimation animation) {
         this.animation = animation;
     }
 

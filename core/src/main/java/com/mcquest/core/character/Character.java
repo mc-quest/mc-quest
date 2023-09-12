@@ -233,7 +233,7 @@ public abstract class Character extends Object implements DamageSource {
         return Component.empty()
                 .append(Component.text("[", NamedTextColor.GRAY))
                 .append(Component.text(name, getAttitude(pc).getColor()))
-                .append(Component.text("]: ", NamedTextColor.GRAY))
+                .append(Component.text("] ", NamedTextColor.GRAY))
                 .append(message);
     }
 

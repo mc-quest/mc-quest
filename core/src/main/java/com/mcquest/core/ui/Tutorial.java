@@ -12,7 +12,7 @@ public class Tutorial {
         message = Component.empty()
                 .append(Component.text("[", NamedTextColor.GRAY))
                 .append(Component.text("Tutorial", NamedTextColor.GREEN))
-                .append(Component.text("]: ", NamedTextColor.GRAY))
+                .append(Component.text("] ", NamedTextColor.GRAY))
                 .append(message);
         pc.sendMessage(message);
     }

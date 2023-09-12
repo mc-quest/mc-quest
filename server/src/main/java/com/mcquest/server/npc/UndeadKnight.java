@@ -2,12 +2,11 @@ package com.mcquest.server.npc;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.ai.*;
-import com.mcquest.core.character.*;
 import com.mcquest.core.character.Character;
+import com.mcquest.core.character.*;
 import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.physics.Triggers;
 import com.mcquest.server.constants.Models;
-import com.mcquest.server.constants.Music;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -53,17 +52,22 @@ public class UndeadKnight extends NonPlayerCharacter {
                         new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new TaskGoToRandomPosition(10)
+                        new Parallel(
+                                Parallel.Policy.REQUIRE_ONE,
+                                Parallel.Policy.REQUIRE_ONE,
+                                new TaskGoToRandomPosition(10),
+                                new LoopForever(new Sequence(
+                                        new TaskWait(Duration.ofMillis(750)),
+                                        new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
+                                                Sound.Source.HOSTILE, 1f, 1f))
+                                ))
+                        )
                 )
         ));
     }
 
     @Override
     public Attitude getAttitude(Character other) {
-        if (other instanceof PlayerCharacter pc) {
-            pc.getMusicPlayer().setSong(Music.BROODMOTHER_LAIR);
-            getBossHealthBar().addViewer(pc);
-        }
         return other instanceof PlayerCharacter ? Attitude.HOSTILE : Attitude.NEUTRAL;
     }
 

@@ -52,7 +52,7 @@ class ResourcePackBuilder {
 
     private void writeBaseResourcePack(FileTree tree) {
         String path = "resourcepack";
-        AssetDirectory resourcePackDir = new AssetDirectory(classLoader(), path);
+        AssetDirectory resourcePackDir = AssetDirectory.of(classLoader(), path);
         for (Asset asset : resourcePackDir.getAssets()) {
             String subPath = asset.getPath().substring(path.length() + 1);
             tree.write(subPath, Writable.inputStream(asset::getStream));
@@ -81,7 +81,7 @@ class ResourcePackBuilder {
         List<ItemOverride> overrides = new ArrayList<>();
 
         for (String icon : icons) {
-            Asset asset = new Asset(classLoader(), String.format("textures/%s.png", icon));
+            Asset asset = Asset.of(classLoader(), String.format("textures/%s.png", icon));
             Key key = Key.key(Namespaces.GUI, icon);
             ResourcePackUtility.writeIcon(tree, asset, key, overrides);
         }
@@ -147,7 +147,7 @@ class ResourcePackBuilder {
     }
 
     private void disableBackgroundMusic(FileTree tree) {
-        String[] backgroundMusic = new Asset(classLoader(), "data/minecraft_music.json")
+        String[] backgroundMusic = Asset.of(classLoader(), "data/minecraft_music.json")
                 .readJson(String[].class);
         Map<String, SoundEvent> sounds = new HashMap<>();
 

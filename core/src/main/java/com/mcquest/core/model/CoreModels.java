@@ -13,7 +13,7 @@ public class CoreModels {
     }
 
     private static Model loadModel(String path) {
-        Asset asset = new Asset(CoreModels.class.getClassLoader(), path);
+        Asset asset = Asset.of(CoreModels.class.getClassLoader(), path);
         return asset.readModel();
     }
 }

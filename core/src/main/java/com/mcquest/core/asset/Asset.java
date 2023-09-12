@@ -19,9 +19,13 @@ public class Asset {
     private final ClassLoader classLoader;
     private final String path;
 
-    public Asset(ClassLoader classLoader, String path) {
+    private Asset(ClassLoader classLoader, String path) {
         this.classLoader = classLoader;
         this.path = path;
+    }
+
+    public static Asset of(ClassLoader classLoader, String path) {
+        return new Asset(classLoader, path);
     }
 
     public String getPath() {

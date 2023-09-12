@@ -44,7 +44,7 @@ import java.time.Duration;
 import java.util.Arrays;
 
 public final class PlayerCharacter extends Character {
-    private static final double[] EXPERIENCE_POINTS_PER_LEVEL = new Asset(
+    private static final double[] EXPERIENCE_POINTS_PER_LEVEL = Asset.of(
             PlayerCharacter.class.getClassLoader(),
             "data/experience_points_per_level.json"
     ).readJson(double[].class);

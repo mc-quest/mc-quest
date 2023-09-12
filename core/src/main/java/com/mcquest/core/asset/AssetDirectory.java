@@ -16,9 +16,13 @@ public class AssetDirectory {
     private final ClassLoader classLoader;
     private final String path;
 
-    public AssetDirectory(ClassLoader classLoader, String path) {
+    private AssetDirectory(ClassLoader classLoader, String path) {
         this.classLoader = classLoader;
         this.path = path;
+    }
+
+    public static AssetDirectory of(ClassLoader classLoader, String path) {
+        return new AssetDirectory(classLoader, path);
     }
 
     public String getPath() {
@@ -45,7 +49,7 @@ public class AssetDirectory {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     String assetPath = path + "/" + dirRootPath.relativize(file);
-                    assets.add(new Asset(classLoader, assetPath));
+                    assets.add(Asset.of(classLoader, assetPath));
                     return FileVisitResult.CONTINUE;
                 }
             });

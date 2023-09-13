@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.hologram.Hologram;
 import net.minestom.server.entity.metadata.other.ArmorStandMeta;
 import net.minestom.server.particle.Particle;
@@ -174,11 +175,11 @@ public final class LootChest extends Object {
         }
     }
 
-    class Entity extends ModelEntity {
+    static class Entity extends ModelEntity {
         private final LootChest lootChest;
 
         private Entity(LootChest lootChest) {
-            super(CoreModels.LOOT_CHEST);
+            super(EntityType.ARMOR_STAND, CoreModels.LOOT_CHEST);
             this.lootChest = lootChest;
         }
 

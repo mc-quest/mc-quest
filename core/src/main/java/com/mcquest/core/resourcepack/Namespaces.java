@@ -10,4 +10,5 @@ public class Namespaces {
     public static final String MUSIC = "music";
     public static final String MODELS = "models";
     public static final String AUDIO = "audio";
+    public static final String MINECRAFT = "minecraft";
 }

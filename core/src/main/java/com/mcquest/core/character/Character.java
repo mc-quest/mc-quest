@@ -105,7 +105,6 @@ public abstract class Character extends Object implements DamageSource {
 
     @Override
     public void setPosition(@NotNull Pos position) {
-        // TODO: fix PlayerCharacter implementation
         updatePosition(position);
 
         getEntity().teleport(position);

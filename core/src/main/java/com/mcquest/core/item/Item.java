@@ -1,7 +1,6 @@
 package com.mcquest.core.item;
 
 import com.google.common.collect.ListMultimap;
-import com.mcquest.core.commerce.Money;
 import com.mcquest.core.instance.Instance;
 import com.mcquest.core.util.MathUtility;
 import net.kyori.adventure.text.Component;
@@ -14,7 +13,7 @@ import net.minestom.server.item.Material;
 import net.minestom.server.tag.Tag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 public abstract class Item {
@@ -77,8 +76,10 @@ public abstract class Item {
     public abstract ItemStack getItemStack();
 
     @ApiStatus.Internal
-    public abstract void writeResources(FileTree tree,
-                                        ListMultimap<Material, ItemOverride> overrides);
+    public abstract void writeResources(
+            ResourcePack resourcePack,
+            ListMultimap<Material, ItemOverride> overrides
+    );
 
     static class Builder {
         int id;

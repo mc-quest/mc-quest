@@ -33,7 +33,7 @@ public interface CharacterModel {
     }
 
     static CharacterModel of(Model model) {
-        return character -> new ModelEntity(model) {
+        return character -> new ModelEntity(EntityType.ARMOR_STAND, model) {
             @Override
             public void tick(long time) {
                 super.tick(time);

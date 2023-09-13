@@ -10,8 +10,8 @@ import com.mcquest.core.ui.Hotbar;
 import net.kyori.adventure.key.Key;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.*;
-import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.*;
 import team.unnamed.creative.texture.Texture;
 
@@ -40,32 +40,49 @@ public class ResourcePackUtility {
         return ret;
     }
 
-    public static int writeIcon(FileTree tree, Asset icon, Key key, Material material,
-                                ListMultimap<Material, ItemOverride> overrides) {
-        return writeIcon(tree, icon, key, overrides.get(material));
+    public static int writeIcon(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            Material material,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
+        return writeIcon(resourcePack, icon, key, overrides.get(material));
     }
 
-    public static int writeIcon(FileTree tree, Asset icon, Key key,
-                                List<ItemOverride> overrides) {
-        return writeIcon(tree,
-                Writable.inputStream(icon::getStream), key, overrides);
+    public static int writeIcon(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            List<ItemOverride> overrides
+    ) {
+        return writeIcon(
+                resourcePack,
+                Writable.inputStream(icon::getStream),
+                key,
+                overrides
+        );
     }
 
-    private static int writeIcon(FileTree tree, Writable icon,
-                                 Key key, List<ItemOverride> overrides) {
+    private static int writeIcon(
+            ResourcePack resourcePack,
+            Writable icon,
+            Key key,
+            List<ItemOverride> overrides
+    ) {
         int customModelData = overrides.size() + 1;
 
         Texture texture = Texture.of(key, icon);
-        tree.write(texture);
+        resourcePack.texture(texture);
 
         Model model = Model.builder()
                 .key(key)
                 .parent(Key.key("minecraft", "item/handheld"))
-                .textures(ModelTexture.builder()
-                        .layers(key)
+                .textures(ModelTextures.builder()
+                        .layers(ModelTexture.ofKey(key))
                         .build())
                 .build();
-        tree.write(model);
+        resourcePack.model(model);
 
         ItemPredicate itemPredicate = ItemPredicate.customModelData(customModelData);
         ItemOverride itemOverride = ItemOverride.of(key, itemPredicate);
@@ -74,15 +91,30 @@ public class ResourcePackUtility {
         return customModelData;
     }
 
-    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
-                                         int cooldownTexture, Material material,
-                                         ListMultimap<Material, ItemOverride> overrides) {
-        writeCooldownIcon(tree, icon, key, cooldownTexture, overrides.get(material));
+    public static void writeCooldownIcon(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            int cooldownTexture,
+            Material material,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
+        writeCooldownIcon(
+                resourcePack,
+                icon,
+                key,
+                cooldownTexture,
+                overrides.get(material)
+        );
     }
 
-    public static void writeCooldownIcon(FileTree tree, Asset icon, Key key,
-                                         int cooldownTexture,
-                                         List<ItemOverride> overrides) {
+    public static void writeCooldownIcon(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            int cooldownTexture,
+            List<ItemOverride> overrides
+    ) {
         try {
             double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
             BufferedImage image = icon.readImage();
@@ -111,15 +143,19 @@ public class ResourcePackUtility {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", stream);
 
-            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+            writeIcon(resourcePack, Writable.bytes(stream.toByteArray()), key, overrides);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public static void writeCooldownIconUnusable(FileTree tree, Asset icon, Key key,
-                                                 int cooldownTexture,
-                                                 List<ItemOverride> overrides) {
+    public static void writeCooldownIconUnusable(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            int cooldownTexture,
+            List<ItemOverride> overrides
+    ) {
         try {
             double thetaMax = ((double) cooldownTexture / Hotbar.COOLDOWN_TEXTURES) * 2.0 * Math.PI;
             BufferedImage image = icon.readImage();
@@ -155,14 +191,18 @@ public class ResourcePackUtility {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", stream);
 
-            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+            writeIcon(resourcePack, Writable.bytes(stream.toByteArray()), key, overrides);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public static void writeLockedIcon(FileTree tree, Asset icon, Key key,
-                                       List<ItemOverride> overrides) {
+    public static void writeLockedIcon(
+            ResourcePack resourcePack,
+            Asset icon,
+            Key key,
+            List<ItemOverride> overrides
+    ) {
         try {
             BufferedImage image = icon.readImage();
             for (int x = 0; x < image.getWidth(); x++) {
@@ -173,41 +213,54 @@ public class ResourcePackUtility {
             }
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ImageIO.write(image, "png", stream);
-            writeIcon(tree, Writable.bytes(stream.toByteArray()), key, overrides);
+            writeIcon(resourcePack, Writable.bytes(stream.toByteArray()), key, overrides);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
     }
 
-    public static void writeItemOverrides(FileTree tree,
-                                          ListMultimap<Material, ItemOverride> overrides) {
+    public static void writeItemOverrides(
+            ResourcePack resourcePack,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
         for (Material material : overrides.keySet()) {
-            writeItemOverrides(tree, material, overrides.get(material));
+            writeItemOverrides(resourcePack, material, overrides.get(material));
         }
     }
 
-    public static void writeItemOverrides(FileTree tree, Material material,
-                                          List<ItemOverride> overrides) {
+    public static void writeItemOverrides(
+            ResourcePack resourcePack,
+            Material material,
+            List<ItemOverride> overrides
+    ) {
         Key materialKey = Key.key(material.key().namespace(), "item/" + material.key().value());
         Model model = Model.builder()
                 .key(materialKey)
                 .parent(Key.key("minecraft", "item/handheld"))
-                .textures(ModelTexture.builder()
-                        .layers(materialKey)
+                .textures(ModelTextures.builder()
+                        .layers(ModelTexture.ofKey(materialKey))
                         .build())
                 .overrides(overrides)
                 .build();
-        tree.write(model);
+        resourcePack.model(model);
     }
 
-    public static int writeModel(FileTree tree, Asset bbmodel, Key key,
-                                 Material material,
-                                 ListMultimap<Material, ItemOverride> overrides) {
-        return writeModel(tree, bbmodel, key, overrides.get(material));
+    public static int writeModel(
+            ResourcePack resourcePack,
+            Asset bbmodel,
+            Key key,
+            Material material,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
+        return writeModel(resourcePack, bbmodel, key, overrides.get(material));
     }
 
-    public static int writeModel(FileTree tree, Asset bbmodel, Key key,
-                                 List<ItemOverride> overrides) {
+    public static int writeModel(
+            ResourcePack resourcePack,
+            Asset bbmodel,
+            Key key,
+            List<ItemOverride> overrides
+    ) {
         int customModelData = overrides.size() + 1;
 
         JsonObject modelJson = bbmodel.readJson().getAsJsonObject();
@@ -222,10 +275,10 @@ public class ResourcePackUtility {
 
         JsonArray texturesJson = modelJson.get("textures").getAsJsonArray();
         List<Texture> textures = new ArrayList<>();
-        Map<String, Key> textureMappings = new HashMap<>();
+        Map<String, ModelTexture> textureMappings = new HashMap<>();
         parseTextures(texturesJson, textures, textureMappings, key);
 
-        ModelTexture modelTexture = ModelTexture.builder()
+        ModelTextures modelTextures = ModelTextures.builder()
                 .variables(textureMappings)
                 .build();
 
@@ -236,15 +289,15 @@ public class ResourcePackUtility {
         JsonArray elementsJson = modelJson.get("elements").getAsJsonArray();
         List<Element> elements = parseElements(elementsJson, textureWidth, textureHeight);
 
-        tree.write(Model.builder()
+        resourcePack.model(Model.builder()
                 .key(key)
                 .display(displays)
-                .textures(modelTexture)
+                .textures(modelTextures)
                 .elements(elements)
                 .build());
 
         for (Texture texture : textures) {
-            tree.write(texture);
+            resourcePack.texture(texture);
         }
 
         ItemOverride override = ItemOverride.of(key, ItemPredicate.customModelData(customModelData));
@@ -295,15 +348,23 @@ public class ResourcePackUtility {
         return builder.build();
     }
 
-    private static void parseTextures(JsonArray texturesJson, List<Texture> textures,
-                                      Map<String, Key> textureMappings, Key key) {
+    private static void parseTextures(
+            JsonArray texturesJson,
+            List<Texture> textures,
+            Map<String, ModelTexture> textureMappings,
+            Key key
+    ) {
         for (JsonElement textureJson : texturesJson) {
             parseTexture(textureJson.getAsJsonObject(), textures, textureMappings, key);
         }
     }
 
-    private static void parseTexture(JsonObject textureJson, List<Texture> textures,
-                                     Map<String, Key> textureMappings, Key key) {
+    private static void parseTexture(
+            JsonObject textureJson,
+            List<Texture> textures,
+            Map<String, ModelTexture> textureMappings,
+            Key key
+    ) {
         int textureId = textureJson.get("id").getAsInt();
         String path = key.value() + "/" + textureId;
         Key textureKey = Key.key(Namespaces.ITEMS, path);
@@ -312,7 +373,10 @@ public class ResourcePackUtility {
         byte[] bytes = Base64.getDecoder().decode(source);
         Writable data = Writable.bytes(bytes);
         textures.add(Texture.of(textureKey, data));
-        textureMappings.put(String.valueOf(textureId), textureKey);
+        textureMappings.put(
+                String.valueOf(textureId),
+                ModelTexture.ofKey(textureKey)
+        );
     }
 
     private static List<Element> parseElements(JsonArray elementsJson, int textureWidth, int textureHeight) {

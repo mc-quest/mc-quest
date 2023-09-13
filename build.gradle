@@ -10,12 +10,13 @@ subprojects {
     dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
         testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-        implementation 'com.github.minestom.minestom:Minestom:e0427a36f3'
+        implementation 'dev.hollowcube:minestom-ce:010fe985bb'
         implementation 'com.google.guava:guava:32.0.1-jre'
         implementation 'com.google.code.gson:gson:2.10'
-        implementation 'team.unnamed:creative-api:0.5.0-SNAPSHOT'
-        implementation 'team.unnamed:creative-server:0.5.0-SNAPSHOT'
-        implementation 'com.github.mc-quest:hephaestus-engine:main-SNAPSHOT'
+        implementation 'team.unnamed:creative-api:0.9.2-SNAPSHOT'
+        implementation 'team.unnamed:creative-serializer-minecraft:0.9.2-SNAPSHOT'
+        implementation 'team.unnamed:creative-server:0.9.2-SNAPSHOT'
+        implementation 'com.github.unnamed:hephaestus-engine:feat~minestom-ce-SNAPSHOT'
         implementation 'org.gagravarr:vorbis-java-core:0.8'
     }
 

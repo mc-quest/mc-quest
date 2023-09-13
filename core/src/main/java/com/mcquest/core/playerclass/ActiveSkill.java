@@ -17,7 +17,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.time.Duration;
@@ -141,10 +141,13 @@ public class ActiveSkill extends Skill {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree, List<ItemOverride> overrides) {
+    public void writeResources(
+            ResourcePack resourcePack,
+            List<ItemOverride> overrides
+    ) {
         // Default texture.
         customModelDataStart = ResourcePackUtility.writeIcon(
-                tree,
+                resourcePack,
                 getIcon(),
                 Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
                 overrides
@@ -153,7 +156,7 @@ public class ActiveSkill extends Skill {
         // Cooldown textures.
         for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
             ResourcePackUtility.writeCooldownIcon(
-                    tree,
+                    resourcePack,
                     getIcon(),
                     Key.key(Namespaces.SKILLS, String.format("%d-%d-%d", playerClass.getId(), getId(), i)),
                     i,
@@ -164,7 +167,7 @@ public class ActiveSkill extends Skill {
         // Unusable cooldown textures.
         for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
             ResourcePackUtility.writeCooldownIconUnusable(
-                    tree,
+                    resourcePack,
                     getIcon(),
                     Key.key(Namespaces.SKILLS, String.format("%d-%d-%d-unusable", playerClass.getId(), getId(), i)),
                     i,
@@ -174,7 +177,7 @@ public class ActiveSkill extends Skill {
 
         // Locked texture.
         ResourcePackUtility.writeLockedIcon(
-                tree,
+                resourcePack,
                 getIcon(),
                 Key.key(Namespaces.SKILLS, String.format("%d-%d-locked", playerClass.getId(), getId())),
                 overrides

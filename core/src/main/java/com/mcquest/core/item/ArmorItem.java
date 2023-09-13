@@ -17,7 +17,7 @@ import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import net.minestom.server.item.metadata.LeatherArmorMeta;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.ArrayList;
@@ -128,12 +128,12 @@ public class ArmorItem extends Item {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree,
+    public void writeResources(ResourcePack resourcePack,
                                ListMultimap<Material, ItemOverride> overrides) {
         if (bbmodel != null) {
             Key key = ItemUtility.resourcePackKey(this);
             customModelData = ResourcePackUtility
-                    .writeModel(tree, bbmodel, key, material(), overrides);
+                    .writeModel(resourcePack, bbmodel, key, material(), overrides);
         }
     }
 

@@ -1,12 +1,8 @@
 package com.mcquest.core.entity;
 
-import net.kyori.adventure.text.Component;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.*;
 import net.minestom.server.entity.metadata.PlayerMeta;
-import net.minestom.server.network.packet.server.SendablePacket;
-import net.minestom.server.network.packet.server.play.PlayerInfoPacket;
-import net.minestom.server.timer.TaskSchedule;
+import net.minestom.server.network.packet.server.play.PlayerInfoUpdatePacket;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -29,29 +25,34 @@ public class EntityHuman extends EntityCreature {
     @Override
     public void updateNewViewer(@NotNull Player player) {
         player.sendPacket(addPlayerToList());
-        removeFromTabList(player);
         super.updateNewViewer(player);
     }
 
-    private PlayerInfoPacket addPlayerToList() {
-        PlayerInfoPacket.AddPlayer.Property prop =
-                new PlayerInfoPacket.AddPlayer.Property("textures",
-                        skin.textures(), skin.signature());
-        List<PlayerInfoPacket.AddPlayer.Property> props = List.of(prop);
-
-        return new PlayerInfoPacket(PlayerInfoPacket.Action.ADD_PLAYER,
-                new PlayerInfoPacket.AddPlayer(getUuid(), "", props,
-                        GameMode.ADVENTURE, 0, Component.empty(), null));
+    private PlayerInfoUpdatePacket addPlayerToList() {
+        return new PlayerInfoUpdatePacket(
+                PlayerInfoUpdatePacket.Action.ADD_PLAYER,
+                addPlayerEntry()
+        );
     }
 
-    private void removeFromTabList(Player player) {
-        SendablePacket packet = new PlayerInfoPacket(
-                PlayerInfoPacket.Action.REMOVE_PLAYER,
-                new PlayerInfoPacket.RemovePlayer(getUuid()));
+    private PlayerInfoUpdatePacket.Entry addPlayerEntry() {
+        return new PlayerInfoUpdatePacket.Entry(
+                getUuid(),
+                "",
+                List.of(textures()),
+                false,
+                0,
+                GameMode.ADVENTURE,
+                null,
+                null
+        );
+    }
 
-        MinecraftServer.getSchedulerManager()
-                .buildTask(() -> player.sendPacket(packet))
-                .delay(TaskSchedule.tick(20))
-                .schedule();
+    private PlayerInfoUpdatePacket.Property textures() {
+        return new PlayerInfoUpdatePacket.Property(
+                "textures",
+                skin.textures(),
+                skin.signature()
+        );
     }
 }

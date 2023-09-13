@@ -15,7 +15,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.ArrayList;
@@ -57,9 +57,12 @@ public class PassiveSkill extends Skill {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree, List<ItemOverride> overrides) {
+    public void writeResources(
+            ResourcePack resourcePack,
+            List<ItemOverride> overrides
+    ) {
         customModelDataStart = ResourcePackUtility.writeIcon(
-                tree,
+                resourcePack,
                 getIcon(),
                 Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
                 overrides

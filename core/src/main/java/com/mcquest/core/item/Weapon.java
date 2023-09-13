@@ -15,7 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.ArrayList;
@@ -117,11 +117,16 @@ public class Weapon extends Item {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree,
+    public void writeResources(ResourcePack resourcePack,
                                ListMultimap<Material, ItemOverride> overrides) {
         Key key = ItemUtility.resourcePackKey(this);
-        customModelData = ResourcePackUtility
-                .writeModel(tree, model, key, Materials.WEAPON, overrides);
+        customModelData = ResourcePackUtility.writeModel(
+                resourcePack,
+                model,
+                key,
+                Materials.WEAPON,
+                overrides
+        );
     }
 
     public static IdStep builder() {

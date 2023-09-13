@@ -13,7 +13,7 @@ import net.kyori.adventure.text.Component;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.ArrayList;
@@ -89,12 +89,14 @@ public class ConsumableItem extends Item {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree,
-                               ListMultimap<Material, ItemOverride> overrides) {
+    public void writeResources(
+            ResourcePack resourcePack,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
         Material material = Materials.ITEM_DEFAULT;
 
         customModelDataStart = ResourcePackUtility.writeIcon(
-                tree,
+                resourcePack,
                 icon,
                 ItemUtility.resourcePackKey(this),
                 material,
@@ -104,7 +106,7 @@ public class ConsumableItem extends Item {
         // Cooldown textures.
         for (int i = 1; i <= Hotbar.COOLDOWN_TEXTURES; i++) {
             ResourcePackUtility.writeCooldownIcon(
-                    tree,
+                    resourcePack,
                     icon,
                     ItemUtility.resourcePackKey(this, i),
                     i,

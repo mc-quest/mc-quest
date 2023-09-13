@@ -7,13 +7,12 @@ import com.mcquest.core.instance.Instance;
 import com.mcquest.core.resourcepack.Namespaces;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.SoundStop;
+import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.ApiStatus;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.base.Writable;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.sound.SoundEntry;
 import team.unnamed.creative.sound.SoundEvent;
-
-import java.util.Map;
 
 public class AudioClip {
     private final Asset audio;
@@ -36,16 +35,12 @@ public class AudioClip {
         pc.playSound(sound(source, volume, pitch));
     }
 
-    public void stop(PlayerCharacter pc) {
-        pc.stopSound(SoundStop.named(key));
+    public void play(Instance instance, Pos position, Sound.Source source) {
+        play(instance, position, source, 1f, 1f);
     }
 
-    public void play(Instance instance, Sound.Source source) {
-        play(instance, source, 1f, 1f);
-    }
-
-    public void play(Instance instance, Sound.Source source, float volume, float pitch) {
-        instance.playSound(sound(source, volume, pitch));
+    public void play(Instance instance, Pos position, Sound.Source source, float volume, float pitch) {
+        instance.playSound(sound(source, volume, pitch), position);
     }
 
     private Sound sound(Sound.Source source, float volume, float pitch) {
@@ -53,19 +48,12 @@ public class AudioClip {
     }
 
     @ApiStatus.Internal
-    public void writeResources(FileTree tree, int id, Map<String, SoundEvent> sounds) {
+    public void writeResources(ResourcePack resourcePack, int id) {
         key = Key.key(Namespaces.AUDIO, String.valueOf(id));
-
-        Writable data = Writable.inputStream(audio::getStream);
-        team.unnamed.creative.sound.Sound.File soundFile =
-                team.unnamed.creative.sound.Sound.File.of(key, data);
-        tree.write(soundFile);
-
-        team.unnamed.creative.sound.Sound sound = team.unnamed.creative.sound.Sound
-                .builder()
-                .nameSound(key)
-                .build();
-        SoundEvent soundEvent = SoundEvent.builder().sounds(sound).build();
-        sounds.put(key.value(), soundEvent);
+        resourcePack.sound(key, Writable.inputStream(audio::getStream));
+        resourcePack.soundEvent(SoundEvent.builder()
+                .key(key)
+                .sounds(SoundEntry.builder().nameSound(key).build())
+                .build());
     }
 }

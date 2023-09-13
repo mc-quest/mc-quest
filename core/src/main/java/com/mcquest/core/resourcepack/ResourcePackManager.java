@@ -5,7 +5,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.player.PlayerLoginEvent;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.ResourcePack;
+import team.unnamed.creative.BuiltResourcePack;
 import team.unnamed.creative.server.ResourcePackServer;
 
 import java.io.File;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 public class ResourcePackManager {
-    private final ResourcePack resourcePack;
+    private final BuiltResourcePack resourcePack;
     private ResourcePackServer server;
     private net.minestom.server.resourcepack.ResourcePack playerResourcePack;
 

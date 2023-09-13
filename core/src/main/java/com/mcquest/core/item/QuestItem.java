@@ -11,7 +11,7 @@ import net.kyori.adventure.key.Key;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.Collections;
@@ -54,10 +54,18 @@ public class QuestItem extends Item {
 
     @Override
     @ApiStatus.Internal
-    public void writeResources(FileTree tree, ListMultimap<Material, ItemOverride> overrides) {
+    public void writeResources(
+            ResourcePack resourcePack,
+            ListMultimap<Material, ItemOverride> overrides
+    ) {
         Key key = ItemUtility.resourcePackKey(this);
-        customModelData = ResourcePackUtility
-                .writeIcon(tree, icon, key, Materials.ITEM_DEFAULT, overrides);
+        customModelData = ResourcePackUtility.writeIcon(
+                resourcePack,
+                icon,
+                key,
+                Materials.ITEM_DEFAULT,
+                overrides
+        );
     }
 
 

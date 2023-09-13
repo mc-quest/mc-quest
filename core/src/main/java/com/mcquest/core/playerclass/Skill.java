@@ -6,7 +6,7 @@ import com.mcquest.core.event.EventEmitter;
 import com.mcquest.core.event.SkillUnlockEvent;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
-import team.unnamed.creative.file.FileTree;
+import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.model.ItemOverride;
 
 import java.util.List;
@@ -89,7 +89,10 @@ public abstract class Skill {
     abstract ItemStack getSkillTreeItemStack(PlayerCharacter pc);
 
     @ApiStatus.Internal
-    public abstract void writeResources(FileTree tree, List<ItemOverride> overrides);
+    public abstract void writeResources(
+            ResourcePack resourcePack,
+            List<ItemOverride> overrides
+    );
 
     static class Builder {
         int id;

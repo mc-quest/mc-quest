@@ -37,6 +37,10 @@ public class ObjectManager {
     }
 
     public void add(ObjectSpawner spawner) {
+        if (spawner.isRemoved()) {
+            throw new IllegalArgumentException();
+        }
+
         SpatialHashCell cell = cellFor(spawner.getInstance(), spawner.getPosition());
         spawnersByCell.put(cell, spawner);
         spawner.setObjectManager(this);
@@ -86,7 +90,8 @@ public class ObjectManager {
 
                 SpatialHashCell.forAllInRange(minCell, maxCell, cell -> {
                     for (ObjectSpawner spawner : spawnersByCell.get(cell)) {
-                        if (!spawner.isSpawned() && spawner.getPosition().distanceSquared(playerPosition)
+                        if (!spawner.isSpawned() && spawner.isActive()
+                                && spawner.getPosition().distanceSquared(playerPosition)
                                 <= SPAWN_RADIUS * SPAWN_RADIUS) {
                             toSpawn.put(cell, spawner);
                         }

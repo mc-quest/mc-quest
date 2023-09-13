@@ -206,7 +206,7 @@ public class NonPlayerCharacter extends Character {
             }
         }
 
-        getSpawner().remove();
+        getSpawner().setActive(false);
         getHitbox().remove();
 
         SchedulerManager scheduler = getMmorpg().getSchedulerManager();
@@ -246,6 +246,6 @@ public class NonPlayerCharacter extends Character {
     }
 
     private void respawn() {
-        getMmorpg().getObjectManager().add(getSpawner());
+        getSpawner().setActive(true);
     }
 }

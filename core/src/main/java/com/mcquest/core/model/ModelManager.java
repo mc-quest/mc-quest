@@ -4,7 +4,7 @@ import net.minestom.server.MinecraftServer;
 import net.minestom.server.event.GlobalEventHandler;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.minestom.ModelClickListener;
+import team.unnamed.hephaestus.minestomce.ModelClickListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;

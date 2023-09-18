@@ -14,7 +14,7 @@ import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.NotNull;
-import team.unnamed.hephaestus.minestom.ModelEntity;
+import team.unnamed.hephaestus.minestomce.ModelEntity;
 
 import java.time.Duration;
 import java.util.*;

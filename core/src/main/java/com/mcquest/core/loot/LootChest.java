@@ -23,7 +23,7 @@ import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.Nullable;
-import team.unnamed.hephaestus.minestom.ModelEntity;
+import team.unnamed.hephaestus.minestomce.ModelEntity;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -179,7 +179,7 @@ public final class LootChest extends Object {
         private final LootChest lootChest;
 
         private Entity(LootChest lootChest) {
-            super(EntityType.ARMOR_STAND, CoreModels.LOOT_CHEST);
+            super(EntityType.ARMOR_STAND, CoreModels.LOOT_CHEST, 1.0f);
             this.lootChest = lootChest;
         }
 

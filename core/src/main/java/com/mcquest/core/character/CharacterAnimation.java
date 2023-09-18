@@ -1,7 +1,7 @@
 package com.mcquest.core.character;
 
 import net.minestom.server.entity.EntityCreature;
-import team.unnamed.hephaestus.minestom.ModelEntity;
+import team.unnamed.hephaestus.minestomce.ModelEntity;
 
 public interface CharacterAnimation {
     void play(EntityCreature entity);

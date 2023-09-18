@@ -6,7 +6,8 @@ import net.minestom.server.entity.EntityType;
 import net.minestom.server.entity.PlayerSkin;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.hephaestus.Model;
-import team.unnamed.hephaestus.minestom.ModelEntity;
+import team.unnamed.hephaestus.minestomce.GenericBoneEntity;
+import team.unnamed.hephaestus.minestomce.ModelEntity;
 
 public interface CharacterModel {
     @ApiStatus.Internal
@@ -33,12 +34,28 @@ public interface CharacterModel {
     }
 
     static CharacterModel of(Model model) {
-        return character -> new ModelEntity(EntityType.ARMOR_STAND, model) {
-            @Override
-            public void tick(long time) {
-                super.tick(time);
-                character.tick(time);
-            }
+        return of(model, 1f);
+    }
+
+    static CharacterModel of(Model model, double scale) {
+        return character -> {
+            ModelEntity entity = new ModelEntity(EntityType.ARMOR_STAND, model, (float) scale) {
+                @Override
+                public void tick(long time) {
+                    super.tick(time);
+                    character.tick(time);
+                    bones().forEach(bone -> bone.teleport(getPosition()));
+                }
+
+                @Override
+                public void remove() {
+                    bones().forEach(GenericBoneEntity::remove);
+                }
+            };
+            entity.setNoGravity(false);
+            entity.setAutoViewable(true);
+            entity.bones().forEach(bone -> bone.setAutoViewable(true));
+            return entity;
         };
     }
 }

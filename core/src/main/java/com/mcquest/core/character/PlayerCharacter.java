@@ -321,8 +321,8 @@ public final class PlayerCharacter extends Character {
     }
 
     private void checkForLevelUp() {
-        int level = levelForExperiencePoints(experiencePoints);
-        if (level != getLevel()) {
+        int newLevel = levelForExperiencePoints(experiencePoints);
+        while (newLevel > getLevel()) {
             levelUp();
         }
     }

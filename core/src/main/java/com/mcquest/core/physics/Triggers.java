@@ -29,16 +29,16 @@ public class Triggers {
         });
     }
 
-    public static Consumer<RaycastHit> character(BiConsumer<Pos, Character> onHit) {
+    public static Consumer<RaycastHit> character(BiConsumer<Character, Pos> onHit) {
         return raycastHit -> {
             if (raycastHit.getCollider() instanceof CharacterHitbox hitbox) {
-                onHit.accept(raycastHit.getPosition(), hitbox.getCharacter());
+                onHit.accept(hitbox.getCharacter(), raycastHit.getPosition());
             }
         };
     }
 
-    public static Predicate<RaycastHit> raycastFilter(Predicate<Character> characterFilter) {
-        return raycastHit -> raycastHit.getCollider() instanceof CharacterHitbox hitbox
+    public static Predicate<Collider> raycastFilter(Predicate<Character> characterFilter) {
+        return collider -> collider instanceof CharacterHitbox hitbox
                 && characterFilter.test(hitbox.getCharacter());
     }
 }

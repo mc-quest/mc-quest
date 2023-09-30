@@ -36,7 +36,7 @@ public class Swords implements Feature {
         Collection<RaycastHit> hits = mmorpg.getPhysicsManager()
                 .raycastAll(instance, origin, direction, maxDistance);
 
-        BiConsumer<Pos, Character> swordHit = (position, character) -> {
+        BiConsumer<Character, Pos> swordHit = (character, pos) -> {
             if (!character.isDamageable(pc)) {
                 return;
             }

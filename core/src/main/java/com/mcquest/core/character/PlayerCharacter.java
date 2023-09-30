@@ -199,8 +199,12 @@ public final class PlayerCharacter extends Character {
     public Pos getHandPosition() {
         Pos position = getPosition();
         Vec lookDirection = position.direction();
-        return position.withY(position.y() + (player.isSneaking() ? 0.65 : 1.0))
+        return position.withY(y -> y + (player.isSneaking() ? 0.65 : 1.0))
                 .add(lookDirection.rotateAroundY(-Math.PI / 4.0).mul(0.5));
+    }
+
+    public Pos getWeaponPosition() {
+        return getHandPosition().withY(y -> y + 0.5);
     }
 
     public Pos getTargetBlockPosition(double maxDistance) {

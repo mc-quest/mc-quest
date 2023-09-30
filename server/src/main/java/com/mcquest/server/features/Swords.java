@@ -36,16 +36,20 @@ public class Swords implements Feature {
         Collection<RaycastHit> hits = mmorpg.getPhysicsManager()
                 .raycastAll(instance, origin, direction, maxDistance);
 
-        BiConsumer<Character, Pos> swordHit = (character, pos) -> {
+        BiConsumer<Character, Pos> swordHit = (character, hitPosition) -> {
             if (!character.isDamageable(pc)) {
                 return;
             }
 
             character.damage(pc, event.getWeapon().getPhysicalDamage());
             character.applyImpulse(direction.mul(100));
-            Sound hitSound =
-                    Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.MASTER, 0.5f, 1f);
-            instance.playSound(hitSound);
+
+            instance.playSound(Sound.sound(
+                    SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR,
+                    Sound.Source.MASTER,
+                    0.5f,
+                    1f
+            ), hitPosition);
         };
 
         hits.forEach(Triggers.character(swordHit));

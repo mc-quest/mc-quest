@@ -12,7 +12,19 @@
             "skillTreeRow": 0,
             "skillTreeColumn": 4,
             "manaCost": 5,
-            "cooldown": 6
+            "cooldown": 1
+        },
+        {
+            "type": "ACTIVE",
+            "id": 2,
+            "name": "Ice Beam",
+            "level": 2,
+            "icon": "fireball.png",
+            "description": "TODO",
+            "skillTreeRow": 1,
+            "skillTreeColumn": 4,
+            "manaCost": 8,
+            "cooldown": 1
         }
     ]
 }

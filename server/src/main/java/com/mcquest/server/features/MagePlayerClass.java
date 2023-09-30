@@ -1,23 +1,24 @@
 package com.mcquest.server.features;
 
 import com.mcquest.core.Mmorpg;
-import com.mcquest.core.character.Attitude;
-import com.mcquest.core.character.Character;
-import com.mcquest.core.character.CharacterHitbox;
 import com.mcquest.core.character.PlayerCharacter;
-import com.mcquest.server.constants.MageSkills;
 import com.mcquest.core.event.ActiveSkillUseEvent;
 import com.mcquest.core.feature.Feature;
 import com.mcquest.core.instance.Instance;
+import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.physics.Collider;
-import com.mcquest.core.physics.PhysicsManager;
-import com.mcquest.core.util.Debug;
+import com.mcquest.core.physics.RaycastHit;
+import com.mcquest.core.physics.Triggers;
+import com.mcquest.server.constants.MageSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+
+import java.time.Duration;
 
 public class MagePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -26,17 +27,21 @@ public class MagePlayerClass implements Feature {
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
+        MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
+        double damageAmount = 6.0;
+        double maxDistance = 20.0;
+        double fireballSpeed = 20.0;
+        Vec hitboxSize = new Vec(1f, 1f, 1f);
+
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
-        Pos startPosition = pc.getEyePosition().add(pc.getLookDirection().mul(1f));
-        double maxDistance = 20.0;
-        Vec hitboxSize = new Vec(1f, 1f, 1f);
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
+        Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
+
         Collider hitbox = new Collider(instance, startPosition, hitboxSize);
-        double fireballSpeed = 20.0;
+
         Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
         Entity fireballEntity = new Entity(EntityType.FIREBALL) {
             @Override
@@ -50,28 +55,113 @@ public class MagePlayerClass implements Feature {
                 }
             }
         };
-        hitbox.onCollisionEnter(other -> {
-            if (!(other instanceof CharacterHitbox characterHitbox)) {
+
+        hitbox.onCollisionEnter(Triggers.character(character -> {
+            if (!character.isDamageable(pc)) {
                 return;
             }
-            Character character = characterHitbox.getCharacter();
-            if (character.getAttitude(pc) == Attitude.FRIENDLY) {
-                return;
-            }
-            double damageAmount = 6.0;
+
             character.damage(pc, damageAmount);
-            if (!fireballEntity.isRemoved()) {
-                fireballEntity.remove();
-                hitbox.remove();
-            }
-            Sound hitSound = Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
-            instance.playSound(hitSound);
-        });
-        fireballEntity.setInstance(instance, startPosition.sub(0.0, 0.5, 0.0)).join();
-        physicsManager.addCollider(hitbox);
+
+            fireballEntity.remove();
+            hitbox.remove();
+
+            ParticleEffects.particle(instance, hitbox.getCenter(), Particle.EXPLOSION);
+
+            instance.playSound(Sound.sound(
+                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
+                    Sound.Source.PLAYER,
+                    1f,
+                    1f
+            ), character.getPosition());
+        }));
+
         fireballEntity.setNoGravity(true);
-        Sound summonFireballSound = Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f);
-        instance.playSound(summonFireballSound);
-        Debug.showCollider(hitbox);
+        fireballEntity.setInstance(instance, startPosition);
+
+        mmorpg.getPhysicsManager().addCollider(hitbox);
+
+        instance.playSound(Sound.sound(
+                SoundEvent.BLOCK_FIRE_EXTINGUISH,
+                Sound.Source.PLAYER,
+                1f,
+                1f
+        ), startPosition);
+    }
+
+    private void useIceBeam(ActiveSkillUseEvent event) {
+        double maxDistance = 15.0;
+        double damagePerTick = 1.0;
+        double impulse = 10.0;
+        Particle particle = Particle.ITEM_SNOWBALL;
+        double particleDensity = 3.0;
+        int tickCount = 12;
+        long tickPeriodMs = 250;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+
+        for (int tick = 0; tick < tickCount; tick++) {
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                Instance instance = pc.getInstance();
+                Pos origin = pc.getWeaponPosition();
+                Vec direction = pc.getEyePosition()
+                        .add(pc.getLookDirection().mul(maxDistance))
+                        .sub(origin)
+                        .asVec()
+                        .normalize();
+                Pos targetBlock = pc.getTargetBlockPosition(maxDistance);
+                double distance = targetBlock == null
+                        ? maxDistance
+                        : Math.min(maxDistance, targetBlock.distance(origin));
+                RaycastHit hit = mmorpg.getPhysicsManager().raycast(
+                        instance,
+                        origin,
+                        direction,
+                        distance,
+                        Triggers.raycastFilter(character -> character.isDamageable(pc))
+                );
+                if (hit == null) {
+                    ParticleEffects.line(
+                            instance,
+                            origin,
+                            direction,
+                            distance,
+                            particle,
+                            particleDensity
+                    );
+
+                    instance.playSound(Sound.sound(
+                            SoundEvent.BLOCK_GLASS_BREAK,
+                            Sound.Source.PLAYER,
+                            1f,
+                            1.5f
+                    ), origin);
+                } else {
+                    Triggers.character((character, hitPosition) -> {
+                        ParticleEffects.line(
+                                instance,
+                                origin,
+                                hitPosition,
+                                particle,
+                                particleDensity
+                        );
+                        character.damage(pc, damagePerTick);
+                        character.applyImpulse(direction.mul(impulse));
+
+                        instance.playSound(Sound.sound(
+                                SoundEvent.BLOCK_GLASS_BREAK,
+                                Sound.Source.PLAYER,
+                                1f,
+                                1f
+                        ), hitPosition);
+                    }).accept(hit);
+                }
+            }).delay(Duration.ofMillis(tickPeriodMs * tick)).schedule();
+        }
+
+        pc.setCanAct(false);
+        mmorpg.getSchedulerManager().buildTask(() -> pc.setCanAct(true))
+                .delay(Duration.ofMillis(tickPeriodMs * tickCount))
+                .schedule();
     }
 }

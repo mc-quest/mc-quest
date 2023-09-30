@@ -54,7 +54,7 @@ public class FighterPlayerClass implements Feature {
 
         if (hits.isEmpty()) {
             Sound missSound = Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1.5f);
-            instance.playSound(missSound);
+            instance.playSound(missSound, hitboxCenter);
         }
     }
 

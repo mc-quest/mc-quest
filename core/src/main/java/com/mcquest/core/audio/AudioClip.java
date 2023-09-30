@@ -8,6 +8,7 @@ import com.mcquest.core.resourcepack.Namespaces;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
+import net.minestom.server.coordinate.Pos;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.base.Writable;
 import team.unnamed.creative.file.FileTree;
@@ -40,12 +41,12 @@ public class AudioClip {
         pc.stopSound(SoundStop.named(key));
     }
 
-    public void play(Instance instance, Sound.Source source) {
-        play(instance, source, 1f, 1f);
+    public void play(Instance instance, Pos position, Sound.Source source) {
+        play(instance, position, source, 1f, 1f);
     }
 
-    public void play(Instance instance, Sound.Source source, float volume, float pitch) {
-        instance.playSound(sound(source, volume, pitch));
+    public void play(Instance instance, Pos position, Sound.Source source, float volume, float pitch) {
+        instance.playSound(sound(source, volume, pitch), position);
     }
 
     private Sound sound(Sound.Source source, float volume, float pitch) {

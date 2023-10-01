@@ -6,13 +6,13 @@ import com.mcquest.server.Assets;
 import com.mcquest.core.asset.Asset;
 
 public class Items {
-    public static final Weapon ADVENTURERS_SWORD = loadWeapon("AdventurersSword");
-    public static final BasicItem TEST_ITEM = loadBasicItem("TestItem");
+    public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
+    public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
-                TEST_ITEM
+                ADVENTURERS_WAND
         };
     }
 

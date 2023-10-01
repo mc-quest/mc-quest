@@ -1,0 +1,9 @@
+{
+    "id": 2,
+    "name": "Adventurer's Wand",
+    "quality": "COMMON",
+    "level": 1,
+    "type": "WAND",
+    "attackSpeed": 1,
+    "physicalDamage": 3
+}

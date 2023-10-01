@@ -29,6 +29,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -208,11 +209,17 @@ public final class PlayerCharacter extends Character {
     }
 
     public Pos getTargetBlockPosition(double maxDistance) {
-        Point target = player.getTargetBlockPosition((int) maxDistance);
-        if (target == null) {
+        Point blockPosition = player.getTargetBlockPosition((int) maxDistance);
+        if (blockPosition == null) {
             return null;
         }
-        return Pos.fromPoint(target);
+
+        Block block = getInstance().getBlock(blockPosition);
+        if (!block.isSolid()) {
+            return null;
+        }
+
+        return Pos.fromPoint(blockPosition).add(0.5, 1.0, 0.5);
     }
 
     public Vec getLookDirection() {

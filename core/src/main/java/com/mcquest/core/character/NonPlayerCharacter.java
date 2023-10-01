@@ -116,12 +116,20 @@ public class NonPlayerCharacter extends Character {
         setHealth(getMaxHealth());
         super.spawn();
         entity.setInstance(getInstance(), getPosition());
+        onSpawn();
     }
 
     @Override
     protected final void despawn() {
         super.despawn();
+        onDespawn();
         entity.remove();
+    }
+
+    @Override
+    public void updatePosition(Pos position) {
+        super.updatePosition(position);
+        onChangePosition(position);
     }
 
     void tick(long time) {
@@ -168,6 +176,15 @@ public class NonPlayerCharacter extends Character {
 
     public void playSound(Sound sound) {
         getInstance().playSound(sound, getPosition());
+    }
+
+    protected void onSpawn() {
+    }
+
+    protected void onDespawn() {
+    }
+
+    protected void onChangePosition(Pos position) {
     }
 
     /**

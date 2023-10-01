@@ -14,6 +14,7 @@ import com.mcquest.core.physics.PhysicsManager;
 import com.mcquest.core.physics.Triggers;
 import com.mcquest.core.util.Debug;
 import com.mcquest.server.constants.*;
+import com.mcquest.server.npc.Broodmother;
 import com.mcquest.server.npc.GuardThomas;
 import com.mcquest.server.npc.Spider;
 import net.minestom.server.coordinate.Pos;
@@ -49,7 +50,7 @@ public class BroodmotherLair implements Feature {
     }
 
     private void enter(PlayerCharacter pc) {
-        Pos to = new Pos(138, 116, 181, 180f, 0.0f);
+        Pos to = new Pos(76, 17, 130, 180, 0); // new Pos(138, 116, 181, 180f, 0.0f);
         pc.setInstance(Instances.BROODMOTHER_LAIR, to);
         pc.setZone(Zones.BROODMOTHER_LAIR);
         pc.getMusicPlayer().setSong(Music.BROODMOTHER_LAIR);
@@ -165,8 +166,11 @@ public class BroodmotherLair implements Feature {
     }
 
     private void broodmother() {
-        // Broodmother broodmother = new Broodmother(mmorpg, Instances.BROODMOTHER_LAIR, new Pos(46, -55, 67));
-        // mmorpg.getObjectManager().add(broodmother);
+        mmorpg.getObjectManager().add(ObjectSpawner.of(
+                Instances.BROODMOTHER_LAIR,
+                new Pos(73, 6, 92),
+                Broodmother::new
+        ));
     }
 
     private void lootChests() {

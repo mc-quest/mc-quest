@@ -9,6 +9,7 @@ public class Models {
     public static final Model DEER = loadModel("deer_antler");
     public static final Model CROW = loadModel("crow");
     public static final Model WOLF_SPIDER = loadModel("wolf_spider");
+    public static final Model BROODMOTHER = loadModel("broodmother");
     public static final Model REDSTONE_MONSTROSITY = loadModel("redstone_monstrosity");
     public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
 
@@ -18,6 +19,7 @@ public class Models {
                 DEER,
                 CROW,
                 WOLF_SPIDER,
+                BROODMOTHER,
                 REDSTONE_MONSTROSITY,
                 UNDEAD_KNIGHT
         };

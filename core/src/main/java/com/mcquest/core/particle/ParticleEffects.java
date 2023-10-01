@@ -39,6 +39,18 @@ public class ParticleEffects {
         line(instance, maxMinMax, maxMaxMax, particle, density);
     }
 
+    public static void wireframeBox(Instance instance, Pos center, Vec extents,
+                                    Particle particle, double density) {
+        Vec halfExtents = extents.mul(0.5);
+        wireframeBox(
+                instance,
+                center.sub(halfExtents),
+                center.add(halfExtents),
+                particle,
+                density
+        );
+    }
+
     public static void line(Instance instance, Pos start, Vec direction,
                             double length, Particle particle, double density) {
         if (!direction.isNormalized()) {

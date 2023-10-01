@@ -23,35 +23,34 @@ public class Swords implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-        Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::basicAttack);
+        Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::autoAttack);
     }
 
-    public void basicAttack(AutoAttackEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
+    public void autoAttack(AutoAttackEvent event) {
+        double maxDistance = 5.0;
+        double impulse = 100.0;
 
+        PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos origin = pc.getEyePosition();
         Vec direction = pc.getLookDirection();
-        double maxDistance = 5.0;
         Collection<RaycastHit> hits = mmorpg.getPhysicsManager()
                 .raycastAll(instance, origin, direction, maxDistance);
 
-        BiConsumer<Character, Pos> swordHit = (character, hitPosition) -> {
+        hits.forEach(Triggers.character((character, hitPosition) -> {
             if (!character.isDamageable(pc)) {
                 return;
             }
 
             character.damage(pc, event.getWeapon().getPhysicalDamage());
-            character.applyImpulse(direction.mul(100));
+            character.applyImpulse(direction.mul(impulse));
 
             instance.playSound(Sound.sound(
                     SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR,
-                    Sound.Source.MASTER,
+                    Sound.Source.PLAYER,
                     0.5f,
                     1f
             ), hitPosition);
-        };
-
-        hits.forEach(Triggers.character(swordHit));
+        }));
     }
 }

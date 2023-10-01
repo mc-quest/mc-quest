@@ -19,7 +19,7 @@
             "id": 2,
             "name": "Ice Beam",
             "level": 2,
-            "icon": "fireball.png",
+            "icon": "ice_beam.png",
             "description": "TODO",
             "skillTreeRow": 1,
             "skillTreeColumn": 4,

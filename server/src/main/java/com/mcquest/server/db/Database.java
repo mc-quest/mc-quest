@@ -19,8 +19,8 @@ public class Database {
 
     public PlayerCharacterData getPlayerCharacterData(Player player) {
         // TODO: read from database.
-        return PlayerCharacterData.create(PlayerClasses.FIGHTER, Instances.ELADRADOR,
-                new Pos(0, 70, 0), Zones.OAKSHIRE, Items.ADVENTURERS_SWORD);
+        return PlayerCharacterData.create(PlayerClasses.MAGE, Instances.ELADRADOR,
+                new Pos(0, 70, 0), Zones.OAKSHIRE, Items.ADVENTURERS_WAND);
     }
 
     public void savePlayerCharacterData(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {

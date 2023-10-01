@@ -144,7 +144,7 @@ public class BroodmotherLair implements Feature {
                 new Pos(42.4, 30.0, 172.8, 23.7f, -16.0f),
                 new Pos(50.7, 26.0, 164.9, -77.4f, 21.9f),
                 new Pos(58.1, 26.0, 165.6, -142.3f, 20.1f),
-                new Pos(74.4, 24.0, 158.3, -109.5f, 19.5f),
+                // new Pos(74.4, 24.0, 158.3, -109.5f, 19.5f),
                 new Pos(80.7, 21.0, 150.9, 132.6f, 19.7f)
         };
 

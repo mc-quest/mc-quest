@@ -11,6 +11,7 @@ import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.physics.Triggers;
 import com.mcquest.server.constants.Items;
 import com.mcquest.server.constants.Models;
+import com.mcquest.server.constants.Quests;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -90,6 +91,7 @@ public class Spider extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource source) {
+        if (source instanceof PlayerCharacter pc) Quests.ARACHNOPHOBIA.getObjective(0).addProgress(pc);
         playSound(Sound.sound(SoundEvent.ENTITY_SPIDER_DEATH, Sound.Source.HOSTILE, 1f, 1f));
     }
 
@@ -105,7 +107,7 @@ public class Spider extends NonPlayerCharacter {
 
     private void attackHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 0.1);
+            character.damage(this, 20);
         }
     }
 }

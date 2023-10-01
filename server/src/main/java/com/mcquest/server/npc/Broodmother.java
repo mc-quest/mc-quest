@@ -131,8 +131,8 @@ public class Broodmother extends NonPlayerCharacter {
 
     private boolean attack(long time) {
         Pos position = getPosition();
-        Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(1.0, 0.5, 1.0);
+        Pos hitboxCenter = position.add(position.direction().mul(2.5)).withY(y -> y + 1.0);
+        Vec extents = new Vec(3.0, 1.5, 3.0);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::attackHit));
@@ -141,7 +141,8 @@ public class Broodmother extends NonPlayerCharacter {
 
     private void attackHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 0.1);
+            character.damage(this, 100.0);
+            character.applyImpulse(getPosition().direction().mul(2000.0));
         }
     }
 }

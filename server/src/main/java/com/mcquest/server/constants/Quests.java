@@ -10,11 +10,21 @@ import com.mcquest.server.Assets;
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("Tutorial");
     public static final Quest THWARTING_THE_THIEVES = loadQuest("ThwartingTheThieves");
+    public static final Quest ARACHNOPHOBIA = Quest.builder(3, "Arachnophobia", 5)
+            .objective("Spiders slain", 15)
+            .objective("Broodmother slain", 1)
+            .build();
+    public static final Quest FANGS_AND_FUMES = Quest.builder(4, "Fangs and Fumes", 5)
+            .objective("Spider fangs", 5)
+            .objective("Spider venom", 3)
+            .build();
 
     public static Quest[] all() {
         return new Quest[]{
                 TUTORIAL,
-                THWARTING_THE_THIEVES
+                THWARTING_THE_THIEVES,
+                ARACHNOPHOBIA,
+                FANGS_AND_FUMES
         };
     }
 

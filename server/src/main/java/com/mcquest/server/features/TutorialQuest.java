@@ -29,7 +29,7 @@ public class TutorialQuest implements Feature {
         spawnTrainingDummies();
         createQuestMarkers();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
+        // eventHandler.addListener(PlayerCharacterLoginEvent.class, this::handleLogin);
         eventHandler.addListener(MenuOpenEvent.class, this::handleOpenMenu);
         eventHandler.addListener(SkillTreeOpenEvent.class, this::handleOpenSkillTree);
         eventHandler.addListener(SkillUnlockEvent.class, this::handleSkillUpgrade);

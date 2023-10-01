@@ -90,6 +90,12 @@ public class PlayerClassManager {
         skill.onUse().emit(event);
         mmorpg.getGlobalEventHandler().call(event);
         if (!event.isCancelled()) {
+            pc.sendMessage(Component.text("Used ", NamedTextColor.GREEN)
+                    .append(Component.text(skill.getName(), NamedTextColor.YELLOW))
+                    .append(Component.text(
+                            String.format(" (-%d MP)", (int) Math.round(skill.getManaCost())),
+                            NamedTextColor.AQUA
+                    )));
             pc.removeMana(manaCost);
             pc.getSkillManager().startCooldown(skill);
         }

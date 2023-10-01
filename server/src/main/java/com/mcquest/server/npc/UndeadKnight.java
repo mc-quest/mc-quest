@@ -23,6 +23,7 @@ public class UndeadKnight extends NonPlayerCharacter {
         setLevel(15);
         setMaxHealth(200);
         setMass(500);
+        setMovementSpeed(6.0);
         setRespawnDuration(Duration.ofSeconds(3));
         setRemovalDelay(Duration.ofMillis(2500));
 

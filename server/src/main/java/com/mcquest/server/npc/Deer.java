@@ -9,7 +9,6 @@ import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
@@ -24,10 +23,10 @@ public class Deer extends NonPlayerCharacter {
         setLevel(1);
         setMaxHealth(10);
         setMass(60);
+        setMovementSpeed(0.6);
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(60));
 
-        getEntity().getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.03f);
         setBrain(new ActiveSelector(
                 // Run if panicking.
                 new Sequence(
@@ -95,7 +94,7 @@ public class Deer extends NonPlayerCharacter {
 
     private void beginPanic() {
         panic = true;
-        getEntity().getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.3f);
+        setMovementSpeed(6.0);
     }
 
     private boolean isPanicking(long time) {
@@ -104,7 +103,7 @@ public class Deer extends NonPlayerCharacter {
 
     private boolean endPanic(long time) {
         panic = false;
-        getEntity().getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.03f);
+        setMovementSpeed(0.6);
         return true;
     }
 }

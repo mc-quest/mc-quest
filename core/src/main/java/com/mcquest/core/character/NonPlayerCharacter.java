@@ -8,6 +8,7 @@ import com.mcquest.core.loot.LootTable;
 import com.mcquest.core.object.ObjectSpawner;
 import com.mcquest.core.quest.QuestObjective;
 import net.kyori.adventure.sound.Sound;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.damage.DamageType;
@@ -76,6 +77,18 @@ public class NonPlayerCharacter extends Character {
 
     public Navigator getNavigator() {
         return navigator;
+    }
+
+    /**
+     * Movement speed in blocks per second.
+     */
+    public double getMovementSpeed() {
+        return entity.getAttributeValue(Attribute.MOVEMENT_SPEED) * 20.0;
+    }
+
+    public void setMovementSpeed(double movementSpeed) {
+        entity.getAttribute(Attribute.MOVEMENT_SPEED)
+                .setBaseValue((float) (movementSpeed / 20.0));
     }
 
     public final void setBrain(Behavior root) {

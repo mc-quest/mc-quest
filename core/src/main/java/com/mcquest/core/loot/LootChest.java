@@ -159,7 +159,11 @@ public final class LootChest extends Object {
             remove();
         }).delay(TaskSchedule.millis(2000)).schedule();
 
-        // TODO: respawn
+        ObjectSpawner spawner = getSpawner();
+        spawner.setActive(false);
+        scheduler.buildTask(() -> spawner.setActive(true))
+                .delay(respawnDuration.plus(Duration.ofSeconds(2)))
+                .schedule();
     }
 
     private Pos lootPosition() {

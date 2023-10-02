@@ -14,6 +14,7 @@ import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.damage.DamageType;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
@@ -160,6 +161,11 @@ public class NonPlayerCharacter extends Character {
         super.heal(source, amount);
 
         onHeal(source);
+    }
+
+    @ApiStatus.Internal
+    public final void interact(PlayerCharacter pc) {
+        onInteract(pc);
     }
 
     public void lookAt(Pos position) {

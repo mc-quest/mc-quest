@@ -2,6 +2,8 @@ package com.mcquest.core.ui;
 
 import com.mcquest.core.Mmorpg;
 import com.mcquest.core.cartography.MapViewer;
+import com.mcquest.core.character.CharacterHitbox;
+import com.mcquest.core.character.NonPlayerCharacter;
 import com.mcquest.core.character.PlayerCharacter;
 import com.mcquest.core.character.PlayerCharacterManager;
 import com.mcquest.core.event.*;
@@ -197,8 +199,11 @@ public class InteractionHandler {
         RaycastHit hit = physicsManager.raycast(instance, origin, direction,
                 MAX_INTERACTION_DISTANCE, this::isInteractionCollider);
         if (hit != null) {
-            InteractCollider collider = (InteractCollider) hit.getCollider();
-            collider.interact(pc);
+            if (hit.getCollider() instanceof InteractCollider interactCollider) {
+                interactCollider.interact(pc);
+            } else if (hit.getCollider() instanceof CharacterHitbox hitbox) {
+                ((NonPlayerCharacter) hitbox.getCharacter()).interact(pc);
+            }
         }
     }
 
@@ -216,6 +221,7 @@ public class InteractionHandler {
     }
 
     private boolean isInteractionCollider(Collider collider) {
-        return collider instanceof InteractCollider;
+        return collider instanceof InteractCollider ||
+                collider instanceof CharacterHitbox hitbox && hitbox.getCharacter() instanceof NonPlayerCharacter;
     }
 }

@@ -5,11 +5,13 @@ import com.mcquest.core.ai.*;
 import com.mcquest.core.character.Character;
 import com.mcquest.core.character.*;
 import com.mcquest.core.object.ObjectSpawner;
+import com.mcquest.core.particle.ParticleEffects;
 import com.mcquest.core.physics.Triggers;
 import com.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.TaskSchedule;
 
@@ -94,8 +96,8 @@ public class UndeadKnight extends NonPlayerCharacter {
 
     private boolean attack(long time) {
         Pos position = getPosition();
-        Pos center = position.withY(y -> y + 2.0).add(position.direction().mul(2.0));
-        Vec extents = new Vec(2.0, 3.0, 2.0);
+        Pos center = position.withY(y -> y + 3.0).add(position.direction().mul(3.0));
+        Vec extents = new Vec(2.5, 3.5, 2.5);
         getMmorpg().getPhysicsManager().overlapBox(getInstance(), center, extents)
                 .forEach(Triggers.character(this::attackHit));
         return true;
@@ -103,7 +105,8 @@ public class UndeadKnight extends NonPlayerCharacter {
 
     private void attackHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 0.5);
+            character.damage(this, 100.0);
+            character.applyImpulse(getPosition().direction().mul(250.0));
         }
     }
 }

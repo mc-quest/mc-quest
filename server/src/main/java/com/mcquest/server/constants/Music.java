@@ -9,13 +9,19 @@ public class Music {
     public static final Song DUNGEON = new Song(2, audio("dungeon"));
     public static final Song BROODMOTHER_LAIR = new Song(3, audio("broodmother_lair"));
     public static final Song BROODMOTHER_BATTLE = new Song(4, audio("broodmother_battle"));
+    public static final Song CREEPY = new Song(5, audio("creepy"));
+    public static final Song CREEPY_2 = new Song(6, audio("creepy_2"));
+    public static final Song VILLAGE = new Song(7, audio("village"));
 
     public static Song[] all() {
         return new Song[]{
                 WILDERNESS,
                 DUNGEON,
                 BROODMOTHER_LAIR,
-                BROODMOTHER_BATTLE
+                BROODMOTHER_BATTLE,
+                CREEPY,
+                CREEPY_2,
+                VILLAGE
         };
     }
 

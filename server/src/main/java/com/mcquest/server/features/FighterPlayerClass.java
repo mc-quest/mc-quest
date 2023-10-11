@@ -36,7 +36,10 @@ public class FighterPlayerClass implements Feature {
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(3.5, 3.5, 3.5);
 
-        Consumer<Character> bashHit = character -> {
+        Collection<Collider> hits = mmorpg.getPhysicsManager()
+                .overlapBox(instance, hitboxCenter, hitboxSize);
+
+        hits.forEach(Triggers.character(character -> {
             if (!character.isDamageable(pc)) {
                 return;
             }
@@ -44,11 +47,7 @@ public class FighterPlayerClass implements Feature {
             character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound, character.getPosition());
-        };
-
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
-        hits.forEach(Triggers.character(bashHit));
+        }));
 
         ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
 

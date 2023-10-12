@@ -32,30 +32,26 @@ public class Deer extends NonPlayerCharacter {
                 new Sequence(
                         new TaskAction(this::isPanicking),
                         new TaskPlayAnimation(CharacterAnimation.named("run")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
+                        new SimpleParallel(
                                 new LoopNTimes(3, new TaskGoToRandomPosition(10)),
-                                new LoopForever(new Sequence(
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
                                         new TaskWait(Duration.ofMillis(250))
-                                ))
+                                )
                         ),
                         new TaskAction(this::endPanic)
                 ),
                 // Forage.
                 new Sequence(
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
+                        new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
-                                new LoopForever(new Sequence(
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
                                         new TaskWait(Duration.ofMillis(750))
-                                ))
+                                )
                         ),
                         new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),

@@ -222,6 +222,10 @@ public final class PlayerCharacter extends Character {
         return Pos.fromPoint(blockPosition).add(0.5, 1.0, 0.5);
     }
 
+    public Vec getVelocity() {
+        return player.getVelocity();
+    }
+
     public Vec getLookDirection() {
         return getPosition().direction();
     }

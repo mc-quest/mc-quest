@@ -58,15 +58,6 @@ public class Parallel extends Composite {
         return BehaviorStatus.RUNNING;
     }
 
-    @Override
-    public void stop(long time) {
-        for (Behavior child : children) {
-            if (child.getStatus() == BehaviorStatus.RUNNING) {
-                child.abort(time);
-            }
-        }
-    }
-
     public enum Policy {
         REQUIRE_ONE,
         REQUIRE_ALL

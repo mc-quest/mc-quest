@@ -1,4 +1,37 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'java'
+
+dependencies {
+    implementation project(path: ':core', configuration: 'shadow')
+    implementation project(path: ':server', configuration: 'shadow')
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'net.mcquest.server.Main'
+    }
+}
+
 subprojects {
+    buildscript {
+        repositories {
+            gradlePluginPortal()
+        }
+        dependencies {
+            classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
+        }
+    }
+
+    apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'java'
 
     repositories {

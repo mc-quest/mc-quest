@@ -6,9 +6,9 @@ import java.util.*;
  * A PlayerClass represents the specialization of a PlayerCharacter.
  */
 public final class PlayerClass {
-    private final int id;
+    private final String id;
     private final String name;
-    private final Map<Integer, Skill> skillsById;
+    private final Map<String, Skill> skillsById;
 
     PlayerClass(Builder builder) {
         id = builder.id;
@@ -20,7 +20,7 @@ public final class PlayerClass {
         }
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -28,7 +28,7 @@ public final class PlayerClass {
         return name;
     }
 
-    public Skill getSkill(int id) {
+    public Skill getSkill(String id) {
         return skillsById.get(id);
     }
 
@@ -36,16 +36,16 @@ public final class PlayerClass {
         return Collections.unmodifiableCollection(skillsById.values());
     }
 
-    public static Builder builder(int id, String name) {
+    public static Builder builder(String id, String name) {
         return new Builder(id, name);
     }
 
     public static class Builder {
-        private final int id;
+        private final String id;
         private final String name;
         final Collection<Skill> skills;
 
-        private Builder(int id, String name) {
+        private Builder(String id, String name) {
             this.id = id;
             this.name = name;
             this.skills = new ArrayList<>();

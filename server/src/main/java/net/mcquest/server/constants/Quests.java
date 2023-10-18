@@ -8,13 +8,13 @@ import net.mcquest.core.util.JsonUtility;
 import net.mcquest.server.Assets;
 
 public class Quests {
-    public static final Quest TUTORIAL = loadQuest("Tutorial");
-    public static final Quest THWARTING_THE_THIEVES = loadQuest("ThwartingTheThieves");
-    public static final Quest ARACHNOPHOBIA = Quest.builder(3, "Arachnophobia", 5)
+    public static final Quest TUTORIAL = loadQuest("tutorial");
+    public static final Quest THWARTING_THE_THIEVES = loadQuest("thwarting_the_thieves");
+    public static final Quest ARACHNOPHOBIA = Quest.builder("arachnophobia", "Arachnophobia", 5)
             .objective("Spiders slain", 15)
             .objective("Broodmother slain", 1)
             .build();
-    public static final Quest FANGS_AND_FUMES = Quest.builder(4, "Fangs and Fumes", 5)
+    public static final Quest FANGS_AND_FUMES = Quest.builder("fangs_and_fumes", "Fangs and Fumes", 5)
             .objective("Spider fangs", 5)
             .objective("Spider venom", 3)
             .build();
@@ -31,7 +31,7 @@ public class Quests {
     private static Quest loadQuest(String fileName) {
         String path = "quests/" + fileName + ".json";
         JsonObject object = Assets.asset(path).readJson().getAsJsonObject();
-        int id = object.get("id").getAsInt();
+        String id = object.get("id").getAsString();
         String name = object.get("name").getAsString();
         int level = object.get("level").getAsInt();
         Quest.Builder builder = Quest.builder(id, name, level);

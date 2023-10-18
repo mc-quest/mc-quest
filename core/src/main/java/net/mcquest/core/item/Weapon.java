@@ -129,7 +129,7 @@ public class Weapon extends Item {
     }
 
     public interface IdStep {
-        NameStep id(int id);
+        NameStep id(String id);
     }
 
     public interface NameStep {
@@ -174,7 +174,7 @@ public class Weapon extends Item {
         private double physicalDamage;
 
         @Override
-        public NameStep id(int id) {
+        public NameStep id(String id) {
             this.id = id;
             return this;
         }

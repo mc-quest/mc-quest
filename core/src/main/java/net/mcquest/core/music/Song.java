@@ -20,11 +20,11 @@ import java.time.Duration;
 import java.util.Map;
 
 public class Song {
-    private final int id;
+    private final String id;
     private final Asset audio;
     private final Duration duration;
 
-    public Song(int id, Asset audio) {
+    public Song(String id, Asset audio) {
         audio.requireType(AssetTypes.OGG);
         this.id = id;
         this.audio = audio;
@@ -45,7 +45,7 @@ public class Song {
         }
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

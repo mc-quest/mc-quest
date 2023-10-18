@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MusicManager {
-    private final Map<Integer, Song> musicById;
+    private final Map<String, Song> musicById;
 
     @ApiStatus.Internal
     public MusicManager(Song[] music) {
@@ -19,14 +19,14 @@ public class MusicManager {
     }
 
     private void registerSong(Song song) {
-        int id = song.getId();
+        String id = song.getId();
         if (musicById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
         musicById.put(id, song);
     }
 
-    public Song getSong(int id) {
+    public Song getSong(String id) {
         return musicById.get(id);
     }
 

@@ -17,7 +17,7 @@ public class MusicPlayer {
     public MusicPlayer(PlayerCharacter pc, PlayerCharacterData data,
                        MusicManager musicManager) {
         this.pc = pc;
-        Integer songId = data.getSongId();
+        String songId = data.songId();
         if (songId == null) {
             song = null;
             repeatTask = null;

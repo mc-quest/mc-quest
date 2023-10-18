@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class MountManager {
     private final Mmorpg mmorpg;
-    private final Map<Integer, Mount> mounts;
+    private final Map<String, Mount> mounts;
 
     @ApiStatus.Internal
     public MountManager(Mmorpg mmorpg, Mount... mounts) {
@@ -30,14 +30,14 @@ public class MountManager {
     }
 
     private void registerMount(Mount mount) {
-        int id = mount.getId();
+        String id = mount.getId();
         if (mounts.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
         mounts.put(id, mount);
     }
 
-    public Mount getMount(int id) {
+    public Mount getMount(String id) {
         return mounts.get(id);
     }
 

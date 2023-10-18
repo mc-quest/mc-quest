@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class ItemManager {
     private final Mmorpg mmorpg;
-    private final Map<Integer, Item> itemsById;
+    private final Map<String, Item> itemsById;
 
     @ApiStatus.Internal
     public ItemManager(Mmorpg mmorpg, Item[] items) {
@@ -42,7 +42,7 @@ public class ItemManager {
     }
 
     private void registerItem(Item item) {
-        int id = item.getId();
+        String id = item.getId();
         if (itemsById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
@@ -52,7 +52,7 @@ public class ItemManager {
     /**
      * Returns the Item with the given ID, or null if none exists.
      */
-    public @Nullable Item getItem(int id) {
+    public @Nullable Item getItem(String id) {
         return itemsById.get(id);
     }
 
@@ -63,7 +63,7 @@ public class ItemManager {
         if (!itemStack.hasTag(Item.ID_TAG)) {
             return null;
         }
-        int id = itemStack.getTag(Item.ID_TAG);
+        String id = itemStack.getTag(Item.ID_TAG);
         return itemsById.get(id);
     }
 

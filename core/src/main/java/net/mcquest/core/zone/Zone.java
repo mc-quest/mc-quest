@@ -15,14 +15,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Zone {
-    private final int id;
+    private final String id;
     private final String name;
     private final int level;
     private final ZoneType type;
     private final Set<PlayerCharacter> pcs;
     private Weather weather;
 
-    public Zone(int id, String name, int level, ZoneType type) {
+    public Zone(String id, String name, int level, ZoneType type) {
         this.id = id;
         this.name = name;
         this.level = level;
@@ -31,7 +31,7 @@ public class Zone {
         weather = Weather.clear();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

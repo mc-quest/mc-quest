@@ -6,11 +6,11 @@ import net.minestom.server.entity.EntityType;
 import java.util.function.Supplier;
 
 public class Mount {
-    private final int id;
+    private final String id;
     private final MountType type;
     private Supplier<Entity> entity;
 
-    public Mount(int id, MountType type) {
+    public Mount(String id, MountType type) {
         this.id = id;
         this.type = type;
         this.entity = Mount::defaultEntity;
@@ -20,7 +20,7 @@ public class Mount {
         return new Entity(EntityType.ARMOR_STAND);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

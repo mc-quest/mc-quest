@@ -17,7 +17,7 @@ import java.util.function.Predicate;
  * The QuestManager is used to register and retrieve Quests.
  */
 public class QuestManager {
-    private final Map<Integer, Quest> questsById;
+    private final Map<String, Quest> questsById;
     private final Multimap<Quest, QuestMarker> questMarkers;
 
     @ApiStatus.Internal
@@ -30,7 +30,7 @@ public class QuestManager {
     }
 
     private void registerQuest(Quest quest) {
-        int id = quest.getId();
+        String id = quest.getId();
         if (questsById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
@@ -41,7 +41,7 @@ public class QuestManager {
      * Returns the registered Quest with the given ID, or null if none
      * exists.
      */
-    public Quest getQuest(int id) {
+    public Quest getQuest(String id) {
         return questsById.get(id);
     }
 

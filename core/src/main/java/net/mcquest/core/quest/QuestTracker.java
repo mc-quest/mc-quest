@@ -33,22 +33,22 @@ public class QuestTracker {
         this.pc = pc;
 
         objectiveProgress = new HashMap<>();
-        PersistentQuestObjectiveData[] objectiveData = data.getQuestObjectiveData();
+        PersistentQuestObjectiveData[] objectiveData = data.questObjectiveData();
         for (PersistentQuestObjectiveData questData : objectiveData) {
             Quest quest = questManager.getQuest(questData.getQuestId());
             objectiveProgress.put(quest, questData.getObjectiveProgress());
         }
 
         completedQuests = new HashSet<>();
-        int[] completedQuestIds = data.getCompletedQuestIds();
-        for (int id : completedQuestIds) {
+        String[] completedQuestIds = data.completedQuestIds();
+        for (String id : completedQuestIds) {
             Quest quest = questManager.getQuest(id);
             completedQuests.add(quest);
         }
 
         trackedQuests = new ArrayList<>();
-        int[] trackedQuestIds = data.getTrackedQuestIds();
-        for (int id : trackedQuestIds) {
+        String[] trackedQuestIds = data.trackedQuestIds();
+        for (String id : trackedQuestIds) {
             Quest quest = questManager.getQuest(id);
             trackedQuests.add(quest);
         }

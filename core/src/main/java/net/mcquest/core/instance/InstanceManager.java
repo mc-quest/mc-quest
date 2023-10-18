@@ -19,7 +19,7 @@ public class InstanceManager {
      */
     private static final Duration CHUNK_UNLOAD_DELAY = Duration.ofSeconds(3);
 
-    private final Map<Integer, Instance> instancesById;
+    private final Map<String, Instance> instancesById;
     /**
      * Maps chunks to remaining time until unload.
      */
@@ -44,7 +44,7 @@ public class InstanceManager {
     }
 
     private void registerInstance(Instance instance) {
-        int id = instance.getId();
+        String id = instance.getId();
         if (instancesById.containsKey(id)) {
             throw new IllegalArgumentException("id already used: " + id);
         }
@@ -52,7 +52,7 @@ public class InstanceManager {
         MinecraftServer.getInstanceManager().registerInstance(instance);
     }
 
-    public Instance getInstance(int id) {
+    public Instance getInstance(String id) {
         return instancesById.get(id);
     }
 

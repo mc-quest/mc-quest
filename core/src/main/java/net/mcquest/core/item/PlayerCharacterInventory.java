@@ -39,7 +39,7 @@ public class PlayerCharacterInventory {
         this.pc = pc;
         this.itemManager = itemManager;
         savedWeapon = null;
-        loadItems(data.getItems());
+        loadItems(data.items());
 
         // TODO: should be responsible for serializing inventory
         // TODO: inventory conditions

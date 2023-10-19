@@ -6,6 +6,8 @@ import net.mcquest.core.cartography.CardinalDirection;
 import net.mcquest.core.cartography.MapViewer;
 import net.mcquest.core.cinema.CutscenePlayer;
 import net.mcquest.core.commerce.Money;
+import net.mcquest.core.event.EventEmitter;
+import net.mcquest.core.event.PlayerCharacterMoveEvent;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.item.PlayerCharacterInventory;
 import net.mcquest.core.mount.Mount;
@@ -75,6 +77,7 @@ public final class PlayerCharacter extends Character {
     private Task undisarmTask;
     private long undisarmTime;
     private boolean teleporting;
+    private final EventEmitter<PlayerCharacterMoveEvent> onMove;
 
     PlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, Player player, PlayerCharacterData data) {
         super(mmorpg, spawner);
@@ -111,6 +114,8 @@ public final class PlayerCharacter extends Character {
         initUi();
         hidePlayerNameplates();
         updateAttackSpeed();
+
+        onMove = new EventEmitter<>();
     }
 
     private void initUi() {
@@ -543,5 +548,9 @@ public final class PlayerCharacter extends Character {
     public void setCanAct(boolean canAct) {
         this.canAct = canAct;
         // TODO: disable skills, consumables, and basic attacks
+    }
+
+    public EventEmitter<PlayerCharacterMoveEvent> onMove() {
+        return onMove;
     }
 }

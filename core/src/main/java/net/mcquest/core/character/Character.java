@@ -1,17 +1,19 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.object.Object;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.util.MathUtility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
+import net.minestom.server.potion.Potion;
+import net.minestom.server.potion.PotionEffect;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,6 +31,7 @@ public abstract class Character extends Object implements DamageSource {
     private double maxHealth;
     private double health;
     private double mass;
+    private boolean invisible;
     private BossHealthBar bossHealthBar;
 
     Character(Mmorpg mmorpg, ObjectSpawner spawner) {
@@ -199,6 +202,21 @@ public abstract class Character extends Object implements DamageSource {
 
     public final void setMass(double mass) {
         this.mass = mass;
+    }
+
+    public final boolean isInvisible() {
+        return invisible;
+    }
+
+    public final void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+
+        Entity entity = getEntity();
+        if (invisible) {
+            entity.addEffect(new Potion(PotionEffect.INVISIBILITY, (byte) 1, Integer.MAX_VALUE));
+        } else {
+            entity.removeEffect(PotionEffect.INVISIBILITY);
+        }
     }
 
     /**

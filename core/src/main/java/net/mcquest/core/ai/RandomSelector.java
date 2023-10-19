@@ -36,12 +36,6 @@ public class RandomSelector extends Composite {
 
     @Override
     public BehaviorStatus update(long time) {
-        BehaviorStatus status = children[currentChild].tick(time);
-
-        if (status != BehaviorStatus.RUNNING) {
-            return status;
-        }
-
-        return BehaviorStatus.RUNNING;
+        return children[currentChild].tick(time);
     }
 }

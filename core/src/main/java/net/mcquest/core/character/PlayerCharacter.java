@@ -8,6 +8,7 @@ import net.mcquest.core.cinema.CutscenePlayer;
 import net.mcquest.core.commerce.Money;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.item.PlayerCharacterInventory;
+import net.mcquest.core.item.Weapon;
 import net.mcquest.core.mount.Mount;
 import net.mcquest.core.music.MusicPlayer;
 import net.mcquest.core.object.ObjectSpawner;
@@ -27,9 +28,14 @@ import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.entity.LivingEntity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.entity.metadata.EntityMeta;
+import net.minestom.server.entity.metadata.PlayerMeta;
 import net.minestom.server.instance.block.Block;
+import net.minestom.server.item.ItemStack;
+import net.minestom.server.network.packet.server.play.EntityEffectPacket;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -43,6 +49,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Arrays;
+
+import static java.nio.file.Files.getAttribute;
 
 public final class PlayerCharacter extends Character {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = Asset.of(
@@ -113,6 +121,7 @@ public final class PlayerCharacter extends Character {
         updateAttackSpeed();
     }
 
+
     private void initUi() {
         updateActionBar();
         // Updating experience bar must be delayed to work properly.
@@ -126,7 +135,9 @@ public final class PlayerCharacter extends Character {
                 .build();
         player.setTeam(team);
     }
-
+    public void sendMessage(String message) {
+        player.sendMessage(message);
+    }
     private void updateAttackSpeed() {
         double attackSpeed = inventory.getWeapon().getAttackSpeed();
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
@@ -146,6 +157,7 @@ public final class PlayerCharacter extends Character {
         getHitbox().setInstance(instance);
     }
 
+
     @Override
     void updatePosition(@NotNull Pos position) {
         super.updatePosition(position);
@@ -159,6 +171,10 @@ public final class PlayerCharacter extends Character {
         updatePosition(position);
     }
 
+    public void setLookDirection(@NotNull Pos position) {
+        player.facePosition(Player.FacePoint.EYE, position);
+    }
+
     boolean isTeleporting() {
         return teleporting;
     }
@@ -169,10 +185,32 @@ public final class PlayerCharacter extends Character {
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, Integer.MAX_VALUE));
     }
 
+    public Weapon getWeapon() {
+        return inventory.getWeapon();
+    }
+
     private void completeTeleport() {
         teleporting = false;
         player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f);
         player.removeEffect(PotionEffect.BLINDNESS);
+    }
+
+    public boolean creatureHasSight(Character creature) {
+        boolean test = player.hasLineOfSight(creature.getEntity(), true);
+        return test;
+    }
+
+    public void addEffect(PotionEffect effect, int secs) {
+        Potion potion = new Potion(effect, (byte) 1, secs * 20);
+        player.addEffect(potion);
+    }
+
+    public void removeEffect(PotionEffect effect) {
+       player.removeEffect(effect);
+    }
+
+    public void changeSpeed(float speedValue) {
+       player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(speedValue);
     }
 
     public Instance getRespawnInstance() {
@@ -187,6 +225,7 @@ public final class PlayerCharacter extends Character {
         this.respawnInstance = instance;
         this.respawnPosition = position;
     }
+
 
     private Pos hitboxCenter() {
         return getPosition().withY(y -> y + 0.9);
@@ -228,6 +267,10 @@ public final class PlayerCharacter extends Character {
 
     public Vec getLookDirection() {
         return getPosition().direction();
+    }
+
+    public boolean isOnGround() {
+        return player.isOnGround();
     }
 
     @Override

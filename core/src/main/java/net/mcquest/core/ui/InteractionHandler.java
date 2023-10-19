@@ -31,6 +31,7 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.potion.PotionEffect;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.List;
@@ -180,6 +181,7 @@ public class InteractionHandler {
 
         Weapon weapon = pc.getInventory().getWeapon();
         AutoAttackEvent basicAttackEvent = new AutoAttackEvent(pc, weapon);
+        pc.removeEffect(PotionEffect.INVISIBILITY);
         weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);
     }

@@ -4,6 +4,12 @@ import net.mcquest.core.Mmorpg;
 import net.mcquest.core.asset.AssetDirectory;
 import net.mcquest.server.db.Database;
 import net.mcquest.server.constants.*;
+import net.mcquest.core.event.PlayerCharacterLoginEvent;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.GameMode;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerLoginEvent;
 
 import java.io.File;
 
@@ -33,6 +39,7 @@ public class Main {
                 .playerCharacterDataProvider(database::getPlayerCharacterData)
                 .playerCharacterLogoutHandler(database::savePlayerCharacterData)
                 .start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);
+
     }
 
     private static void extractWorldResources() {

@@ -11,6 +11,7 @@ import net.mcquest.server.constants.Items;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
 import java.util.Collection;
@@ -27,7 +28,6 @@ public class Swords implements Feature {
     public void autoAttack(AutoAttackEvent event) {
         double maxDistance = 5.0;
         double impulse = 100.0;
-
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos origin = pc.getEyePosition();

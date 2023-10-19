@@ -21,11 +21,23 @@
             "level": 2,
             "icon": "self_heal.png",
             "description": "Heal yourself",
-            "skillTreeRow": 1,
-            "skillTreeColumn": 4,
+            "skillTreeRow": 0,
+            "skillTreeColumn": 5,
             "manaCost": 5,
             "cooldown": 20,
             "prerequisiteId": 1
+        },
+        {
+            "type": "ACTIVE",
+            "id": 3,
+            "name": "Tremor",
+            "level": 2,
+            "icon": "tremor.png",
+            "description": "Launches player in air. When they land knock everyone at impact zone away",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 6,
+            "manaCost": 5,
+            "cooldown": 15
         }
     ]
 }

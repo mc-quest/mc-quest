@@ -1,0 +1,66 @@
+{
+  "id": 3,
+  "name": "Rogue",
+  "skills": [
+    {
+      "type": "ACTIVE",
+      "id": 1,
+      "name": "Dodge",
+      "level": 1,
+      "icon": "dodge.png",
+      "description": "Moves the player fastly in a specific direction",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 4,
+      "manaCost": 5,
+      "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": 2,
+      "name": "Backstab",
+      "level": 1,
+      "icon": "backstab.png",
+      "description": "Do 50% more damage when attacking a player from behind",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 5,
+      "manaCost": 0,
+      "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": 3,
+      "name": "Sneak",
+      "level": 1,
+      "icon": "sneak.png",
+      "description": "The player is invisible for 10 seconds or until they attack",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 6,
+      "manaCost": 0,
+      "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": 4,
+      "name": "Adrenaline",
+      "level": 1,
+      "icon": "adrenaline.png",
+      "description": "Increases attack speed and damage for 5 seconds",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 7,
+      "manaCost": 0,
+      "cooldown": 0
+    },
+    {
+      "type": "PASSIVE",
+      "id": 5,
+      "name": "Fleet of Foot",
+      "level": 1,
+      "icon": "fleetoffoot.png",
+      "description": "Passively increases movement speed by 25%",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 8,
+      "manaCost": 0,
+      "cooldown": 0
+    }
+  ]
+}

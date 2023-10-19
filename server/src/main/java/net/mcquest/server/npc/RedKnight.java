@@ -36,19 +36,16 @@ public class RedKnight extends NonPlayerCharacter {
                 .build());
         getEntity().setItemInMainHand(Items.ADVENTURERS_SWORD.getItemStack());
 
-        BlackboardKey<Character> targetKey = BlackboardKey.of("target");
         setBrain(new ActiveSelector(
                 new Sequence(
-                        new TaskFindClosestTarget(targetKey, 10.0),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
-                                new TaskFollowTarget(targetKey, 2.0, 15.0),
-                                new LoopForever(new Sequence(
+                        new TaskFindClosestTarget(10.0),
+                        new SimpleParallel(
+                                new TaskFollowTarget(2.0, 15.0),
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
-                                ))
+                                )
                         ),
                         new TaskPlayAnimation(CharacterAnimation.swingMainHand()),
                         new TaskWait(Duration.ofMillis(250)),
@@ -57,15 +54,13 @@ public class RedKnight extends NonPlayerCharacter {
                 ),
                 new Sequence(
                         new TaskWait(Duration.ofSeconds(2)),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
+                        new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
-                                new LoopForever(new Sequence(
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
-                                ))
+                                )
                         )
                 )
         ));

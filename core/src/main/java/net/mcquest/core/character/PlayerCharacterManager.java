@@ -81,8 +81,8 @@ public class PlayerCharacterManager {
     private void handlePlayerLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         PlayerCharacterData data = dataProvider.apply(player);
-        Instance instance = mmorpg.getInstanceManager().getInstance(data.getInstanceId());
-        Pos position = data.getPosition();
+        Instance instance = mmorpg.getInstanceManager().getInstance(data.instanceId());
+        Pos position = data.position();
         event.setSpawningInstance(instance);
         player.setRespawnPoint(position);
         player.setGameMode(GameMode.ADVENTURE);
@@ -136,7 +136,9 @@ public class PlayerCharacterManager {
         }
 
         PlayerCharacterMoveEvent pcMoveEvent = new PlayerCharacterMoveEvent(pc, event);
+        pc.onMove().emit(pcMoveEvent);
         MinecraftServer.getGlobalEventHandler().call(pcMoveEvent);
+
         if (!pcMoveEvent.isCancelled()) {
             pc.updatePosition(pcMoveEvent.getNewPosition());
         }

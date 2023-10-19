@@ -7,7 +7,7 @@ import net.minestom.server.world.DimensionType;
 import java.util.UUID;
 
 public class Instance extends InstanceContainer {
-    private final int id;
+    private final String id;
 
     private Instance(Builder builder) {
         super(UUID.randomUUID(), builder.dimensionType);
@@ -15,20 +15,20 @@ public class Instance extends InstanceContainer {
         setChunkLoader(builder.loader);
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public static Builder builder(int id) {
+    public static Builder builder(String id) {
         return new Builder(id);
     }
 
     public static class Builder {
-        private final int id;
+        private final String id;
         private DimensionType dimensionType;
         private IChunkLoader loader;
 
-        private Builder(int id) {
+        private Builder(String id) {
             this.id = id;
             dimensionType = DimensionType.OVERWORLD;
             loader = null;

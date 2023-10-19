@@ -12,7 +12,7 @@ import java.util.List;
  * A Quest represents a series of objectives for a player to complete.
  */
 public final class Quest {
-    private final int id;
+    private final String id;
     private final String name;
     private final int level;
     private final QuestObjective[] objectives;
@@ -28,7 +28,7 @@ public final class Quest {
         onComplete = new EventEmitter<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -64,17 +64,17 @@ public final class Quest {
         return onComplete;
     }
 
-    public static Builder builder(int id, String name, int level) {
+    public static Builder builder(String id, String name, int level) {
         return new Builder(id, name, level);
     }
 
     public static class Builder {
-        final int id;
+        final String id;
         final String name;
         final int level;
         final List<QuestObjective> objectives;
 
-        private Builder(int id, String name, int level) {
+        private Builder(String id, String name, int level) {
             this.id = id;
             this.name = name;
             this.level = level;

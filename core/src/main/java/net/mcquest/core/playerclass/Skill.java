@@ -12,10 +12,10 @@ import team.unnamed.creative.model.ItemOverride;
 import java.util.List;
 
 public abstract class Skill {
-    private final int id;
+    private final String id;
     private final String name;
     private final int level;
-    private final Integer prerequisiteId;
+    private final String prerequisiteId;
     private final Asset icon;
     private final String description;
     private final int skillTreeRow;
@@ -35,7 +35,7 @@ public abstract class Skill {
         onUnlock = new EventEmitter<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -92,13 +92,13 @@ public abstract class Skill {
     public abstract void writeResources(FileTree tree, List<ItemOverride> overrides);
 
     static class Builder {
-        int id;
+        String id;
         String name;
         int level;
         Asset icon;
         String description;
         int skillTreeRow;
         int skillTreeColumn;
-        int prerequisiteId;
+        String prerequisiteId;
     }
 }

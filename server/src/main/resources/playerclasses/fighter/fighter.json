@@ -1,10 +1,10 @@
 {
-    "id": 1,
+    "id": "fighter",
     "name": "Fighter",
     "skills": [
         {
             "type": "ACTIVE",
-            "id": 1,
+            "id": "bash",
             "name": "Bash",
             "level": 1,
             "icon": "bash.png",
@@ -16,7 +16,7 @@
         },
         {
             "type": "ACTIVE",
-            "id": 2,
+            "id": "self_heal",
             "name": "Self Heal",
             "level": 2,
             "icon": "self_heal.png",

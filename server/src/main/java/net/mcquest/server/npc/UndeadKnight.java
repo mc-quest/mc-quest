@@ -27,20 +27,17 @@ public class UndeadKnight extends NonPlayerCharacter {
         setRespawnDuration(Duration.ofSeconds(3));
         setRemovalDelay(Duration.ofMillis(2500));
 
-        BlackboardKey<Character> targetKey = BlackboardKey.of("target");
         setBrain(new ActiveSelector(
                 new Sequence(
-                        new TaskFindClosestTarget(targetKey, 15.0),
+                        new TaskFindClosestTarget(15.0),
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
-                                new TaskFollowTarget(targetKey, 3.0, 15.0),
-                                new LoopForever(new Sequence(
+                        new SimpleParallel(
+                                new TaskFollowTarget(3.0, 15.0),
+                                new Sequence(
                                         new TaskWait(Duration.ofMillis(750)),
                                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
-                                ))
+                                )
                         ),
                         new TaskPlayAnimation(CharacterAnimation.named("attack_sword")),
                         new TaskWait(Duration.ofMillis(700)),
@@ -53,15 +50,13 @@ public class UndeadKnight extends NonPlayerCharacter {
                         new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
+                        new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
-                                new LoopForever(new Sequence(
+                                new Sequence(
                                         new TaskWait(Duration.ofMillis(750)),
                                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
-                                ))
+                                )
                         )
                 )
         ));

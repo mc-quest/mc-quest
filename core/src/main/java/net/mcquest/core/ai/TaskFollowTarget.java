@@ -26,6 +26,10 @@ public class TaskFollowTarget extends Task {
             return BehaviorStatus.FAILURE;
         }
 
+        if (target.isInvisible()) {
+            return BehaviorStatus.FAILURE;
+        }
+
         Navigator navigator = character.getNavigator();
         Pos targetPosition = target.getPosition();
         if (character.getPosition().distanceSquared(targetPosition) <= acceptanceRadius * acceptanceRadius) {

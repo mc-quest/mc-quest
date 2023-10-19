@@ -217,6 +217,8 @@ public abstract class Character extends Object implements DamageSource {
         } else {
             entity.removeEffect(PotionEffect.INVISIBILITY);
         }
+
+        // TODO: update nameplate visibility
     }
 
     /**

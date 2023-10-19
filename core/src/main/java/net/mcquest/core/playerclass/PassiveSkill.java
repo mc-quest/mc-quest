@@ -61,7 +61,7 @@ public class PassiveSkill extends Skill {
         customModelDataStart = ResourcePackUtility.writeIcon(
                 tree,
                 getIcon(),
-                Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
+                Key.key(Namespaces.SKILLS, String.format("%s-%s", playerClass.getId(), getId())),
                 overrides
         );
     }

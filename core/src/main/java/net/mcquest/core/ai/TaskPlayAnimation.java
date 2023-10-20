@@ -10,7 +10,8 @@ public class TaskPlayAnimation extends Task {
     }
 
     @Override
-    public void start(long time) {
+    public BehaviorStatus update(long time) {
         getCharacter().playAnimation(animation);
+        return BehaviorStatus.SUCCESS;
     }
 }

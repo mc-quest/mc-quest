@@ -52,14 +52,18 @@ class Nameplate {
         Attitude attitude = character.getAttitude(pc);
         Player player = pc.getEntity();
         names.forEach((att, name) -> {
-            if (att == attitude) {
+            if (att == attitude && !character.isInvisible()) {
                 name.addViewer(player);
             } else {
                 name.removeViewer(player);
             }
         });
 
-        healthBar.addViewer(player);
+        if (character.isInvisible()) {
+            healthBar.removeViewer(player);
+        } else {
+            healthBar.addViewer(player);
+        }
     }
 
     void updateInstance() {

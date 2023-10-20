@@ -38,7 +38,7 @@ public class TaskFindClosestTarget extends Task {
                 && target.isAlive()
                 && target.isDamageable(character)
                 && character.getAttitude(target) == Attitude.HOSTILE
-                && !character.isInvisible();
+                && !target.isInvisible();
     }
 
     private int compareTargetsByDistance(Character target1, Character target2) {

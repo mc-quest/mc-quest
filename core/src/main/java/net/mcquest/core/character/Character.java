@@ -12,8 +12,6 @@ import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,6 +40,7 @@ public abstract class Character extends Object implements DamageSource {
         level = 1;
         maxHealth = 1.0;
         mass = 70;
+        invisible = false;
     }
 
     @Override
@@ -210,15 +209,8 @@ public abstract class Character extends Object implements DamageSource {
 
     public final void setInvisible(boolean invisible) {
         this.invisible = invisible;
-
-        Entity entity = getEntity();
-        if (invisible) {
-            entity.addEffect(new Potion(PotionEffect.INVISIBILITY, (byte) 1, Integer.MAX_VALUE));
-        } else {
-            entity.removeEffect(PotionEffect.INVISIBILITY);
-        }
-
-        // TODO: update nameplate visibility
+        // TODO: this doesn't work for model entities.
+        getEntity().setInvisible(invisible);
     }
 
     /**

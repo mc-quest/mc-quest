@@ -429,6 +429,7 @@ public final class PlayerCharacter extends Character {
         setInstance(respawnInstance, respawnPosition);
         setHealth(getMaxHealth());
         setMana(maxMana);
+        setInvisible(false);
 
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
 

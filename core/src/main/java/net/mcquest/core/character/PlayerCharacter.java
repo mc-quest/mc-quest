@@ -116,6 +116,8 @@ public final class PlayerCharacter extends Character {
         updateAttackSpeed();
 
         onMove = new EventEmitter<>();
+
+        player.setInstance(spawner.getInstance(), spawner.getPosition());
     }
 
     private void initUi() {

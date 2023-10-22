@@ -11,6 +11,7 @@ import net.mcquest.core.instance.Instance;
 import net.mcquest.core.instance.InstanceManager;
 import net.mcquest.core.item.Item;
 import net.mcquest.core.item.ItemManager;
+import net.mcquest.core.login.LoginManager;
 import net.mcquest.core.loot.LootManager;
 import net.mcquest.core.model.ModelManager;
 import net.mcquest.core.mount.Mount;
@@ -56,6 +57,7 @@ public class Mmorpg {
     private final LootManager lootManager;
     private final CutsceneManager cutsceneManager;
     private final ResourcePackManager resourcePackManager;
+    private final LoginManager loginManager;
     private final Feature[] features;
     private final PersistenceService persistenceService;
 
@@ -79,6 +81,7 @@ public class Mmorpg {
         lootManager = new LootManager(this);
         cutsceneManager = new CutsceneManager(this);
         resourcePackManager = new ResourcePackManager(this);
+        loginManager = new LoginManager(this);
         features = builder.features;
         persistenceService = builder.persistenceService;
         InteractionHandler interactionHandler = new InteractionHandler(this);

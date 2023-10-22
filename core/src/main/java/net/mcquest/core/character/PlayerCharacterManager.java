@@ -35,7 +35,6 @@ public class PlayerCharacterManager {
         this.mmorpg = mmorpg;
         pcs = new HashMap<>();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
         eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
@@ -70,31 +69,11 @@ public class PlayerCharacterManager {
 
     @ApiStatus.Internal
     public void loginPlayerCharacter(Player player, int slot, PlayerCharacterData data) {
-        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-
-        Instance instance;
-        Pos position;
-
-        if (data.instanceId() == null) {
-            PlayerCharacterCreateEvent event = new PlayerCharacterCreateEvent();
-            eventHandler.call(event);
-            if (event.getInstance() == null) {
-                throw new IllegalStateException("Must specify a spawning instance");
-            }
-            instance = event.getInstance();
-
-        } else {
-            instance = mmorpg.getInstanceManager().getInstance(data.instanceId())
-        }
-
-        Pos position = data.position();
-        event.setSpawningInstance(instance);
-        player.setRespawnPoint(position);
-        player.setGameMode(GameMode.ADVENTURE);
-        ObjectSpawner spawner = pcSpawner(instance, position, player, data);
+        Instance instance = mmorpg.getInstanceManager().getInstance(data.instanceId());
+        ObjectSpawner spawner = pcSpawner(instance, data.position(), player, data);
         PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
         pcs.put(player, pc);
-        eventHandler.call(new PlayerCharacterLoginEvent(pc));
+        mmorpg.getGlobalEventHandler().call(new PlayerCharacterLoginEvent(pc));
     }
 
     private ObjectSpawner pcSpawner(Instance instance, Pos position,
@@ -107,21 +86,17 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
-        TODO
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
         handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.DISCONNECT);
     }
 
     private void handlePlayerCharacterMenuLogout(ClickMenuLogoutEvent event) {
-        TODO
         PlayerCharacter pc = event.getPlayerCharacter();
         handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.MENU_LOGOUT);
     }
 
     private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
-        TODO
-        logoutHandler.accept(pc, logoutType);
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
         eventHandler.call(event);
@@ -130,8 +105,11 @@ public class PlayerCharacterManager {
     }
 
     private void handlePlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacter pc = getPlayerCharacter(player);
+        PlayerCharacter pc = getPlayerCharacter(event.getPlayer());
+
+        if (pc == null) {
+            return;
+        }
 
         if (pc.isTeleporting()) {
             event.setCancelled(true);

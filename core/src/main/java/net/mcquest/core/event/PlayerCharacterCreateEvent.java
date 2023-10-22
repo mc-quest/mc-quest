@@ -5,16 +5,16 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.Event;
 
 public class PlayerCharacterCreateEvent implements Event {
-    public PlayerCharacterCreateEvent() {
-        instance = null;
-        position = null;
+    private Result result;
+
+    public Result getResult() {
+        return result;
     }
 
-    public Instance getInstance() {
-        return instance;
+    public void setResult(Result result) {
+        this.result = result;
     }
 
-    public Pos getPosition() {
-        return position;
+    public record Result(Instance instance, Pos position) {
     }
 }

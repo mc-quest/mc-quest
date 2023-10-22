@@ -4,7 +4,6 @@ import net.mcquest.core.audio.AudioClip;
 import net.mcquest.core.audio.AudioManager;
 import net.mcquest.core.cartography.Map;
 import net.mcquest.core.cartography.MapManager;
-import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.character.PlayerCharacterManager;
 import net.mcquest.core.cinema.CutsceneManager;
 import net.mcquest.core.feature.Feature;
@@ -20,7 +19,7 @@ import net.mcquest.core.music.MusicManager;
 import net.mcquest.core.music.Song;
 import net.mcquest.core.object.ObjectManager;
 import net.mcquest.core.particle.ParticleManager;
-import net.mcquest.core.persistence.PlayerCharacterData;
+import net.mcquest.core.persistence.PersistenceService;
 import net.mcquest.core.physics.PhysicsManager;
 import net.mcquest.core.playerclass.PlayerClass;
 import net.mcquest.core.playerclass.PlayerClassManager;
@@ -28,19 +27,14 @@ import net.mcquest.core.quest.Quest;
 import net.mcquest.core.quest.QuestManager;
 import net.mcquest.core.resourcepack.ResourcePackManager;
 import net.mcquest.core.ui.InteractionHandler;
-import net.mcquest.core.ui.PlayerCharacterLogoutType;
 import net.mcquest.core.zone.Zone;
 import net.mcquest.core.zone.ZoneManager;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.extras.MojangAuth;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.world.biomes.Biome;
 import team.unnamed.hephaestus.Model;
-
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class Mmorpg {
     private final MinecraftServer server;
@@ -63,6 +57,7 @@ public class Mmorpg {
     private final CutsceneManager cutsceneManager;
     private final ResourcePackManager resourcePackManager;
     private final Feature[] features;
+    private final PersistenceService persistenceService;
 
     private Mmorpg(Builder builder) {
         server = builder.server;
@@ -77,11 +72,7 @@ public class Mmorpg {
         mapManager = new MapManager(this, builder.maps);
         mountManager = new MountManager(this, builder.mounts);
         instanceManager = new InstanceManager(builder.instances, builder.biomes);
-        pcManager = new PlayerCharacterManager(
-                this,
-                builder.pcDataProvider,
-                builder.pcLogoutHandler
-        );
+        pcManager = new PlayerCharacterManager(this);
         objectManager = new ObjectManager(this);
         physicsManager = new PhysicsManager();
         particleManager = new ParticleManager();
@@ -89,6 +80,7 @@ public class Mmorpg {
         cutsceneManager = new CutsceneManager(this);
         resourcePackManager = new ResourcePackManager(this);
         features = builder.features;
+        persistenceService = builder.persistenceService;
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }
@@ -182,6 +174,10 @@ public class Mmorpg {
         return MinecraftServer.getSchedulerManager();
     }
 
+    public PersistenceService getPersistenceService() {
+        return persistenceService;
+    }
+
     public static NameStep builder() {
         return new Builder();
     }
@@ -235,17 +231,11 @@ public class Mmorpg {
     }
 
     public interface FeaturesStep {
-        PlayerCharacterDataProviderStep features(Feature... features);
+        PersistenceServiceStep features(Feature... features);
     }
 
-    public interface PlayerCharacterDataProviderStep {
-        PlayerCharacterLogoutHandlerStep
-        playerCharacterDataProvider(Function<Player, PlayerCharacterData> dataProvider);
-    }
-
-    public interface PlayerCharacterLogoutHandlerStep {
-        StartStep
-        playerCharacterLogoutHandler(BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler);
+    public interface PersistenceServiceStep {
+        StartStep persistenceService(PersistenceService persistenceService);
     }
 
     public interface StartStep {
@@ -255,8 +245,7 @@ public class Mmorpg {
     private static class Builder implements NameStep, PlayerClassesStep,
             ItemsStep, QuestsStep, ZonesStep, MusicStep, MapsStep, MountsStep,
             InstancesStep, BiomesStep, ModelsStep, AudioStep, FeaturesStep,
-            PlayerCharacterDataProviderStep, PlayerCharacterLogoutHandlerStep,
-            StartStep {
+            PersistenceServiceStep, StartStep {
         private final MinecraftServer server;
         private String name;
         private PlayerClass[] playerClasses;
@@ -271,8 +260,7 @@ public class Mmorpg {
         private Model[] models;
         private AudioClip[] audio;
         private Feature[] features;
-        private Function<Player, PlayerCharacterData> pcDataProvider;
-        private BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> pcLogoutHandler;
+        private PersistenceService persistenceService;
 
         private Builder() {
             System.setProperty("minestom.chunk-view-distance", String.valueOf(10));
@@ -352,22 +340,14 @@ public class Mmorpg {
         }
 
         @Override
-        public PlayerCharacterDataProviderStep features(Feature... features) {
+        public PersistenceServiceStep features(Feature... features) {
             this.features = features.clone();
             return this;
         }
 
         @Override
-        public PlayerCharacterLogoutHandlerStep playerCharacterDataProvider(
-                Function<Player, PlayerCharacterData> dataProvider) {
-            this.pcDataProvider = dataProvider;
-            return this;
-        }
-
-        @Override
-        public StartStep playerCharacterLogoutHandler(
-                BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
-            this.pcLogoutHandler = logoutHandler;
+        public StartStep persistenceService(PersistenceService persistenceService) {
+            this.persistenceService = persistenceService;
             return this;
         }
 

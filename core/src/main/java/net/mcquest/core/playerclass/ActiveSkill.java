@@ -146,7 +146,7 @@ public class ActiveSkill extends Skill {
         customModelDataStart = ResourcePackUtility.writeIcon(
                 tree,
                 getIcon(),
-                Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
+                Key.key(Namespaces.SKILLS, String.format("%s-%s", playerClass.getId(), getId())),
                 overrides
         );
 
@@ -155,7 +155,7 @@ public class ActiveSkill extends Skill {
             ResourcePackUtility.writeCooldownIcon(
                     tree,
                     getIcon(),
-                    Key.key(Namespaces.SKILLS, String.format("%d-%d-%d", playerClass.getId(), getId(), i)),
+                    Key.key(Namespaces.SKILLS, String.format("%s-%s-%d", playerClass.getId(), getId(), i)),
                     i,
                     overrides
             );
@@ -166,7 +166,7 @@ public class ActiveSkill extends Skill {
             ResourcePackUtility.writeCooldownIconUnusable(
                     tree,
                     getIcon(),
-                    Key.key(Namespaces.SKILLS, String.format("%d-%d-%d-unusable", playerClass.getId(), getId(), i)),
+                    Key.key(Namespaces.SKILLS, String.format("%s-%s-%d-unusable", playerClass.getId(), getId(), i)),
                     i,
                     overrides
             );
@@ -176,14 +176,14 @@ public class ActiveSkill extends Skill {
         ResourcePackUtility.writeLockedIcon(
                 tree,
                 getIcon(),
-                Key.key(Namespaces.SKILLS, String.format("%d-%d-locked", playerClass.getId(), getId())),
+                Key.key(Namespaces.SKILLS, String.format("%s-%s-locked", playerClass.getId(), getId())),
                 overrides
         );
     }
 
 
     public interface IdStep {
-        NameStep id(int id);
+        NameStep id(String id);
     }
 
     public interface NameStep {
@@ -215,7 +215,7 @@ public class ActiveSkill extends Skill {
     }
 
     public interface BuildStep {
-        BuildStep prerequisite(int id);
+        BuildStep prerequisite(String id);
 
         PlayerClass.Builder build();
     }
@@ -232,7 +232,7 @@ public class ActiveSkill extends Skill {
         }
 
         @Override
-        public NameStep id(int id) {
+        public NameStep id(String id) {
             this.id = id;
             return this;
         }
@@ -282,7 +282,7 @@ public class ActiveSkill extends Skill {
         }
 
         @Override
-        public BuildStep prerequisite(int id) {
+        public BuildStep prerequisite(String id) {
             this.prerequisiteId = id;
             return this;
         }

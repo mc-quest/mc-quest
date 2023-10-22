@@ -22,13 +22,13 @@ public class Map {
     private static final double QUEST_MARKER_BOTTOM_PADDING = 1.0;
     private static final double QUEST_MARKER_LEFT_PADDING = 0.0;
 
-    private final int id;
+    private final String id;
     private final Pos origin;
     private final Asset image;
     private final BufferedImage bufferedImage;
     private final Collection<QuestMarker> questMarkers;
 
-    public Map(int id, Pos origin, Asset image) {
+    public Map(String id, Pos origin, Asset image) {
         this.id = id;
         this.origin = origin;
         image.requireType(AssetTypes.PNG);
@@ -37,7 +37,7 @@ public class Map {
         this.questMarkers = new ArrayList<>();
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 

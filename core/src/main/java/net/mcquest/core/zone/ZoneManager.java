@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ZoneManager {
-    private final Map<Integer, Zone> zonesById;
+    private final Map<String, Zone> zonesById;
 
     @ApiStatus.Internal
     public ZoneManager(Zone[] zones) {
@@ -17,14 +17,14 @@ public class ZoneManager {
     }
 
     private void registerZone(Zone zone) {
-        int id = zone.getId();
+        String id = zone.getId();
         if (zonesById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
         zonesById.put(id, zone);
     }
 
-    public Zone getZone(int id) {
+    public Zone getZone(String id) {
         return zonesById.get(id);
     }
 }

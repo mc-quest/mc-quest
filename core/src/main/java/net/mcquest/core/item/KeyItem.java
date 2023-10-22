@@ -74,7 +74,7 @@ public class KeyItem extends Item {
     }
 
     public interface IdStep {
-        NameStep id(int id);
+        NameStep id(String id);
     }
 
     public interface NameStep {
@@ -100,7 +100,7 @@ public class KeyItem extends Item {
         private Asset icon;
 
         @Override
-        public NameStep id(int id) {
+        public NameStep id(String id) {
             this.id = id;
             return this;
         }

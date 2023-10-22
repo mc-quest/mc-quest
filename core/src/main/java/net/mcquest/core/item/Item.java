@@ -17,9 +17,9 @@ import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;
 
 public abstract class Item {
-    static final Tag<Integer> ID_TAG = Tag.Integer("item_id");
+    static final Tag<String> ID_TAG = Tag.String("item_id");
 
-    private final int id;
+    private final String id;
     private final String name;
     private final ItemQuality quality;
     private final String description;
@@ -31,7 +31,7 @@ public abstract class Item {
         description = builder.description;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -80,7 +80,7 @@ public abstract class Item {
                                         ListMultimap<Material, ItemOverride> overrides);
 
     static class Builder {
-        int id;
+        String id;
         String name;
         ItemQuality quality;
         String description;

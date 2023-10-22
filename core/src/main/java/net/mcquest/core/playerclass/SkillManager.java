@@ -30,7 +30,7 @@ import java.time.Duration;
 import java.util.*;
 
 public class SkillManager {
-    static final Tag<Integer> SKILL_ID_TAG = Tag.Integer("skill_id");
+    static final Tag<String> SKILL_ID_TAG = Tag.String("skill_id");
     public static final int MIN_HOTBAR_SLOT = 0;
     public static final int MAX_HOTBAR_SLOT = 5;
 
@@ -45,23 +45,23 @@ public class SkillManager {
         PlayerClass playerClass = pc.getPlayerClass();
 
         unlockedSkills = new HashSet<>();
-        for (int skillId : new int[0]) { // TODO: data.getUnlockedSkillIds()
+        for (String skillId : new String[0]) { // TODO: data.unlockedSkillIds()
             Skill skill = playerClass.getSkill(skillId);
             unlockedSkills.add(skill);
         }
 
         cooldowns = new HashMap<>();
-        for (Map.Entry<Integer, Long> cooldown : new HashMap<Integer, Long>().entrySet()) { // TODO: data.skillCooldowns
-            int skillId = cooldown.getKey();
+        for (Map.Entry<String, Long> cooldown : new HashMap<String, Long>().entrySet()) { // TODO: data.skillCooldowns
+            String skillId = cooldown.getKey();
             ActiveSkill skill = (ActiveSkill) playerClass.getSkill(skillId);
             cooldowns.put(skill, Duration.ofMillis(0));
         }
 
         PlayerInventory inventory = pc.getEntity().getInventory();
 
-        Integer[] hotbarSkillIds = new Integer[MAX_HOTBAR_SLOT - MIN_HOTBAR_SLOT + 1]; // TODO data.getHotbarSkills()
+        String[] hotbarSkillIds = new String[MAX_HOTBAR_SLOT - MIN_HOTBAR_SLOT + 1]; // TODO data.getHotbarSkills()
         for (int slot = MIN_HOTBAR_SLOT; slot <= MAX_HOTBAR_SLOT; slot++) {
-            Integer skillId = hotbarSkillIds[slot];
+            String skillId = hotbarSkillIds[slot];
             if (skillId == null) {
                 inventory.setItemStack(slot, hotbarSkillPlaceholder(slot, false));
             } else {
@@ -70,7 +70,7 @@ public class SkillManager {
             }
         }
 
-        skillPoints = data.getSkillPoints();
+        skillPoints = data.skillPoints();
 
         inventory.addInventoryCondition(this::handleInventoryClick);
     }
@@ -224,7 +224,7 @@ public class SkillManager {
             return null;
         }
 
-        int skillId = itemStack.getTag(SKILL_ID_TAG);
+        String skillId = itemStack.getTag(SKILL_ID_TAG);
         return pc.getPlayerClass().getSkill(skillId);
     }
 

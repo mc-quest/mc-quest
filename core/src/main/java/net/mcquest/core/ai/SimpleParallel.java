@@ -20,11 +20,6 @@ public class SimpleParallel extends Composite {
     public BehaviorStatus update(long time) {
         BehaviorStatus status = child().tick(time);
         background().tick(time);
-
-        if (status != BehaviorStatus.RUNNING) {
-            return status;
-        }
-
-        return BehaviorStatus.RUNNING;
+        return status;
     }
 }

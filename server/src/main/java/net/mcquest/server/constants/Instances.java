@@ -4,16 +4,16 @@ import net.mcquest.core.instance.Instance;
 import net.minestom.server.instance.AnvilLoader;
 
 public class Instances {
-    public static final Instance ELADRADOR = Instance.builder(1)
+    public static final Instance ELADRADOR = Instance.builder("eladrador")
             .chunkLoader(new AnvilLoader("world/eladrador"))
             .build();
-    public static final Instance BROODMOTHER_LAIR = Instance.builder(2)
+    public static final Instance BROODMOTHER_LAIR = Instance.builder("broodmother_lair")
             .chunkLoader(new AnvilLoader("world/broodmother_lair"))
             .build();
-    public static final Instance SKULL_ENTRANCE = Instance.builder(3)
+    public static final Instance SKULL_ENTRANCE = Instance.builder("skull_entrance")
             .chunkLoader(new AnvilLoader("world/skull_entrance"))
             .build();
-    public static final Instance VAMPIRE_CASTLE = Instance.builder(4)
+    public static final Instance VAMPIRE_CASTLE = Instance.builder("vampire_castle")
             .chunkLoader(new AnvilLoader("world/vampire_castle"))
             .build();
 

@@ -1,13 +1,13 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.object.Object;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.util.MathUtility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.collision.BoundingBox;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -29,6 +29,7 @@ public abstract class Character extends Object implements DamageSource {
     private double maxHealth;
     private double health;
     private double mass;
+    private boolean invisible;
     private BossHealthBar bossHealthBar;
 
     Character(Mmorpg mmorpg, ObjectSpawner spawner) {
@@ -39,6 +40,7 @@ public abstract class Character extends Object implements DamageSource {
         level = 1;
         maxHealth = 1.0;
         mass = 70;
+        invisible = false;
     }
 
     @Override
@@ -199,6 +201,16 @@ public abstract class Character extends Object implements DamageSource {
 
     public final void setMass(double mass) {
         this.mass = mass;
+    }
+
+    public final boolean isInvisible() {
+        return invisible;
+    }
+
+    public final void setInvisible(boolean invisible) {
+        this.invisible = invisible;
+        // TODO: this doesn't work for model entities.
+        getEntity().setInvisible(invisible);
     }
 
     /**

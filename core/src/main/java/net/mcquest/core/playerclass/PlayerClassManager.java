@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public class PlayerClassManager {
     private final Mmorpg mmorpg;
-    private final Map<Integer, PlayerClass> playerClassesById;
+    private final Map<String, PlayerClass> playerClassesById;
 
     @ApiStatus.Internal
     public PlayerClassManager(Mmorpg mmorpg, PlayerClass[] playerClasses) {
@@ -45,7 +45,7 @@ public class PlayerClassManager {
     }
 
     private void registerPlayerClass(PlayerClass playerClass) {
-        int id = playerClass.getId();
+        String id = playerClass.getId();
         if (playerClassesById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
@@ -104,7 +104,7 @@ public class PlayerClassManager {
     /**
      * Returns the PlayerClass with the given name.
      */
-    public PlayerClass getPlayerClass(int id) {
+    public PlayerClass getPlayerClass(String id) {
         return playerClassesById.get(id);
     }
 

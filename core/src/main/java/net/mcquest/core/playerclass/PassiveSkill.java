@@ -61,13 +61,13 @@ public class PassiveSkill extends Skill {
         customModelDataStart = ResourcePackUtility.writeIcon(
                 tree,
                 getIcon(),
-                Key.key(Namespaces.SKILLS, String.format("%d-%d", playerClass.getId(), getId())),
+                Key.key(Namespaces.SKILLS, String.format("%s-%s", playerClass.getId(), getId())),
                 overrides
         );
     }
 
     public interface IdStep {
-        NameStep id(int id);
+        NameStep id(String id);
     }
 
     public interface NameStep {
@@ -91,7 +91,7 @@ public class PassiveSkill extends Skill {
     }
 
     public interface BuildStep {
-        BuildStep prerequisite(int id);
+        BuildStep prerequisite(String id);
 
         PlayerClass.Builder build();
     }
@@ -105,7 +105,7 @@ public class PassiveSkill extends Skill {
         }
 
         @Override
-        public NameStep id(int id) {
+        public NameStep id(String id) {
             this.id = id;
             return this;
         }
@@ -143,7 +143,7 @@ public class PassiveSkill extends Skill {
         }
 
         @Override
-        public BuildStep prerequisite(int id) {
+        public BuildStep prerequisite(String id) {
             this.prerequisiteId = id;
             return this;
         }

@@ -35,20 +35,17 @@ public class Spider extends NonPlayerCharacter {
                         .build())
                 .build());
 
-        BlackboardKey<Character> targetKey = BlackboardKey.of("target");
         setBrain(new ActiveSelector(
                 new Sequence(
-                        new TaskFindClosestTarget(targetKey, 10.0),
+                        new TaskFindClosestTarget(10.0),
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
-                                new TaskFollowTarget(targetKey, 2.0, 15.0),
-                                new LoopForever(new Sequence(
+                        new SimpleParallel(
+                                new TaskFollowTarget(2.0, 15.0),
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
-                                ))
+                                )
                         ),
                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK, Sound.Source.HOSTILE, 1f
                                 , 1f)),
@@ -61,15 +58,13 @@ public class Spider extends NonPlayerCharacter {
                         new TaskPlayAnimation(CharacterAnimation.named("idle")),
                         new TaskWait(Duration.ofSeconds(2)),
                         new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new Parallel(
-                                Parallel.Policy.REQUIRE_ONE,
-                                Parallel.Policy.REQUIRE_ONE,
+                        new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
-                                new LoopForever(new Sequence(
+                                new Sequence(
                                         new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
-                                ))
+                                )
                         )
                 )
         ));

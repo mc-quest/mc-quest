@@ -4,7 +4,7 @@
     "skills": [
         {
             "type": "ACTIVE",
-            "id": 1,
+            "id": "fireball",
             "name": "Fireball",
             "level": 1,
             "icon": "fireball.png",
@@ -16,7 +16,7 @@
         },
         {
             "type": "ACTIVE",
-            "id": 2,
+            "id": "ice_beam",
             "name": "Ice Beam",
             "level": 2,
             "icon": "ice_beam.png",

@@ -16,6 +16,7 @@ import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.Task;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import team.unnamed.hephaestus.minestom.ModelEntity;
 
 import java.time.Duration;
@@ -30,6 +31,7 @@ public class NonPlayerCharacter extends Character {
     private double experiencePoints;
     private LootTable lootTable;
     private Duration respawnDuration;
+    private Character target;
     private Task endDamageTint;
 
     public NonPlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, CharacterModel model) {
@@ -41,6 +43,7 @@ public class NonPlayerCharacter extends Character {
         experiencePoints = 0.0;
         lootTable = null;
         slayQuestObjectives = new ArrayList<>();
+        target = null;
     }
 
     public final void setLevel(int level) {
@@ -64,11 +67,19 @@ public class NonPlayerCharacter extends Character {
     }
 
     public Collection<QuestObjective> getSlayQuestObjectives() {
-        return slayQuestObjectives;
+        return Collections.unmodifiableCollection(slayQuestObjectives);
     }
 
     public void addSlayQuestObjective(QuestObjective objective) {
         slayQuestObjectives.add(objective);
+    }
+
+    public @Nullable Character getTarget() {
+        return target;
+    }
+
+    public void setTarget(@Nullable Character target) {
+        this.target = target;
     }
 
     @Override

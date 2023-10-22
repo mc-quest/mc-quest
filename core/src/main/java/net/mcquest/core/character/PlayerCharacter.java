@@ -6,6 +6,8 @@ import net.mcquest.core.cartography.CardinalDirection;
 import net.mcquest.core.cartography.MapViewer;
 import net.mcquest.core.cinema.CutscenePlayer;
 import net.mcquest.core.commerce.Money;
+import net.mcquest.core.event.EventEmitter;
+import net.mcquest.core.event.PlayerCharacterMoveEvent;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.item.PlayerCharacterInventory;
 import net.mcquest.core.mount.Mount;
@@ -75,28 +77,29 @@ public final class PlayerCharacter extends Character {
     private Task undisarmTask;
     private long undisarmTime;
     private boolean teleporting;
+    private final EventEmitter<PlayerCharacterMoveEvent> onMove;
 
     PlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, Player player, PlayerCharacterData data) {
         super(mmorpg, spawner);
         this.player = player;
         setName(player.getUsername());
-        playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.getPlayerClassId());
+        playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.playerClassId());
         skillManager = new SkillManager(this, data);
         inventory = new PlayerCharacterInventory(this, data, mmorpg.getItemManager());
         questTracker = new QuestTracker(this, data, mmorpg.getQuestManager());
         musicPlayer = new MusicPlayer(this, data, mmorpg.getMusicManager());
         mapViewer = new MapViewer(this, data, mmorpg.getMapManager());
         cutscenePlayer = new CutscenePlayer(this);
-        setLevel(levelForExperiencePoints(data.getExperiencePoints()));
-        setMaxHealth(data.getMaxHealth());
-        setHealth(data.getHealth());
-        maxMana = data.getMaxMana();
-        mana = data.getMana();
-        healthRegenRate = data.getHealthRegenRate();
-        manaRegenRate = data.getManaRegenRate();
-        zone = mmorpg.getZoneManager().getZone(data.getZoneId());
-        respawnInstance = mmorpg.getInstanceManager().getInstance(data.getRespawnInstanceId());
-        respawnPosition = data.getRespawnPosition();
+        setLevel(levelForExperiencePoints(data.experiencePoints()));
+        setMaxHealth(data.maxHealth());
+        setHealth(data.health());
+        maxMana = data.maxMana();
+        mana = data.mana();
+        healthRegenRate = data.healthRegenRate();
+        manaRegenRate = data.manaRegenRate();
+        zone = mmorpg.getZoneManager().getZone(data.zoneId());
+        respawnInstance = mmorpg.getInstanceManager().getInstance(data.respawnInstanceId());
+        respawnPosition = data.respawnPosition();
         isDisarmed = false;
         undisarmTask = null;
         undisarmTime = 0;
@@ -104,13 +107,15 @@ public final class PlayerCharacter extends Character {
         // TODO
         canAct = true;
         teleporting = false;
-        money = new Money(data.getMoney());
+        money = new Money(data.money());
 
         zone.addPlayerCharacter(this);
 
         initUi();
         hidePlayerNameplates();
         updateAttackSpeed();
+
+        onMove = new EventEmitter<>();
     }
 
     private void initUi() {
@@ -424,6 +429,7 @@ public final class PlayerCharacter extends Character {
         setInstance(respawnInstance, respawnPosition);
         setHealth(getMaxHealth());
         setMana(maxMana);
+        setInvisible(false);
 
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
 
@@ -543,5 +549,9 @@ public final class PlayerCharacter extends Character {
     public void setCanAct(boolean canAct) {
         this.canAct = canAct;
         // TODO: disable skills, consumables, and basic attacks
+    }
+
+    public EventEmitter<PlayerCharacterMoveEvent> onMove() {
+        return onMove;
     }
 }

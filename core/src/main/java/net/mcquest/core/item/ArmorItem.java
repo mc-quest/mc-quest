@@ -150,7 +150,7 @@ public class ArmorItem extends Item {
     }
 
     public interface IdStep {
-        NameStep id(int id);
+        NameStep id(String id);
     }
 
     public interface NameStep {
@@ -201,7 +201,7 @@ public class ArmorItem extends Item {
         private double protections;
 
         @Override
-        public NameStep id(int id) {
+        public NameStep id(String id) {
             this.id = id;
             return this;
         }

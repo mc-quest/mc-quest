@@ -10,7 +10,7 @@ import java.util.HashMap;
 
 public class MapManager {
     private final Mmorpg mmorpg;
-    private final java.util.Map<Integer, Map> mapsById;
+    private final java.util.Map<String, Map> mapsById;
 
     @ApiStatus.Internal
     public MapManager(Mmorpg mmorpg, Map[] maps) {
@@ -26,14 +26,14 @@ public class MapManager {
     }
 
     private void registerMap(Map map) {
-        int id = map.getId();
+        String id = map.getId();
         if (mapsById.containsKey(id)) {
             throw new IllegalArgumentException("ID already in use: " + id);
         }
         mapsById.put(id, map);
     }
 
-    public Map getMap(int id) {
+    public Map getMap(String id) {
         return mapsById.get(id);
     }
 

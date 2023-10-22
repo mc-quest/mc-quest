@@ -21,7 +21,7 @@ public class Items {
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
-        int id = object.get("id").getAsInt();
+        String id = object.get("id").getAsString();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         Asset icon = Assets.asset(iconPath);
@@ -41,7 +41,7 @@ public class Items {
         String itemPath = basePath + ".json";
         String modelPath = basePath + ".bbmodel";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
-        int id = object.get("id").getAsInt();
+        String id = object.get("id").getAsString();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
@@ -71,7 +71,7 @@ public class Items {
         String itemPath = basePath + ".json";
         String modelPath = basePath + ".bbmodel";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
-        int id = object.get("id").getAsInt();
+        String id = object.get("id").getAsString();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
@@ -100,7 +100,7 @@ public class Items {
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
-        int id = object.get("id").getAsInt();
+        String id = object.get("id").getAsString();
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();

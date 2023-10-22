@@ -1,11 +1,12 @@
 plugins {
     id 'application'
-}
-
-application {
-    mainClassName = 'net.mcquest.server.Main'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 dependencies {
     implementation project(':core')
+}
+
+application {
+    mainClassName = 'net.mcquest.server.Main'
 }

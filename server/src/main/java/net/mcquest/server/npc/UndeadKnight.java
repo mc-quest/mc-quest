@@ -35,13 +35,13 @@ public class UndeadKnight extends NonPlayerCharacter {
                                 new TaskFollowTarget(3.0, 15.0),
                                 new Sequence(
                                         new TaskWait(Duration.ofMillis(750)),
-                                        new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
                                 )
                         ),
                         new TaskPlayAnimation(CharacterAnimation.named("attack_sword")),
                         new TaskWait(Duration.ofMillis(700)),
-                        new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.HOSTILE, 1f
+                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.HOSTILE, 1f
                                 , 0.75f)),
                         new TaskAction(this::attack),
                         new TaskWait(Duration.ofMillis(800))
@@ -54,7 +54,7 @@ public class UndeadKnight extends NonPlayerCharacter {
                                 new TaskGoToRandomPosition(10),
                                 new Sequence(
                                         new TaskWait(Duration.ofMillis(750)),
-                                        new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
                                 )
                         )
@@ -74,14 +74,14 @@ public class UndeadKnight extends NonPlayerCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
-        playSound(Sound.sound(SoundEvent.ENTITY_BLAZE_HURT, Sound.Source.HOSTILE, 1f, 1f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_BLAZE_HURT, Sound.Source.HOSTILE, 1f, 1f));
     }
 
     @Override
     protected void onDeath(DamageSource source) {
         playAnimation(CharacterAnimation.named("death"));
         getMmorpg().getSchedulerManager()
-                .buildTask(() -> playSound(Sound.sound(SoundEvent.ENTITY_GENERIC_BIG_FALL, Sound.Source.HOSTILE, 1f,
+                .buildTask(() -> emitSound(Sound.sound(SoundEvent.ENTITY_GENERIC_BIG_FALL, Sound.Source.HOSTILE, 1f,
                         1f)))
                 .delay(TaskSchedule.millis(1000))
                 .schedule();

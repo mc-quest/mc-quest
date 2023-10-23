@@ -21,12 +21,10 @@ public class TaskFollowTarget extends Task {
     public BehaviorStatus update(long time) {
         NonPlayerCharacter character = getCharacter();
         Character target = character.getTarget();
-        if (target == null) {
-            // No target is set.
-            return BehaviorStatus.FAILURE;
-        }
 
-        if (target.isInvisible()) {
+        if (target == null
+                || target.isInvisible()
+                || target.getInstance() != character.getInstance()) {
             return BehaviorStatus.FAILURE;
         }
 

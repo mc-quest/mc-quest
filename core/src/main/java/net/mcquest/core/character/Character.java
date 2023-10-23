@@ -1,5 +1,6 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -8,11 +9,13 @@ import net.mcquest.core.instance.Instance;
 import net.mcquest.core.object.Object;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.util.MathUtility;
+import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
+import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import net.minestom.server.entity.LivingEntity;
+import net.minestom.server.instance.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -44,7 +47,6 @@ public abstract class Character extends Object implements DamageSource {
     }
 
     @Override
-    @MustBeInvokedByOverriders
     protected void spawn() {
         nameplate.spawn();
         hitbox.setExtents(hitboxExtents());
@@ -52,7 +54,6 @@ public abstract class Character extends Object implements DamageSource {
     }
 
     @Override
-    @MustBeInvokedByOverriders
     protected void despawn() {
         nameplate.despawn();
 
@@ -98,16 +99,14 @@ public abstract class Character extends Object implements DamageSource {
     }
 
     @Override
-    @MustBeInvokedByOverriders
-    public void setInstance(@NotNull Instance instance, Pos position) {
+    public void setInstance(Instance instance, Pos position) {
         super.setInstance(instance, position);
 
         nameplate.updateInstance();
     }
 
     @Override
-    public void setPosition(@NotNull Pos position) {
-        // TODO: fix PlayerCharacter implementation
+    public void setPosition(Pos position) {
         updatePosition(position);
 
         getEntity().teleport(position);
@@ -131,7 +130,6 @@ public abstract class Character extends Object implements DamageSource {
     /**
      * Sets the maximum health of this Character.
      */
-    @MustBeInvokedByOverriders
     public void setMaxHealth(double maxHealth) {
         if (maxHealth <= 0.0) {
             throw new IllegalArgumentException();
@@ -156,7 +154,6 @@ public abstract class Character extends Object implements DamageSource {
     /**
      * Sets the current health of this Character.
      */
-    @MustBeInvokedByOverriders
     public void setHealth(double health) {
         if (health < 0.0 || health > maxHealth) {
             throw new IllegalArgumentException();
@@ -175,7 +172,6 @@ public abstract class Character extends Object implements DamageSource {
         return health > 0.0;
     }
 
-    @MustBeInvokedByOverriders
     public void damage(@NotNull DamageSource source, double amount) {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
@@ -185,7 +181,6 @@ public abstract class Character extends Object implements DamageSource {
         setHealth(newHealth);
     }
 
-    @MustBeInvokedByOverriders
     public void heal(@NotNull DamageSource source, double amount) {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
@@ -203,6 +198,18 @@ public abstract class Character extends Object implements DamageSource {
         this.mass = mass;
     }
 
+    /**
+     * Movement speed in blocks per second.
+     */
+    public final double getMovementSpeed() {
+        return getEntity().getAttributeValue(Attribute.MOVEMENT_SPEED) * 20.0;
+    }
+
+    public final void setMovementSpeed(double movementSpeed) {
+        getEntity().getAttribute(Attribute.MOVEMENT_SPEED)
+                .setBaseValue((float) (movementSpeed / 20.0));
+    }
+
     public final boolean isInvisible() {
         return invisible;
     }
@@ -213,19 +220,31 @@ public abstract class Character extends Object implements DamageSource {
         getEntity().setInvisible(invisible);
     }
 
+    public Vec getVelocity() {
+        return getEntity().getVelocity();
+    }
+
+    public void setVelocity(Vec velocity) {
+        getEntity().setVelocity(velocity);
+    }
+
     /**
      * @param impulse the impulse in kg m/s
      */
-    public void applyImpulse(Vec impulse) {
-        getEntity().setVelocity(impulse.div(mass));
+    public final void applyImpulse(Vec impulse) {
+        getEntity().setVelocity(getVelocity().add(impulse.div(mass)));
     }
 
-    public BossHealthBar getBossHealthBar() {
+    public final BossHealthBar getBossHealthBar() {
         if (bossHealthBar == null) {
             bossHealthBar = new BossHealthBar(this);
         }
 
         return bossHealthBar;
+    }
+
+    public final void emitSound(Sound sound) {
+        getInstance().playSound(sound, getPosition());
     }
 
     public final void speak(Collection<PlayerCharacter> pcs, Component message) {
@@ -234,9 +253,8 @@ public abstract class Character extends Object implements DamageSource {
         }
     }
 
-    public abstract Entity getEntity();
+    public abstract LivingEntity getEntity();
 
-    @MustBeInvokedByOverriders
     public void speak(PlayerCharacter pc, Component message) {
         pc.sendMessage(formatMessage(pc, message));
     }
@@ -255,6 +273,40 @@ public abstract class Character extends Object implements DamageSource {
 
     public boolean isDamageable(@NotNull DamageSource source) {
         return false;
+    }
+
+    public final Pos getTargetBlockPosition(double maxDistance) {
+        Point blockPosition = getEntity().getTargetBlockPosition((int) maxDistance);
+        if (blockPosition == null) {
+            return null;
+        }
+
+        Block block = getInstance().getBlock(blockPosition);
+        if (!block.isSolid()) {
+            return null;
+        }
+
+        return Pos.fromPoint(blockPosition).add(0.5, 1.0, 0.5);
+    }
+
+    public final Vec getLookDirection() {
+        return getPosition().direction();
+    }
+
+    public final void lookAt(Pos position) {
+        getEntity().lookAt(position);
+    }
+
+    public final void lookAt(Character character) {
+        getEntity().lookAt(character.getEntity());
+    }
+
+    public final boolean hasLineOfSight(Character other, boolean exactView) {
+        return getEntity().hasLineOfSight(other.getEntity(), exactView);
+    }
+
+    public final boolean isOnGround() {
+        return getEntity().isOnGround();
     }
 
     final CharacterHitbox getHitbox() {

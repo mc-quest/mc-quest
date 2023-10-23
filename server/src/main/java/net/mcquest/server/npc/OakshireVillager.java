@@ -26,7 +26,7 @@ public class OakshireVillager extends NonPlayerCharacter {
                 new SimpleParallel(
                         new TaskGoToRandomPosition(10),
                         new Sequence(
-                                new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+                                new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                         Sound.Source.AMBIENT, 1f, 1f)),
                                 new TaskWait(Duration.ofMillis(500))
                         )

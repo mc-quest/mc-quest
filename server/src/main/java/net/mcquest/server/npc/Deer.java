@@ -35,7 +35,7 @@ public class Deer extends NonPlayerCharacter {
                         new SimpleParallel(
                                 new LoopNTimes(3, new TaskGoToRandomPosition(10)),
                                 new Sequence(
-                                        new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
                                         new TaskWait(Duration.ofMillis(250))
                                 )
@@ -48,7 +48,7 @@ public class Deer extends NonPlayerCharacter {
                         new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
                                 new Sequence(
-                                        new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
                                         new TaskWait(Duration.ofMillis(750))
                                 )
@@ -58,7 +58,7 @@ public class Deer extends NonPlayerCharacter {
                         new TaskPlayAnimation(CharacterAnimation.named("eat")),
                         new TaskWait(Duration.ofMillis(1500)),
                         new LoopNTimes(9, new Sequence(
-                                new TaskPlaySound(Sound.sound(SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.AMBIENT,
+                                new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.AMBIENT,
                                         0.2f, 1f)),
                                 new TaskWait(Duration.ofMillis(500))
                         )),
@@ -78,14 +78,14 @@ public class Deer extends NonPlayerCharacter {
 
     @Override
     protected void onDamage(DamageSource source) {
-        playSound(Sound.sound(SoundEvent.ENTITY_MULE_HURT, Sound.Source.AMBIENT, 1f, 1f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_MULE_HURT, Sound.Source.AMBIENT, 1f, 1f));
         beginPanic();
     }
 
     @Override
     protected void onDeath(DamageSource killer) {
         playAnimation(CharacterAnimation.named("death"));
-        playSound(Sound.sound(SoundEvent.ENTITY_MULE_DEATH, Sound.Source.AMBIENT, 1f, 1f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_MULE_DEATH, Sound.Source.AMBIENT, 1f, 1f));
     }
 
     private void beginPanic() {

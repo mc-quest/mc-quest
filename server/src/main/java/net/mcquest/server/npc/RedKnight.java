@@ -42,7 +42,7 @@ public class RedKnight extends NonPlayerCharacter {
                         new SimpleParallel(
                                 new TaskFollowTarget(2.0, 15.0),
                                 new Sequence(
-                                        new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
                                 )
@@ -57,7 +57,7 @@ public class RedKnight extends NonPlayerCharacter {
                         new SimpleParallel(
                                 new TaskGoToRandomPosition(10),
                                 new Sequence(
-                                        new TaskPlaySound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
+                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_STONE_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         new TaskWait(Duration.ofMillis(500))
                                 )
@@ -77,12 +77,12 @@ public class RedKnight extends NonPlayerCharacter {
     }
 
     protected void onDamage(DamageSource source) {
-        playSound(Sound.sound(SoundEvent.ENTITY_BLAZE_HURT, Sound.Source.HOSTILE, 0.75f, 1f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_BLAZE_HURT, Sound.Source.HOSTILE, 0.75f, 1f));
     }
 
     @Override
     protected void onDeath(DamageSource source) {
-        playSound(Sound.sound(SoundEvent.ENTITY_BLAZE_DEATH, Sound.Source.HOSTILE, 1f, 1f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_BLAZE_DEATH, Sound.Source.HOSTILE, 1f, 1f));
     }
 
     private boolean attack(long time) {

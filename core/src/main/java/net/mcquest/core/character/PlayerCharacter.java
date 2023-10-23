@@ -1,5 +1,10 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.SoundStop;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.title.Title;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.asset.Asset;
 import net.mcquest.core.cartography.CardinalDirection;
@@ -19,19 +24,12 @@ import net.mcquest.core.playerclass.SkillManager;
 import net.mcquest.core.quest.QuestTracker;
 import net.mcquest.core.util.MathUtility;
 import net.mcquest.core.zone.Zone;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.SoundStop;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
-import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.instance.block.Block;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -176,6 +174,7 @@ public final class PlayerCharacter extends Character {
 
     private void completeTeleport() {
         teleporting = false;
+        // TODO: movement speed may be incorrect
         player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f);
         player.removeEffect(PotionEffect.BLINDNESS);
     }
@@ -211,24 +210,6 @@ public final class PlayerCharacter extends Character {
 
     public Pos getWeaponPosition() {
         return getHandPosition().withY(y -> y + 0.5);
-    }
-
-    public Pos getTargetBlockPosition(double maxDistance) {
-        Point blockPosition = player.getTargetBlockPosition((int) maxDistance);
-        if (blockPosition == null) {
-            return null;
-        }
-
-        Block block = getInstance().getBlock(blockPosition);
-        if (!block.isSolid()) {
-            return null;
-        }
-
-        return Pos.fromPoint(blockPosition).add(0.5, 1.0, 0.5);
-    }
-
-    public Vec getLookDirection() {
-        return getPosition().direction();
     }
 
     @Override
@@ -434,9 +415,9 @@ public final class PlayerCharacter extends Character {
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));
 
         player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.0f);
-        MinecraftServer.getSchedulerManager().buildTask(() -> {
-            player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f);
-        }).delay(TaskSchedule.millis(2500)).schedule();
+        MinecraftServer.getSchedulerManager().buildTask(() ->
+                player.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1f)
+        ).delay(TaskSchedule.millis(2500)).schedule();
 
         player.showTitle(Title.title(Component.text("YOU DIED", NamedTextColor.RED),
                 Component.text("Respawning...", NamedTextColor.GRAY),

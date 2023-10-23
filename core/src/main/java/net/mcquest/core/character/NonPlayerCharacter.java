@@ -1,14 +1,14 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.Behavior;
 import net.mcquest.core.ai.BehaviorTree;
 import net.mcquest.core.ai.Navigator;
+import net.mcquest.core.instance.Instance;
 import net.mcquest.core.loot.LootTable;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.quest.QuestObjective;
-import net.kyori.adventure.sound.Sound;
-import net.minestom.server.attribute.Attribute;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.EntityCreature;
 import net.minestom.server.entity.damage.DamageType;
@@ -91,18 +91,6 @@ public class NonPlayerCharacter extends Character {
         return navigator;
     }
 
-    /**
-     * Movement speed in blocks per second.
-     */
-    public double getMovementSpeed() {
-        return entity.getAttributeValue(Attribute.MOVEMENT_SPEED) * 20.0;
-    }
-
-    public void setMovementSpeed(double movementSpeed) {
-        entity.getAttribute(Attribute.MOVEMENT_SPEED)
-                .setBaseValue((float) (movementSpeed / 20.0));
-    }
-
     public final void setBrain(Behavior root) {
         brain.setRoot(root);
     }
@@ -139,6 +127,12 @@ public class NonPlayerCharacter extends Character {
     }
 
     @Override
+    public final void setInstance(Instance instance, Pos position) {
+        super.setInstance(instance, position);
+        entity.setInstance(instance, position);
+    }
+
+    @Override
     public void updatePosition(Pos position) {
         super.updatePosition(position);
         onChangePosition(position);
@@ -150,6 +144,16 @@ public class NonPlayerCharacter extends Character {
         if (isAlive()) {
             brain.tick(time);
         }
+    }
+
+    @Override
+    public final void setMaxHealth(double maxHealth) {
+        super.setMaxHealth(maxHealth);
+    }
+
+    @Override
+    public final void setHealth(double health) {
+        super.setHealth(health);
     }
 
     @Override
@@ -174,25 +178,20 @@ public class NonPlayerCharacter extends Character {
         onHeal(source);
     }
 
+    @Override
+    public void speak(PlayerCharacter pc, Component message) {
+        super.speak(pc, message);
+
+        onSpeak(pc);
+    }
+
     @ApiStatus.Internal
     public final void interact(PlayerCharacter pc) {
         onInteract(pc);
     }
 
-    public void lookAt(Pos position) {
-        entity.lookAt(position);
-    }
-
-    public void lookAt(Character character) {
-        entity.lookAt(character.getEntity());
-    }
-
     public final void playAnimation(@NotNull CharacterAnimation animation) {
         animation.play(entity);
-    }
-
-    public void playSound(Sound sound) {
-        getInstance().playSound(sound, getPosition());
     }
 
     protected void onSpawn() {

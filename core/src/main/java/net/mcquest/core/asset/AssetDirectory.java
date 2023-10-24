@@ -48,7 +48,7 @@ public class AssetDirectory {
             Files.walkFileTree(dirRootPath, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    String assetPath = path + "/" + dirRootPath.relativize(file);
+                    String assetPath = path + "/" + dirRootPath.relativize(file).toString();
                     assets.add(Asset.of(classLoader, assetPath));
                     return FileVisitResult.CONTINUE;
                 }
@@ -87,7 +87,7 @@ public class AssetDirectory {
                 @Override
                 public FileVisitResult preVisitDirectory(
                         Path dirPath, BasicFileAttributes attrs) throws IOException {
-                    Path destPath = destRootPath.resolve(dirRootPath.relativize(dirPath));
+                    Path destPath = destRootPath.resolve(dirRootPath.relativize(dirPath).toString());
                     Files.createDirectories(destPath);
                     return FileVisitResult.CONTINUE;
                 }
@@ -95,7 +95,7 @@ public class AssetDirectory {
                 @Override
                 public FileVisitResult visitFile(
                         Path assetPath, BasicFileAttributes attrs) throws IOException {
-                    Path destPath = destRootPath.resolve(dirRootPath.relativize(assetPath));
+                    Path destPath = destRootPath.resolve(dirRootPath.relativize(assetPath).toString());
                     Files.copy(assetPath, destPath, StandardCopyOption.REPLACE_EXISTING);
                     return FileVisitResult.CONTINUE;
                 }

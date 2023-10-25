@@ -1,24 +1,24 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
-import net.mcquest.core.event.*;
+import net.mcquest.core.event.PlayerCharacterLoginEvent;
+import net.mcquest.core.event.PlayerCharacterLogoutEvent;
+import net.mcquest.core.event.PlayerCharacterMoveEvent;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.object.Object;
 import net.mcquest.core.object.ObjectManager;
 import net.mcquest.core.object.ObjectProvider;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.persistence.PlayerCharacterData;
-import net.mcquest.core.ui.PlayerCharacterLogoutType;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
@@ -36,7 +36,6 @@ public class PlayerCharacterManager {
         pcs = new HashMap<>();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
-        eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
         eventHandler.addListener(EntityDamageEvent.class, this::handleDamage);
         eventHandler.addListener(PlayerChatEvent.class, this::handleChat);
@@ -69,11 +68,15 @@ public class PlayerCharacterManager {
 
     @ApiStatus.Internal
     public void loginPlayerCharacter(Player player, int slot, PlayerCharacterData data) {
+        player.sendMessage(Component.text("Logging in...", NamedTextColor.GREEN));
         Instance instance = mmorpg.getInstanceManager().getInstance(data.instanceId());
-        ObjectSpawner spawner = pcSpawner(instance, data.position(), player, data);
-        PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
-        pcs.put(player, pc);
-        mmorpg.getGlobalEventHandler().call(new PlayerCharacterLoginEvent(pc));
+        Pos position = data.position();
+        ObjectSpawner spawner = pcSpawner(instance, position, player, data);
+        player.setInstance(instance, position).thenRun(() -> {
+            PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
+            pcs.put(player, pc);
+            mmorpg.getGlobalEventHandler().call(new PlayerCharacterLoginEvent(pc));
+        });
     }
 
     private ObjectSpawner pcSpawner(Instance instance, Pos position,
@@ -88,17 +91,13 @@ public class PlayerCharacterManager {
     private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
-        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.DISCONNECT);
+        logoutPlayerCharacter(pc);
     }
 
-    private void handlePlayerCharacterMenuLogout(ClickMenuLogoutEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.MENU_LOGOUT);
-    }
-
-    private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
+    @ApiStatus.Internal
+    public void logoutPlayerCharacter(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
+        PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc);
         eventHandler.call(event);
         pc.remove();
         pcs.remove(pc.getEntity());

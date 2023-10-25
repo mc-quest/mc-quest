@@ -1,5 +1,6 @@
 package net.mcquest.server.features;
 
+import net.kyori.adventure.sound.Sound;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
@@ -9,7 +10,6 @@ import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.FighterSkills;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
@@ -58,5 +58,14 @@ public class FighterPlayerClass implements Feature {
     private void useSelfHeal(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.heal(pc, 10.0);
+    }
+
+    interface SkillExecutor {
+        enum SkillResult {
+            DONE,
+            EXECUTING
+        }
+
+        SkillResult tick(long time);
     }
 }

@@ -84,6 +84,11 @@ public class InteractionHandler {
     private void handleOpenMenu(PlayerSwapItemEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+
+        if (pc == null) {
+            return;
+        }
+
         event.setCancelled(true);
         openMenu(pc);
     }
@@ -126,9 +131,8 @@ public class InteractionHandler {
     }
 
     private void handleLogoutClick(PlayerCharacter pc) {
-        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        // PlayerCharacterManager listens to this event.
-        eventHandler.call(new ClickMenuLogoutEvent(pc));
+        mmorpg.getPlayerCharacterManager().logoutPlayerCharacter(pc);
+        mmorpg.getLoginManager().sendToLogin(pc.getEntity());
     }
 
     private void handlePickupItem(PickupItemEvent event) {

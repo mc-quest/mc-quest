@@ -114,15 +114,12 @@ public final class PlayerCharacter extends Character {
         updateAttackSpeed();
 
         onMove = new EventEmitter<>();
-
-        player.setInstance(spawner.getInstance(), spawner.getPosition());
     }
 
     private void initUi() {
+        player.setHeldItemSlot((byte) PlayerCharacterInventory.WEAPON_SLOT);
         updateActionBar();
-        // Updating experience bar must be delayed to work properly.
-        MinecraftServer.getSchedulerManager().buildTask(this::updateExperienceBar)
-                .delay(TaskSchedule.nextTick()).schedule();
+        updateExperienceBar();
     }
 
     private void hidePlayerNameplates() {

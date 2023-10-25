@@ -1,5 +1,6 @@
 package net.mcquest.core.login;
 
+import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.persistence.PlayerCharacterData;
@@ -20,11 +21,15 @@ import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.scoreboard.Sidebar;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
 
 public class LoginManager {
     public static final int NUM_CHARACTERS = 4;
+
+    private static final Pos SPAWN_POSITION = new Pos(0, 1, 0);
 
     private final Mmorpg mmorpg;
     private final Instance loginInstance;
@@ -39,6 +44,16 @@ public class LoginManager {
         eventHandler.addListener(PlayerSpawnEvent.class, this::handleSpawn);
 
         loginInstance.eventNode().addListener(InventoryCloseEvent.class, this::handleInventoryClose);
+    }
+
+    @ApiStatus.Internal
+    public void sendToLogin(Player player) {
+        player.setInstance(loginInstance, SPAWN_POSITION);
+        player.getInventory().clear();
+        new Sidebar(Component.empty()).addViewer(player);
+        player.setHealth(20.0f);
+        player.setFood(20);
+        player.stopSound(SoundStop.all());
     }
 
     private Instance createLoginInstance() {
@@ -61,7 +76,7 @@ public class LoginManager {
 
     private void handleLogin(PlayerLoginEvent event) {
         Player player = event.getPlayer();
-        player.setRespawnPoint(new Pos(0, 1, 0));
+        player.setRespawnPoint(SPAWN_POSITION);
         player.setGameMode(GameMode.ADVENTURE);
         event.setSpawningInstance(loginInstance);
     }

@@ -57,9 +57,9 @@ public class Mmorpg {
     private final LootManager lootManager;
     private final CutsceneManager cutsceneManager;
     private final ResourcePackManager resourcePackManager;
-    private final LoginManager loginManager;
     private final Feature[] features;
     private final PersistenceService persistenceService;
+    private final LoginManager loginManager;
 
     private Mmorpg(Builder builder) {
         server = builder.server;
@@ -81,9 +81,9 @@ public class Mmorpg {
         lootManager = new LootManager(this);
         cutsceneManager = new CutsceneManager(this);
         resourcePackManager = new ResourcePackManager(this);
-        loginManager = new LoginManager(this);
         features = builder.features;
         persistenceService = builder.persistenceService;
+        loginManager = new LoginManager(this);
         InteractionHandler interactionHandler = new InteractionHandler(this);
         interactionHandler.registerListeners();
     }
@@ -169,16 +169,20 @@ public class Mmorpg {
         return resourcePackManager;
     }
 
+    public PersistenceService getPersistenceService() {
+        return persistenceService;
+    }
+
+    public LoginManager getLoginManager() {
+        return loginManager;
+    }
+
     public GlobalEventHandler getGlobalEventHandler() {
         return MinecraftServer.getGlobalEventHandler();
     }
 
     public SchedulerManager getSchedulerManager() {
         return MinecraftServer.getSchedulerManager();
-    }
-
-    public PersistenceService getPersistenceService() {
-        return persistenceService;
     }
 
     public static NameStep builder() {
@@ -344,7 +348,7 @@ public class Mmorpg {
 
         @Override
         public PersistenceServiceStep features(Feature... features) {
-            this.features = features.clone();
+            this.features = features;
             return this;
         }
 

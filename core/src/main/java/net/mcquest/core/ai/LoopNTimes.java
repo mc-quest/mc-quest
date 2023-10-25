@@ -4,9 +4,13 @@ public class LoopNTimes extends Decorator {
     private final int n;
     private int counter;
 
-    public LoopNTimes(int n, Behavior child) {
+    private LoopNTimes(int n, Behavior child) {
         super(child);
         this.n = n;
+    }
+
+    public static LoopNTimes of(int n, Behavior child) {
+        return new LoopNTimes(n, child);
     }
 
     @Override

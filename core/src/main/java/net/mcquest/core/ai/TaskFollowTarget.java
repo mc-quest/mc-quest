@@ -11,10 +11,14 @@ public class TaskFollowTarget extends Task {
     private final double followDistance;
     private long lastPathUpdate;
 
-    public TaskFollowTarget(double acceptanceRadius, double followDistance) {
+    private TaskFollowTarget(double acceptanceRadius, double followDistance) {
         this.acceptanceRadius = acceptanceRadius;
         this.followDistance = followDistance;
         lastPathUpdate = 0;
+    }
+
+    public static TaskFollowTarget of(double acceptanceRadius, double followDistance) {
+        return new TaskFollowTarget(acceptanceRadius, followDistance);
     }
 
     @Override

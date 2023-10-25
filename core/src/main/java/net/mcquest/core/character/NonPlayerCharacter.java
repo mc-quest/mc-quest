@@ -242,6 +242,8 @@ public class NonPlayerCharacter extends Character {
     }
 
     private void die(DamageSource killer) {
+        navigator.setPathTo(null);
+
         deathEffect();
         onDeath(killer);
 

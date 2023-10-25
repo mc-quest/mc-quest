@@ -6,8 +6,12 @@ public class TaskEmitSound extends Task {
     // TODO: also support AudioClips
     private final Sound sound;
 
-    public TaskEmitSound(Sound sound) {
+    private TaskEmitSound(Sound sound) {
         this.sound = sound;
+    }
+
+    public static TaskEmitSound of(Sound sound) {
+        return new TaskEmitSound(sound);
     }
 
     @Override

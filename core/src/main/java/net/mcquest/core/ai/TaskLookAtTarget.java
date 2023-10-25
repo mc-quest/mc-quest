@@ -1,23 +1,25 @@
 package net.mcquest.core.ai;
 
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.NonPlayerCharacter;
 
 public class TaskLookAtTarget extends Task {
-    private final BlackboardKey<Character> targetKey;
+    private TaskLookAtTarget() {}
 
-    public TaskLookAtTarget(BlackboardKey<Character> targetKey) {
-        this.targetKey = targetKey;
+    public static TaskLookAtTarget of() {
+        return new TaskLookAtTarget();
     }
 
     @Override
     public BehaviorStatus update(long time) {
-        Character target = getBlackboard().get(targetKey);
+        NonPlayerCharacter character = getCharacter();
+        Character target = character.getTarget();
 
         if (target == null) {
             return BehaviorStatus.FAILURE;
         }
 
-        getCharacter().lookAt(target);
+        character.lookAt(target);
 
         return BehaviorStatus.SUCCESS;
     }

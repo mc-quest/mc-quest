@@ -1,8 +1,12 @@
 package net.mcquest.core.ai;
 
 public class Inverter extends Decorator {
-    public Inverter(Behavior child) {
+    private Inverter(Behavior child) {
         super(child);
+    }
+
+    public static Inverter of(Behavior child) {
+        return new Inverter(child);
     }
 
     @Override

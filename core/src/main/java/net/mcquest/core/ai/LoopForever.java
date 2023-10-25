@@ -1,8 +1,12 @@
 package net.mcquest.core.ai;
 
 public class LoopForever extends Decorator {
-    public LoopForever(Behavior child) {
+    private LoopForever(Behavior child) {
         super(child);
+    }
+
+    public static LoopForever of(Behavior child) {
+        return new LoopForever(child);
     }
 
     @Override

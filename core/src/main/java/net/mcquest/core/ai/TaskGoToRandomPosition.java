@@ -13,8 +13,12 @@ public class TaskGoToRandomPosition extends Task {
 
     private final List<Vec> offsets;
 
-    public TaskGoToRandomPosition(int radius) {
+    private TaskGoToRandomPosition(int radius) {
         offsets = getOffsets(radius);
+    }
+
+    public static TaskGoToRandomPosition of(int radius) {
+        return new TaskGoToRandomPosition(radius);
     }
 
     @Override

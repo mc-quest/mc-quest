@@ -6,8 +6,12 @@ public class TaskWait extends Task {
     private final Duration duration;
     private long startTime;
 
-    public TaskWait(Duration duration) {
+    private TaskWait(Duration duration) {
         this.duration = duration;
+    }
+
+    public static TaskWait of(Duration duration) {
+        return new TaskWait(duration);
     }
 
     @Override

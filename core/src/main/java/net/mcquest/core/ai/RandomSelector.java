@@ -10,7 +10,7 @@ public class RandomSelector extends Composite {
     private final int totalWeight;
     private int currentChild;
 
-    public RandomSelector(int[] weights, Behavior... children) {
+    private RandomSelector(int[] weights, Behavior... children) {
         super(children);
 
         if (weights.length != children.length) {
@@ -19,6 +19,10 @@ public class RandomSelector extends Composite {
 
         this.weights = weights;
         this.totalWeight = Arrays.stream(weights).sum();
+    }
+
+    public static RandomSelector of(int[] weights, Behavior... children) {
+        return new RandomSelector(weights, children);
     }
 
     @Override

@@ -27,44 +27,44 @@ public class Deer extends NonPlayerCharacter {
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(60));
 
-        setBrain(new ActiveSelector(
+        setBrain(ActiveSelector.of(
                 // Run if panicking.
-                new Sequence(
-                        new TaskAction(this::isPanicking),
-                        new TaskPlayAnimation(CharacterAnimation.named("run")),
-                        new SimpleParallel(
-                                new LoopNTimes(3, new TaskGoToRandomPosition(10)),
-                                new Sequence(
-                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+                Sequence.of(
+                        TaskAction.of(this::isPanicking),
+                        TaskPlayAnimation.of(CharacterAnimation.named("run")),
+                        SimpleParallel.of(
+                                LoopNTimes.of(3, TaskGoToRandomPosition.of(10)),
+                                Sequence.of(
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
-                                        new TaskWait(Duration.ofMillis(250))
+                                        TaskWait.of(Duration.ofMillis(250))
                                 )
                         ),
-                        new TaskAction(this::endPanic)
+                        TaskAction.of(this::endPanic)
                 ),
                 // Forage.
-                new Sequence(
-                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new SimpleParallel(
-                                new TaskGoToRandomPosition(10),
-                                new Sequence(
-                                        new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+                Sequence.of(
+                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        SimpleParallel.of(
+                                TaskGoToRandomPosition.of(10),
+                                Sequence.of(
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                                 Sound.Source.AMBIENT, 1f, 1f)),
-                                        new TaskWait(Duration.ofMillis(750))
+                                        TaskWait.of(Duration.ofMillis(750))
                                 )
                         ),
-                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
-                        new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation(CharacterAnimation.named("eat")),
-                        new TaskWait(Duration.ofMillis(1500)),
-                        new LoopNTimes(9, new Sequence(
-                                new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.AMBIENT,
+                        TaskPlayAnimation.of(CharacterAnimation.named("idle")),
+                        TaskWait.of(Duration.ofSeconds(2)),
+                        TaskPlayAnimation.of(CharacterAnimation.named("eat")),
+                        TaskWait.of(Duration.ofMillis(1500)),
+                        LoopNTimes.of(9, Sequence.of(
+                                TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_GENERIC_EAT, Sound.Source.AMBIENT,
                                         0.2f, 1f)),
-                                new TaskWait(Duration.ofMillis(500))
+                                TaskWait.of(Duration.ofMillis(500))
                         )),
-                        new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
-                        new TaskWait(Duration.ofSeconds(2))
+                        TaskWait.of(Duration.ofSeconds(2)),
+                        TaskPlayAnimation.of(CharacterAnimation.named("idle")),
+                        TaskWait.of(Duration.ofSeconds(2))
                 )
         ));
 

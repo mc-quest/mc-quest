@@ -3,8 +3,12 @@ package net.mcquest.core.ai;
 public final class Selector extends Composite {
     private int currentChild;
 
-    public Selector(Behavior... children) {
+    private Selector(Behavior... children) {
         super(children);
+    }
+
+    public static Selector of(Behavior... children) {
+        return new Selector(children);
     }
 
     @Override

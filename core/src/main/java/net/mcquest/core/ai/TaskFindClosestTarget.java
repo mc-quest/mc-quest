@@ -11,8 +11,12 @@ import net.minestom.server.coordinate.Pos;
 public class TaskFindClosestTarget extends Task {
     private final double radius;
 
-    public TaskFindClosestTarget(double radius) {
+    private TaskFindClosestTarget(double radius) {
         this.radius = radius;
+    }
+
+    public static TaskFindClosestTarget of(double radius) {
+        return new TaskFindClosestTarget(radius);
     }
 
     @Override

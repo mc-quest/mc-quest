@@ -3,8 +3,12 @@ package net.mcquest.core.ai;
 public final class Sequence extends Composite {
     private int currentChild;
 
-    public Sequence(Behavior... children) {
+    private Sequence(Behavior... children) {
         super(children);
+    }
+
+    public static Sequence of(Behavior... children) {
+        return new Sequence(children);
     }
 
     @Override

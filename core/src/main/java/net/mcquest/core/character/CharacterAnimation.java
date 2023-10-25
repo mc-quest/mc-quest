@@ -16,6 +16,7 @@ public interface CharacterAnimation {
 
     static CharacterAnimation named(String name) {
         return entity -> {
+            System.out.println("playing " + name);
             if (!(entity instanceof ModelEntity modelEntity)) {
                 return;
             }

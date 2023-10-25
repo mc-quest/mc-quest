@@ -21,40 +21,40 @@ public class UndeadKnight extends NonPlayerCharacter {
 
         setName("Undead Knight");
         setLevel(15);
-        setMaxHealth(200);
+        setMaxHealth(5);
         setMass(500);
         setMovementSpeed(6.0);
-        setRespawnDuration(Duration.ofSeconds(3));
-        setRemovalDelay(Duration.ofMillis(2500));
+        setRespawnDuration(Duration.ofSeconds(6));
+        setRemovalDelay(Duration.ofMillis(5500));
 
-        setBrain(new ActiveSelector(
-                new Sequence(
-                        new TaskFindClosestTarget(15.0),
-                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new SimpleParallel(
-                                new TaskFollowTarget(3.0, 15.0),
-                                new Sequence(
-                                        new TaskWait(Duration.ofMillis(750)),
-                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
+        setBrain(ActiveSelector.of(
+                Sequence.of(
+                        TaskFindClosestTarget.of(15.0),
+                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        SimpleParallel.of(
+                                TaskFollowTarget.of(3.0, 15.0),
+                                Sequence.of(
+                                        TaskWait.of(Duration.ofMillis(750)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
                                 )
                         ),
-                        new TaskPlayAnimation(CharacterAnimation.named("attack_sword")),
-                        new TaskWait(Duration.ofMillis(700)),
-                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP, Sound.Source.HOSTILE, 1f
-                                , 0.75f)),
-                        new TaskAction(this::attack),
-                        new TaskWait(Duration.ofMillis(800))
+                        TaskPlayAnimation.of(CharacterAnimation.named("attack_sword")),
+                        TaskWait.of(Duration.ofMillis(700)),
+                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP,
+                                Sound.Source.HOSTILE, 1f, 0.75f)),
+                        TaskAction.of(this::attack),
+                        TaskWait.of(Duration.ofMillis(800))
                 ),
-                new Sequence(
-                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
-                        new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new SimpleParallel(
-                                new TaskGoToRandomPosition(10),
-                                new Sequence(
-                                        new TaskWait(Duration.ofMillis(750)),
-                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
+                Sequence.of(
+                        TaskPlayAnimation.of(CharacterAnimation.named("idle")),
+                        TaskWait.of(Duration.ofSeconds(2)),
+                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        SimpleParallel.of(
+                                TaskGoToRandomPosition.of(10),
+                                Sequence.of(
+                                        TaskWait.of(Duration.ofMillis(750)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_RAVAGER_STEP,
                                                 Sound.Source.HOSTILE, 1f, 1f))
                                 )
                         )

@@ -39,35 +39,35 @@ public class Broodmother extends NonPlayerCharacter {
                         .build())
                 .build());
 
-        setBrain(new ActiveSelector(
-                new Sequence(
-                        new TaskFindClosestTarget(25.0),
-                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new SimpleParallel(
-                                new TaskFollowTarget(4.0, 15.0),
-                                new Sequence(
-                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
+        setBrain(ActiveSelector.of(
+                Sequence.of(
+                        TaskFindClosestTarget.of(25.0),
+                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        SimpleParallel.of(
+                                TaskFollowTarget.of(4.0, 15.0),
+                                Sequence.of(
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
-                                        new TaskWait(Duration.ofMillis(500))
+                                        TaskWait.of(Duration.ofMillis(500))
                                 )
                         ),
-                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK, Sound.Source.HOSTILE,
+                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK, Sound.Source.HOSTILE,
                                 1f, 1f)),
-                        new TaskPlayAnimation(CharacterAnimation.named("attack")),
-                        new TaskWait(Duration.ofMillis(500)),
-                        new TaskAction(this::attack),
-                        new TaskWait(Duration.ofMillis(800))
+                        TaskPlayAnimation.of(CharacterAnimation.named("attack")),
+                        TaskWait.of(Duration.ofMillis(500)),
+                        TaskAction.of(this::attack),
+                        TaskWait.of(Duration.ofMillis(800))
                 ),
-                new Sequence(
-                        new TaskPlayAnimation(CharacterAnimation.named("idle")),
-                        new TaskWait(Duration.ofSeconds(2)),
-                        new TaskPlayAnimation(CharacterAnimation.named("walk")),
-                        new SimpleParallel(
-                                new TaskGoToRandomPosition(10),
-                                new Sequence(
-                                        new TaskEmitSound(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
+                Sequence.of(
+                        TaskPlayAnimation.of(CharacterAnimation.named("idle")),
+                        TaskWait.of(Duration.ofSeconds(2)),
+                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        SimpleParallel.of(
+                                TaskGoToRandomPosition.of(10),
+                                Sequence.of(
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_SPIDER_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
-                                        new TaskWait(Duration.ofMillis(500))
+                                        TaskWait.of(Duration.ofMillis(500))
                                 )
                         )
                 )

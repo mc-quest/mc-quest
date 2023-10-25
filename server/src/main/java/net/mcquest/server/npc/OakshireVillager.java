@@ -21,14 +21,14 @@ public class OakshireVillager extends NonPlayerCharacter {
         setLevel(1);
         setMovementSpeed(2.0);
 
-        setBrain(new Sequence(
-                new TaskWait(Duration.ofSeconds(2)),
-                new SimpleParallel(
-                        new TaskGoToRandomPosition(10),
-                        new Sequence(
-                                new TaskEmitSound(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
+        setBrain(Sequence.of(
+                TaskWait.of(Duration.ofSeconds(2)),
+                SimpleParallel.of(
+                        TaskGoToRandomPosition.of(10),
+                        Sequence.of(
+                                TaskEmitSound.of(Sound.sound(SoundEvent.BLOCK_GRASS_STEP,
                                         Sound.Source.AMBIENT, 1f, 1f)),
-                                new TaskWait(Duration.ofMillis(500))
+                                TaskWait.of(Duration.ofMillis(500))
                         )
                 )
         ));

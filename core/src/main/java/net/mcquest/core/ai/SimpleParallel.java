@@ -4,8 +4,12 @@ package net.mcquest.core.ai;
  * Used to run a child behavior while repeatedly executing a background behavior.
  */
 public class SimpleParallel extends Composite {
-    public SimpleParallel(Behavior child, Behavior background) {
+    private SimpleParallel(Behavior child, Behavior background) {
         super(child, background);
+    }
+
+    public static SimpleParallel of(Behavior child, Behavior background) {
+        return new SimpleParallel(child, background);
     }
 
     private Behavior child() {

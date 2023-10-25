@@ -8,11 +8,15 @@ public class Parallel extends Composite {
     private final Policy failurePolicy;
     private final Set<Behavior> completedChildren;
 
-    public Parallel(Policy successPolicy, Policy failurePolicy, Behavior... children) {
+    private Parallel(Policy successPolicy, Policy failurePolicy, Behavior... children) {
         super(children);
         this.successPolicy = successPolicy;
         this.failurePolicy = failurePolicy;
         completedChildren = new HashSet<>();
+    }
+
+    public static Parallel of(Policy successPolicy, Policy failurePolicy, Behavior... children) {
+        return new Parallel(successPolicy, failurePolicy, children);
     }
 
     @Override

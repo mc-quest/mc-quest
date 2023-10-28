@@ -5,7 +5,6 @@ import net.mcquest.server.features.*;
 
 public class Features {
     public static final Feature PLAYER_CHARACTER_INIT = new PlayerCharacterInit();
-    public static final Feature TEST_FEATURES = new TestFeature();
     public static final Feature FIGHTER_PLAYER_CLASS = new FighterPlayerClass();
     public static final Feature MAGE_PLAYER_CLASS = new MagePlayerClass();
     public static final Feature SWORDS = new Swords();
@@ -16,7 +15,6 @@ public class Features {
     public static Feature[] all() {
         return new Feature[]{
                 PLAYER_CHARACTER_INIT,
-                TEST_FEATURES,
                 FIGHTER_PLAYER_CLASS,
                 MAGE_PLAYER_CLASS,
                 SWORDS,

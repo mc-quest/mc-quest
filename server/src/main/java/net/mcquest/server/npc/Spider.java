@@ -1,9 +1,10 @@
 package net.mcquest.server.npc;
 
+import net.kyori.adventure.sound.Sound;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
-import net.mcquest.core.character.*;
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.*;
 import net.mcquest.core.loot.ItemPoolEntry;
 import net.mcquest.core.loot.LootTable;
 import net.mcquest.core.loot.Pool;
@@ -11,8 +12,6 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
-import net.mcquest.server.constants.Quests;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
@@ -86,7 +85,6 @@ public class Spider extends NonPlayerCharacter {
 
     @Override
     protected void onDeath(DamageSource source) {
-        if (source instanceof PlayerCharacter pc) Quests.ARACHNOPHOBIA.getObjective(0).addProgress(pc);
         emitSound(Sound.sound(SoundEvent.ENTITY_SPIDER_DEATH, Sound.Source.HOSTILE, 1f, 1f));
     }
 

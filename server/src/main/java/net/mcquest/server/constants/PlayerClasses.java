@@ -13,11 +13,14 @@ import java.time.Duration;
 public class PlayerClasses {
     public static final PlayerClass FIGHTER = loadPlayerClass("fighter");
     public static final PlayerClass MAGE = loadPlayerClass("mage");
+    public static final PlayerClass ROGUE = loadPlayerClass("rogue");
+
 
     public static PlayerClass[] all() {
         return new PlayerClass[]{
                 FIGHTER,
-                MAGE
+                MAGE,
+                ROGUE
         };
     }
 

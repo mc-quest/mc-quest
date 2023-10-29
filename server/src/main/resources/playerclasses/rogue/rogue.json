@@ -1,0 +1,55 @@
+{
+  "id": "rogue",
+  "name": "Rogue",
+  "skills": [
+    {
+      "type": "ACTIVE",
+      "id": "dash",
+      "name": "Dash",
+      "level": 1,
+      "icon": "dodge.png",
+      "description": "Moves the player fastly in a specific direction",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 4,
+      "manaCost": 5,
+      "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": "backstab",
+      "name": "Backstab",
+      "level": 1,
+      "icon": "backstab.png",
+      "description": "Do 50% more damage when attacking a player from behind",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 5,
+      "manaCost": 0,
+      "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": "sneak",
+      "name": "Sneak",
+      "level": 1,
+      "icon": "sneak.png",
+      "description": "The player is invisible for 10 seconds or until they attack",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 6,
+      "manaCost": 0,
+      "cooldown": 20
+    },
+    {
+      "type": "ACTIVE",
+      "id": "adrenaline",
+      "name": "Adrenaline",
+      "level": 1,
+      "icon": "adrenaline.png",
+      "description": "Increases attack speed and damage for 5 seconds",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 7,
+      "manaCost": 0,
+      "cooldown": 0
+    }
+
+  ]
+}

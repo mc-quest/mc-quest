@@ -82,6 +82,13 @@ public class ItemManager {
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
         // TODO: sound
 
+        Player player = event.getPlayer();
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+
+        if (pc == null) {
+            return;
+        }
+
         int slot = event.getSlot();
         if (!(slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_1 ||
                 slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_2)) {
@@ -90,8 +97,6 @@ public class ItemManager {
 
         event.setCancelled(true);
 
-        Player player = event.getPlayer();
-        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
         if (!pc.canAct()) {
             return;
         }

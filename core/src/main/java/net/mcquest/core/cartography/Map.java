@@ -28,13 +28,17 @@ public class Map {
     private final BufferedImage bufferedImage;
     private final Collection<QuestMarker> questMarkers;
 
-    public Map(String id, Pos origin, Asset image) {
+    private Map(String id, Pos origin, Asset image) {
         this.id = id;
         this.origin = origin;
         image.requireType(AssetTypes.PNG);
         this.image = image;
         this.bufferedImage = image.readImage();
         this.questMarkers = new ArrayList<>();
+    }
+
+    public static Map of(String id, Pos origin, Asset image) {
+        return new Map(id, origin, image);
     }
 
     public String getId() {

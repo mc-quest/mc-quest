@@ -43,6 +43,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.UUID;
 
 public final class PlayerCharacter extends Character {
     private static final double[] EXPERIENCE_POINTS_PER_LEVEL = Asset.of(
@@ -53,6 +54,7 @@ public final class PlayerCharacter extends Character {
             Arrays.stream(EXPERIENCE_POINTS_PER_LEVEL).sum();
 
     private final Player player;
+    private final int characterSlot;
     private final PlayerClass playerClass;
     private final SkillManager skillManager;
     private final PlayerCharacterInventory inventory;
@@ -77,9 +79,16 @@ public final class PlayerCharacter extends Character {
     private boolean teleporting;
     private final EventEmitter<PlayerCharacterMoveEvent> onMove;
 
-    PlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, Player player, PlayerCharacterData data) {
+    PlayerCharacter(
+            Mmorpg mmorpg,
+            ObjectSpawner spawner,
+            Player player,
+            int characterSlot,
+            PlayerCharacterData data
+    ) {
         super(mmorpg, spawner);
         this.player = player;
+        this.characterSlot = characterSlot;
         setName(player.getUsername());
         playerClass = mmorpg.getPlayerClassManager().getPlayerClass(data.playerClassId());
         skillManager = new SkillManager(this, data);
@@ -216,6 +225,14 @@ public final class PlayerCharacter extends Character {
         return player;
     }
 
+    public UUID getUuid() {
+        return player.getUuid();
+    }
+
+    public int getCharacterSlot() {
+        return characterSlot;
+    }
+
     public PlayerClass getPlayerClass() {
         return playerClass;
     }
@@ -290,7 +307,7 @@ public final class PlayerCharacter extends Character {
         this.manaRegenRate = manaRegenRate;
     }
 
-    private static int levelForExperiencePoints(double experiencePoints) {
+    public static int levelForExperiencePoints(double experiencePoints) {
         int level = 1;
         while (experiencePoints >= 0) {
             experiencePoints -= EXPERIENCE_POINTS_PER_LEVEL[level - 1];

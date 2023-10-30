@@ -3,7 +3,7 @@ package net.mcquest.server;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.asset.AssetDirectory;
 import net.mcquest.server.constants.*;
-import net.mcquest.server.persistence.InMemoryPersistenceService;
+import net.mcquest.core.persistence.InMemoryPersistenceService;
 
 import java.io.File;
 

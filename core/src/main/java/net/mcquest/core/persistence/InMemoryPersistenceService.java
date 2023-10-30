@@ -1,12 +1,4 @@
-package net.mcquest.server.persistence;
-
-import net.mcquest.core.persistence.PersistenceService;
-import net.mcquest.core.persistence.PlayerCharacterData;
-import net.mcquest.server.constants.Instances;
-import net.mcquest.server.constants.Items;
-import net.mcquest.server.constants.PlayerClasses;
-import net.mcquest.server.constants.Zones;
-import net.minestom.server.coordinate.Pos;
+package net.mcquest.core.persistence;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +16,6 @@ public class InMemoryPersistenceService implements PersistenceService {
         if (!dataByUuid.containsKey(uuid)) {
             dataByUuid.put(uuid, new PlayerCharacterData[4]);
         }
-        dataByUuid.get(uuid)[0] = PlayerCharacterData.create(PlayerClasses.FIGHTER, Instances.ELADRADOR, new Pos(2000, 150, 2000), Zones.OAKSHIRE, Items.ADVENTURERS_SWORD);
         return dataByUuid.get(uuid);
     }
 

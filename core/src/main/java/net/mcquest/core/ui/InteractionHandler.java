@@ -139,9 +139,6 @@ public class InteractionHandler {
         if (event.getEntity() instanceof Player player) {
             PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
             PlayerCharacter pc = pcManager.getPlayerCharacter(player);
-            if (pc == null) {
-                return;
-            }
             // TODO
         }
     }

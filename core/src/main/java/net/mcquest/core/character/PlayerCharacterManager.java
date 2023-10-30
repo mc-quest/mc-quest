@@ -67,11 +67,11 @@ public class PlayerCharacterManager {
     }
 
     @ApiStatus.Internal
-    public void loginPlayerCharacter(Player player, int slot, PlayerCharacterData data) {
+    public void loginPlayerCharacter(Player player, int characterSlot, PlayerCharacterData data) {
         player.sendMessage(Component.text("Logging in...", NamedTextColor.GREEN));
         Instance instance = mmorpg.getInstanceManager().getInstance(data.instanceId());
         Pos position = data.position();
-        ObjectSpawner spawner = pcSpawner(instance, position, player, data);
+        ObjectSpawner spawner = pcSpawner(instance, position, player, characterSlot, data);
         player.setInstance(instance, position).thenRun(() -> {
             PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
             pcs.put(player, pc);
@@ -79,19 +79,37 @@ public class PlayerCharacterManager {
         });
     }
 
-    private ObjectSpawner pcSpawner(Instance instance, Pos position,
-                                    Player player, PlayerCharacterData data) {
-        return ObjectSpawner.of(instance, position, pcProvider(player, data));
+    private ObjectSpawner pcSpawner(
+            Instance instance,
+            Pos position,
+            Player player,
+            int characterSlot,
+            PlayerCharacterData data
+    ) {
+        return ObjectSpawner.of(instance, position, pcProvider(player, characterSlot, data));
     }
 
-    private ObjectProvider pcProvider(Player player, PlayerCharacterData data) {
-        return (mmorpg, spawner) -> new PlayerCharacter(mmorpg, spawner, player, data);
+    private ObjectProvider pcProvider(
+            Player player,
+            int characterSlot,
+            PlayerCharacterData data
+    ) {
+        return (mmorpg, spawner) -> new PlayerCharacter(
+                mmorpg,
+                spawner,
+                player,
+                characterSlot,
+                data
+        );
     }
 
     private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
-        logoutPlayerCharacter(pc);
+
+        if (pc != null) {
+            logoutPlayerCharacter(pc);
+        }
     }
 
     @ApiStatus.Internal
@@ -101,6 +119,11 @@ public class PlayerCharacterManager {
         eventHandler.call(event);
         pc.remove();
         pcs.remove(pc.getEntity());
+        mmorpg.getPersistenceService().store(
+                pc.getUuid(),
+                pc.getCharacterSlot(),
+                PlayerCharacterData.save(pc)
+        );
     }
 
     private void handlePlayerMove(PlayerMoveEvent event) {
@@ -139,6 +162,10 @@ public class PlayerCharacterManager {
 
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
+
+        if (pc == null) {
+            return;
+        }
 
         Instance instance = pc.getInstance();
         Pos position = pc.getPosition();

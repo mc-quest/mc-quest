@@ -3,28 +3,28 @@ package net.mcquest.core.login;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.event.PlayerCharacterCreateEvent;
 import net.mcquest.core.persistence.PlayerCharacterData;
-import net.mcquest.core.util.ItemStackUtility;
+import net.mcquest.core.playerclass.PlayerClass;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.coordinate.Point;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.inventory.InventoryCloseEvent;
+import net.minestom.server.event.player.PlayerDisconnectEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
+import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.event.player.PlayerSpawnEvent;
 import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.block.Block;
-import net.minestom.server.inventory.Inventory;
-import net.minestom.server.inventory.InventoryType;
-import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import net.minestom.server.scoreboard.Sidebar;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Collections;
+import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LoginManager {
     public static final int NUM_CHARACTERS = 4;
@@ -33,17 +33,20 @@ public class LoginManager {
 
     private final Mmorpg mmorpg;
     private final Instance loginInstance;
+    private final Set<Player> loggingInPlayers;
 
     public LoginManager(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-
         loginInstance = createLoginInstance();
+        loggingInPlayers = new HashSet<>();
 
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
+        eventHandler.addListener(PlayerLoginEvent.class, this::handleConnect);
         eventHandler.addListener(PlayerSpawnEvent.class, this::handleSpawn);
 
         loginInstance.eventNode().addListener(InventoryCloseEvent.class, this::handleInventoryClose);
+        loginInstance.eventNode().addListener(PlayerMoveEvent.class, this::handleMove);
+        loginInstance.eventNode().addListener(PlayerDisconnectEvent.class, this::handleDisconnect);
     }
 
     @ApiStatus.Internal
@@ -56,28 +59,53 @@ public class LoginManager {
         player.stopSound(SoundStop.all());
     }
 
+    void openCharacterSelectMenu(Player player) {
+        PlayerCharacterData[] data = mmorpg.getPersistenceService().fetch(player.getUuid());
+        player.openInventory(Menus.characterSelectMenu(data, mmorpg));
+    }
+
+    void createCharacter(Player player, int characterSlot, PlayerClass playerClass) {
+        PlayerCharacterCreateEvent event = new PlayerCharacterCreateEvent(playerClass);
+        mmorpg.getGlobalEventHandler().call(event);
+
+        PlayerCharacterCreateEvent.Result characterCreateResult = event.getResult();
+        if (characterCreateResult == null) {
+            throw new RuntimeException("You need to specify a character create result");
+        }
+
+        PlayerCharacterData data = PlayerCharacterData.create(playerClass, characterCreateResult);
+        mmorpg.getPersistenceService().store(
+                player.getUuid(),
+                characterSlot,
+                data
+        );
+
+        openCharacterSelectMenu(player);
+    }
+
+    void deleteCharacter(Player player, int characterSlot) {
+        mmorpg.getPersistenceService().delete(player.getUuid(), characterSlot);
+        openCharacterSelectMenu(player);
+    }
+
+    void loginPlayerCharacter(Player player, int characterSlot, PlayerCharacterData data) {
+        loggingInPlayers.remove(player);
+        mmorpg.getPlayerCharacterManager().loginPlayerCharacter(player, characterSlot, data);
+    }
+
     private Instance createLoginInstance() {
         Instance instance = MinecraftServer.getInstanceManager().createInstanceContainer();
-        for (Point position : new Point[]{
-                new Vec(-1, 0, -1),
-                new Vec(-1, 0, 0),
-                new Vec(-1, 0, 1),
-                new Vec(0, 0, -1),
-                new Vec(0, 0, 0),
-                new Vec(0, 0, 1),
-                new Vec(1, 0, -1),
-                new Vec(1, 0, 0),
-                new Vec(1, 0, 1),
-        }) {
-            instance.setBlock(position, Block.BARRIER);
-        }
+
+        instance.setBlock(new Vec(0, 0, 0), Block.BARRIER);
+        instance.setTimeRate(0);
+        instance.setTime(18000);
+
         return instance;
     }
 
-    private void handleLogin(PlayerLoginEvent event) {
+    private void handleConnect(PlayerLoginEvent event) {
         Player player = event.getPlayer();
         player.setRespawnPoint(SPAWN_POSITION);
-        player.setGameMode(GameMode.ADVENTURE);
         event.setSpawningInstance(loginInstance);
     }
 
@@ -87,58 +115,27 @@ public class LoginManager {
         }
 
         Player player = event.getPlayer();
-        PlayerCharacterData[] data = mmorpg.getPersistenceService().fetch(player.getUuid());
-        Inventory menu = createCharacterSelectMenu(data);
-        player.openInventory(menu);
-        // TODO: prevent closing inventory
+        player.setGameMode(GameMode.ADVENTURE);
+        loggingInPlayers.add(player);
+        player.setInvisible(true);
+        openCharacterSelectMenu(player);
     }
 
     private void handleInventoryClose(InventoryCloseEvent event) {
-        event.setNewInventory(event.getInventory());
+        MinecraftServer.getSchedulerManager().buildTask(() -> {
+            Player player = event.getPlayer();
+
+            if (loggingInPlayers.contains(player)) {
+                openCharacterSelectMenu(player);
+            }
+        }).delay(Duration.ofSeconds(3)).schedule();
     }
 
-    private Inventory createCharacterSelectMenu(PlayerCharacterData[] data) {
-        Inventory inventory = new Inventory(InventoryType.CHEST_1_ROW, "Select Character");
-        for (int slot = 0; slot < NUM_CHARACTERS; slot++) {
-            ItemStack button = createCharacterSelectButton(data[slot]);
-            inventory.setItemStack(slot * 2, button);
-        }
-
-        inventory.addInventoryCondition((player, invSlot, clickType, result) -> {
-            if (invSlot % 2 != 0) {
-                return;
-            }
-
-            if (invSlot == 8) {
-                // TODO delete character
-            }
-
-            int slot = invSlot / 2;
-            PlayerCharacterData datum = data[slot];
-            if (datum == null) {
-                // TODO: open create new character menu
-            } else {
-                player.closeInventory();
-                mmorpg.getPlayerCharacterManager().loginPlayerCharacter(player, slot, datum);
-            }
-        });
-
-        return inventory;
+    private void handleMove(PlayerMoveEvent event) {
+        event.setCancelled(true);
     }
 
-    private ItemStack createCharacterSelectButton(PlayerCharacterData data) {
-        if (data == null) {
-            return ItemStackUtility.create(
-                    Material.EMERALD,
-                    Component.text("Create new character"),
-                    Collections.emptyList()
-            ).build();
-        }
-
-        return ItemStackUtility.create(
-                Material.IRON_SWORD,
-                Component.text(data.playerClassId()),
-                Collections.emptyList()
-        ).build();
+    private void handleDisconnect(PlayerDisconnectEvent event) {
+        loggingInPlayers.remove(event.getPlayer());
     }
 }

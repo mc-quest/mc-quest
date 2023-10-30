@@ -64,6 +64,8 @@ public class PlayerClassManager {
             return;
         }
 
+        event.setCancelled(true);
+
         PlayerInventory inventory = player.getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
         SkillManager skillManager = pc.getSkillManager();

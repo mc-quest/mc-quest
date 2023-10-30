@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
@@ -31,6 +32,7 @@ import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
+import java.awt.*;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Collection;
@@ -87,9 +89,9 @@ public class RoguePlayerClass implements Feature {
         hits.forEach(Triggers.character(character -> {
 
             // If the character is in the line of sight of the creature being hit or it isn't damageable then do nothing
-//            if (!character.isDamageable(pc) || pc.creatureHasSight(character)) {
-//                return;
-//            }
+           if (!character.isDamageable(pc) || pc.creatureHasSight(character)) {
+               return;
+           }
 
             //Calculate the damage of the item being held in the hand and increase it by 50%
             //double damageAmount = pc.getWeapon().getPhysicalDamage() * 1.5;
@@ -112,18 +114,14 @@ public class RoguePlayerClass implements Feature {
 
     private void useSneak(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-
         long startTime = System.currentTimeMillis();
 
         pc.setInvisible(true);
-        //pc.sendMessage("Is PC invisible?: " + pc.isInvisible());
         EventListener[] listener = new EventListener[1];
         listener[0] = EventListener.of(PlayerTickEvent.class, tick -> {
-            //pc.sendMessage("Still Invisible?: " + pc.isInvisible());
             long currTime = System.currentTimeMillis();
             if((startTime+5000) < currTime) {
                 pc.setInvisible(false);
-                //pc.sendMessage("All done being invisible! Invisiblity: " + pc.isInvisible());
                 mmorpg.getGlobalEventHandler().removeListener(listener[0]);
             }
         });
@@ -133,8 +131,19 @@ public class RoguePlayerClass implements Feature {
 
     private void useAdrenaline(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        long startTime = System.currentTimeMillis();
+        pc.updateAttackSpeed(20);
 
-       // pc.addEffect(PotionEffect.HASTE, 5);// pc.addEffect(PotionEffect.STRENGTH, 5);
+        EventListener[] listener = new EventListener[1];
+        listener[0] = EventListener.of(PlayerTickEvent.class, tick -> {
+            long currTime = System.currentTimeMillis();
+            if((startTime+5000) < currTime) {
+                pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
+                mmorpg.getGlobalEventHandler().removeListener(listener[0]);
+            }
+        });
+
+        mmorpg.getGlobalEventHandler().addListener(listener[0]);
     }
 
     private void useFleetofFoot(SkillUnlockEvent event) {

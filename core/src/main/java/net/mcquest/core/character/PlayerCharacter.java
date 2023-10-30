@@ -111,9 +111,13 @@ public final class PlayerCharacter extends Character {
 
         initUi();
         hidePlayerNameplates();
-        updateAttackSpeed();
+        updateAttackSpeed(inventory.getWeapon().getAttackSpeed());
 
         onMove = new EventEmitter<>();
+
+        for (int i = 0; i < 4; i++) {
+        getSkillManager().grantSkillPoint();
+        }
     }
 
     private void initUi() {
@@ -130,10 +134,17 @@ public final class PlayerCharacter extends Character {
         player.setTeam(team);
     }
 
-    private void updateAttackSpeed() {
-        double attackSpeed = inventory.getWeapon().getAttackSpeed();
-        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
+    public boolean creatureHasSight(Character creature) {
+        boolean test = player.hasLineOfSight(creature.getEntity(), true);
+        return test;
     }
+
+    public void updateAttackSpeed(double attackSpeed) {
+        player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
+        player.sendMessage("" + player.getAttribute(Attribute.ATTACK_SPEED).getValue());
+    }
+
+
 
     @Override
     public void setInstance(@NotNull Instance instance, Pos position) {

@@ -59,13 +59,4 @@ public class FighterPlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.heal(pc, 10.0);
     }
-
-    interface SkillExecutor {
-        enum SkillResult {
-            DONE,
-            EXECUTING
-        }
-
-        SkillResult tick(long time);
-    }
 }

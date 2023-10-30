@@ -1,23 +1,24 @@
 package net.mcquest.core.ui;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.cartography.MapViewer;
 import net.mcquest.core.character.CharacterHitbox;
 import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.character.PlayerCharacterManager;
-import net.mcquest.core.event.*;
+import net.mcquest.core.event.AutoAttackEvent;
+import net.mcquest.core.event.MenuOpenEvent;
+import net.mcquest.core.event.QuestLogOpenEvent;
+import net.mcquest.core.event.SkillTreeOpenEvent;
 import net.mcquest.core.instance.Instance;
-import net.mcquest.core.item.ConsumableItem;
-import net.mcquest.core.item.Item;
 import net.mcquest.core.item.PlayerCharacterInventory;
 import net.mcquest.core.item.Weapon;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.PhysicsManager;
 import net.mcquest.core.physics.RaycastHit;
 import net.mcquest.core.util.ItemStackUtility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -25,7 +26,10 @@ import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.ItemDropEvent;
 import net.minestom.server.event.item.PickupItemEvent;
-import net.minestom.server.event.player.*;
+import net.minestom.server.event.player.PlayerBlockInteractEvent;
+import net.minestom.server.event.player.PlayerHandAnimationEvent;
+import net.minestom.server.event.player.PlayerSwapItemEvent;
+import net.minestom.server.event.player.PlayerUseItemEvent;
 import net.minestom.server.inventory.Inventory;
 import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
@@ -74,7 +78,6 @@ public class InteractionHandler {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
         eventHandler.addListener(PlayerSwapItemEvent.class, this::handleOpenMenu);
-        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
         eventHandler.addListener(PlayerHandAnimationEvent.class, this::handleBasicAttack);
         eventHandler.addListener(PlayerUseItemEvent.class, this::handleInteract);
         eventHandler.addListener(PlayerBlockInteractEvent.class, this::handleBlockInteract);
@@ -140,26 +143,6 @@ public class InteractionHandler {
             PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
             PlayerCharacter pc = pcManager.getPlayerCharacter(player);
             // TODO
-        }
-    }
-
-    private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacterManager pcManager = mmorpg.getPlayerCharacterManager();
-        PlayerCharacter pc = pcManager.getPlayerCharacter(player);
-        event.setCancelled(true);
-        int slot = event.getSlot();
-        PlayerInventory inventory = player.getInventory();
-        ItemStack itemStack = inventory.getItemStack(slot);
-
-        Item item = mmorpg.getItemManager().getItem(itemStack);
-        if (item instanceof ConsumableItem consumableItem) {
-            int newAmount = itemStack.amount() - 1;
-            inventory.setItemStack(slot, itemStack.withAmount(newAmount));
-            pc.sendMessage(Component.text("Used ", NamedTextColor.GRAY).append(item.getDisplayName()));
-            GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-            eventHandler.call(new ItemConsumeEvent(pc, consumableItem));
-            return;
         }
     }
 

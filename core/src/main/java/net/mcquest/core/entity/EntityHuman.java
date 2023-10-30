@@ -9,9 +9,12 @@ import net.minestom.server.network.packet.server.play.PlayerInfoPacket;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Duration;
 import java.util.List;
 
 public class EntityHuman extends EntityCreature {
+    private static final int LOAD_SKIN_RETRIES = 3;
+
     private final PlayerSkin skin;
 
     public EntityHuman(@NotNull PlayerSkin skin) {
@@ -31,6 +34,13 @@ public class EntityHuman extends EntityCreature {
         player.sendPacket(addPlayerToList());
         removeFromTabList(player);
         super.updateNewViewer(player);
+
+        for (int i = 0; i < LOAD_SKIN_RETRIES; i++) {
+            MinecraftServer.getSchedulerManager().buildTask(() -> {
+                player.sendPacket(addPlayerToList());
+                removeFromTabList(player);
+            }).delay(Duration.ofSeconds(i)).schedule();
+        }
     }
 
     private PlayerInfoPacket addPlayerToList() {

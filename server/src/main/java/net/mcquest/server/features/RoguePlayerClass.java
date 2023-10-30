@@ -53,10 +53,78 @@ public class RoguePlayerClass implements Feature {
         RogueSkills.BACKSTAB.onUse().subscribe(this::useBackstab);
         RogueSkills.SNEAK.onUse().subscribe(this::useSneak);
         RogueSkills.ADRENALINE.onUse().subscribe(this::useAdrenaline);
+        RogueSkills.FANOFKNIVES.onUse().subscribe(this::useFanOfKnives);
         // RogueSkills.FLEETOFFOOT.onUnlock().subscribe(this::useFleetofFoot);
     }
 
+    private void useFanOfKnives(ActiveSkillUseEvent event) {
+        double damageAmount = 6.0;
+        double maxDistance = 20.0;
+        double arrowSpeed = 20.0;
+        Vec hitboxSize = new Vec(1f, 1f, 1f);
 
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
+
+
+        /*
+            x' = x cos θ − y sin θ
+            y' = x sin θ + y cos θ
+         */
+        double rotation = Math.PI/4;
+        Vec dir = pc.getLookDirection();
+        Vec[] velocities = {
+                            new Vec(dir.x()*Math.cos(rotation) - dir.z()*Math.sin(rotation), dir.y(), dir.x()*Math.sin(rotation) + dir.z()*Math.cos(rotation)),
+                            dir,
+                            new Vec(dir.x()*Math.cos(-rotation) - dir.z()*Math.sin(-rotation), dir.y(), dir.x()*Math.sin(-rotation) + dir.z()*Math.cos(-rotation))
+                           };
+
+
+        for(int i = 0; i < 3; i++) {
+
+            Collider hitbox = new Collider(instance, startPosition, hitboxSize);
+
+            Vec arrowVelocity = velocities[i].mul(arrowSpeed);
+            Entity arrowEntity = new Entity(EntityType.ARROW) {
+                @Override
+                public void tick(long time) {
+                    super.tick(time);
+                    hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
+                    setVelocity(arrowVelocity);
+                    if (getPosition().distanceSquared(startPosition) > maxDistance * maxDistance) {
+                        remove();
+                        hitbox.remove();
+                    }
+                }
+            };
+
+            hitbox.onCollisionEnter(Triggers.character(character -> {
+                if (!character.isDamageable(pc)) {
+                    return;
+                }
+
+                character.damage(pc, damageAmount);
+
+                arrowEntity.remove();
+                hitbox.remove();
+
+                ParticleEffects.particle(instance, hitbox.getCenter(), Particle.EXPLOSION);
+
+                instance.playSound(Sound.sound(
+                        SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
+                        Sound.Source.PLAYER,
+                        1f,
+                        1f
+                ), character.getPosition());
+            }));
+
+            arrowEntity.setNoGravity(true);
+            arrowEntity.setInstance(instance, startPosition);
+
+            mmorpg.getPhysicsManager().addCollider(hitbox);
+        }
+    }
 
     private void useDash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();

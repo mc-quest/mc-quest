@@ -49,6 +49,18 @@
       "skillTreeColumn": 7,
       "manaCost": 0,
       "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": "fanofknives",
+      "name": "Fan of Knives",
+      "level": 1,
+      "icon": "fanofknives.png",
+      "description": "Throws 3 daggers that deal damage",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 7,
+      "manaCost": 0,
+      "cooldown": 0
     }
 
   ]

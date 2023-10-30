@@ -1,9 +1,6 @@
 package net.mcquest.core.resourcepack;
 
 import net.mcquest.core.Mmorpg;
-import net.minestom.server.MinecraftServer;
-import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerLoginEvent;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.ResourcePack;
 import team.unnamed.creative.server.ResourcePackServer;
@@ -22,9 +19,6 @@ public class ResourcePackManager {
     public ResourcePackManager(Mmorpg mmorpg) {
         ResourcePackBuilder builder = new ResourcePackBuilder(mmorpg);
         resourcePack = builder.build();
-
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
     }
 
     @ApiStatus.Internal
@@ -58,7 +52,7 @@ public class ResourcePackManager {
         }
     }
 
-    private void handleLogin(PlayerLoginEvent event) {
-        event.getPlayer().setResourcePack(playerResourcePack);
+    public net.minestom.server.resourcepack.ResourcePack getPlayerResourcePack() {
+        return playerResourcePack;
     }
 }

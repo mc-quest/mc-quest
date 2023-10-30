@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class LoginManager {
-    public static final int NUM_CHARACTERS = 4;
-
     private static final Pos SPAWN_POSITION = new Pos(0, 1, 0);
 
     private final Mmorpg mmorpg;
@@ -118,6 +116,7 @@ public class LoginManager {
         player.setGameMode(GameMode.ADVENTURE);
         loggingInPlayers.add(player);
         player.setInvisible(true);
+        player.setResourcePack(mmorpg.getResourcePackManager().getPlayerResourcePack());
         openCharacterSelectMenu(player);
     }
 

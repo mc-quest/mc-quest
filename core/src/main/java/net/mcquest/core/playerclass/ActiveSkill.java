@@ -28,6 +28,7 @@ import java.util.List;
 public class ActiveSkill extends Skill {
     private final double manaCost;
     private final Duration cooldown;
+    private final double damageEffectiveness;
     private final EventEmitter<ActiveSkillUseEvent> onUse;
     int customModelDataStart;
 
@@ -35,6 +36,7 @@ public class ActiveSkill extends Skill {
         super(builder);
         this.manaCost = builder.manaCost;
         this.cooldown = builder.cooldown;
+        this.damageEffectiveness = 1.0;
         this.onUse = new EventEmitter<>();
     }
 

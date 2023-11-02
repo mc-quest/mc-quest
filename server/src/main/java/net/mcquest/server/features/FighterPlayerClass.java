@@ -139,7 +139,7 @@ public class FighterPlayerClass implements Feature {
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);
 
-        //Hits every entity in a 20x1x20 range
+        //Hits every entity in a 20x1x20 range and sets target to player
         hits.forEach(Triggers.character(character -> {
             if(character instanceof NonPlayerCharacter) {
                 NonPlayerCharacter npc = (NonPlayerCharacter) character;
@@ -154,13 +154,15 @@ public class FighterPlayerClass implements Feature {
 
         PlayerCharacter pc = event.getPlayerCharacter();
         long startTime = System.currentTimeMillis();
+        pc.setMaxHealth(40);
+        pc.heal(pc, 20);
 
-        // pc.changeArmor(4);
         EventListener[] listener = new EventListener[1];
         listener[0] = EventListener.of(PlayerTickEvent.class, tick -> {
             long currTime = System.currentTimeMillis();
-            if((startTime+5000) < currTime) {
-                // pc.changeArmor(-4);
+            if((startTime+20000) < currTime) {
+                pc.damage(pc, 20);
+                pc.setMaxHealth(20);
                 mmorpg.getGlobalEventHandler().removeListener(listener[0]);
             }
         });

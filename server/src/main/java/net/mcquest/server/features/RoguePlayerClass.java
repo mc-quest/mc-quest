@@ -58,7 +58,7 @@ public class RoguePlayerClass implements Feature {
     }
 
     private void useFanOfKnives(ActiveSkillUseEvent event) {
-        double damageAmount = 6.0;
+        double damageAmount = 3.0;
         double maxDistance = 20.0;
         double arrowSpeed = 20.0;
         Vec hitboxSize = new Vec(1f, 1f, 1f);

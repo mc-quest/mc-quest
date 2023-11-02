@@ -20,7 +20,7 @@ public class Database {
     public PlayerCharacterData getPlayerCharacterData(Player player) {
         // TODO: read from database.
 
-        return PlayerCharacterData.create(PlayerClasses.ROGUE, Instances.ELADRADOR,
+        return PlayerCharacterData.create(PlayerClasses.FIGHTER, Instances.ELADRADOR,
                 new Pos(0, 70, 0), Zones.OAKSHIRE, Items.ADVENTURERS_SWORD);
     }
 

@@ -26,6 +26,8 @@ import net.mcquest.core.util.MathUtility;
 import net.mcquest.core.zone.Zone;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
+import net.minestom.server.attribute.AttributeModifier;
+import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
@@ -190,6 +192,18 @@ public final class PlayerCharacter extends Character {
         player.removeEffect(PotionEffect.BLINDNESS);
     }
 
+    public void changeSpeed(float speedValue) {
+        double amount = speedValue;
+        System.out.println(amount);
+        AttributeModifier attributeModifier = new AttributeModifier("generic.speed",
+                amount, AttributeOperation.ADDITION);
+        player.sendMessage("Speed value: " + attributeModifier.getAmount());
+        player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(attributeModifier);
+        player.sendMessage(player.getAttribute(Attribute.MOVEMENT_SPEED).getModifiers().toString());
+    }
+
+
+
     public Instance getRespawnInstance() {
         return respawnInstance;
     }
@@ -202,6 +216,7 @@ public final class PlayerCharacter extends Character {
         this.respawnInstance = instance;
         this.respawnPosition = position;
     }
+
 
     private Pos hitboxCenter() {
         return getPosition().withY(y -> y + 0.9);

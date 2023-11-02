@@ -61,8 +61,8 @@
             "description": "Increases player armor by 4 temporarily (only works while wearing armor)",
             "skillTreeRow": 0,
             "skillTreeColumn": 8,
-            "manaCost": 5,
-            "cooldown": 5
+            "manaCost": 0,
+            "cooldown": 40
         }
     ]
 }

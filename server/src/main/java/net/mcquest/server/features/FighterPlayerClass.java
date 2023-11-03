@@ -197,18 +197,20 @@ public class FighterPlayerClass implements Feature {
                     }
                     double damageAmount = 2.0;
                     character.damage(pc, damageAmount);
-                    Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
+
                 }));
                 tick[0]++;
                 pc.sendMessage(Component.text("Rotate: " + tick[0]));
 
-                Pos newPosition = new Pos(direction.rotateAroundY((Math.PI/4)*tick[0]).x() * 5 + playerPos.x(),
+                Pos newPosition = new Pos(direction.rotateAroundY((Math.PI/4)*tick[0]).x() * 4 + playerPos.x(),
                         playerPos.y()+1.6,
-                        direction.rotateAroundY((Math.PI/4)*tick[0]).z() * 5 + playerPos.z());
+                        direction.rotateAroundY((Math.PI/4)*tick[0]).z() * 4 + playerPos.z());
 
                 pc.lookAt(newPosition);
 
-            }).delay(Duration.ofMillis(250 * i)).schedule();
+                ParticleEffects.particle(instance, newPosition, Particle.EXPLOSION);
+
+            }).delay(Duration.ofMillis(50 * i)).schedule();
         }
     }
 }

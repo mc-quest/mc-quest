@@ -2,9 +2,8 @@ package net.mcquest.core.damage;
 
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.playerclass.ActiveSkill;
-import net.mcquest.core.playerclass.PlayerClass;
 
-import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class Damage {
@@ -15,12 +14,16 @@ public class Damage {
     private static class Builder {
         private double damageEffectiveness;
         private DamageType type;
-        private double[] baseDamage;
-        private double[] increasedDamage;
+        private Map<DamageType, Double> baseDamage;
+        private Map<DamageType, Double> increasedDamage;
 
         public Builder() {
-            double[] baseDamage = new double[DamageType.NUM_DAMAGE_TYPES];
-            double[] increasedDamage = new double[DamageType.NUM_DAMAGE_TYPES];
+            baseDamage = new EnumMap<>(DamageType.class);
+            increasedDamage = new EnumMap<>(DamageType.class);
+            for (DamageType type : DamageType.values()) {
+                baseDamage.put(type, 0.0);
+                increasedDamage.put(type, 0.0);
+            }
         }
 
         public Builder damageEffectiveness(double damageEffectiveness) {
@@ -34,33 +37,50 @@ public class Damage {
         }
 
         public Builder baseDamage(DamageType type, double amount) {
-            baseDamage[type.getId()] += amount;
+            baseDamage.put(type, baseDamage.get(type) + amount);
             return this;
         }
 
         public Builder increasedDamage(DamageType type, double amount) {
-            increasedDamage[type.getId()] += amount;
+            increasedDamage.put(type, increasedDamage.get(type) + amount);
             return this;
         }
 
         public double calculate() {
-            double[] damage = new double[DamageType.NUM_DAMAGE_TYPES - 1];
+            EnumMap<DamageType, Double> damage = new EnumMap<>(DamageType.class);
+            for (DamageType type : DamageType.values()) {
+                damage.put(type, 0.0);
+            }
 
             // Calculate base damage
-            damage[type.getId()] += baseDamage[DamageType.Generic.getId()];
-            for (int i = 0; i < damage.length; i++) {
-                damage[i] += baseDamage[i];
+            for (DamageType type : DamageType.values()) {
+                if (type == DamageType.Generic) {
+                    double d = damage.get(this.type) + baseDamage.get(DamageType.Generic);
+                    damage.put(this.type, d);
+                } else {
+                    double d = damage.get(type) + baseDamage.get(type);
+                    damage.put(type, d);
+                }
+            }
+
+            // Calculate damage effectiveness
+            for (DamageType type : DamageType.values()) {
+                double d = damage.get(type) * damageEffectiveness;
+                damage.put(type, d);
             }
 
             // Calculate increased damage
-            for (int i = 0; i < damage.length; i++) {
-                double increased = increasedDamage[DamageType.Generic.getId()] + increasedDamage[i];
-                damage[i] *= increased;
+            for (DamageType type : DamageType.values()) {
+                if (type != DamageType.Generic) {
+                    double i = increasedDamage.get(type) + increasedDamage.get(DamageType.Generic);
+                    double d = damage.get(type) * i;
+                    damage.put(type, d);
+                }
             }
 
             // Return damage amount
             double sum = 0;
-            for (double d : damage) {
+            for (double d : damage.values()) {
                 sum += d;
             }
             return sum;

@@ -1,27 +1,19 @@
 package net.mcquest.core.damage;
 
 public enum DamageType {
-    Physical("Physical", 0),
-    Lightning("Lightning", 1),
-    Cold("Cold", 2),
-    Fire("Fire", 3),
-    Generic("", 4);
-
-    public static final int NUM_DAMAGE_TYPES = 5;
+    Physical("Physical"),
+    Lightning("Lightning"),
+    Cold("Cold"),
+    Fire("Fire"),
+    Generic("");
 
     private final String text;
-    private final int id;
 
-    DamageType(String text, int id) {
+    DamageType(String text) {
         this.text = text;
-        this.id = id;
     }
 
     public String getText() {
         return text;
-    }
-
-    public int getId() {
-        return id;
     }
 }

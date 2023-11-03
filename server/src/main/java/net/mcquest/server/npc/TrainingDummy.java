@@ -6,6 +6,7 @@ import net.mcquest.core.character.Character;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.server.constants.Models;
 import net.kyori.adventure.sound.Sound;
+import net.mcquest.server.constants.Quests;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
@@ -17,6 +18,7 @@ public class TrainingDummy extends NonPlayerCharacter {
         setMaxHealth(10);
         setRemovalDelay(Duration.ofMillis(1500));
         setRespawnDuration(Duration.ofSeconds(30));
+        addSlayQuestObjective(Quests.TUTORIAL.getObjective(7));
     }
 
     @Override

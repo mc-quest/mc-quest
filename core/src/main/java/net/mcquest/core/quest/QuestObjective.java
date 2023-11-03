@@ -3,6 +3,7 @@ package net.mcquest.core.quest;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.EventEmitter;
 import net.mcquest.core.event.QuestObjectiveChangeProgressEvent;
+import net.mcquest.core.event.QuestObjectiveCompleteEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,6 +15,7 @@ public final class QuestObjective {
     private final int goal;
     private final int[] prerequisites;
     private final EventEmitter<QuestObjectiveChangeProgressEvent> onProgress;
+    private final EventEmitter<QuestObjectiveCompleteEvent> onComplete;
     Quest quest;
 
     QuestObjective(int index, String description, int goal, int[] prerequisites) {
@@ -21,7 +23,8 @@ public final class QuestObjective {
         this.description = description;
         this.goal = goal;
         this.prerequisites = prerequisites;
-        this.onProgress = new EventEmitter<>();
+        onProgress = new EventEmitter<>();
+        onComplete = new EventEmitter<>();
     }
 
     public String getDescription() {
@@ -50,6 +53,10 @@ public final class QuestObjective {
         return onProgress;
     }
 
+    public EventEmitter<QuestObjectiveCompleteEvent> onComplete() {
+        return onComplete;
+    }
+
     public boolean isAccessible(PlayerCharacter pc) {
         return pc.getQuestTracker().isAvailable(this);
     }
@@ -64,6 +71,10 @@ public final class QuestObjective {
 
     public void addProgress(PlayerCharacter pc) {
         addProgress(pc, 1);
+    }
+
+    public boolean isInProgress(PlayerCharacter pc) {
+        return isAccessible(pc) && !isComplete(pc);
     }
 
     public boolean isComplete(PlayerCharacter pc) {

@@ -1,7 +1,9 @@
 package net.mcquest.core.event;
 
+import net.mcquest.core.cartography.Map;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.item.Weapon;
+import net.mcquest.core.music.Song;
 import net.mcquest.core.playerclass.PlayerClass;
 import net.mcquest.core.zone.Zone;
 import net.minestom.server.coordinate.Pos;
@@ -30,6 +32,13 @@ public class PlayerCharacterCreateEvent implements Event {
             Instance respawnInstance,
             Pos respawnPosition,
             Zone zone,
-            Weapon weapon
-    ) {}
+            Weapon weapon,
+            Map map,
+            Song song,
+            double maxHealth,
+            double maxMana,
+            double healthRegenRate,
+            double manaRegenRate
+    ) {
+    }
 }

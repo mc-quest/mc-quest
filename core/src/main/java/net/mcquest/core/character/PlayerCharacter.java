@@ -32,6 +32,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
+import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -78,6 +79,7 @@ public final class PlayerCharacter extends Character {
     private long undisarmTime;
     private boolean teleporting;
     private final EventEmitter<PlayerCharacterMoveEvent> onMove;
+    private final EventEmitter<PlayerTickEvent> onTick;
 
     PlayerCharacter(Mmorpg mmorpg, ObjectSpawner spawner, Player player, PlayerCharacterData data) {
         super(mmorpg, spawner);
@@ -116,6 +118,7 @@ public final class PlayerCharacter extends Character {
         updateAttackSpeed(inventory.getWeapon().getAttackSpeed());
 
         onMove = new EventEmitter<>();
+        onTick = new EventEmitter<>();
 
         for (int i = 0; i < 4; i++) {
         getSkillManager().grantSkillPoint();
@@ -560,5 +563,9 @@ public final class PlayerCharacter extends Character {
 
     public EventEmitter<PlayerCharacterMoveEvent> onMove() {
         return onMove;
+    }
+
+    public EventEmitter<PlayerTickEvent> onTick() {
+        return onTick;
     }
 }

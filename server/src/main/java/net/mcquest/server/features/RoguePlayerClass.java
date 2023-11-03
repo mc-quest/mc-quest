@@ -34,6 +34,7 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.awt.*;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 
@@ -182,41 +183,25 @@ public class RoguePlayerClass implements Feature {
 
     private void useSneak(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        long startTime = System.currentTimeMillis();
 
         pc.setInvisible(true);
-        EventListener[] listener = new EventListener[1];
-        listener[0] = EventListener.of(PlayerTickEvent.class, tick -> {
-            long currTime = System.currentTimeMillis();
-            if((startTime+5000) < currTime) {
-                pc.setInvisible(false);
-                mmorpg.getGlobalEventHandler().removeListener(listener[0]);
-            }
-        });
-
-        mmorpg.getGlobalEventHandler().addListener(listener[0]);
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            pc.setInvisible(false);
+        }).delay(Duration.ofSeconds(5)).schedule();
     }
 
     private void useAdrenaline(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        long startTime = System.currentTimeMillis();
         pc.updateAttackSpeed(20);
 
-        EventListener[] listener = new EventListener[1];
-        listener[0] = EventListener.of(PlayerTickEvent.class, tick -> {
-            long currTime = System.currentTimeMillis();
-            if((startTime+5000) < currTime) {
-                pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
-                mmorpg.getGlobalEventHandler().removeListener(listener[0]);
-            }
-        });
-
-        mmorpg.getGlobalEventHandler().addListener(listener[0]);
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
+        }).delay(Duration.ofSeconds(5)).schedule();
     }
 
     private void useFleetofFoot(SkillUnlockEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
-        // pc.changeSpeed(.1f);
+        pc.changeSpeed(.1f);
     }
 
 }

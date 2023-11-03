@@ -54,15 +54,27 @@
         },
         {
             "type": "ACTIVE",
-            "id": "armor_up",
-            "name": "Armor Up",
+            "id": "berserk",
+            "name": "Berserk",
             "level": 1,
-            "icon": "armor_up.png",
-            "description": "Increases player armor by 4 temporarily (only works while wearing armor)",
+            "icon": "berserk.png",
+            "description": "Temporarily double health, but all damage is carried over",
             "skillTreeRow": 0,
             "skillTreeColumn": 8,
             "manaCost": 0,
             "cooldown": 40
+        },
+        {
+            "type": "ACTIVE",
+            "id": "whirlwind",
+            "name": "Whirlwind",
+            "level": 1,
+            "icon": "whirlwind.png",
+            "description": "Spins the player around and hits everyone around them",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 1,
+            "manaCost": 0,
+            "cooldown": 0
         }
     ]
 }

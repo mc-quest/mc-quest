@@ -8,6 +8,7 @@ public class FighterSkills {
     public static final ActiveSkill SELF_HEAL = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("self_heal");
     public static final ActiveSkill TREMOR = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("tremor");
     public static final ActiveSkill TAUNT = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("taunt");
-    public static final ActiveSkill ARMORUP = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("armor_up");
+    public static final ActiveSkill BERSERK = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("berserk");
+    public static final ActiveSkill WHIRLWIND = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("whirlwind");
 
 }

@@ -1,7 +1,8 @@
 package net.mcquest.core.character;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
-import net.mcquest.core.event.ClickMenuLogoutEvent;
 import net.mcquest.core.event.PlayerCharacterLoginEvent;
 import net.mcquest.core.event.PlayerCharacterLogoutEvent;
 import net.mcquest.core.event.PlayerCharacterMoveEvent;
@@ -11,43 +12,30 @@ import net.mcquest.core.object.ObjectManager;
 import net.mcquest.core.object.ObjectProvider;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.persistence.PlayerCharacterData;
-import net.mcquest.core.ui.PlayerCharacterLogoutType;
-import net.kyori.adventure.text.Component;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.entity.EntityDamageEvent;
 import net.minestom.server.event.player.PlayerChatEvent;
 import net.minestom.server.event.player.PlayerDisconnectEvent;
-import net.minestom.server.event.player.PlayerLoginEvent;
 import net.minestom.server.event.player.PlayerMoveEvent;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class PlayerCharacterManager {
     private final Mmorpg mmorpg;
-    private final Function<Player, PlayerCharacterData> dataProvider;
-    private final BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler;
     private final Map<Player, PlayerCharacter> pcs;
 
     @ApiStatus.Internal
-    public PlayerCharacterManager(Mmorpg mmorpg, Function<Player, PlayerCharacterData> dataProvider,
-                                  BiConsumer<PlayerCharacter, PlayerCharacterLogoutType> logoutHandler) {
+    public PlayerCharacterManager(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-        this.dataProvider = dataProvider;
-        this.logoutHandler = logoutHandler;
         pcs = new HashMap<>();
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.addListener(PlayerLoginEvent.class, this::handlePlayerLogin);
         eventHandler.addListener(PlayerDisconnectEvent.class, this::handlePlayerDisconnect);
-        eventHandler.addListener(ClickMenuLogoutEvent.class, this::handlePlayerCharacterMenuLogout);
         eventHandler.addListener(PlayerMoveEvent.class, this::handlePlayerMove);
         eventHandler.addListener(EntityDamageEvent.class, this::handleDamage);
         eventHandler.addListener(PlayerChatEvent.class, this::handleChat);
@@ -78,53 +66,72 @@ public class PlayerCharacterManager {
         return pcs;
     }
 
-    private void handlePlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacterData data = dataProvider.apply(player);
+    @ApiStatus.Internal
+    public void loginPlayerCharacter(Player player, int characterSlot, PlayerCharacterData data) {
+        player.sendMessage(Component.text("Logging in...", NamedTextColor.GREEN));
         Instance instance = mmorpg.getInstanceManager().getInstance(data.instanceId());
         Pos position = data.position();
-        event.setSpawningInstance(instance);
-        player.setRespawnPoint(position);
-        player.setGameMode(GameMode.ADVENTURE);
-        ObjectSpawner spawner = pcSpawner(instance, position, player, data);
-        PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
-        pcs.put(player, pc);
-        GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        eventHandler.call(new PlayerCharacterLoginEvent(pc));
+        ObjectSpawner spawner = pcSpawner(instance, position, player, characterSlot, data);
+        player.setInstance(instance, position).thenRun(() -> {
+            PlayerCharacter pc = (PlayerCharacter) mmorpg.getObjectManager().spawn(spawner);
+            pcs.put(player, pc);
+            mmorpg.getGlobalEventHandler().call(new PlayerCharacterLoginEvent(pc));
+        });
     }
 
-    private ObjectSpawner pcSpawner(Instance instance, Pos position,
-                                    Player player, PlayerCharacterData data) {
-        return ObjectSpawner.of(instance, position, pcProvider(player, data));
+    private ObjectSpawner pcSpawner(
+            Instance instance,
+            Pos position,
+            Player player,
+            int characterSlot,
+            PlayerCharacterData data
+    ) {
+        return ObjectSpawner.of(instance, position, pcProvider(player, characterSlot, data));
     }
 
-    private ObjectProvider pcProvider(Player player, PlayerCharacterData data) {
-        return (mmorpg, spawner) -> new PlayerCharacter(mmorpg, spawner, player, data);
+    private ObjectProvider pcProvider(
+            Player player,
+            int characterSlot,
+            PlayerCharacterData data
+    ) {
+        return (mmorpg, spawner) -> new PlayerCharacter(
+                mmorpg,
+                spawner,
+                player,
+                characterSlot,
+                data
+        );
     }
 
     private void handlePlayerDisconnect(PlayerDisconnectEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
-        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.DISCONNECT);
+
+        if (pc != null) {
+            logoutPlayerCharacter(pc);
+        }
     }
 
-    private void handlePlayerCharacterMenuLogout(ClickMenuLogoutEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        handlePlayerCharacterLogout(pc, PlayerCharacterLogoutType.MENU_LOGOUT);
-    }
-
-    private void handlePlayerCharacterLogout(PlayerCharacter pc, PlayerCharacterLogoutType logoutType) {
-        logoutHandler.accept(pc, logoutType);
+    @ApiStatus.Internal
+    public void logoutPlayerCharacter(PlayerCharacter pc) {
         GlobalEventHandler eventHandler = mmorpg.getGlobalEventHandler();
-        PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc, logoutType);
+        PlayerCharacterLogoutEvent event = new PlayerCharacterLogoutEvent(pc);
         eventHandler.call(event);
         pc.remove();
         pcs.remove(pc.getEntity());
+        mmorpg.getPersistenceService().store(
+                pc.getUuid(),
+                pc.getCharacterSlot(),
+                PlayerCharacterData.save(pc)
+        );
     }
 
     private void handlePlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        PlayerCharacter pc = getPlayerCharacter(player);
+        PlayerCharacter pc = getPlayerCharacter(event.getPlayer());
+
+        if (pc == null) {
+            return;
+        }
 
         if (pc.isTeleporting()) {
             event.setCancelled(true);
@@ -155,6 +162,10 @@ public class PlayerCharacterManager {
 
         Player player = event.getPlayer();
         PlayerCharacter pc = getPlayerCharacter(player);
+
+        if (pc == null) {
+            return;
+        }
 
         Instance instance = pc.getInstance();
         Pos position = pc.getPosition();

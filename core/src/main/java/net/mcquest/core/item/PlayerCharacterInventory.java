@@ -1,16 +1,17 @@
 package net.mcquest.core.item;
 
 import com.google.common.base.Predicates;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.persistence.PersistentInventory;
 import net.mcquest.core.persistence.PersistentItem;
 import net.mcquest.core.persistence.PlayerCharacterData;
 import net.mcquest.core.quest.QuestObjective;
 import net.mcquest.core.resourcepack.CustomModelData;
 import net.mcquest.core.resourcepack.Materials;
 import net.mcquest.core.util.ItemStackUtility;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -39,9 +40,8 @@ public class PlayerCharacterInventory {
         this.pc = pc;
         this.itemManager = itemManager;
         savedWeapon = null;
-        loadItems(data.items());
+        loadInventory(data.inventory());
 
-        // TODO: should be responsible for serializing inventory
         // TODO: inventory conditions
     }
 
@@ -219,24 +219,82 @@ public class PlayerCharacterInventory {
         return pc.getEntity().getInventory();
     }
 
-    private void loadItems(PersistentItem[] items) {
+    private void loadInventory(PersistentInventory data) {
         PlayerInventory inventory = inventory();
 
-        for (PersistentItem persistentItem : items) {
-            if (persistentItem == null) {
+        PersistentItem[] storage = data.storage();
+        for (int i = 0; i < storage.length; i++) {
+            PersistentItem storageItem = storage[i];
+
+            if (storageItem == null) {
                 continue;
             }
 
-
-            Item item = itemManager.getItem(persistentItem.getItemId());
-            ItemStack itemStack = item.getItemStack()
-                    .withAmount(persistentItem.getAmount());
-            inventory.setItemStack(persistentItem.getSlot(), itemStack);
+            Item item = itemManager.getItem(storageItem.itemId());
+            inventory.setItemStack(
+                    i + 9,
+                    item.getItemStack().withAmount(storageItem.amount())
+            );
         }
 
-        // TODO other slots (weapon, armor, consumables)
-        inventory.setItemStack(6, hotbarConsumablePlaceholder(0, false));
-        inventory.setItemStack(7, hotbarConsumablePlaceholder(1, false));
+        inventory.setItemStack(
+                WEAPON_SLOT,
+                itemManager.getItem(data.weaponId()).getItemStack()
+        );
+
+        if (data.feetArmorId() != null) {
+            inventory.setItemStack(
+                    44,
+                    itemManager.getItem(data.feetArmorId()).getItemStack()
+            );
+        }
+
+        if (data.legsArmorId() != null) {
+            inventory.setItemStack(
+                    43,
+                    itemManager.getItem(data.legsArmorId()).getItemStack()
+            );
+        }
+
+        if (data.chestArmorId() != null) {
+            inventory.setItemStack(
+                    42,
+                    itemManager.getItem(data.chestArmorId()).getItemStack()
+            );
+        }
+
+        if (data.headArmorId() != null) {
+            inventory.setItemStack(
+                    41,
+                    itemManager.getItem(data.headArmorId()).getItemStack()
+            );
+        }
+
+        if (data.hotbarConsumable1() != null) {
+            inventory.setItemStack(
+                    HOTBAR_CONSUMABLE_SLOT_1,
+                    itemManager.getItem(data.hotbarConsumable1().itemId()).getItemStack()
+                            .withAmount(data.hotbarConsumable1().amount())
+            );
+        } else {
+            inventory.setItemStack(
+                    HOTBAR_CONSUMABLE_SLOT_1,
+                    hotbarConsumablePlaceholder(0, false)
+            );
+        }
+
+        if (data.hotbarConsumable2() != null) {
+            inventory.setItemStack(
+                    HOTBAR_CONSUMABLE_SLOT_2,
+                    itemManager.getItem(data.hotbarConsumable2().itemId()).getItemStack()
+                            .withAmount(data.hotbarConsumable2().amount())
+            );
+        } else {
+            inventory.setItemStack(
+                    HOTBAR_CONSUMABLE_SLOT_2,
+                    hotbarConsumablePlaceholder(1, false)
+            );
+        }
     }
 
     private ItemStack hotbarConsumablePlaceholder(int slot, boolean flashing) {
@@ -255,5 +313,52 @@ public class PlayerCharacterInventory {
         }
 
         return itemManager.getItem(itemStack);
+    }
+
+    @ApiStatus.Internal
+    public PersistentInventory save() {
+        PlayerInventory inventory = inventory();
+
+        ConsumableItem hotbarConsumable1 = getHotbarConsumable1();
+        PersistentItem persistentHotbarConsumable1 = hotbarConsumable1 == null ? null :
+                new PersistentItem(
+                        hotbarConsumable1.getId(),
+                        inventory.getItemStack(HOTBAR_CONSUMABLE_SLOT_1).amount()
+                );
+
+        ConsumableItem hotbarConsumable2 = getHotbarConsumable1();
+        PersistentItem persistentHotbarConsumable2 = hotbarConsumable2 == null ? null :
+                new PersistentItem(
+                        hotbarConsumable2.getId(),
+                        inventory.getItemStack(HOTBAR_CONSUMABLE_SLOT_2).amount()
+                );
+
+        PersistentItem[] storage = new PersistentItem[3 * 9];
+        for (int i = 0; i < storage.length; i++) {
+            ItemStack itemStack = inventory.getItemStack(i + 9);
+            if (itemStack.isAir()) {
+                continue;
+            }
+
+            storage[i] = new PersistentItem(
+                    itemManager.getItem(itemStack).getId(),
+                    itemStack.amount()
+            );
+        }
+
+        return new PersistentInventory(
+                idOf(getWeapon()),
+                idOf(getArmor(ArmorSlot.FEET)),
+                idOf(getArmor(ArmorSlot.LEGS)),
+                idOf(getArmor(ArmorSlot.CHEST)),
+                idOf(getArmor(ArmorSlot.HEAD)),
+                persistentHotbarConsumable1,
+                persistentHotbarConsumable2,
+                storage
+        );
+    }
+
+    private static String idOf(Item item) {
+        return item == null ? null : item.getId();
     }
 }

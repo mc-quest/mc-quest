@@ -1,13 +1,10 @@
 package net.mcquest.core.persistence;
 
 import net.mcquest.core.character.PlayerCharacter;
-import net.mcquest.core.instance.Instance;
-import net.mcquest.core.item.PlayerCharacterInventory;
-import net.mcquest.core.item.Weapon;
+import net.mcquest.core.event.PlayerCharacterCreateEvent;
 import net.mcquest.core.music.Song;
 import net.mcquest.core.playerclass.PlayerClass;
 import net.mcquest.core.util.JsonUtility;
-import net.mcquest.core.zone.Zone;
 import net.minestom.server.coordinate.Pos;
 
 public record PlayerCharacterData(
@@ -26,7 +23,7 @@ public record PlayerCharacterData(
         double experiencePoints,
         int skillPoints,
         int money,
-        PersistentItem[] items,
+        PersistentInventory inventory,
         PersistentQuestObjectiveData[] questObjectiveData,
         String[] completedQuestIds,
         String[] trackedQuestIds,
@@ -34,29 +31,36 @@ public record PlayerCharacterData(
         boolean canMount,
         String[] ownedMountIds
 ) {
-    public static PlayerCharacterData create(PlayerClass playerClass, Instance instance,
-                                             Pos position, Zone zone, Weapon weapon) {
+    public static PlayerCharacterData create(
+            PlayerClass playerClass,
+            PlayerCharacterCreateEvent.Result characterCreateResult
+    ) {
         return new PlayerCharacterData(
                 playerClass.getId(),
-                instance.getId(),
-                position,
-                instance.getId(),
-                position,
-                zone.getId(),
-                20,
-                20,
+                characterCreateResult.instance().getId(),
+                characterCreateResult.position(),
+                characterCreateResult.respawnInstance().getId(),
+                characterCreateResult.respawnPosition(),
+                characterCreateResult.zone().getId(),
+                1,
+                1,
                 1,
                 1,
                 0,
                 0,
                 0,
+                1,
                 0,
-                0,
-                new PersistentItem[]{new PersistentItem(
-                        weapon.getId(),
-                        1,
-                        PlayerCharacterInventory.WEAPON_SLOT
-                )},
+                new PersistentInventory(
+                        characterCreateResult.weapon().getId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        new PersistentItem[3 * 9]
+                ),
                 new PersistentQuestObjectiveData[0],
                 new String[0],
                 new String[0],
@@ -85,7 +89,7 @@ public record PlayerCharacterData(
                 pc.getExperiencePoints(),
                 pc.getSkillManager().getSkillPoints(),
                 pc.getMoney().getValue(),
-                new PersistentItem[0], // TODO
+                pc.getInventory().save(),
                 new PersistentQuestObjectiveData[0], // TODO
                 new String[0], // TODO
                 new String[0], // TODO

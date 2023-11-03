@@ -2,11 +2,8 @@ package net.mcquest.server;
 
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.asset.AssetDirectory;
-import net.mcquest.core.event.PlayerCharacterLoginEvent;
-import net.mcquest.core.event.PlayerCharacterMoveEvent;
-import net.mcquest.server.db.Database;
 import net.mcquest.server.constants.*;
-import net.minestom.server.event.EventListener;
+import net.mcquest.core.persistence.InMemoryPersistenceService;
 
 import java.io.File;
 
@@ -18,7 +15,6 @@ public class Main {
 
     public static void main(String[] args) {
         extractWorldResources();
-        Database database = new Database();
         Mmorpg.builder()
                 .name(MMORPG_NAME)
                 .playerClasses(PlayerClasses.all())
@@ -33,8 +29,7 @@ public class Main {
                 .models(Models.all())
                 .audio(AudioClips.all())
                 .features(Features.all())
-                .playerCharacterDataProvider(database::getPlayerCharacterData)
-                .playerCharacterLogoutHandler(database::savePlayerCharacterData)
+                .persistenceService(new InMemoryPersistenceService())
                 .start(SERVER_ADDRESS, SERVER_PORT, RESOURCE_PACK_SERVER_PORT);
     }
 

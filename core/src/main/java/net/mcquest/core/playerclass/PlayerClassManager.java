@@ -53,15 +53,21 @@ public class PlayerClassManager {
     }
 
     private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+        Player player = event.getPlayer();
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+        if (pc == null) {
+            return;
+        }
+
         int slot = event.getSlot();
         if (!(slot >= SkillManager.MIN_HOTBAR_SLOT && slot <= SkillManager.MAX_HOTBAR_SLOT)) {
             return;
         }
 
-        Player player = event.getPlayer();
+        event.setCancelled(true);
+
         PlayerInventory inventory = player.getInventory();
         ItemStack itemStack = inventory.getItemStack(slot);
-        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
         SkillManager skillManager = pc.getSkillManager();
 
         ActiveSkill skill = (ActiveSkill) skillManager.getSkill(itemStack);

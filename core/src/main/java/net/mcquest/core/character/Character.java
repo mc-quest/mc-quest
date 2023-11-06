@@ -293,6 +293,10 @@ public abstract class Character extends Object implements DamageSource {
         return getPosition().direction();
     }
 
+    public final void setLookDirection(Vec lookDirection) {
+        setPosition(getPosition().withDirection(lookDirection));
+    }
+
     public final void lookAt(Pos position) {
         getEntity().lookAt(position);
     }

@@ -15,6 +15,7 @@ import net.minestom.server.sound.SoundEvent;
 
 public class GuardThomas extends NonPlayerCharacter {
     private final InteractionSequence completeTutorialSequence;
+    private final InteractionSequence completeCanineCarnageSequence;
 
     public GuardThomas(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Skins.GUARD_MALE));
@@ -24,6 +25,12 @@ public class GuardThomas extends NonPlayerCharacter {
         completeTutorialSequence = InteractionSequence.builder()
                 .interaction(this::completeTutorialInteraction1)
                 .interaction(this::completeTutorialInteraction2)
+                .interaction(this::startCanineCarnageInteraction)
+                .build();
+
+        completeCanineCarnageSequence = InteractionSequence.builder()
+                .interaction(this::completeCanineCarnageInteraction1)
+                .interaction(this::completeCanineCarnageInteraction2)
                 .build();
     }
 
@@ -32,6 +39,10 @@ public class GuardThomas extends NonPlayerCharacter {
         if (Quests.TUTORIAL.getObjective(7).isComplete(pc)
                 && Quests.TUTORIAL.getStatus(pc) != QuestStatus.COMPLETED) {
             completeTutorialSequence.advance(pc);
+        }
+        if (Quests.CANINE_CARNAGE.getObjective(3).isComplete(pc)
+                && Quests.CANINE_CARNAGE.getStatus(pc) != QuestStatus.COMPLETED) {
+            completeCanineCarnageSequence.advance(pc);
         }
     }
 
@@ -47,5 +58,30 @@ public class GuardThomas extends NonPlayerCharacter {
 
     private void completeTutorialInteraction2(PlayerCharacter pc) {
         Quests.TUTORIAL.getObjective(8).addProgress(pc);
+    }
+
+    private void startCanineCarnageInteraction(PlayerCharacter pc) {
+        speak(pc, Component.text("Now that you're all trained up, I'll let you in on a secret."));
+        speak(pc, Component.text("Have you ever heard of demons?"));
+        speak(pc, Component.text("I doubted the existence of such things up until recently."));
+        speak(pc, Component.text("'A story for the children' I thought."));
+        speak(pc, Component.text("Some wolves have been attacking our camp,"
+                                    + " and killing all the animals in the forest."));
+        speak(pc, Component.text("There's something off about them, I tell you!"
+                                    + " They have red eyes,"
+                                    + " and bite like they've never once eaten before!"));
+        speak(pc, Component.text("Always hungry, never fulfilled...."));
+        speak(pc, Component.text("Anyways, you seem strong and capable."
+                                    + " I'd pay good money if you managed to kill their leader."));
+        Quests.CANINE_CARNAGE.start(pc);
+    }
+
+    private void completeCanineCarnageInteraction1(PlayerCharacter pc) {
+        speak(pc, Component.text("Woah, you survived!"));
+        speak(pc, Component.text("You have my thanks for culling those nasty, demonic creatures!"));
+    }
+
+    private void completeCanineCarnageInteraction2(PlayerCharacter pc) {
+        Quests.CANINE_CARNAGE.getObjective(3).addProgress(pc);
     }
 }

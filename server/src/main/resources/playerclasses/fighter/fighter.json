@@ -32,13 +32,13 @@
             "type": "ACTIVE",
             "id": "tremor",
             "name": "Tremor",
-            "level": 2,
+            "level": 1,
             "icon": "tremor.png",
             "description": "Launches player in air. When they land knock everyone at impact zone away",
             "skillTreeRow": 0,
             "skillTreeColumn": 6,
-            "manaCost": 5,
-            "cooldown": 15
+            "manaCost": 0,
+            "cooldown": 0
         },
         {
             "type": "ACTIVE",
@@ -73,6 +73,18 @@
             "description": "Spins the player around and hits everyone around them",
             "skillTreeRow": 0,
             "skillTreeColumn": 1,
+            "manaCost": 0,
+            "cooldown": 0
+        },
+        {
+            "type": "ACTIVE",
+            "id": "charge",
+            "name": "Charge",
+            "level": 1,
+            "icon": "charge.png",
+            "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 2,
             "manaCost": 0,
             "cooldown": 0
         }

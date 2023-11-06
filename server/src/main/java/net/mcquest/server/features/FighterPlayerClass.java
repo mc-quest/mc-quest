@@ -49,6 +49,7 @@ public class FighterPlayerClass implements Feature {
         FighterSkills.TAUNT.onUse().subscribe(this::useTaunt);
         FighterSkills.BERSERK.onUse().subscribe(this::useBerserk);
         FighterSkills.WHIRLWIND.onUse().subscribe(this::useWhirlwind);
+        FighterSkills.CHARGE.onUse().subscribe(this::useCharge);
     }
 
     private void useBash(ActiveSkillUseEvent event) {
@@ -213,4 +214,45 @@ public class FighterPlayerClass implements Feature {
             }).delay(Duration.ofMillis(50 * i)).schedule();
         }
     }
+
+    public void useCharge(ActiveSkillUseEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Vec direction = pc.getLookDirection();
+        Vec impulse = direction.mul(75 * 10, 0, 75 * 10);
+        pc.applyImpulse(impulse);
+
+
+        Instance instance = pc.getInstance();
+        Pos hitboxCenter = pc.getPosition();
+        Vec hitboxSize = new Vec(direction.x() * 2,
+                                 pc.getPosition().y()+1.6,
+                                 direction.z() * 2 + pc.getPosition().z());
+
+
+        Collection<Collider> hits = mmorpg.getPhysicsManager()
+                .overlapBox(instance, hitboxCenter, hitboxSize);
+
+        //Hits every entity in the direction looked at for 4 blocks
+        hits.forEach(Triggers.character(character -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+            double damageAmount = 2.0;
+            character.damage(pc, damageAmount);
+            character.applyImpulse(impulse);
+
+        }));
+
+
+        // make a hitbox in a line.
+
+
+        // anything in the line is hit for some damage
+
+
+        // everything within the line is knocked forward
+
+
+    }
+
 }

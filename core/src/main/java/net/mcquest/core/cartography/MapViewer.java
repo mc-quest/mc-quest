@@ -27,10 +27,13 @@ public class MapViewer {
     private Map map;
     private boolean open;
 
-    public MapViewer(PlayerCharacter pc, PlayerCharacterData data,
-                     MapManager mapManager) {
+    public MapViewer(
+            PlayerCharacter pc,
+            PlayerCharacterData data,
+            MapManager mapManager
+    ) {
         this.pc = pc;
-        map = null;
+        map = mapManager.getMap(data.mapId());
         open = false;
     }
 

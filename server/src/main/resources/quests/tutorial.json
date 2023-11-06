@@ -43,7 +43,7 @@
             "prerequisites": [6]
         },
         {
-            "description": "Speak with Mayor of Oakshire",
+            "description": "Speak with Guard Thomas",
             "goal": 1,
             "prerequisites": [7]
         }

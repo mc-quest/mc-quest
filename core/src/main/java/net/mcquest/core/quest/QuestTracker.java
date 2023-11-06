@@ -1,6 +1,8 @@
 package net.mcquest.core.quest;
 
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.event.QuestObjectiveChangeProgressEvent;
+import net.mcquest.core.event.QuestObjectiveCompleteEvent;
 import net.mcquest.core.persistence.PersistentQuestObjectiveData;
 import net.mcquest.core.persistence.PlayerCharacterData;
 import net.mcquest.core.text.WordWrap;
@@ -12,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.scoreboard.Sidebar;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
@@ -162,9 +165,27 @@ public class QuestTracker {
                 currentProgress[objectiveIndex] + progress,
                 objective.getGoal()
         );
+
+        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
+        QuestObjectiveChangeProgressEvent changeProgressEvent = new QuestObjectiveChangeProgressEvent(
+                pc,
+                objective,
+                currentProgress[objectiveIndex],
+                newProgress
+        );
+        objective.onProgress().emit(changeProgressEvent);
+        eventHandler.call(changeProgressEvent);
+
         currentProgress[objectiveIndex] = newProgress;
 
         if (newProgress == goal) {
+            QuestObjectiveCompleteEvent completeEvent = new QuestObjectiveCompleteEvent(
+                    pc,
+                    objective
+            );
+            objective.onComplete().emit(completeEvent);
+            eventHandler.call(completeEvent);
+
             pc.sendMessage(objectiveCompleteMessage(objective));
 
             recentlyCompletedObjectives.add(objective);

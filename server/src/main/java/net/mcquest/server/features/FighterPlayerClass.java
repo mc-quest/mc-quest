@@ -85,34 +85,36 @@ public class FighterPlayerClass implements Feature {
         subscriptions[0] = emitter.subscribe((pcMoveEvent) -> {
 
             //If the player hits the ground
-            if(!pcMoveEvent.isOnGround()
+            if (!pcMoveEvent.isOnGround()
                     || pcMoveEvent.getOldPosition().y() <= pcMoveEvent.getNewPosition().y()) {
-
-                Instance instance = pc.getInstance();
-                Pos hitboxCenter = pc.getPosition();
-                Vec hitboxSize = new Vec(5, 1, 5);
-
-                Collection<Collider> hits = mmorpg.getPhysicsManager()
-                        .overlapBox(instance, hitboxCenter, hitboxSize);
-
-                //Hits every entity in a 5x5 range
-                hits.forEach(Triggers.character(character -> {
-                    if (!character.isDamageable(pc)) {
-                        return;
-                    }
-                    double damageAmount = 2.0;
-                    character.damage(pc, damageAmount);
-                    Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
-                    instance.playSound(hitSound, character.getPosition());
-                    Pos charPos = character.getPosition();
-                    Vec launchVector = new Vec((hitboxCenter.x() - charPos.x()) * 1000, 150, (hitboxCenter.y() - charPos.y()) * 1000);
-                    character.applyImpulse(launchVector);
-                }));
-
-                // Remove listener and apply effects
-                ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
-                subscriptions[0].unsubscribe();
+                return;
             }
+
+            Instance instance = pc.getInstance();
+            Pos hitboxCenter = pc.getPosition();
+            Vec hitboxSize = new Vec(5, 1, 5);
+
+            Collection<Collider> hits = mmorpg.getPhysicsManager()
+                    .overlapBox(instance, hitboxCenter, hitboxSize);
+
+            //Hits every entity in a 5x5 range
+            hits.forEach(Triggers.character(character -> {
+                if (!character.isDamageable(pc)) {
+                    return;
+                }
+                double damageAmount = 2.0;
+                character.damage(pc, damageAmount);
+                Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
+                instance.playSound(hitSound, character.getPosition());
+                Pos charPos = character.getPosition();
+                Vec launchVector = new Vec((hitboxCenter.x() - charPos.x()) * 1000, 150, (hitboxCenter.y() - charPos.y()) * 1000);
+                character.applyImpulse(launchVector);
+            }));
+
+            // Remove listener and apply effects
+            ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
+            subscriptions[0].unsubscribe();
+
         });
     }
 
@@ -130,7 +132,7 @@ public class FighterPlayerClass implements Feature {
             if ((character instanceof NonPlayerCharacter npc) && (character.getAttitude(pc) == Attitude.HOSTILE)) {
                 npc = (NonPlayerCharacter) character;
                 npc.setTarget(pc);
-             }
+            }
         }));
     }
 
@@ -145,8 +147,8 @@ public class FighterPlayerClass implements Feature {
         // After 20 seconds, the current health of the player is reduced by the amount originally gained.
         // If health would be set below 1, their health is just 1
         mmorpg.getSchedulerManager().buildTask(() -> {
-            double damageAmount = pc.getMaxHealth()/2;
-            if(pc.getHealth() > damageAmount) {
+            double damageAmount = pc.getMaxHealth() / 2;
+            if (pc.getHealth() > damageAmount) {
                 pc.damage(pc, damageAmount);
             } else {
                 pc.setHealth(1);
@@ -166,7 +168,7 @@ public class FighterPlayerClass implements Feature {
 
         int iterations = 8;
         // Create a for loop for 8 iterations
-        for(int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             tick[0] = 0;
             // Each iteration, create a gt scheduleManager of i * .25 seconds
             // Every for loop tick hurt everything in front of where the character is looking
@@ -192,15 +194,15 @@ public class FighterPlayerClass implements Feature {
 
                 // The new position the player is moving to
                 Pos newPosition = new Pos(
-                        direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).x() * 4 + playerPos.x(),
-                        playerPos.y()+1.6,
-                        direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).z() * 4 + playerPos.z());
+                        direction.rotateAroundY(((2 * Math.PI) / iterations) * tick[0]).x() * 4 + playerPos.x(),
+                        playerPos.y() + 1.6,
+                        direction.rotateAroundY(((2 * Math.PI) / iterations) * tick[0]).z() * 4 + playerPos.z());
 
                 pc.lookAt(newPosition);
 
                 ParticleEffects.particle(instance, newPosition, Particle.EXPLOSION);
 
-            }).delay(Duration.ofMillis((400/iterations) * i)).schedule();
+            }).delay(Duration.ofMillis((400 / iterations) * i)).schedule();
         }
     }
 
@@ -215,8 +217,8 @@ public class FighterPlayerClass implements Feature {
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition();
         Vec hitboxSize = new Vec(direction.x() * 2,
-                                 pc.getPosition().y()+1.6,
-                                 direction.z() * 2 + pc.getPosition().z());
+                pc.getPosition().y() + 1.6,
+                direction.z() * 2 + pc.getPosition().z());
 
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);

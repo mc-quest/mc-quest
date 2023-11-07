@@ -56,7 +56,7 @@
             "id": "berserk",
             "name": "Berserk",
             "level": 1,
-            "icon": "berserk.png",
+            "icon": "berserk.jpg",
             "description": "Temporarily double health, but all damage is carried over",
             "skillTreeRow": 0,
             "skillTreeColumn": 8,

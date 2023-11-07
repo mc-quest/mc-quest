@@ -184,7 +184,7 @@ public class FighterPlayerClass implements Feature {
 
                 }));
                 tick[0]++;
-                
+
                 // The new position the player is moving to
                 Pos newPosition = new Pos(
                         direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).x() * 4 + playerPos.x(),

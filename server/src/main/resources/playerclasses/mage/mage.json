@@ -25,6 +25,18 @@
             "skillTreeColumn": 4,
             "manaCost": 8,
             "cooldown": 7
+        },
+        {
+            "type": "ACTIVE",
+            "id": "chain_lightning",
+            "name": "Chain Lightning",
+            "level": 3,
+            "icon": "ice_beam.png",
+            "description": "TODO",
+            "skillTreeRow": 2,
+            "skillTreeColumn": 4,
+            "manaCost": 4,
+            "cooldown": 4
         }
     ]
 }

@@ -26,13 +26,10 @@ import net.mcquest.core.util.MathUtility;
 import net.mcquest.core.zone.Zone;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.attribute.Attribute;
-import net.minestom.server.attribute.AttributeModifier;
-import net.minestom.server.attribute.AttributeOperation;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.damage.DamageType;
-import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.network.packet.server.play.TeamsPacket;
 import net.minestom.server.potion.Potion;
 import net.minestom.server.potion.PotionEffect;
@@ -81,7 +78,6 @@ public final class PlayerCharacter extends Character {
     private long undisarmTime;
     private boolean teleporting;
     private final EventEmitter<PlayerCharacterMoveEvent> onMove;
-    private final EventEmitter<PlayerTickEvent> onTick;
 
     PlayerCharacter(
             Mmorpg mmorpg,
@@ -124,14 +120,9 @@ public final class PlayerCharacter extends Character {
 
         initUi();
         hidePlayerNameplates();
-        updateAttackSpeed(inventory.getWeapon().getAttackSpeed());
+        updateAttackSpeed();
 
         onMove = new EventEmitter<>();
-        onTick = new EventEmitter<>();
-
-        for (int i = 0; i < 4; i++) {
-        getSkillManager().grantSkillPoint();
-        }
     }
 
     private void initUi() {
@@ -147,17 +138,10 @@ public final class PlayerCharacter extends Character {
         player.setTeam(team);
     }
 
-    public boolean creatureHasSight(Character creature) {
-        boolean test = player.hasLineOfSight(creature.getEntity(), true);
-        return test;
-    }
-
-    public void updateAttackSpeed(double attackSpeed) {
+    private void updateAttackSpeed() {
+        double attackSpeed = inventory.getWeapon().getAttackSpeed();
         player.getAttribute(Attribute.ATTACK_SPEED).setBaseValue((float) attackSpeed);
-        player.sendMessage("" + player.getAttribute(Attribute.ATTACK_SPEED).getValue());
     }
-
-
 
     @Override
     public void setInstance(@NotNull Instance instance, Pos position) {
@@ -203,18 +187,6 @@ public final class PlayerCharacter extends Character {
         player.removeEffect(PotionEffect.BLINDNESS);
     }
 
-    public void changeSpeed(float speedValue) {
-        double amount = speedValue;
-        System.out.println(amount);
-        AttributeModifier attributeModifier = new AttributeModifier("generic.speed",
-                amount, AttributeOperation.ADDITION);
-        player.sendMessage("Speed value: " + attributeModifier.getAmount());
-        player.getAttribute(Attribute.MOVEMENT_SPEED).addModifier(attributeModifier);
-        player.sendMessage(player.getAttribute(Attribute.MOVEMENT_SPEED).getModifiers().toString());
-    }
-
-
-
     public Instance getRespawnInstance() {
         return respawnInstance;
     }
@@ -227,7 +199,6 @@ public final class PlayerCharacter extends Character {
         this.respawnInstance = instance;
         this.respawnPosition = position;
     }
-
 
     private Pos hitboxCenter() {
         return getPosition().withY(y -> y + 0.9);
@@ -580,5 +551,4 @@ public final class PlayerCharacter extends Character {
     public EventEmitter<PlayerCharacterMoveEvent> onMove() {
         return onMove;
     }
-
 }

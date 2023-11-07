@@ -28,7 +28,6 @@ public class RoguePlayerClass implements Feature {
 
     private Mmorpg mmorpg;
 
-
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
@@ -71,12 +70,12 @@ public class RoguePlayerClass implements Feature {
         hits.forEach(Triggers.character(character -> {
 
             // If the character is in the line of sight of the creature being hit or it isn't damageable then do nothing
-           if (!character.isDamageable(pc) || character.hasLineOfSight(pc, false)) {
-               return;
-           }
+            if (!character.isDamageable(pc) || character.hasLineOfSight(pc, false)) {
+                return;
+            }
 
             //Calculate the damage of the item being held in the hand and increase it by 50%
-            double damageAmount =  pc.getInventory().getWeapon().getPhysicalDamage() * 2;
+            double damageAmount = pc.getInventory().getWeapon().getPhysicalDamage() * 2;
             //Apply damage to creature hit within hitbox
             ParticleEffects.particle(instance, hitboxCenter, Particle.SMOKE);
             character.damage(pc, damageAmount);
@@ -112,11 +111,11 @@ public class RoguePlayerClass implements Feature {
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
         Vec centerKnife = pc.getLookDirection();
-        Vec leftKnife = pc.getLookDirection().rotateAroundY(Math.PI/4);
-        Vec rightKnife = pc.getLookDirection().rotateAroundY(-Math.PI/4);
-        Vec[] velocities = { leftKnife, centerKnife, rightKnife};
+        Vec leftKnife = pc.getLookDirection().rotateAroundY(Math.PI / 4);
+        Vec rightKnife = pc.getLookDirection().rotateAroundY(-Math.PI / 4);
+        Vec[] velocities = {leftKnife, centerKnife, rightKnife};
 
-        for(int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             Collider hitbox = new Collider(instance, startPosition, hitboxSize);
             Vec arrowVelocity = velocities[i].mul(arrowSpeed);
             Entity arrowEntity = new Entity(EntityType.ARROW) {
@@ -176,7 +175,7 @@ public class RoguePlayerClass implements Feature {
             }
 
             // Hurt the player over time (2 damage every 2 seconds for 10 seconds)
-            for(int i = 0; i < 5; i++) {
+            for (int i = 0; i < 5; i++) {
                 mmorpg.getSchedulerManager().buildTask(() -> {
                     character.damage(pc, 2);
                     Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);

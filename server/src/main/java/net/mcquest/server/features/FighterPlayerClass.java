@@ -111,10 +111,17 @@ public class FighterPlayerClass implements Feature {
                 character.applyImpulse(launchVector);
             }));
 
-            // Remove listener and apply effects
-            ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
-            subscriptions[0].unsubscribe();
+            Sound hitSound = Sound.sound(SoundEvent.ENTITY_GENERIC_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
+            instance.playSound(hitSound, pc.getPosition());
 
+            // Remove listener and apply effects
+            for(int i = -1; i < 2; i++) {
+                for(int j = -1; j < 2; j ++) {
+                    ParticleEffects.particle(instance, hitboxCenter.add(i*2, 0, j*2), Particle.EXPLOSION);
+                }
+            }
+
+            subscriptions[0].unsubscribe();
         });
     }
 

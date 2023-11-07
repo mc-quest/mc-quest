@@ -82,11 +82,11 @@ public class FighterPlayerClass implements Feature {
         //Set up an event for when the player hits the ground
         EventEmitter<PlayerCharacterMoveEvent> emitter = pc.onMove();
         Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
-        subscriptions[0] = emitter.subscribe((playerMoveEvent) -> {
+        subscriptions[0] = emitter.subscribe((pcMoveEvent) -> {
 
             //If the player hits the ground
-            if (playerMoveEvent.getPlayerCharacter().getVelocity().y() == -1.568
-                    && playerMoveEvent.getPlayerCharacter().isOnGround()) {
+            if(!pcMoveEvent.isOnGround()
+                    || pcMoveEvent.getOldPosition().y() <= pcMoveEvent.getNewPosition().y()) {
 
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition();
@@ -184,7 +184,7 @@ public class FighterPlayerClass implements Feature {
 
                 }));
                 tick[0]++;
-
+                
                 // The new position the player is moving to
                 Pos newPosition = new Pos(
                         direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).x() * 4 + playerPos.x(),
@@ -205,13 +205,11 @@ public class FighterPlayerClass implements Feature {
         Vec impulse = direction.mul(75 * 10, 0, 75 * 10);
         pc.applyImpulse(impulse);
 
-
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition();
         Vec hitboxSize = new Vec(direction.x() * 2,
                                  pc.getPosition().y()+1.6,
                                  direction.z() * 2 + pc.getPosition().z());
-
 
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);
@@ -224,7 +222,6 @@ public class FighterPlayerClass implements Feature {
             double damageAmount = 2.0;
             character.damage(pc, damageAmount);
             character.applyImpulse(impulse);
-
         }));
     }
 }

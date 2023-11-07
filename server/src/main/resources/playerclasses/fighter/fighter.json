@@ -2,7 +2,6 @@
     "id": "fighter",
     "name": "Fighter",
     "skills": [
-
         {
             "type": "ACTIVE",
             "id": "bash",

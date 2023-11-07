@@ -76,10 +76,8 @@ public class RoguePlayerClass implements Feature {
                 }
 
                 character.damage(pc, damageAmount);
-
                 arrowEntity.remove();
                 hitbox.remove();
-
                 ParticleEffects.particle(instance, hitbox.getCenter(), Particle.EXPLOSION);
 
                 instance.playSound(Sound.sound(
@@ -103,13 +101,12 @@ public class RoguePlayerClass implements Feature {
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
 
-        // Makes partical effects
+        // Makes particle effects
         ParticleEffects.particle(instance, hitboxCenter, Particle.SMOKE);
         ParticleEffects.particle(instance, hitboxCenter, Particle.FLASH);
 
         // Launches player in direction of vector
         pc.applyImpulse(direction.mul(75 * 30, 0, 75 * 30));
-
     }
 
 
@@ -128,7 +125,7 @@ public class RoguePlayerClass implements Feature {
         hits.forEach(Triggers.character(character -> {
 
             // If the character is in the line of sight of the creature being hit or it isn't damageable then do nothing
-           if (!character.isDamageable(pc) || pc.creatureHasSight(character)) {
+           if (!character.isDamageable(pc) || character.hasLineOfSight(pc, true)) {
                return;
            }
 
@@ -160,18 +157,17 @@ public class RoguePlayerClass implements Feature {
         }).delay(Duration.ofSeconds(5)).schedule();
     }
 
-    private void useAdrenaline(ActiveSkillUseEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        pc.updateAttackSpeed(20);
-
-        mmorpg.getSchedulerManager().buildTask(() -> {
-            pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
-        }).delay(Duration.ofSeconds(5)).schedule();
-    }
-
-    private void useFleetofFoot(SkillUnlockEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        pc.changeSpeed(.1f);
-    }
-
+//    private void useAdrenaline(ActiveSkillUseEvent event) {
+//        PlayerCharacter pc = event.getPlayerCharacter();
+//        pc.updateAttackSpeed(20);
+//
+//        mmorpg.getSchedulerManager().buildTask(() -> {
+//            pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
+//        }).delay(Duration.ofSeconds(5)).schedule();
+//    }
+//
+//    private void useFleetofFoot(SkillUnlockEvent event) {
+//        PlayerCharacter pc = event.getPlayerCharacter();
+//        pc.changeSpeed(.1f);
+//    }
 }

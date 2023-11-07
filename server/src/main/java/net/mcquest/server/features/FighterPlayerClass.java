@@ -136,9 +136,14 @@ public class FighterPlayerClass implements Feature {
 
     private void useBerserk(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+
+        // Doubles health of player
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
         pc.sendMessage(Component.text("Beginning Berserk!"));
+
+        // After 20 seconds, the current health of the player is reduced by the amount originally gained.
+        // If health would be set below 1, their health is just 1
         mmorpg.getSchedulerManager().buildTask(() -> {
             double damageAmount = pc.getMaxHealth()/2;
             if(pc.getHealth() > damageAmount) {
@@ -201,8 +206,10 @@ public class FighterPlayerClass implements Feature {
 
     private void useCharge(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+
+        // Charges player forward
         Vec direction = pc.getLookDirection();
-        Vec impulse = direction.mul(75 * 10, 0, 75 * 10);
+        Vec impulse = direction.mul(75 * 20, 0, 75 * 20);
         pc.applyImpulse(impulse);
 
         Instance instance = pc.getInstance();

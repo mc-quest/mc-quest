@@ -185,7 +185,7 @@ public class RoguePlayerClass implements Feature {
                     Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
                     instance.playSound(poisonSound, character.getPosition());
                     ParticleEffects.particle(instance, hitboxCenter, Particle.DRIPPING_LAVA);
-                }).delay(Duration.ofMillis((200 * iterations) * i)).schedule();
+                }).delay(Duration.ofSeconds((2 * iterations) * i)).schedule();
             }
 
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);

@@ -11,7 +11,7 @@
       "description": "Moves the player fastly in a specific direction",
       "skillTreeRow": 0,
       "skillTreeColumn": 4,
-      "manaCost": 5,
+      "manaCost": 0,
       "cooldown": 0
     },
     {
@@ -61,7 +61,18 @@
       "skillTreeColumn": 7,
       "manaCost": 0,
       "cooldown": 0
+    },
+    {
+      "type": "ACTIVE",
+      "id": "woundingslash",
+      "name": "Wounding Slash",
+      "level": 1,
+      "icon": "woundingslash.png",
+      "description": "Causes enemies directly in front of you to bleed for 10 seconds",
+      "skillTreeRow": 0,
+      "skillTreeColumn": 8,
+      "manaCost": 0,
+      "cooldown": 0
     }
-
   ]
 }

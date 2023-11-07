@@ -17,7 +17,7 @@ import net.mcquest.core.physics.PhysicsManager;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.core.util.Debug;
 import net.mcquest.server.constants.Quests;
-import net.mcquest.server.npc.AlphaDireWolf;
+import net.mcquest.server.npc.DirePacklord;
 import net.mcquest.server.npc.GuardThomas;
 import net.mcquest.server.npc.DireWolf;
 import net.mcquest.core.quest.*;
@@ -38,7 +38,7 @@ public class CanineCarnage {
         npcs();
         lootChests();
         createQuestMarkers();
-        Quests.CANINE_CARNAGE.getObjective(3).onComplete().subscribe(this::handleSlayAlphaWolfObjectiveComplete);
+        Quests.CANINE_CARNAGE.getObjective(3).onComplete().subscribe(this::handleSlayDirePacklordObjectiveComplete);
     }
 
     private void createWolfDenBounds() {
@@ -54,7 +54,7 @@ public class CanineCarnage {
 
     private void npcs() {
         direWolves();
-        alphaDireWolf();
+        direPacklord();
     }
 
     private void direWolves() {
@@ -95,11 +95,11 @@ public class CanineCarnage {
         }
     }
 
-    private void alphaDireWolf() {
+    private void direPacklord() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
                 new Pos(2993, 78, 3665),
-                AlphaDireWolf::new
+                DirePacklord::new
         ));
     }
 
@@ -161,7 +161,7 @@ public class CanineCarnage {
         pc.sendMessage(Component.text("Welcome to the wolf den..."));
     }
 
-    private void handleSlayAlphaWolfObjectiveComplete(QuestObjectiveCompleteEvent event) {
+    private void handleSlayDirePacklordObjectiveComplete(QuestObjectiveCompleteEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.sendMessage(Component.text("Impressive! Speak with Guard Thomas to claim your reward!"));
     }

@@ -12,7 +12,7 @@ public class Models {
     public static final Model BROODMOTHER = loadModel("broodmother");
     public static final Model REDSTONE_MONSTROSITY = loadModel("redstone_monstrosity");
     public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
-    public static final Model ALPHA_DIRE_WOLF = loadModel("wolf_packlord");
+    public static final Model DIRE_PACKLORD = loadModel("wolf_packlord");
     public static final Model DIRE_WOLF = loadModel("wolf_dire");
 
     public static Model[] all() {
@@ -24,7 +24,7 @@ public class Models {
                 BROODMOTHER,
                 REDSTONE_MONSTROSITY,
                 UNDEAD_KNIGHT,
-                ALPHA_DIRE_WOLF,
+                DIRE_PACKLORD,
                 DIRE_WOLF
         };
     }

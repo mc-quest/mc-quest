@@ -61,19 +61,29 @@ public class GuardThomas extends NonPlayerCharacter {
     }
 
     private void startCanineCarnageInteraction(PlayerCharacter pc) {
-        speak(pc, Component.text("Now that you're all trained up, I'll let you in on a secret."));
-        speak(pc, Component.text("Have you ever heard of demons?"));
-        speak(pc, Component.text("I doubted the existence of such things up until recently."));
-        speak(pc, Component.text("'A story for the children' I thought."));
-        speak(pc, Component.text("Some wolves have been attacking our camp,"
-                                    + " and killing all the animals in the forest."));
-        speak(pc, Component.text("There's something off about them, I tell you!"
+        InteractionSequence.builder()
+            .interaction(Interactions.speak(pc,
+                Component.text("Now that you're all trained up, I'll let you in on a secret.")))
+            .interaction(Interactions.speak(pc, Component.text("Have you ever heard of demons?")))
+            .interaction(Interactions.speak(pc,
+                Component.text("I doubted the existence of such things up until recently.")))
+            .interaction(Interactions.speak(pc,
+                Component.text("'A story for the children' I thought.")))
+            .interaction(Interactions.speak(pc, Component.text("Have you ever heard of demons?")))
+            .interaction(Interactions.speak(pc,
+                Component.text("Some wolves have been attacking our camp,"
+                                    + " and killing all the animals in the forest.")))
+            .interaction(Interactions.speak(pc,
+                Component.text("There's something off about them, I tell you!"
                                     + " They have red eyes,"
-                                    + " and bite like they've never once eaten before!"));
-        speak(pc, Component.text("Always hungry, never fulfilled...."));
-        speak(pc, Component.text("Anyways, you seem strong and capable."
-                                    + " I'd pay good money if you managed to kill their leader."));
-        Quests.CANINE_CARNAGE.start(pc);
+                                    + " and bite like they've never once eaten before!")))
+            .interaction(Interactions.speak(pc,
+                Component.text("Always hungry, never fulfilled....")))
+            .interaction(Interactions.speak(pc,
+                Component.text("Anyways, you seem strong and capable."
+                                    + " I'd pay good money if you managed to kill their leader.")))
+            .interaction(Interactions.addProgress(this, Quests.CANINE_CARNAGE.start(pc)))
+            .build();
     }
 
     private void completeCanineCarnageInteraction1(PlayerCharacter pc) {

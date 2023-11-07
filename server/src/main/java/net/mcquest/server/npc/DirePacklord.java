@@ -20,12 +20,12 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
 
-public class AlphaDireWolf extends NonPlayerCharacter {
+public class DirePacklord extends NonPlayerCharacter {
     private final Collider bossBattleBounds;
 
-    public AlphaDireWolf(Mmorpg mmorpg, ObjectSpawner spawner) {
-        super(mmorpg, spawner, CharacterModel.of(Models.ALPHA_DIRE_WOLF));
-        setName("AlphaDireWolf");
+    public DirePacklord(Mmorpg mmorpg, ObjectSpawner spawner) {
+        super(mmorpg, spawner, CharacterModel.of(Models.DIRE_PACKLORD));
+        setName("Dire Packlord");
         setLevel(6);
         setMaxHealth(70);
         setMass(20);
@@ -100,7 +100,7 @@ public class AlphaDireWolf extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
-        return (other instanceof DireWolf || other instanceof AlphaDireWolf)
+        return (other instanceof DireWolf || other instanceof DirePacklord)
                 ? Attitude.FRIENDLY
                 : Attitude.HOSTILE;
     }

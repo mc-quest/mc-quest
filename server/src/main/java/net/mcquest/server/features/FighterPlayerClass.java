@@ -1,12 +1,12 @@
 package net.mcquest.server.features;
 
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.Attitude;
 import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
-import net.mcquest.core.event.EventEmitter;
 import net.mcquest.core.event.PlayerCharacterMoveEvent;
 import net.mcquest.core.event.Subscription;
 import net.mcquest.core.feature.Feature;
@@ -15,7 +15,6 @@ import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.FighterSkills;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
@@ -73,20 +72,20 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useTremor(ActiveSkillUseEvent event) {
+        double damageAmount = 2.0;
+
         PlayerCharacter pc = event.getPlayerCharacter();
         Vec direction = new Vec(pc.getLookDirection().x(), 1, pc.getLookDirection().z());
 
-        //Launch player into the air with impulse. The arc should move them 5 blocks
+        // Launch player into the air with impulse. The arc should move them 5 blocks.
         pc.applyImpulse(direction.mul(75 * 20));
 
-        //Set up an event for when the player hits the ground
-        EventEmitter<PlayerCharacterMoveEvent> emitter = pc.onMove();
+        // Set up an event for when the player hits the ground.
         Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
-        subscriptions[0] = emitter.subscribe((pcMoveEvent) -> {
-
-            //If the player hits the ground
+        subscriptions[0] = pc.onMove().subscribe((pcMoveEvent) -> {
             if (!pcMoveEvent.isOnGround()
                     || pcMoveEvent.getOldPosition().y() <= pcMoveEvent.getNewPosition().y()) {
+                // Return if player is in air or going up.
                 return;
             }
 
@@ -97,17 +96,20 @@ public class FighterPlayerClass implements Feature {
             Collection<Collider> hits = mmorpg.getPhysicsManager()
                     .overlapBox(instance, hitboxCenter, hitboxSize);
 
-            //Hits every entity in a 5x5 range
+            // Hits every character in a 5x5 range.
             hits.forEach(Triggers.character(character -> {
                 if (!character.isDamageable(pc)) {
                     return;
                 }
-                double damageAmount = 2.0;
                 character.damage(pc, damageAmount);
-                Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
+                Sound hitSound = Sound.sound(
+                        SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR,
+                        Sound.Source.PLAYER,
+                        1f,
+                        1f
+                );
                 instance.playSound(hitSound, character.getPosition());
-                Pos charPos = character.getPosition();
-                Vec launchVector = new Vec((hitboxCenter.x() - charPos.x()) * 1000, 150, (hitboxCenter.y() - charPos.y()) * 1000);
+                Vec launchVector = character.getPosition().sub(hitboxCenter).asVec().normalize().withY(150);
                 character.applyImpulse(launchVector);
             }));
 
@@ -115,9 +117,9 @@ public class FighterPlayerClass implements Feature {
             instance.playSound(hitSound, pc.getPosition());
 
             // Remove listener and apply effects
-            for(int i = -1; i < 2; i++) {
-                for(int j = -1; j < 2; j ++) {
-                    ParticleEffects.particle(instance, hitboxCenter.add(i*2, 0, j*2), Particle.EXPLOSION);
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++) {
+                    ParticleEffects.particle(instance, hitboxCenter.add(i * 2, .5, j * 2), Particle.EXPLOSION);
                 }
             }
 
@@ -134,10 +136,9 @@ public class FighterPlayerClass implements Feature {
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);
 
-        //Hits every entity in a 20x1x20 range and sets target to player
+        // Hits every entity in a 20x1x20 range and sets target to player.
         hits.forEach(Triggers.character(character -> {
             if ((character instanceof NonPlayerCharacter npc) && (character.getAttitude(pc) == Attitude.HOSTILE)) {
-                npc = (NonPlayerCharacter) character;
                 npc.setTarget(pc);
             }
         }));
@@ -166,21 +167,17 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useWhirlwind(ActiveSkillUseEvent event) {
+        int iterations = 8;
 
         PlayerCharacter pc = event.getPlayerCharacter();
 
         Vec direction = pc.getLookDirection();
-        Pos playerPos = pc.getPosition();
-        int[] tick = new int[1];
 
-        int iterations = 8;
         // Create a for loop for 8 iterations
-        for (int i = 0; i < iterations; i++) {
-            tick[0] = 0;
-            // Each iteration, create a gt scheduleManager of i * .25 seconds
+        for (int i = 1; i <= iterations; i++) {
+            Vec newDir = direction.rotateAroundY(i * 2.0 * Math.PI / iterations);
             // Every for loop tick hurt everything in front of where the character is looking
             mmorpg.getSchedulerManager().buildTask(() -> {
-
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition();
                 Vec hitboxSize = new Vec(4, 4, 4);
@@ -197,47 +194,42 @@ public class FighterPlayerClass implements Feature {
                     character.damage(pc, damageAmount);
 
                 }));
-                tick[0]++;
 
-                // The new position the player is moving to
-                Pos newPosition = new Pos(
-                        direction.rotateAroundY(((2 * Math.PI) / iterations) * tick[0]).x() * 4 + playerPos.x(),
-                        playerPos.y() + 1.6,
-                        direction.rotateAroundY(((2 * Math.PI) / iterations) * tick[0]).z() * 4 + playerPos.z());
+                pc.setLookDirection(newDir);
 
-                pc.lookAt(newPosition);
-
-                ParticleEffects.particle(instance, newPosition, Particle.EXPLOSION);
-
+                ParticleEffects.particle(
+                        instance,
+                        pc.getPosition().add(1.5).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
+                        Particle.EXPLOSION
+                );
             }).delay(Duration.ofMillis((400 / iterations) * i)).schedule();
         }
     }
 
     private void useCharge(ActiveSkillUseEvent event) {
+        double damageAmount = 2.0;
+
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        // Charges player forward
-        Vec direction = pc.getLookDirection();
-        Vec impulse = direction.mul(75 * 20, 0, 75 * 20);
-        pc.applyImpulse(impulse);
+        // Charges player forward.
+        Vec direction = pc.getLookDirection().withY(0);
+        pc.setVelocity(direction.mul(20.0).withY(0.0));
 
         Instance instance = pc.getInstance();
-        Pos hitboxCenter = pc.getPosition();
-        Vec hitboxSize = new Vec(direction.x() * 2,
-                pc.getPosition().y() + 1.6,
-                direction.z() * 2 + pc.getPosition().z());
+        Pos hitboxCenter = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(3.0)).withY(y -> y + 1.0);
+        Vec hitboxSize = new Vec(3.0, 3.0, 3.0);
+
+        ParticleEffects.wireframeBox(instance, hitboxCenter, hitboxSize, Particle.CRIT, 4.0);
 
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);
 
-        //Hits every entity in the direction looked at for 4 blocks
         hits.forEach(Triggers.character(character -> {
             if (!character.isDamageable(pc)) {
                 return;
             }
-            double damageAmount = 2.0;
             character.damage(pc, damageAmount);
-            character.applyImpulse(impulse);
+            character.applyImpulse(direction.mul(200));
         }));
     }
 }

@@ -1,66 +1,66 @@
 {
-  "id": "rogue",
-  "name": "Rogue",
-  "skills": [
-    {
-      "type": "ACTIVE",
-      "id": "dash",
-      "name": "Dash",
-      "level": 1,
-      "icon": "dodge.png",
-      "description": "Moves the player fastly in a specific direction",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 4,
-      "manaCost": 0,
-      "cooldown": 0
-    },
-    {
-      "type": "ACTIVE",
-      "id": "backstab",
-      "name": "Backstab",
-      "level": 1,
-      "icon": "backstab.png",
-      "description": "Do 50% more damage when attacking a player from behind",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 5,
-      "manaCost": 0,
-      "cooldown": 0
-    },
-    {
-      "type": "ACTIVE",
-      "id": "sneak",
-      "name": "Sneak",
-      "level": 1,
-      "icon": "sneak.png",
-      "description": "The player is invisible for 10 seconds or until they attack",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 6,
-      "manaCost": 0,
-      "cooldown": 20
-    },
-    {
-      "type": "ACTIVE",
-      "id": "fanofknives",
-      "name": "Fan of Knives",
-      "level": 1,
-      "icon": "fanofknives.png",
-      "description": "Throws 3 daggers that deal damage",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 7,
-      "manaCost": 0,
-      "cooldown": 0
-    },
-    {
-      "type": "ACTIVE",
-      "id": "woundingslash",
-      "name": "Wounding Slash",
-      "level": 1,
-      "icon": "woundingslash.png",
-      "description": "Causes enemies directly in front of you to bleed for 10 seconds",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 8,
-      "manaCost": 0,
-      "cooldown": 0
-    }
-  ]
+    "id": "rogue",
+    "name": "Rogue",
+    "skills": [
+        {
+            "type": "ACTIVE",
+            "id": "dash",
+            "name": "Dash",
+            "level": 1,
+            "icon": "dodge.png",
+            "description": "Moves the player fastly in a specific direction",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 4,
+            "manaCost": 0,
+            "cooldown": 0
+        },
+        {
+            "type": "ACTIVE",
+            "id": "backstab",
+            "name": "Backstab",
+            "level": 1,
+            "icon": "backstab.png",
+            "description": "Damages enemies when attacked from behind",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 5,
+            "manaCost": 0,
+            "cooldown": 0
+        },
+        {
+            "type": "ACTIVE",
+            "id": "sneak",
+            "name": "Sneak",
+            "level": 1,
+            "icon": "sneak.png",
+            "description": "The player is invisible for 10 seconds or until they attack",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 6,
+            "manaCost": 0,
+            "cooldown": 20
+        },
+        {
+            "type": "ACTIVE",
+            "id": "fan_of_knives",
+            "name": "Fan of Knives",
+            "level": 1,
+            "icon": "fan_of_knives.png",
+            "description": "Throws 3 daggers that deal damage",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 7,
+            "manaCost": 0,
+            "cooldown": 0
+        },
+        {
+            "type": "ACTIVE",
+            "id": "wounding_slash",
+            "name": "Wounding Slash",
+            "level": 1,
+            "icon": "wounding_slash.png",
+            "description": "Causes enemies directly in front of you to bleed for 10 seconds",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 8,
+            "manaCost": 0,
+            "cooldown": 0
+        }
+    ]
 }

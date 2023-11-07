@@ -581,7 +581,4 @@ public final class PlayerCharacter extends Character {
         return onMove;
     }
 
-    public EventEmitter<PlayerTickEvent> onTick() {
-        return onTick;
-    }
 }

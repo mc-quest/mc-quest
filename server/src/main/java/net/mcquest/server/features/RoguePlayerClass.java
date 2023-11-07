@@ -1,44 +1,25 @@
 package net.mcquest.server.features;
 
 import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
-import net.mcquest.core.event.PlayerCharacterMoveEvent;
 import net.mcquest.core.event.SkillUnlockEvent;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
-import net.mcquest.core.physics.RaycastHit;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.RogueSkills;
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
-import net.minestom.server.event.EventListener;
-import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerLoginEvent;
-import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
-import net.minestom.server.network.packet.server.play.PlayerAbilitiesPacket;
 import net.minestom.server.particle.Particle;
-import net.minestom.server.potion.Potion;
-import net.minestom.server.potion.PotionEffect;
 import net.minestom.server.sound.SoundEvent;
 
-import java.awt.*;
-import java.time.Clock;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Collection;
-
-import static net.minestom.server.utils.PacketUtils.sendPacket;
 
 public class RoguePlayerClass implements Feature {
 
@@ -53,7 +34,7 @@ public class RoguePlayerClass implements Feature {
         RogueSkills.DASH.onUse().subscribe(this::useDash);
         RogueSkills.BACKSTAB.onUse().subscribe(this::useBackstab);
         RogueSkills.SNEAK.onUse().subscribe(this::useSneak);
-        RogueSkills.ADRENALINE.onUse().subscribe(this::useAdrenaline);
+        // RogueSkills.ADRENALINE.onUse().subscribe(this::useAdrenaline);
         RogueSkills.FANOFKNIVES.onUse().subscribe(this::useFanOfKnives);
         // RogueSkills.FLEETOFFOOT.onUnlock().subscribe(this::useFleetofFoot);
     }
@@ -68,24 +49,13 @@ public class RoguePlayerClass implements Feature {
         Instance instance = pc.getInstance();
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
-
-        /*
-            x' = x cos θ − y sin θ
-            y' = x sin θ + y cos θ
-         */
-        double rotation = Math.PI/4;
-        Vec dir = pc.getLookDirection();
-        Vec[] velocities = {
-                            new Vec(dir.x()*Math.cos(rotation) - dir.z()*Math.sin(rotation), dir.y(), dir.x()*Math.sin(rotation) + dir.z()*Math.cos(rotation)),
-                            dir,
-                            new Vec(dir.x()*Math.cos(-rotation) - dir.z()*Math.sin(-rotation), dir.y(), dir.x()*Math.sin(-rotation) + dir.z()*Math.cos(-rotation))
-                           };
-
+        Vec centerKnife = pc.getLookDirection();
+        Vec leftKnife = pc.getLookDirection().rotateAroundY(Math.PI/4);
+        Vec rightKnife = pc.getLookDirection().rotateAroundY(-Math.PI/4);
+        Vec[] velocities = { leftKnife, centerKnife, rightKnife};
 
         for(int i = 0; i < 3; i++) {
-
             Collider hitbox = new Collider(instance, startPosition, hitboxSize);
-
             Vec arrowVelocity = velocities[i].mul(arrowSpeed);
             Entity arrowEntity = new Entity(EntityType.ARROW) {
                 @Override

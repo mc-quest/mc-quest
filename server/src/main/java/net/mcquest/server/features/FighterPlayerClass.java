@@ -2,6 +2,7 @@ package net.mcquest.server.features;
 
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Attitude;
 import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
@@ -15,27 +16,13 @@ import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.FighterSkills;
 import net.kyori.adventure.sound.Sound;
-import net.mcquest.server.constants.Items;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
-import net.minestom.server.entity.Entity;
-import net.minestom.server.entity.EntityType;
-import net.minestom.server.entity.Player;
-import net.minestom.server.event.Event;
-import net.minestom.server.event.EventListener;
-import net.minestom.server.event.EventNode;
-import net.minestom.server.event.GlobalEventHandler;
-import net.minestom.server.event.player.PlayerMoveEvent;
-import net.minestom.server.event.player.PlayerTickEvent;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -90,19 +77,17 @@ public class FighterPlayerClass implements Feature {
         Vec direction = new Vec(pc.getLookDirection().x(), 1, pc.getLookDirection().z());
 
         //Launch player into the air with impulse. The arc should move them 5 blocks
-        pc.applyImpulse(direction.mul(75 * 20, 75 * 20, 75 * 20));
+        pc.applyImpulse(direction.mul(75 * 20));
 
         //Set up an event for when the player hits the ground
+        EventEmitter<PlayerCharacterMoveEvent> emitter = pc.onMove();
+        Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
+        subscriptions[0] = emitter.subscribe((playerMoveEvent) -> {
 
-        EventListener[] listener = new EventListener[1];
-        listener[0] = EventListener.of(PlayerCharacterMoveEvent.class, playerMoveEvent -> {
-
-            //playerMoveEvent.getPlayer().sendMessage("Velocty: " + playerMoveEvent.getPlayer().getVelocity().y());
             //If the player hits the ground
             if (playerMoveEvent.getPlayerCharacter().getVelocity().y() == -1.568
                     && playerMoveEvent.getPlayerCharacter().isOnGround()) {
 
-                //playerMoveEvent.getPlayer().sendMessage("On Ground");
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition();
                 Vec hitboxSize = new Vec(5, 1, 5);
@@ -120,21 +105,15 @@ public class FighterPlayerClass implements Feature {
                     Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
                     instance.playSound(hitSound, character.getPosition());
                     Pos charPos = character.getPosition();
-                    Vec launchVector = new Vec((hitboxCenter.x() + charPos.x()) * 1000, 150, (hitboxCenter.y() + charPos.y()) * 1000);
-                    // playerMoveEvent.getPlayerCharacter().sendMessage(launchVector.toString());
+                    Vec launchVector = new Vec((hitboxCenter.x() - charPos.x()) * 1000, 150, (hitboxCenter.y() - charPos.y()) * 1000);
                     character.applyImpulse(launchVector);
                 }));
 
                 // Remove listener and apply effects
                 ParticleEffects.particle(instance, hitboxCenter, Particle.EXPLOSION);
-                mmorpg.getGlobalEventHandler().removeListener(listener[0]);
+                subscriptions[0].unsubscribe();
             }
         });
-
-
-        mmorpg.getGlobalEventHandler().addListener(listener[0]);
-
-
     }
 
     public void useTaunt(ActiveSkillUseEvent event) {
@@ -148,25 +127,28 @@ public class FighterPlayerClass implements Feature {
 
         //Hits every entity in a 20x1x20 range and sets target to player
         hits.forEach(Triggers.character(character -> {
-            if (character instanceof NonPlayerCharacter) {
-                NonPlayerCharacter npc = (NonPlayerCharacter) character;
+            if ((character instanceof NonPlayerCharacter npc) && (character.getAttitude(pc) == Attitude.HOSTILE)) {
+                npc = (NonPlayerCharacter) character;
                 npc.setTarget(pc);
-                // pc.sendMessage(npc.getName() + " is now attacking " + pc.getName());
-            }
+             }
         }));
     }
 
     public void useBerserk(ActiveSkillUseEvent event) {
-
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
-
+        pc.sendMessage(Component.text("Beginning Berserk!"));
         mmorpg.getSchedulerManager().buildTask(() -> {
-            pc.damage(pc, pc.getMaxHealth() / 2);
-            pc.setMaxHealth(pc.getMaxHealth() / 2);
+            double damageAmount = pc.getMaxHealth()/2;
+            if(pc.getHealth() > damageAmount) {
+                pc.damage(pc, damageAmount);
+            } else {
+                pc.setHealth(1);
+            }
+            pc.sendMessage(Component.text("Berserk Ended... you are so tired"));
+            pc.setMaxHealth(damageAmount);
         }).delay(Duration.ofSeconds(20)).schedule();
-
     }
 
     public void useWhirlwind(ActiveSkillUseEvent event) {
@@ -177,8 +159,9 @@ public class FighterPlayerClass implements Feature {
         Pos playerPos = pc.getPosition();
         int[] tick = new int[1];
 
+        int iterations = 8;
         // Create a for loop for 8 iterations
-        for(int i = 0; i < 8; i++) {
+        for(int i = 0; i < iterations; i++) {
             tick[0] = 0;
             // Each iteration, create a gt scheduleManager of i * .25 seconds
             // Every for loop tick hurt everything in front of where the character is looking
@@ -201,17 +184,18 @@ public class FighterPlayerClass implements Feature {
 
                 }));
                 tick[0]++;
-                pc.sendMessage(Component.text("Rotate: " + tick[0]));
 
-                Pos newPosition = new Pos(direction.rotateAroundY((Math.PI/4)*tick[0]).x() * 4 + playerPos.x(),
+                // The new position the player is moving to
+                Pos newPosition = new Pos(
+                        direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).x() * 4 + playerPos.x(),
                         playerPos.y()+1.6,
-                        direction.rotateAroundY((Math.PI/4)*tick[0]).z() * 4 + playerPos.z());
+                        direction.rotateAroundY(((2*Math.PI)/iterations)*tick[0]).z() * 4 + playerPos.z());
 
                 pc.lookAt(newPosition);
 
                 ParticleEffects.particle(instance, newPosition, Particle.EXPLOSION);
 
-            }).delay(Duration.ofMillis(50 * i)).schedule();
+            }).delay(Duration.ofMillis((400/iterations) * i)).schedule();
         }
     }
 
@@ -242,17 +226,5 @@ public class FighterPlayerClass implements Feature {
             character.applyImpulse(impulse);
 
         }));
-
-
-        // make a hitbox in a line.
-
-
-        // anything in the line is hit for some damage
-
-
-        // everything within the line is knocked forward
-
-
     }
-
 }

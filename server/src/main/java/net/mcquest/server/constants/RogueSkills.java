@@ -8,9 +8,5 @@ public class RogueSkills {
     public static final ActiveSkill BACKSTAB = (ActiveSkill) PlayerClasses.ROGUE.getSkill("backstab");
     public static final ActiveSkill SNEAK = (ActiveSkill) PlayerClasses.ROGUE.getSkill("sneak");
     public static final ActiveSkill ADRENALINE = (ActiveSkill) PlayerClasses.ROGUE.getSkill("adrenaline");
-
     public static final ActiveSkill FANOFKNIVES = (ActiveSkill) PlayerClasses.ROGUE.getSkill("fanofknives");
-
-    // public static final PassiveSkill FLEETOFFOOT = (PassiveSkill) PlayerClasses.ROGUE.getSkill("fleet_of_foot");
-
 }

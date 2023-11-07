@@ -9,23 +9,83 @@
             "level": 1,
             "icon": "bash.png",
             "description": "Damage enemies in front of you",
-            "manaCost": 5,
-            "cooldown": 1,
             "skillTreeRow": 0,
-            "skillTreeColumn": 4
+            "skillTreeColumn": 1,
+            "manaCost": 5,
+            "cooldown": 1
         },
         {
             "type": "ACTIVE",
             "id": "self_heal",
             "name": "Self Heal",
-            "level": 2,
+            "level": 1,
             "icon": "self_heal.png",
             "description": "Heal yourself",
-            "skillTreeRow": 1,
-            "skillTreeColumn": 4,
+            "skillTreeRow": 0,
+            "skillTreeColumn": 2,
             "manaCost": 5,
             "cooldown": 20,
             "prerequisiteId": 1
+        },
+        {
+            "type": "ACTIVE",
+            "id": "tremor",
+            "name": "Tremor",
+            "level": 1,
+            "icon": "tremor.png",
+            "description": "Launches player in air. When they land knock everyone at impact zone away",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 3,
+            "manaCost": 10,
+            "cooldown": 10
+        },
+        {
+            "type": "ACTIVE",
+            "id": "taunt",
+            "name": "Taunt",
+            "level": 1,
+            "icon": "taunt.png",
+            "description": "Changes target of all nearby enemies to you",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 4,
+            "manaCost": 5,
+            "cooldown": 20
+        },
+        {
+            "type": "ACTIVE",
+            "id": "berserk",
+            "name": "Berserk",
+            "level": 1,
+            "icon": "berserk.png",
+            "description": "Temporarily double health, but all damage is carried over",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 5,
+            "manaCost": 10,
+            "cooldown": 40
+        },
+        {
+            "type": "ACTIVE",
+            "id": "whirlwind",
+            "name": "Whirlwind",
+            "level": 1,
+            "icon": "whirlwind.png",
+            "description": "Spins the player around and hits everyone around them",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 6,
+            "manaCost": 0,
+            "cooldown": 0
+        },
+        {
+            "type": "ACTIVE",
+            "id": "charge",
+            "name": "Charge",
+            "level": 1,
+            "icon": "charge.png",
+            "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 7,
+            "manaCost": 0,
+            "cooldown": 0
         }
     ]
 }

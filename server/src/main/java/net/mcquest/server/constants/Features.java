@@ -7,6 +7,7 @@ public class Features {
     public static final Feature PLAYER_CHARACTER_INIT = new PlayerCharacterInit();
     public static final Feature FIGHTER_PLAYER_CLASS = new FighterPlayerClass();
     public static final Feature MAGE_PLAYER_CLASS = new MagePlayerClass();
+    public static final Feature ROGUE_PLAYER_CLASS = new RoguePlayerClass();
     public static final Feature SWORDS = new Swords();
     public static final Feature WANDS = new Wands();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
@@ -17,6 +18,7 @@ public class Features {
                 PLAYER_CHARACTER_INIT,
                 FIGHTER_PLAYER_CLASS,
                 MAGE_PLAYER_CLASS,
+                ROGUE_PLAYER_CLASS,
                 SWORDS,
                 WANDS,
                 TUTORIAL_QUEST,

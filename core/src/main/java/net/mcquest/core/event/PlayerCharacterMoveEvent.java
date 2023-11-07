@@ -20,6 +20,11 @@ public class PlayerCharacterMoveEvent implements Event {
     }
 
     @NotNull
+    public Pos getOldPosition() {
+        return pc.getPosition();
+    }
+
+    @NotNull
     public Pos getNewPosition() {
         return playerMoveEvent.getNewPosition();
     }

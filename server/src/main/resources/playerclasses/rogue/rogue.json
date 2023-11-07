@@ -10,8 +10,8 @@
             "icon": "dodge.png",
             "description": "Moves the player fastly in a specific direction",
             "skillTreeRow": 0,
-            "skillTreeColumn": 4,
-            "manaCost": 0,
+            "skillTreeColumn": 2,
+            "manaCost": 5,
             "cooldown": 0
         },
         {
@@ -22,9 +22,9 @@
             "icon": "backstab.png",
             "description": "Damages enemies when attacked from behind",
             "skillTreeRow": 0,
-            "skillTreeColumn": 5,
-            "manaCost": 0,
-            "cooldown": 0
+            "skillTreeColumn": 3,
+            "manaCost": 5,
+            "cooldown": 5
         },
         {
             "type": "ACTIVE",
@@ -34,7 +34,7 @@
             "icon": "sneak.png",
             "description": "The player is invisible for 10 seconds or until they attack",
             "skillTreeRow": 0,
-            "skillTreeColumn": 6,
+            "skillTreeColumn": 4,
             "manaCost": 0,
             "cooldown": 20
         },
@@ -46,9 +46,9 @@
             "icon": "fan_of_knives.png",
             "description": "Throws 3 daggers that deal damage",
             "skillTreeRow": 0,
-            "skillTreeColumn": 7,
-            "manaCost": 0,
-            "cooldown": 0
+            "skillTreeColumn": 5,
+            "manaCost": 10,
+            "cooldown": 10
         },
         {
             "type": "ACTIVE",
@@ -58,9 +58,9 @@
             "icon": "wounding_slash.png",
             "description": "Causes enemies directly in front of you to bleed for 10 seconds",
             "skillTreeRow": 0,
-            "skillTreeColumn": 8,
-            "manaCost": 0,
-            "cooldown": 0
+            "skillTreeColumn": 6,
+            "manaCost": 15,
+            "cooldown": 20
         }
     ]
 }

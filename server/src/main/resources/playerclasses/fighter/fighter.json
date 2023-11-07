@@ -10,7 +10,7 @@
             "icon": "bash.png",
             "description": "Damage enemies in front of you",
             "skillTreeRow": 0,
-            "skillTreeColumn": 4,
+            "skillTreeColumn": 1,
             "manaCost": 5,
             "cooldown": 1
         },
@@ -22,7 +22,7 @@
             "icon": "self_heal.png",
             "description": "Heal yourself",
             "skillTreeRow": 0,
-            "skillTreeColumn": 5,
+            "skillTreeColumn": 2,
             "manaCost": 5,
             "cooldown": 20,
             "prerequisiteId": 1
@@ -35,9 +35,9 @@
             "icon": "tremor.png",
             "description": "Launches player in air. When they land knock everyone at impact zone away",
             "skillTreeRow": 0,
-            "skillTreeColumn": 6,
-            "manaCost": 0,
-            "cooldown": 0
+            "skillTreeColumn": 3,
+            "manaCost": 10,
+            "cooldown": 10
         },
         {
             "type": "ACTIVE",
@@ -47,9 +47,9 @@
             "icon": "taunt.png",
             "description": "Changes target of all nearby enemies to you",
             "skillTreeRow": 0,
-            "skillTreeColumn": 7,
+            "skillTreeColumn": 4,
             "manaCost": 5,
-            "cooldown": 5
+            "cooldown": 20
         },
         {
             "type": "ACTIVE",
@@ -59,8 +59,8 @@
             "icon": "berserk.png",
             "description": "Temporarily double health, but all damage is carried over",
             "skillTreeRow": 0,
-            "skillTreeColumn": 8,
-            "manaCost": 0,
+            "skillTreeColumn": 5,
+            "manaCost": 10,
             "cooldown": 40
         },
         {
@@ -71,7 +71,7 @@
             "icon": "whirlwind.png",
             "description": "Spins the player around and hits everyone around them",
             "skillTreeRow": 0,
-            "skillTreeColumn": 1,
+            "skillTreeColumn": 6,
             "manaCost": 0,
             "cooldown": 0
         },
@@ -83,7 +83,7 @@
             "icon": "charge.png",
             "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
             "skillTreeRow": 0,
-            "skillTreeColumn": 2,
+            "skillTreeColumn": 7,
             "manaCost": 0,
             "cooldown": 0
         }

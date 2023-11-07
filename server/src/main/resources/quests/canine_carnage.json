@@ -4,19 +4,17 @@
     "level": 1,
     "objectives": [
         {
-            "description": "Enter wolf den",
-            "goal": 1,
-            "prerequisites": [0]
+            "description": "Dire wolves slain",
+            "goal": 10
         },
         {
-            "description": "Alpha wolf slain",
-            "goal": 3,
-            "prerequisites": [1]
+            "description": "Dire Packlord slain",
+            "goal": 1
         },
         {
             "description": "Speak with Guard Thomas",
             "goal": 1,
-            "prerequisites": [2]
+            "prerequisites": [0, 1]
         }
     ]
 }

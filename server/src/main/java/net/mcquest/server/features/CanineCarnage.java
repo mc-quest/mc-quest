@@ -132,8 +132,8 @@ public class CanineCarnage {
                 Quests.CANINE_CARNAGE,
                 QuestMarkerIcon.OBJECTIVE,
                 Predicates.or(
-                        Quests.CANINE_CARNAGE.getObjective(1)::isInProgress,
-                        Quests.CANINE_CARNAGE.getObjective(2)::isInProgress
+                        Quests.CANINE_CARNAGE.getObjective(0)::isInProgress,
+                        Quests.CANINE_CARNAGE.getObjective(1)::isInProgress
                 )
         );
         Maps.ELADRADOR.addQuestMarker(wolfDenMarker);

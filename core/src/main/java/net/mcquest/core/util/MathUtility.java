@@ -65,4 +65,12 @@ public class MathUtility {
     public static double randomRange(double min, double max) {
         return min + (max - min) * random.nextDouble();
     }
+
+    public static Pos randomRange(Pos min, Pos max) {
+        return new Pos(
+                randomRange(min.x(), max.x()),
+                randomRange(min.y(), max.y()),
+                randomRange(min.z(), max.z())
+        );
+    }
 }

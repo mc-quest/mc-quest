@@ -12,7 +12,7 @@
             "skillTreeRow": 0,
             "skillTreeColumn": 2,
             "manaCost": 5,
-            "cooldown": 0
+            "cooldown": 3
         },
         {
             "type": "ACTIVE",

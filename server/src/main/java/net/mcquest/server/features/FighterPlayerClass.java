@@ -116,7 +116,7 @@ public class FighterPlayerClass implements Feature {
         });
     }
 
-    public void useTaunt(ActiveSkillUseEvent event) {
+    private void useTaunt(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition();
@@ -134,7 +134,7 @@ public class FighterPlayerClass implements Feature {
         }));
     }
 
-    public void useBerserk(ActiveSkillUseEvent event) {
+    private void useBerserk(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
@@ -151,7 +151,7 @@ public class FighterPlayerClass implements Feature {
         }).delay(Duration.ofSeconds(20)).schedule();
     }
 
-    public void useWhirlwind(ActiveSkillUseEvent event) {
+    private void useWhirlwind(ActiveSkillUseEvent event) {
 
         PlayerCharacter pc = event.getPlayerCharacter();
 
@@ -199,7 +199,7 @@ public class FighterPlayerClass implements Feature {
         }
     }
 
-    public void useCharge(ActiveSkillUseEvent event) {
+    private void useCharge(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
         Vec direction = pc.getLookDirection();
         Vec impulse = direction.mul(75 * 10, 0, 75 * 10);

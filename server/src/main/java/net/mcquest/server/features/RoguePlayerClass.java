@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
@@ -125,14 +126,12 @@ public class RoguePlayerClass implements Feature {
         hits.forEach(Triggers.character(character -> {
 
             // If the character is in the line of sight of the creature being hit or it isn't damageable then do nothing
-           if (!character.isDamageable(pc) || character.hasLineOfSight(pc, true)) {
+           if (!character.isDamageable(pc) || character.hasLineOfSight(pc, false)) {
                return;
            }
 
             //Calculate the damage of the item being held in the hand and increase it by 50%
-            //double damageAmount = pc.getWeapon().getPhysicalDamage() * 1.5;
-
-            double damageAmount = 0;
+            double damageAmount =  pc.getInventory().getWeapon().getPhysicalDamage() * 2;
             //Apply damage to creature hit within hitbox
             ParticleEffects.particle(instance, hitboxCenter, Particle.SMOKE);
             character.damage(pc, damageAmount);

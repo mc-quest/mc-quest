@@ -39,8 +39,6 @@ public class RoguePlayerClass implements Feature {
         RogueSkills.SNEAK.onUse().subscribe(this::useSneak);
         RogueSkills.FANOFKNIVES.onUse().subscribe(this::useFanOfKnives);
         RogueSkills.WOUNDINGSLASH.onUse().subscribe(this::useWoundingSlash);
-        // RogueSkills.ADRENALINE.onUse().subscribe(this::useAdrenaline);
-        // RogueSkills.FLEETOFFOOT.onUnlock().subscribe(this::useFleetofFoot);
     }
 
     private void useDash(ActiveSkillUseEvent event) {
@@ -172,25 +170,25 @@ public class RoguePlayerClass implements Feature {
         //For each character hit
         hits.forEach(Triggers.character(character -> {
 
-            // If the character is in the line of sight of the creature being hit or it isn't damageable then do nothing
+            // If the character isn't damageable do nothing
             if (!character.isDamageable(pc)) {
                 return;
             }
 
-            // Hurt the player over time
-            int iterations = 5;
-            for(int i = 0; i < iterations; i++) {
+            // Hurt the player over time (2 damage every 2 seconds for 10 seconds)
+            for(int i = 0; i < 5; i++) {
                 mmorpg.getSchedulerManager().buildTask(() -> {
-                    character.damage(pc, 1);
+                    character.damage(pc, 2);
                     Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
                     instance.playSound(poisonSound, character.getPosition());
-                    ParticleEffects.particle(instance, hitboxCenter, Particle.DRIPPING_LAVA);
-                }).delay(Duration.ofSeconds((2 * iterations) * i)).schedule();
+                    Pos creatureCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
+                    ParticleEffects.particle(instance, creatureCenter, Particle.DRIPPING_LAVA);
+                }).delay(Duration.ofSeconds(2 * i)).schedule();
             }
 
+            ParticleEffects.particle(instance, hitboxCenter, Particle.CRIT);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound, character.getPosition());
-
         }));
 
         //If nothing was hit make sound signifying they haven't
@@ -199,18 +197,4 @@ public class RoguePlayerClass implements Feature {
             instance.playSound(missSound, hitboxCenter);
         }
     }
-
-//    private void useAdrenaline(ActiveSkillUseEvent event) {
-//        PlayerCharacter pc = event.getPlayerCharacter();
-//        pc.updateAttackSpeed(20);
-//
-//        mmorpg.getSchedulerManager().buildTask(() -> {
-//            pc.updateAttackSpeed(pc.getInventory().getWeapon().getAttackSpeed());
-//        }).delay(Duration.ofSeconds(5)).schedule();
-//    }
-//
-//    private void useFleetofFoot(SkillUnlockEvent event) {
-//        PlayerCharacter pc = event.getPlayerCharacter();
-//        pc.changeSpeed(.1f);
-//    }
 }

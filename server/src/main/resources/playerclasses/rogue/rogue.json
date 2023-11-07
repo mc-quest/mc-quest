@@ -40,18 +40,6 @@
     },
     {
       "type": "ACTIVE",
-      "id": "adrenaline",
-      "name": "Adrenaline",
-      "level": 1,
-      "icon": "adrenaline.png",
-      "description": "Increases attack speed and damage for 5 seconds",
-      "skillTreeRow": 0,
-      "skillTreeColumn": 7,
-      "manaCost": 0,
-      "cooldown": 0
-    },
-    {
-      "type": "ACTIVE",
       "id": "fanofknives",
       "name": "Fan of Knives",
       "level": 1,

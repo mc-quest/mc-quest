@@ -59,7 +59,7 @@ public class CanineCarnage implements Feature {
 
     private void direWolves() {
         Pos[] positions = {
-                // forest wolves (20)
+                // forest wolves
                 new Pos(3044, 99.0, 3654, 175.2f, 17.5f),
                 new Pos(3046, 103.0, 3601, 56.0f, 8.5f),
                 new Pos(3099, 105.0, 3630, 56.0f, 8.5f),
@@ -84,12 +84,10 @@ public class CanineCarnage implements Feature {
                 new Pos(3037, 99, 3662),
                 new Pos(3013, 102, 3606),
 
-                // den wolves (5)
-                new Pos(2995, 78.0, 3670, 56.0f, 8.5f),
-                new Pos(2987, 78.0, 3670, -101.2f, 2.2f),
-                new Pos(2991, 79.0, 3674, -101.2f, 2.2f),
-                new Pos(3006, 82.0, 3642, -101.2f, 2.2f),
-                new Pos(3020, 92.0, 3636, 175.2f, 17.5f)
+                // den wolves
+                new Pos(2990, 78, 3652),
+                new Pos(2997, 78, 3661),
+                new Pos(3012, 85, 3641),
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();
@@ -101,7 +99,7 @@ public class CanineCarnage implements Feature {
     private void direPacklord() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2993, 78, 3665),
+                new Pos(2990, 78, 3659),
                 DirePacklord::new
         ));
     }

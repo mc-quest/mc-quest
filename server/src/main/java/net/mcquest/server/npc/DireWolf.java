@@ -24,45 +24,43 @@ public class DireWolf extends NonPlayerCharacter {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_WOLF));
         setName("Dire Wolf");
         setLevel(2);
-        setMaxHealth(25);
-        setMass(20);
+        setMaxHealth(30);
+        setMass(80);
         setRemovalDelay(Duration.ofMillis(2000));
-        setRespawnDuration(Duration.ofSeconds(45));
+        setRespawnDuration(Duration.ofSeconds(60));
         setExperiencePoints(10);
-        setLootTable(LootTable.builder()
-                .pool(Pool.builder()
-                        .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
-                        .build())
-                .build());
         addSlayQuestObjective(Quests.CANINE_CARNAGE.getObjective(0));
 
         setBrain(ActiveSelector.of(
                 Sequence.of(
-                        TaskFindClosestTarget.of(10.0),
+                        TaskFindClosestTarget.of(25.0),
                         TaskPlayAnimation.of(CharacterAnimation.named("run")),
                         SimpleParallel.of(
-                                TaskFollowTarget.of(2.0, 15.0),
+                                TaskFollowTarget.of(4.0, 15.0),
                                 Sequence.of(
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_STEP,
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         TaskWait.of(Duration.ofMillis(500))
                                 )
                         ),
+                        TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
                                 new int[]{1, 1},
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
-                                        TaskWait.of(Duration.ofMillis(500)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::claw),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("bite")),
-                                        TaskWait.of(Duration.ofMillis(500)),
+                                        TaskWait.of(Duration.ofMillis(300)),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::bite),
                                         TaskWait.of(Duration.ofMillis(800))
                                 )
@@ -79,7 +77,8 @@ public class DireWolf extends NonPlayerCharacter {
                                                 Sound.Source.HOSTILE, 0.75f, 1.5f)),
                                         TaskWait.of(Duration.ofMillis(500))
                                 )
-                        )
+                        ),
+                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_HOWL, Sound.Source.HOSTILE, 1f, 1f))
                 )
         ));
     }
@@ -103,6 +102,7 @@ public class DireWolf extends NonPlayerCharacter {
     @Override
     protected void onDeath(DamageSource source) {
         emitSound(Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 1f, 1f));
+        playAnimation(CharacterAnimation.named("death"));
     }
 
     private boolean claw(long time) {

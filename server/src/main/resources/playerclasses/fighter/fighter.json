@@ -29,10 +29,10 @@
         },
         {
             "type": "ACTIVE",
-            "id": "tremor",
-            "name": "Tremor",
+            "id": "overhead_strike",
+            "name": "Overhead Strike",
             "level": 1,
-            "icon": "tremor.png",
+            "icon": "overhead_strike.png",
             "description": "Launches player in air. When they land knock everyone at impact zone away",
             "skillTreeRow": 0,
             "skillTreeColumn": 3,

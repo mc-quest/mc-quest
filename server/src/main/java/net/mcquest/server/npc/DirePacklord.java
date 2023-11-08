@@ -31,13 +31,8 @@ public class DirePacklord extends NonPlayerCharacter {
         setMass(200);
         setMovementSpeed(10.0);
         setRemovalDelay(Duration.ofMillis(2000));
-        setRespawnDuration(Duration.ofSeconds(45));
+        setRespawnDuration(Duration.ofSeconds(60));
         setExperiencePoints(70);
-        setLootTable(LootTable.builder()
-                .pool(Pool.builder()
-                        .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
-                        .build())
-                .build());
         addSlayQuestObjective(Quests.CANINE_CARNAGE.getObjective(1));
 
         setBrain(ActiveSelector.of(
@@ -98,7 +93,7 @@ public class DirePacklord extends NonPlayerCharacter {
                 )
         ));
 
-        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(20, 10, 20));
+        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(25, 10, 25));
         bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
         bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
     }

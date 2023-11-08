@@ -1,0 +1,20 @@
+{
+    "id": "canine_carnage",
+    "name": "Canine Carnage",
+    "level": 1,
+    "objectives": [
+        {
+            "description": "Dire wolves slain",
+            "goal": 10
+        },
+        {
+            "description": "Dire Packlord slain",
+            "goal": 1
+        },
+        {
+            "description": "Speak with Guard Thomas",
+            "goal": 1,
+            "prerequisites": [0, 1]
+        }
+    ]
+}

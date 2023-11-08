@@ -31,7 +31,7 @@ public class FighterPlayerClass implements Feature {
         this.mmorpg = mmorpg;
         FighterSkills.BASH.onUse().subscribe(this::useBash);
         FighterSkills.SELF_HEAL.onUse().subscribe(this::useSelfHeal);
-        FighterSkills.TREMOR.onUse().subscribe(this::useTremor);
+        FighterSkills.OVERHEAD_STRIKE.onUse().subscribe(this::useOverheadStrike);
         FighterSkills.TAUNT.onUse().subscribe(this::useTaunt);
         FighterSkills.BERSERK.onUse().subscribe(this::useBerserk);
         FighterSkills.WHIRLWIND.onUse().subscribe(this::useWhirlwind);
@@ -68,10 +68,11 @@ public class FighterPlayerClass implements Feature {
 
     private void useSelfHeal(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        pc.playSound(Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f));
         pc.heal(pc, 10.0);
     }
 
-    private void useTremor(ActiveSkillUseEvent event) {
+    private void useOverheadStrike(ActiveSkillUseEvent event) {
         double damageAmount = 2.0;
 
         PlayerCharacter pc = event.getPlayerCharacter();
@@ -175,12 +176,17 @@ public class FighterPlayerClass implements Feature {
 
         // Create a for loop for 8 iterations
         for (int i = 1; i <= iterations; i++) {
+            boolean sound = i % 2 == 1;
             Vec newDir = direction.rotateAroundY(i * 2.0 * Math.PI / iterations);
-            // Every for loop tick hurt everything in front of where the character is looking
+
             mmorpg.getSchedulerManager().buildTask(() -> {
+                if (sound) {
+                    pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
+                }
+
                 Instance instance = pc.getInstance();
-                Pos hitboxCenter = pc.getPosition();
-                Vec hitboxSize = new Vec(4, 4, 4);
+                Pos hitboxCenter = pc.getPosition().withY(y -> y + 1.5);
+                Vec hitboxSize = new Vec(5, 3, 5);
 
                 Collection<Collider> hits = mmorpg.getPhysicsManager()
                         .overlapBox(instance, hitboxCenter, hitboxSize);
@@ -190,9 +196,8 @@ public class FighterPlayerClass implements Feature {
                     if (!character.isDamageable(pc)) {
                         return;
                     }
-                    double damageAmount = 2.0;
+                    double damageAmount = 1.5;
                     character.damage(pc, damageAmount);
-
                 }));
 
                 pc.setLookDirection(newDir);
@@ -215,11 +220,11 @@ public class FighterPlayerClass implements Feature {
         Vec direction = pc.getLookDirection().withY(0);
         pc.setVelocity(direction.mul(20.0).withY(0.0));
 
+        pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
+
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(3.0)).withY(y -> y + 1.0);
         Vec hitboxSize = new Vec(3.0, 3.0, 3.0);
-
-        ParticleEffects.wireframeBox(instance, hitboxCenter, hitboxSize, Particle.CRIT, 4.0);
 
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);

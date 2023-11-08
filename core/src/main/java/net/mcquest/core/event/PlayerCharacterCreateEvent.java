@@ -18,6 +18,10 @@ public class PlayerCharacterCreateEvent implements Event {
         result = null;
     }
 
+    public PlayerClass getPlayerClass() {
+        return playerClass;
+    }
+
     public Result getResult() {
         return result;
     }

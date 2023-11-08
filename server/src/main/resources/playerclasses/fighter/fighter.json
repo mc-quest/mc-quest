@@ -12,7 +12,7 @@
             "skillTreeRow": 0,
             "skillTreeColumn": 1,
             "manaCost": 5,
-            "cooldown": 1
+            "cooldown": 4
         },
         {
             "type": "ACTIVE",
@@ -29,10 +29,10 @@
         },
         {
             "type": "ACTIVE",
-            "id": "tremor",
-            "name": "Tremor",
+            "id": "overhead_strike",
+            "name": "Overhead Strike",
             "level": 1,
-            "icon": "tremor.png",
+            "icon": "overhead_strike.png",
             "description": "Launches player in air. When they land knock everyone at impact zone away",
             "skillTreeRow": 0,
             "skillTreeColumn": 3,
@@ -72,8 +72,8 @@
             "description": "Spins the player around and hits everyone around them",
             "skillTreeRow": 0,
             "skillTreeColumn": 6,
-            "manaCost": 0,
-            "cooldown": 0
+            "manaCost": 5,
+            "cooldown": 10
         },
         {
             "type": "ACTIVE",
@@ -84,8 +84,8 @@
             "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
             "skillTreeRow": 0,
             "skillTreeColumn": 7,
-            "manaCost": 0,
-            "cooldown": 0
+            "manaCost": 5,
+            "cooldown": 10
         }
     ]
 }

@@ -18,7 +18,7 @@
             "type": "ACTIVE",
             "id": "ice_beam",
             "name": "Ice Beam",
-            "level": 2,
+            "level": 1,
             "icon": "ice_beam.png",
             "description": "TODO",
             "skillTreeRow": 1,

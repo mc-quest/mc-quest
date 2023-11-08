@@ -1,0 +1,16 @@
+{
+    "id": "wolf_bite_delight",
+    "name": "Wolf Bite Delight",
+    "level": 1,
+    "objectives": [
+        {
+            "description": "Wolf flanks",
+            "goal": 5
+        },
+        {
+            "description": "Speak with Chef Marco",
+            "goal": 1,
+            "prerequisites": [0]
+        }
+    ]
+}

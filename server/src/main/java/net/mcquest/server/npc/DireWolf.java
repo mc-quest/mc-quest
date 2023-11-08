@@ -106,9 +106,8 @@ public class DireWolf extends NonPlayerCharacter {
     }
 
     private boolean claw(long time) {
-        Pos position = getPosition();
-        Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(1.0, 0.5, 1.0);
+        Pos hitboxCenter = getPosition().add(getLookDirection().mul(3)).withY(y -> y + 1);
+        Vec extents = new Vec(3, 2, 3);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::clawHit));
@@ -118,13 +117,13 @@ public class DireWolf extends NonPlayerCharacter {
     private void clawHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
             character.damage(this, 3);
+            character.applyImpulse(getLookDirection().mul(50));
         }
     }
 
     private boolean bite(long time) {
-        Pos position = getPosition();
-        Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(1.0, 0.5, 1.0);
+        Pos hitboxCenter = getPosition().add(getLookDirection().mul(3)).withY(y -> y + 1);
+        Vec extents = new Vec(3, 2, 3);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::biteHit));
@@ -134,6 +133,7 @@ public class DireWolf extends NonPlayerCharacter {
     private void biteHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
             character.damage(this, 4);
+            character.applyImpulse(getLookDirection().mul(40));
         }
     }
 }

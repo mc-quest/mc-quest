@@ -12,7 +12,7 @@
             "skillTreeRow": 0,
             "skillTreeColumn": 1,
             "manaCost": 5,
-            "cooldown": 1
+            "cooldown": 4
         },
         {
             "type": "ACTIVE",
@@ -72,8 +72,8 @@
             "description": "Spins the player around and hits everyone around them",
             "skillTreeRow": 0,
             "skillTreeColumn": 6,
-            "manaCost": 0,
-            "cooldown": 0
+            "manaCost": 5,
+            "cooldown": 10
         },
         {
             "type": "ACTIVE",
@@ -84,8 +84,8 @@
             "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
             "skillTreeRow": 0,
             "skillTreeColumn": 7,
-            "manaCost": 0,
-            "cooldown": 0
+            "manaCost": 5,
+            "cooldown": 10
         }
     ]
 }

@@ -12,6 +12,7 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
+import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
@@ -23,7 +24,7 @@ public class DireWolf extends NonPlayerCharacter {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_WOLF));
         setName("Dire Wolf");
         setLevel(2);
-        setMaxHealth(10);
+        setMaxHealth(25);
         setMass(20);
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(45));
@@ -33,6 +34,7 @@ public class DireWolf extends NonPlayerCharacter {
                         .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
                         .build())
                 .build());
+        addSlayQuestObjective(Quests.CANINE_CARNAGE.getObjective(0));
 
         setBrain(ActiveSelector.of(
                 Sequence.of(
@@ -51,7 +53,7 @@ public class DireWolf extends NonPlayerCharacter {
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
                                         TaskWait.of(Duration.ofMillis(500)),
-                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
                                         TaskAction.of(this::claw),
                                         TaskWait.of(Duration.ofMillis(800))

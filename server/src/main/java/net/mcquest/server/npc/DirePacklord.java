@@ -14,6 +14,7 @@ import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
 import net.mcquest.server.constants.Music;
 import net.kyori.adventure.sound.Sound;
+import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
@@ -27,7 +28,7 @@ public class DirePacklord extends NonPlayerCharacter {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_PACKLORD));
         setName("Dire Packlord");
         setLevel(3);
-        setMaxHealth(70);
+        setMaxHealth(200);
         setMass(20);
         setMovementSpeed(10.0);
         setRemovalDelay(Duration.ofMillis(2000));
@@ -38,8 +39,8 @@ public class DirePacklord extends NonPlayerCharacter {
                         .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
                         .build())
                 .build());
+        addSlayQuestObjective(Quests.CANINE_CARNAGE.getObjective(1));
 
-        int[] weights = {2, 2, 1};
         setBrain(ActiveSelector.of(
                 Sequence.of(
                         TaskFindClosestTarget.of(25.0),
@@ -55,11 +56,11 @@ public class DirePacklord extends NonPlayerCharacter {
                         TaskPlayAnimation.of(CharacterAnimation.named("run")),
                         TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
-                                weights,
+                                new int[]{2, 2, 1},
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
                                         TaskWait.of(Duration.ofMillis(250)),
-                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
                                         TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::claw),
@@ -100,7 +101,7 @@ public class DirePacklord extends NonPlayerCharacter {
                 )
         ));
 
-        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(20, 8, 20));
+        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(20, 10, 20));
         bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
         bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
     }
@@ -164,7 +165,8 @@ public class DirePacklord extends NonPlayerCharacter {
 
     private void clawHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 10);
+            character.damage(this, 5);
+            character.applyImpulse(getLookDirection().mul(200));
         }
     }
 
@@ -180,7 +182,8 @@ public class DirePacklord extends NonPlayerCharacter {
 
     private void biteHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 20);
+            character.damage(this, 6);
+            character.applyImpulse(getLookDirection().mul(100));
         }
     }
 
@@ -196,7 +199,8 @@ public class DirePacklord extends NonPlayerCharacter {
 
     private void roarHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 30);
+            character.damage(this, 6);
+            character.applyImpulse(getLookDirection().mul(2000));
         }
     }
 }

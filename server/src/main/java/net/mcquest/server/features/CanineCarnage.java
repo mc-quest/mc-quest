@@ -3,6 +3,7 @@ package net.mcquest.server.features;
 import com.google.common.base.Predicates;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.event.PlayerCharacterLoginEvent;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.loot.ItemPoolEntry;
 import net.mcquest.core.loot.LootChest;
@@ -32,10 +33,6 @@ public class CanineCarnage implements Feature {
             Pos pos = event.getPlayer().getPosition();
             System.out.println(String.format("new Pos(%d, %d, %d),", (int) pos.x(), (int) pos.y(), (int) pos.z()));
         });
-//        mmorpg.getGlobalEventHandler().addListener(PlayerCharacterLoginEvent.class, event -> {
-//            event.getPlayerCharacter().getEntity().setGameMode(GameMode.SPECTATOR);
-//            event.getPlayerCharacter().setMovementSpeed(20);
-//        });
         this.mmorpg = mmorpg;
         createDenBounds();
         npcs();
@@ -84,6 +81,8 @@ public class CanineCarnage implements Feature {
                 new Pos(3127, 98.0, 3827, 56.0f, 8.5f),
                 new Pos(3195, 112.0, 3869, 56.0f, 8.5f),
                 new Pos(3185, 112.0, 3691, 56.0f, 8.5f),
+                new Pos(3037, 99, 3662),
+                new Pos(3013, 102, 3606),
 
                 // den wolves (5)
                 new Pos(2995, 78.0, 3670, 56.0f, 8.5f),
@@ -141,6 +140,7 @@ public class CanineCarnage implements Feature {
                 )
         );
         Maps.ELADRADOR.addQuestMarker(wolfDenMarker);
+        System.out.println(wolfDenMarker);
 
         QuestMarker guardThomasMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
@@ -158,7 +158,7 @@ public class CanineCarnage implements Feature {
     }
 
     private void handleExitDen(PlayerCharacter pc) {
-        pc.setZone(Zones.ELADRADOR);
+        pc.setZone(Zones.PROWLWOOD);
         pc.getMusicPlayer().setSong(Music.WILDERNESS);
     }
 }

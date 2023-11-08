@@ -49,8 +49,8 @@ public class TutorialQuest implements Feature {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
         Collider trainingGroundsBounds = new Collider(
                 Instances.ELADRADOR,
-                new Pos(2868, 85, 3200),
-                new Pos(2876, 100, 3216)
+                new Pos(3201, 116, 3646),
+                new Pos(3230, 120, 3662)
         );
         trainingGroundsBounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnterTrainingGrounds));
         physicsManager.addCollider(trainingGroundsBounds);
@@ -60,11 +60,25 @@ public class TutorialQuest implements Feature {
         ObjectManager objectManager = mmorpg.getObjectManager();
 
         for (Pos position : new Pos[]{
-                new Pos(2873.171556, 86.000000, 3213.282500, 116.399986f, 37.649979f),
-                new Pos(2870.046252, 86.000000, 3212.691405, 120.749977f, 35.249958f),
-                new Pos(2868.191163, 86.000000, 3208.879730, 176.549988f, 24.749960f),
-                new Pos(2870.644940, 85.937500, 3205.491251, -121.050018f, 17.999956f),
-                new Pos(2873.360996, 86.000000, 3205.378723, -29.100037f, 10.199958f)
+                new Pos(3222, 117, 3661, -179f, 0f),
+                new Pos(3220, 117, 3661, -179f, 0f),
+                new Pos(3218, 117, 3661, -179f, 0f),
+                new Pos(3213, 117, 3658, 146f, 0f),
+                new Pos(3212, 117, 3663, 161f, 0f),
+                new Pos(3206, 117, 3664, -174f, 0f),
+                new Pos(3201, 117, 3660, -127f, 0f),
+                new Pos(3199, 117, 3655, -89f, 0f),
+                new Pos(3202, 117, 3652, -91f, 0f),
+                new Pos(3207, 117, 3657, -142f, 0f),
+                new Pos(3200, 117, 3647, -176f, 0f),
+                new Pos(3197, 117, 3648, 180f, 0f),
+                new Pos(3194, 117, 3646, -130f, 0f),
+                new Pos(3194, 117, 3642, -120f, 0f),
+                new Pos(3192, 117, 3640, -98f, 0f),
+                new Pos(3192, 117, 3637, -89f, 0f),
+                new Pos(3194, 117, 3634, -82f, 0f),
+                new Pos(3196, 117, 3631, -29f, 0f),
+                new Pos(3200, 117, 3628, -65f, 0f)
         }) {
             objectManager.add(ObjectSpawner.of(Instances.ELADRADOR, position, TrainingDummy::new));
         }
@@ -73,7 +87,7 @@ public class TutorialQuest implements Feature {
     private void guardThomas() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(3198, 117, 3646, 180, 0),
+                new Pos(3198, 117, 3642, 180, 0),
                 GuardThomas::new
         ));
     }
@@ -83,7 +97,7 @@ public class TutorialQuest implements Feature {
 
         QuestMarker trainingGroundsMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(2871, 86, 3206),
+                new Pos(3209, 117, 3655),
                 Quests.TUTORIAL,
                 QuestMarkerIcon.OBJECTIVE,
                 Predicates.or(
@@ -95,7 +109,7 @@ public class TutorialQuest implements Feature {
 
         QuestMarker guardThomasMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(2871, 86, 3206),
+                new Pos(3198, 117, 3646, 180, 0),
                 Quests.TUTORIAL,
                 QuestMarkerIcon.READY_TO_TURN_IN,
                 Quests.TUTORIAL.getObjective(8)::isInProgress

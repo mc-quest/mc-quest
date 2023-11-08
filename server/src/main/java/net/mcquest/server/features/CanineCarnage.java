@@ -38,7 +38,7 @@ public class CanineCarnage {
         npcs();
         lootChests();
         createQuestMarkers();
-        Quests.CANINE_CARNAGE.getObjective(3).onComplete().subscribe(this::handleSlayDirePacklordObjectiveComplete);
+        Quests.CANINE_CARNAGE.getObjective(2).onComplete().subscribe(this::handleSlayDirePacklordObjectiveComplete);
     }
 
     private void createWolfDenBounds() {
@@ -80,6 +80,7 @@ public class CanineCarnage {
                 new Pos(3053, 97.0, 3678, 56.0f, 8.5f),
                 new Pos(3127, 98.0, 3827, 56.0f, 8.5f),
                 new Pos(3195, 112.0, 3869, 56.0f, 8.5f),
+                new Pos(3185, 112.0, 3691, 56.0f, 8.5f),
 
                 // den wolves (5)
                 new Pos(2995, 78.0, 3670, 56.0f, 8.5f),

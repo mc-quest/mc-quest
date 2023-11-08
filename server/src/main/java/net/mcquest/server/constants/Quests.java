@@ -10,8 +10,8 @@ import net.mcquest.server.Assets;
 public class Quests {
     public static final Quest TUTORIAL = loadQuest("tutorial");
     public static final Quest THWARTING_THE_THIEVES = loadQuest("thwarting_the_thieves");
-    public static final Quest FLAVORFUL_PURSUIT_WOLF_FLANKS =
-            loadQuest("flavorful_pursuit_wolf_flanks");
+    public static final Quest WOLF_BITE_DELIGHT =
+            loadQuest("wolf_bite_delight");
 
 
 
@@ -19,7 +19,7 @@ public class Quests {
         return new Quest[]{
                 TUTORIAL,
                 THWARTING_THE_THIEVES,
-                FLAVORFUL_PURSUIT_WOLF_FLANKS
+                WOLF_BITE_DELIGHT
         };
     }
 

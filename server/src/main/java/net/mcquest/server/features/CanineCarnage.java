@@ -1,6 +1,5 @@
 package net.mcquest.server.features;
 
-
 import com.google.common.base.Predicates;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;

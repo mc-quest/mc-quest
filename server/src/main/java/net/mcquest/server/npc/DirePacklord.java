@@ -8,15 +8,14 @@ import net.mcquest.core.loot.ItemPoolEntry;
 import net.mcquest.core.loot.LootTable;
 import net.mcquest.core.loot.Pool;
 import net.mcquest.core.object.ObjectSpawner;
+import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
-import net.mcquest.server.constants.Items;
-import net.mcquest.server.constants.Models;
-import net.mcquest.server.constants.Music;
+import net.mcquest.server.constants.*;
 import net.kyori.adventure.sound.Sound;
-import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
@@ -28,8 +27,8 @@ public class DirePacklord extends NonPlayerCharacter {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_PACKLORD));
         setName("Dire Packlord");
         setLevel(3);
-        setMaxHealth(200);
-        setMass(20);
+        setMaxHealth(400);
+        setMass(200);
         setMovementSpeed(10.0);
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(45));
@@ -44,7 +43,7 @@ public class DirePacklord extends NonPlayerCharacter {
         setBrain(ActiveSelector.of(
                 Sequence.of(
                         TaskFindClosestTarget.of(25.0),
-                        TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                        TaskPlayAnimation.of(CharacterAnimation.named("run")),
                         SimpleParallel.of(
                                 TaskFollowTarget.of(4.0, 15.0),
                                 Sequence.of(
@@ -53,10 +52,9 @@ public class DirePacklord extends NonPlayerCharacter {
                                         TaskWait.of(Duration.ofMillis(500))
                                 )
                         ),
-                        TaskPlayAnimation.of(CharacterAnimation.named("run")),
                         TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
-                                new int[]{2, 2, 1},
+                                new int[]{1, 1, 1},
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
                                         TaskWait.of(Duration.ofMillis(250)),
@@ -68,7 +66,7 @@ public class DirePacklord extends NonPlayerCharacter {
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("bite")),
-                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskWait.of(Duration.ofMillis(300)),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
                                         TaskWait.of(Duration.ofMillis(250)),
@@ -77,12 +75,11 @@ public class DirePacklord extends NonPlayerCharacter {
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("roar")),
-                                        TaskWait.of(Duration.ofMillis(250)),
-                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_HOWL,
-                                                Sound.Source.HOSTILE, 1f, 0.75f)),
-                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_RAVAGER_ROAR,
+                                                Sound.Source.HOSTILE, 1.5f, 0.75f)),
+                                        TaskWait.of(Duration.ofMillis(900)),
                                         TaskAction.of(this::roar),
-                                        TaskWait.of(Duration.ofMillis(800))
+                                        TaskWait.of(Duration.ofMillis(1000))
                                 )
                         )
                 ),
@@ -133,13 +130,9 @@ public class DirePacklord extends NonPlayerCharacter {
         bossBattleBounds.setCenter(position);
     }
 
-    protected void onDamage(DamageSource source) {
-        emitSound(Sound.sound(SoundEvent.ENTITY_WOLF_HURT, Sound.Source.HOSTILE, 2f, 0.75f));
-    }
-
     @Override
     protected void onDeath(DamageSource source) {
-        emitSound(Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 2f, 0.75f));
+        emitSound(Sound.sound(SoundEvent.ENTITY_WOLF_DEATH, Sound.Source.HOSTILE, 2f, 0.6f));
         playAnimation(CharacterAnimation.named("death"));
     }
 
@@ -154,9 +147,8 @@ public class DirePacklord extends NonPlayerCharacter {
     }
 
     private boolean claw(long time) {
-        Pos position = getPosition();
-        Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(1.0, 0.5, 1.0);
+        Pos hitboxCenter = getPosition().add(getLookDirection().mul(3)).withY(y -> y + 1.5);
+        Vec extents = new Vec(3.25, 3, 3.25);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::clawHit));
@@ -171,9 +163,8 @@ public class DirePacklord extends NonPlayerCharacter {
     }
 
     private boolean bite(long time) {
-        Pos position = getPosition();
-        Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(1.0, 0.5, 1.0);
+        Pos hitboxCenter = getPosition().add(getLookDirection().mul(3)).withY(y -> y + 1.5);
+        Vec extents = new Vec(3.25, 3, 3.25);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::biteHit));
@@ -190,10 +181,11 @@ public class DirePacklord extends NonPlayerCharacter {
     private boolean roar(long time) {
         Pos position = getPosition();
         Pos hitboxCenter = position.add(position.direction().mul(1.5));
-        Vec extents = new Vec(4.0, 0.5, 4.0);
+        Vec extents = new Vec(7, 4, 7);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::roarHit));
+        ParticleEffects.particle(getInstance(), hitboxCenter, Particle.FLASH);
         return true;
     }
 

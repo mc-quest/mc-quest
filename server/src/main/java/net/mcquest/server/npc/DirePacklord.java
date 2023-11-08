@@ -26,7 +26,7 @@ public class DirePacklord extends NonPlayerCharacter {
     public DirePacklord(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_PACKLORD));
         setName("Dire Packlord");
-        setLevel(6);
+        setLevel(3);
         setMaxHealth(70);
         setMass(20);
         setMovementSpeed(10.0);
@@ -52,27 +52,34 @@ public class DirePacklord extends NonPlayerCharacter {
                                         TaskWait.of(Duration.ofMillis(500))
                                 )
                         ),
-                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_HOWL, Sound.Source.HOSTILE,
-                                1f, 1f)),
                         TaskPlayAnimation.of(CharacterAnimation.named("run")),
                         TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
                                 weights,
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
-                                        TaskWait.of(Duration.ofMillis(500)),
+                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                                Sound.Source.HOSTILE, 1f, 1f)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::claw),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("bite")),
-                                        TaskWait.of(Duration.ofMillis(500)),
+                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                                Sound.Source.HOSTILE, 1f, 1f)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::bite),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("roar")),
-                                        TaskWait.of(Duration.ofMillis(500)),
+                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_HOWL,
+                                                Sound.Source.HOSTILE, 1f, 0.75f)),
+                                        TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::roar),
                                         TaskWait.of(Duration.ofMillis(800))
                                 )
@@ -93,7 +100,7 @@ public class DirePacklord extends NonPlayerCharacter {
                 )
         ));
 
-        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(50, 30, 50));
+        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(20, 8, 20));
         bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
         bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
     }

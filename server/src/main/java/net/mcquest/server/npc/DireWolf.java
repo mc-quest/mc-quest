@@ -1,9 +1,10 @@
 package net.mcquest.server.npc;
 
+import net.kyori.adventure.sound.Sound;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
-import net.mcquest.core.character.*;
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.*;
 import net.mcquest.core.loot.ItemPoolEntry;
 import net.mcquest.core.loot.LootTable;
 import net.mcquest.core.loot.Pool;
@@ -11,8 +12,6 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
-import net.mcquest.server.constants.Quests;
-import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
@@ -22,8 +21,8 @@ import java.time.Duration;
 public class DireWolf extends NonPlayerCharacter {
     public DireWolf(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Models.DIRE_WOLF));
-        setName("DireWolf");
-        setLevel(4);
+        setName("Dire Wolf");
+        setLevel(2);
         setMaxHealth(10);
         setMass(20);
         setRemovalDelay(Duration.ofMillis(2000));
@@ -35,7 +34,6 @@ public class DireWolf extends NonPlayerCharacter {
                         .build())
                 .build());
 
-        int[] weights = {1, 1};
         setBrain(ActiveSelector.of(
                 Sequence.of(
                         TaskFindClosestTarget.of(10.0),
@@ -48,19 +46,21 @@ public class DireWolf extends NonPlayerCharacter {
                                         TaskWait.of(Duration.ofMillis(500))
                                 )
                         ),
-                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_WOLF_HOWL, Sound.Source.HOSTILE, 1f
-                                , 1f)),
                         RandomSelector.of(
-                                weights,
+                                new int[]{1, 1},
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("claw")),
                                         TaskWait.of(Duration.ofMillis(500)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                                Sound.Source.HOSTILE, 1f, 1f)),
                                         TaskAction.of(this::claw),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("bite")),
                                         TaskWait.of(Duration.ofMillis(500)),
+                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_EVOKER_FANGS_ATTACK,
+                                                Sound.Source.HOSTILE, 1f, 1f)),
                                         TaskAction.of(this::bite),
                                         TaskWait.of(Duration.ofMillis(800))
                                 )
@@ -84,7 +84,9 @@ public class DireWolf extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
-        return other instanceof DireWolf ? Attitude.FRIENDLY : Attitude.HOSTILE;
+        return other instanceof DireWolf || other instanceof DirePacklord
+                ? Attitude.FRIENDLY
+                : Attitude.HOSTILE;
     }
 
     @Override
@@ -113,7 +115,7 @@ public class DireWolf extends NonPlayerCharacter {
 
     private void clawHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 10);
+            character.damage(this, 3);
         }
     }
 
@@ -129,7 +131,7 @@ public class DireWolf extends NonPlayerCharacter {
 
     private void biteHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 20);
+            character.damage(this, 4);
         }
     }
 }

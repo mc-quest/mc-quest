@@ -11,6 +11,7 @@ public class Features {
     public static final Feature SWORDS = new Swords();
     public static final Feature WANDS = new Wands();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
+    public static final Feature CANINE_CARNAGE = new CanineCarnage();
     public static final Feature BROODMOTHER_LAIR = new BroodmotherLair();
 
     public static Feature[] all() {
@@ -22,7 +23,8 @@ public class Features {
                 SWORDS,
                 WANDS,
                 TUTORIAL_QUEST,
-                BROODMOTHER_LAIR
+                CANINE_CARNAGE,
+                BROODMOTHER_LAIR,
         };
     }
 }

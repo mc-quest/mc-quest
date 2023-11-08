@@ -1,28 +1,14 @@
 package net.mcquest.server.features;
 
-import com.google.common.base.Predicates;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.Mmorpg;
-import net.mcquest.core.character.PlayerCharacter;
-import net.mcquest.core.event.*;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.object.ObjectManager;
 import net.mcquest.core.object.ObjectSpawner;
-import net.mcquest.core.physics.Collider;
-import net.mcquest.core.physics.PhysicsManager;
-import net.mcquest.core.physics.Triggers;
-import net.mcquest.core.quest.*;
-import net.mcquest.core.ui.Tutorial;
 import net.mcquest.server.constants.Instances;
-import net.mcquest.server.constants.Maps;
-import net.mcquest.server.constants.Quests;
-import net.mcquest.server.npc.GuardThomas;
-import net.mcquest.server.npc.TrainingDummy;
+import net.mcquest.server.npc.Adventurer;
 import net.minestom.server.coordinate.Pos;
-import java.time.Duration;
 
-public class WolfwoodOutpost {
+public class WolfwoodOutpost implements Feature {
     private Mmorpg mmorpg;
 
     public void hook(Mmorpg mmorpg) {

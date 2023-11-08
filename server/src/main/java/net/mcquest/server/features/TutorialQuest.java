@@ -73,7 +73,7 @@ public class TutorialQuest implements Feature {
     private void guardThomas() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2871, 86, 3206),
+                new Pos(3198, 117, 3646, 180, 0),
                 GuardThomas::new
         ));
     }

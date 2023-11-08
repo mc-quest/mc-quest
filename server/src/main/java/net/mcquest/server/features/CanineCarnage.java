@@ -2,7 +2,6 @@ package net.mcquest.server.features;
 
 
 import com.google.common.base.Predicates;
-import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.feature.Feature;
@@ -13,43 +12,48 @@ import net.mcquest.core.loot.Pool;
 import net.mcquest.core.object.ObjectManager;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Collider;
-import net.mcquest.core.physics.PhysicsManager;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.core.quest.QuestManager;
+import net.mcquest.core.quest.QuestMarker;
+import net.mcquest.core.quest.QuestMarkerIcon;
 import net.mcquest.core.util.Debug;
-import net.mcquest.server.constants.Quests;
-import net.mcquest.server.npc.DirePacklord;
-import net.mcquest.server.npc.GuardThomas;
-import net.mcquest.server.npc.DireWolf;
-import net.mcquest.core.quest.*;
-import net.mcquest.core.event.*;
 import net.mcquest.server.constants.*;
+import net.mcquest.server.npc.DirePacklord;
+import net.mcquest.server.npc.DireWolf;
 import net.minestom.server.coordinate.Pos;
-import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.player.PlayerStartSneakingEvent;
 
 import java.time.Duration;
 
-public class CanineCarnage {
-
+public class CanineCarnage implements Feature {
     private Mmorpg mmorpg;
 
     public void hook(Mmorpg mmorpg) {
+        mmorpg.getGlobalEventHandler().addListener(PlayerStartSneakingEvent.class, event -> {
+            Pos pos = event.getPlayer().getPosition();
+            System.out.println(String.format("new Pos(%d, %d, %d),", (int) pos.x(), (int) pos.y(), (int) pos.z()));
+        });
+//        mmorpg.getGlobalEventHandler().addListener(PlayerCharacterLoginEvent.class, event -> {
+//            event.getPlayerCharacter().getEntity().setGameMode(GameMode.SPECTATOR);
+//            event.getPlayerCharacter().setMovementSpeed(20);
+//        });
         this.mmorpg = mmorpg;
-        createWolfDenBounds();
+        createDenBounds();
         npcs();
         lootChests();
         createQuestMarkers();
-        Quests.CANINE_CARNAGE.getObjective(2).onComplete().subscribe(this::handleSlayDirePacklordObjectiveComplete);
     }
 
-    private void createWolfDenBounds() {
-        PhysicsManager physicsManager = mmorpg.getPhysicsManager();
-        Collider wolfDenBounds = new Collider(
+    private void createDenBounds() {
+        Collider bounds = new Collider(
                 Instances.ELADRADOR,
-                new Pos(3020, 92, 3636),
-                new Pos(3006, 82, 3642)
+                new Pos(2976, 73, 3632),
+                new Pos(3020, 90, 3695)
         );
-        wolfDenBounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnterWolfDen));
-        physicsManager.addCollider(wolfDenBounds);
+        Debug.showCollider(bounds);
+        bounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnterDen));
+        bounds.onCollisionExit(Triggers.playerCharacter(this::handleExitDen));
+        mmorpg.getPhysicsManager().addCollider(bounds);
     }
 
     private void npcs() {
@@ -141,29 +145,21 @@ public class CanineCarnage {
 
         QuestMarker guardThomasMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(2871, 86, 3206),
+                new Pos(3198, 117, 3646),
                 Quests.CANINE_CARNAGE,
                 QuestMarkerIcon.READY_TO_TURN_IN,
-                Quests.CANINE_CARNAGE.getObjective(3)::isInProgress
+                Quests.CANINE_CARNAGE.getObjective(2)::isInProgress
         );
         Maps.ELADRADOR.addQuestMarker(guardThomasMarker);
     }
 
-    private boolean canineCarnageObjectiveActive(PlayerCharacter pc, int objectiveIndex) {
-        QuestObjective objective = Quests.CANINE_CARNAGE.getObjective(objectiveIndex);
-        return objective.isAccessible(pc) && !objective.isComplete(pc);
+    private void handleEnterDen(PlayerCharacter pc) {
+        pc.setZone(Zones.PACKLORD_DEN);
+        pc.getMusicPlayer().setSong(Music.WOLF_DEN);
     }
 
-    private void handleEnterWolfDen(PlayerCharacter pc) {
-        if (!canineCarnageObjectiveActive(pc, 1)) {
-            return;
-        }
-        Quests.CANINE_CARNAGE.getObjective(1).addProgress(pc);
-        pc.sendMessage(Component.text("Welcome to the wolf den..."));
-    }
-
-    private void handleSlayDirePacklordObjectiveComplete(QuestObjectiveCompleteEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        pc.sendMessage(Component.text("Impressive! Speak with Guard Thomas to claim your reward!"));
+    private void handleExitDen(PlayerCharacter pc) {
+        pc.setZone(Zones.ELADRADOR);
+        pc.getMusicPlayer().setSong(Music.WILDERNESS);
     }
 }

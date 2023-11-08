@@ -1,18 +1,17 @@
 package net.mcquest.server.npc;
 
+import net.kyori.adventure.sound.Sound;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
-import net.mcquest.core.character.*;
 import net.mcquest.core.character.Character;
-import net.mcquest.core.loot.ItemPoolEntry;
-import net.mcquest.core.loot.LootTable;
-import net.mcquest.core.loot.Pool;
+import net.mcquest.core.character.*;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
-import net.mcquest.server.constants.*;
-import net.kyori.adventure.sound.Sound;
+import net.mcquest.server.constants.Models;
+import net.mcquest.server.constants.Music;
+import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;

@@ -18,7 +18,6 @@ public class Quests {
                 TUTORIAL,
                 CANINE_CARNAGE,
                 THWARTING_THE_THIEVES,
-                THWARTING_THE_THIEVES,
                 WOLF_BITE_DELIGHT
         };
     }

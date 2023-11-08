@@ -35,7 +35,28 @@ public class ProwlwoodOutpost implements Feature {
 
     private void adventurers() {
         Pos[] positions = {
-                new Pos(3269, 121.0, 3605, 175.2f, 17.5f)
+                new Pos(3269, 121, 3605),
+                new Pos(3221, 116, 3642),
+                new Pos(3209, 117, 3650),
+                new Pos(3226, 117, 3654),
+                new Pos(3238, 118, 3643),
+                new Pos(3244, 122, 3625),
+                new Pos(3234, 120, 3602),
+                new Pos(3216, 118, 3597),
+                new Pos(3200, 114, 3607),
+                new Pos(3182, 111, 3618),
+                new Pos(3174, 114, 3583),
+                new Pos(3193, 119, 3571),
+                new Pos(3218, 120, 3566),
+                new Pos(3245, 122, 3569),
+                new Pos(3256, 122, 3602),
+                new Pos(3226, 117, 3642),
+                new Pos(3237, 118, 3640),
+                new Pos(3244, 119, 3633),
+                new Pos(3252, 122, 3620),
+                new Pos(3263, 121, 3622),
+                new Pos(3265, 121, 3639),
+                new Pos(3283, 121, 3641)
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();

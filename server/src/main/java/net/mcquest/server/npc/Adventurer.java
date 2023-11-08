@@ -36,8 +36,8 @@ public class Adventurer extends NonPlayerCharacter {
 
     private static PlayerSkin skin() {
         return Math.random() < 0.5
-                ? Skins.VILLAGER_MALE
-                : Skins.VILLAGER_FEMALE;
+                ? Skins.ADVENTURER_MALE
+                : Skins.ADVENTURER_FEMALE;
     }
 
     @Override

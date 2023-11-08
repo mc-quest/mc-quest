@@ -29,10 +29,6 @@ public class CanineCarnage implements Feature {
     private Mmorpg mmorpg;
 
     public void hook(Mmorpg mmorpg) {
-        mmorpg.getGlobalEventHandler().addListener(PlayerStartSneakingEvent.class, event -> {
-            Pos pos = event.getPlayer().getPosition();
-            System.out.println(String.format("new Pos(%d, %d, %d),", (int) pos.x(), (int) pos.y(), (int) pos.z()));
-        });
         this.mmorpg = mmorpg;
         createDenBounds();
         npcs();

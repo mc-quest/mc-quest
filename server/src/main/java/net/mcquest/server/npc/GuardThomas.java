@@ -12,6 +12,7 @@ import net.mcquest.server.constants.Skins;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.sound.SoundEvent;
+import net.mcquest.core.ui.Interactions;
 
 public class GuardThomas extends NonPlayerCharacter {
     private final InteractionSequence completeTutorialSequence;
@@ -40,7 +41,7 @@ public class GuardThomas extends NonPlayerCharacter {
                 && Quests.TUTORIAL.getStatus(pc) != QuestStatus.COMPLETED) {
             completeTutorialSequence.advance(pc);
         }
-        if (Quests.CANINE_CARNAGE.getObjective(3).isComplete(pc)
+        if (Quests.CANINE_CARNAGE.getObjective(2).isComplete(pc)
                 && Quests.CANINE_CARNAGE.getStatus(pc) != QuestStatus.COMPLETED) {
             completeCanineCarnageSequence.advance(pc);
         }
@@ -82,7 +83,7 @@ public class GuardThomas extends NonPlayerCharacter {
             .interaction(Interactions.speak(pc,
                 Component.text("Anyways, you seem strong and capable."
                                     + " I'd pay good money if you managed to kill their leader.")))
-            .interaction(Interactions.addProgress(this, Quests.CANINE_CARNAGE.start(pc)))
+            .interaction(Interactions.startQuest(Quests.CANINE_CARNAGE))
             .build();
     }
 

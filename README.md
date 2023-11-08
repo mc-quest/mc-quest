@@ -1,4 +1,4 @@
-# MCQuest (`v1.0`)
+# MCQuest (`v0.1.0`)
 
 The implementation of MCQuest, an MMORPG Minecraft server. Players embark on
 quests, explore an open world, delve through dungeons, level their character,

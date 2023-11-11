@@ -1,5 +1,9 @@
 package net.mcquest.core.playerclass;
 
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.asset.Asset;
 import net.mcquest.core.asset.AssetTypes;
 import net.mcquest.core.character.PlayerCharacter;
@@ -7,14 +11,8 @@ import net.mcquest.core.resourcepack.Materials;
 import net.mcquest.core.resourcepack.Namespaces;
 import net.mcquest.core.resourcepack.ResourcePackUtility;
 import net.mcquest.core.text.WordWrap;
-import net.mcquest.core.ui.Hotbar;
 import net.mcquest.core.util.ItemStackUtility;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.minestom.server.item.ItemStack;
-import net.minestom.server.item.Material;
 import org.jetbrains.annotations.ApiStatus;
 import team.unnamed.creative.file.FileTree;
 import team.unnamed.creative.model.ItemOverride;

@@ -7,6 +7,7 @@ import net.mcquest.core.resourcepack.Materials;
 import net.mcquest.core.resourcepack.Namespaces;
 import net.mcquest.core.resourcepack.ResourcePackUtility;
 import net.mcquest.core.text.WordWrap;
+import net.mcquest.core.ui.Hotbar;
 import net.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -31,37 +32,64 @@ public class PassiveSkill extends Skill {
     @Override
     ItemStack getSkillTreeItemStack(PlayerCharacter pc) {
         boolean isUnlocked = isUnlocked(pc);
-        Material icon = isUnlocked ? Materials.SKILL : Material.BARRIER;
+
         Component displayName = Component.text(getName(), NamedTextColor.YELLOW);
+
         List<TextComponent> lore = new ArrayList<>();
+
         lore.add(Component.text("Passive Skill", NamedTextColor.GRAY));
+
         lore.add(Component.empty());
         lore.addAll(WordWrap.wrap(getDescription()));
+
         if (!isUnlocked) {
             lore.add(Component.empty());
+
+            boolean unlockable = true;
+
+            if (pc.getLevel() < getLevel()) {
+                unlockable = false;
+                lore.add(Component.text("Requires level " + getLevel(), NamedTextColor.RED));
+            }
+
             Skill prerequisite = getPrerequisite();
             if (prerequisite != null && !prerequisite.isUnlocked(pc)) {
+                unlockable = false;
                 lore.add(Component.text("Requires " + prerequisite.getName(), NamedTextColor.RED));
-            } else if (pc.getLevel() < getLevel()) {
-                lore.add(Component.text("Requires level " + getLevel(), NamedTextColor.RED));
-            } else {
+            }
+
+            if (unlockable) {
                 lore.add(Component.text("Shift-click to", NamedTextColor.GREEN));
                 lore.add(Component.text("unlock", NamedTextColor.GREEN));
             }
         }
 
-        return ItemStackUtility.create(icon, displayName, lore)
-                .meta(builder -> builder.customModelData(customModelDataStart))
+        int customModelData = isUnlocked
+                ? customModelDataStart
+                : customModelDataStart + 1;
+
+        return ItemStackUtility.create(Materials.SKILL, displayName, lore)
+                .set(SkillManager.SKILL_ID_TAG, getId())
+                .meta(builder -> builder.customModelData(customModelData))
                 .build();
     }
 
     @Override
     @ApiStatus.Internal
     public void writeResources(FileTree tree, List<ItemOverride> overrides) {
+        // Default texture.
         customModelDataStart = ResourcePackUtility.writeIcon(
                 tree,
                 getIcon(),
                 Key.key(Namespaces.SKILLS, String.format("%s-%s", playerClass.getId(), getId())),
+                overrides
+        );
+
+        // Locked texture.
+        ResourcePackUtility.writeLockedIcon(
+                tree,
+                getIcon(),
+                Key.key(Namespaces.SKILLS, String.format("%s-%s-locked", playerClass.getId(), getId())),
                 overrides
         );
     }

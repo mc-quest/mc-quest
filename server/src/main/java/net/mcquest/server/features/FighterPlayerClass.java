@@ -8,6 +8,7 @@ import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.event.PlayerCharacterMoveEvent;
+import net.mcquest.core.event.SkillUnlockEvent;
 import net.mcquest.core.event.Subscription;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.instance.Instance;
@@ -25,10 +26,15 @@ import java.util.Collection;
 
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
+    private Vec overheadSize;
+    private double overheadDamage;
+
 
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
+        initSkillDefaults();
+
         FighterSkills.BASH.onUse().subscribe(this::useBash);
         FighterSkills.SELF_HEAL.onUse().subscribe(this::useSelfHeal);
         FighterSkills.OVERHEAD_STRIKE.onUse().subscribe(this::useOverheadStrike);
@@ -36,6 +42,24 @@ public class FighterPlayerClass implements Feature {
         FighterSkills.BERSERK.onUse().subscribe(this::useBerserk);
         FighterSkills.WHIRLWIND.onUse().subscribe(this::useWhirlwind);
         FighterSkills.CHARGE.onUse().subscribe(this::useCharge);
+
+        FighterSkills.ENLARGED_OVERHEAD_STRIKE.onUnlock().subscribe(this::enlargeOverheadStrike);
+        FighterSkills.ENPOWERED_OVERHEAD_STRIKE.onUnlock().subscribe(this::enpowerOverheadStrike);
+    }
+
+    // Initalizes unupgraded skill values
+    private void initSkillDefaults() {
+        overheadSize = new Vec(3, 1, 3);
+        overheadDamage = 3;
+    }
+
+    private void enpowerOverheadStrike(SkillUnlockEvent skillUnlockEvent) {
+        overheadDamage *= 2;
+    }
+
+    private void enlargeOverheadStrike(SkillUnlockEvent event) {
+        overheadSize = overheadSize.add(2, 0, 2);
+        event.getPlayerCharacter().sendMessage(Component.text(overheadSize.toString()));
     }
 
     private void useBash(ActiveSkillUseEvent event) {
@@ -73,8 +97,6 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useOverheadStrike(ActiveSkillUseEvent event) {
-        double damageAmount = 2.0;
-
         PlayerCharacter pc = event.getPlayerCharacter();
         Vec direction = new Vec(pc.getLookDirection().x(), 1, pc.getLookDirection().z());
 
@@ -92,7 +114,7 @@ public class FighterPlayerClass implements Feature {
 
             Instance instance = pc.getInstance();
             Pos hitboxCenter = pc.getPosition();
-            Vec hitboxSize = new Vec(5, 1, 5);
+            Vec hitboxSize = overheadSize;
 
             Collection<Collider> hits = mmorpg.getPhysicsManager()
                     .overlapBox(instance, hitboxCenter, hitboxSize);
@@ -102,7 +124,7 @@ public class FighterPlayerClass implements Feature {
                 if (!character.isDamageable(pc)) {
                     return;
                 }
-                character.damage(pc, damageAmount);
+                character.damage(pc, overheadDamage);
                 Sound hitSound = Sound.sound(
                         SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR,
                         Sound.Source.PLAYER,
@@ -118,8 +140,8 @@ public class FighterPlayerClass implements Feature {
             instance.playSound(hitSound, pc.getPosition());
 
             // Remove listener and apply effects
-            for (int i = -1; i < 2; i++) {
-                for (int j = -1; j < 2; j++) {
+            for (int i = (int) -(overheadSize.x()/2); i < (overheadSize.x()/2); i++) {
+                for (int j = (int) -(overheadSize.x()/2); j < (overheadSize.x()/2); j++) {
                     ParticleEffects.particle(instance, hitboxCenter.add(i * 2, .5, j * 2), Particle.EXPLOSION);
                 }
             }
@@ -127,6 +149,7 @@ public class FighterPlayerClass implements Feature {
             subscriptions[0].unsubscribe();
         });
     }
+
 
     private void useTaunt(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();

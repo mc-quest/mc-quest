@@ -91,11 +91,11 @@
         },
         {
             "type": "ACTIVE",
-            "id": "whirlwind",
-            "name": "Whirlwind",
+            "id": "charge",
+            "name": "Charge",
             "level": 1,
-            "icon": "whirlwind.png",
-            "description": "Spins the player around and hits everyone around them",
+            "icon": "charge.png",
+            "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
             "skillTreeRow": 0,
             "skillTreeColumn": 6,
             "manaCost": 5,
@@ -103,15 +103,28 @@
         },
         {
             "type": "ACTIVE",
-            "id": "charge",
-            "name": "Charge",
+            "id": "whirlwind",
+            "name": "Whirlwind",
             "level": 1,
-            "icon": "charge.png",
-            "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
+            "icon": "whirlwind.png",
+            "description": "Spins the player around and hits everyone around them",
             "skillTreeRow": 0,
             "skillTreeColumn": 7,
             "manaCost": 5,
             "cooldown": 10
+        },
+        {
+            "type": "PASSIVE",
+            "id": "agile_whirlwind",
+            "name": "Agile Whirlwind",
+            "level": 1,
+            "icon": "whirlwind.png",
+            "description": "Allows whirlwind to propel you upwards when you press space",
+            "skillTreeRow": 1,
+            "skillTreeColumn": 8,
+            "manaCost": 10,
+            "cooldown": 10,
+            "prerequisiteId": "whirlwind"
         }
     ]
 }

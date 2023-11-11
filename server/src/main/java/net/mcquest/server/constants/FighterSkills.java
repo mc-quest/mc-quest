@@ -11,7 +11,5 @@ public class FighterSkills {
     public static final ActiveSkill BERSERK = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("berserk");
     public static final ActiveSkill WHIRLWIND = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("whirlwind");
     public static final ActiveSkill CHARGE = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("charge");
-
-    public static final PassiveSkill ENLARGED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike");
-    public static final PassiveSkill ENPOWERED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("enpowered_overhead_strike");
+    public static final PassiveSkill AGILE_WHIRLWIND = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("agile_whirlwind");
 }

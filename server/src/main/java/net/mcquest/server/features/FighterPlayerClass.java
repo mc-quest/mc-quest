@@ -19,11 +19,14 @@ import net.mcquest.server.constants.FighterSkills;
 import net.mcquest.server.constants.PlayerClasses;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
 import java.util.Collection;
+
+import static com.extollit.gaming.ai.path.model.Element.fire;
 
 public class FighterPlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -96,10 +99,7 @@ public class FighterPlayerClass implements Feature {
             Pos hitboxCenter = pc.getPosition();
             Vec hitboxSize;
 
-            pc.sendMessage(Component.text(pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
-                    PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike"))));
-
-            if(pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
+            if (pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
                     PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike"))) {
                 hitboxSize = new Vec(5, 1, 5);
             } else {
@@ -110,7 +110,7 @@ public class FighterPlayerClass implements Feature {
                     .overlapBox(instance, hitboxCenter, hitboxSize);
 
             double damageAmount;
-            if(pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
+            if (pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
                     PlayerClasses.FIGHTER.getSkill("enpowered_overhead_strike"))) {
                 damageAmount = 6;
             } else {
@@ -138,8 +138,8 @@ public class FighterPlayerClass implements Feature {
             instance.playSound(hitSound, pc.getPosition());
 
             // Remove listener and apply effects
-            for (int i = (int) -(hitboxSize.x()/2); i < (hitboxSize.x()/2); i++) {
-                for (int j = (int) -(hitboxSize.z()/2); j < (hitboxSize.z()/2); j++) {
+            for (int i = (int) -(hitboxSize.x() / 2); i < (hitboxSize.x() / 2); i++) {
+                for (int j = (int) -(hitboxSize.z() / 2); j < (hitboxSize.z() / 2); j++) {
                     ParticleEffects.particle(instance, hitboxCenter.add(i * 2, .5, j * 2), Particle.EXPLOSION);
                 }
             }
@@ -189,33 +189,36 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useWhirlwind(ActiveSkillUseEvent event) {
-        int iterations = 8;
-
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        Vec direction = pc.getLookDirection();
+        int iterations;
+        // Move up if player is holding space
+        if (pc.getSkillManager().isUnlocked(
+                PlayerClasses.FIGHTER.getSkill("agile_whirlwind"))) {
+            iterations = 16;
+        } else {
+            iterations = 8;
+        }
 
+        Vec direction = pc.getLookDirection();
+        int[] tick = {0};
         // Create a for loop for 8 iterations
         for (int i = 1; i <= iterations; i++) {
             boolean sound = i % 2 == 1;
-            Vec newDir = direction.rotateAroundY(i * 2.0 * Math.PI / iterations);
-
+            Vec horizontalDir = direction.rotateAroundY(i * Math.PI / 4);
+            Vec verticalDir = direction.rotateAroundX(i * Math.PI / 4);
+            pc.sendMessage(Component.text(iterations));
             mmorpg.getSchedulerManager().buildTask(() -> {
                 if (sound) {
                     pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
                 }
-                // Move up if player is holding space
-                if(event.getPlayerCharacter().getSkillManager().isUnlocked(
-                        PlayerClasses.FIGHTER.getSkill("agile_whirlwind"))) {
-
-                }
 
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition().withY(y -> y + 1.5);
-                Vec hitboxSize = new Vec(5, 3, 5);
+                Vec horizontalHitboxSize = new Vec(2, 1, 2);
 
                 Collection<Collider> hits = mmorpg.getPhysicsManager()
-                        .overlapBox(instance, hitboxCenter, hitboxSize);
+                        .overlapBox(instance, hitboxCenter, horizontalHitboxSize);
 
                 //Hits every entity in a 2x2 range
                 hits.forEach(Triggers.character(character -> {
@@ -226,13 +229,38 @@ public class FighterPlayerClass implements Feature {
                     character.damage(pc, damageAmount);
                 }));
 
-                pc.setLookDirection(newDir);
+                pc.setLookDirection(horizontalDir);
 
                 ParticleEffects.particle(
                         instance,
-                        pc.getPosition().add(1.5).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
+                        pc.getPosition().add(0, 1.5, 0).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
                         Particle.EXPLOSION
                 );
+
+
+                if (pc.getSkillManager().isUnlocked(
+                        PlayerClasses.FIGHTER.getSkill("multi_slash"))) {
+
+                    Vec verticalHitboxSize = new Vec(1, 2, 2);
+
+                    hits = mmorpg.getPhysicsManager()
+                            .overlapBox(instance, hitboxCenter, verticalHitboxSize);
+
+                    hits.forEach(Triggers.character(character -> {
+                        if (!character.isDamageable(pc)) {
+                            return;
+                        }
+                        double damageAmount = 1.5;
+                        character.damage(pc, damageAmount);
+                    }));
+
+                    //   pc.getPosition().add(0, 1.5, 0).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
+                    ParticleEffects.particle(
+                            instance,
+                            pc.getPosition().add(1.5, 1.5, 0).add(verticalDir.withX(0).normalize().mul(5.0)),
+                            Particle.EXPLOSION);
+                }
+
             }).delay(Duration.ofMillis((400 / iterations) * i)).schedule();
         }
     }
@@ -249,7 +277,9 @@ public class FighterPlayerClass implements Feature {
         pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
 
         Instance instance = pc.getInstance();
+
         Pos hitboxCenter = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(3.0)).withY(y -> y + 1.0);
+
         Vec hitboxSize = new Vec(3.0, 3.0, 3.0);
 
         Collection<Collider> hits = mmorpg.getPhysicsManager()
@@ -262,5 +292,18 @@ public class FighterPlayerClass implements Feature {
             character.damage(pc, damageAmount);
             character.applyImpulse(direction.mul(200));
         }));
+
+        if (pc.getSkillManager().isUnlocked(
+                PlayerClasses.FIGHTER.getSkill("hellish_charge"))) {
+            for (int i = 0; i < 3; i++) {
+                Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(i));
+                if (instance.getBlock(position) == Block.AIR) {
+                    instance.setBlock(position, Block.FIRE);
+                    mmorpg.getSchedulerManager().buildTask(() -> {
+                        instance.setBlock(position, Block.AIR);
+                    }).delay(Duration.ofSeconds(5)).schedule();
+                }
+            }
+        }
     }
 }

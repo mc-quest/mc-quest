@@ -96,10 +96,23 @@
             "level": 1,
             "icon": "charge.png",
             "description": "Runs the fighter 4 blocks in a direction while hurting and knocking monsters back",
-            "skillTreeRow": 0,
-            "skillTreeColumn": 6,
+            "skillTreeRow": 3,
+            "skillTreeColumn": 2,
             "manaCost": 5,
             "cooldown": 10
+        },
+        {
+            "type": "PASSIVE",
+            "id": "hellish_charge",
+            "name": "Hellish Charge",
+            "level": 1,
+            "icon": "charge.png",
+            "description": "Leaves a 3 block trail of fire that enemies won't walk through",
+            "skillTreeRow": 4,
+            "skillTreeColumn": 1,
+            "manaCost": 0,
+            "cooldown": 0,
+            "prerequisiteId": "charge"
         },
         {
             "type": "ACTIVE",
@@ -111,7 +124,7 @@
             "skillTreeRow": 0,
             "skillTreeColumn": 7,
             "manaCost": 5,
-            "cooldown": 10
+            "cooldown": 0
         },
         {
             "type": "PASSIVE",
@@ -119,11 +132,24 @@
             "name": "Agile Whirlwind",
             "level": 1,
             "icon": "whirlwind.png",
-            "description": "Allows whirlwind to propel you upwards when you press space",
+            "description": "Whirlwind rotates you twice",
             "skillTreeRow": 1,
             "skillTreeColumn": 8,
-            "manaCost": 10,
-            "cooldown": 10,
+            "manaCost": 0,
+            "cooldown": 0,
+            "prerequisiteId": "whirlwind"
+        },
+        {
+            "type": "PASSIVE",
+            "id": "multi_slash",
+            "name": "Multi-Slash",
+            "level": 1,
+            "icon": "whirlwind.png",
+            "description": "Whirlwind does a horizontal slash and a vertical one",
+            "skillTreeRow": 1,
+            "skillTreeColumn": 6,
+            "manaCost": 0,
+            "cooldown": 0,
             "prerequisiteId": "whirlwind"
         }
     ]

@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Character;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
@@ -19,6 +20,9 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class MagePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -167,6 +171,111 @@ public class MagePlayerClass implements Feature {
     }
 
     private void useChainLightning(ActiveSkillUseEvent event) {
-        int maxChains = 3;
+        int chains = 3;
+        double chainRange = 10.0;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Pos origin = pc.getEyePosition();
+        Vec direction = pc.getLookDirection();
+
+        RaycastHit initialHit = mmorpg.getPhysicsManager().raycast(
+                instance,
+                origin,
+                direction,
+                chainRange,
+                Triggers.raycastFilter(character -> character.isDamageable(pc))
+        );
+
+        if (initialHit == null) {
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    origin.add(direction.mul(chainRange)),
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+            return;
+        }
+
+        Triggers.character((character, hitPosition) -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    hitPosition,
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+
+            character.damage(pc, 10);
+
+            Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                chainLightning(
+                        event,
+                        chains,
+                        characterPos,
+                        chainRange
+                );
+            }).delay(Duration.ofMillis(200L)).schedule();
+        }).accept(initialHit);
+    }
+
+    private void chainLightning(ActiveSkillUseEvent event, int chains, Pos chainOrigin, double chainRange) {
+        if (chains == 0) {
+            return;
+        }
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Vec chainHitBoxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
+
+        Collection<Collider> chainHitbox = mmorpg.getPhysicsManager()
+                .overlapBox(instance, chainOrigin, chainHitBoxSize);
+        List<Character> targets = new ArrayList<>();
+        chainHitbox.forEach(Triggers.character(character -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+            targets.add(character);
+        }));
+        if (targets.isEmpty()) {
+            return;
+        }
+
+        Character character = targets.get(0);
+        double shortestDistance = chainOrigin.distance(character.getPosition());
+        for (Character target : targets) {
+            double distance = chainOrigin.distance(target.getPosition());
+            if (distance < shortestDistance) {
+                character = target;
+                shortestDistance = distance;
+            }
+        }
+
+        Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+
+        ParticleEffects.line(
+                instance,
+                chainOrigin,
+                characterPos,
+                Particle.DRAGON_BREATH,
+                3.0
+        );
+
+        character.damage(pc, 10);
+
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            chainLightning(
+                    event,
+                    chains - 1,
+                    characterPos,
+                    chainRange
+            );
+        }).delay(Duration.ofMillis(200L)).schedule();
     }
 }

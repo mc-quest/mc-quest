@@ -73,7 +73,7 @@ public class Damage {
             for (DamageType type : DamageType.values()) {
                 if (type != DamageType.Generic) {
                     double i = increasedDamage.get(type) + increasedDamage.get(DamageType.Generic);
-                    double d = damage.get(type) * i;
+                    double d = damage.get(type) * (i + 1.0);
                     damage.put(type, d);
                 }
             }

@@ -28,6 +28,7 @@ public class MagePlayerClass implements Feature {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
         MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
+        MageSkills.CHAIN_LIGHTNING.onUse().subscribe(this::useChainLightning);
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
@@ -163,5 +164,9 @@ public class MagePlayerClass implements Feature {
         mmorpg.getSchedulerManager().buildTask(() -> pc.setCanAct(true))
                 .delay(Duration.ofMillis(tickPeriodMs * tickCount))
                 .schedule();
+    }
+
+    private void useChainLightning(ActiveSkillUseEvent event) {
+        int maxChains = 3;
     }
 }

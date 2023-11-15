@@ -22,7 +22,7 @@ public class MoneyLoot extends Loot {
     }
 
     @Override
-    public void drop(Instance instance, Pos position) {
+    void drop(Instance instance, Pos position) {
         value.drop(instance, position);
     }
 }

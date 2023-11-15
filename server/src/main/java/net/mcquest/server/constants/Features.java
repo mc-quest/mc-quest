@@ -14,7 +14,6 @@ public class Features {
     public static final Feature PROWLWOOD = new Prowlwood();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
     public static final Feature CANINE_CARNAGE = new CanineCarnage();
-    public static final Feature WOLF_BITE_DELIGHT = new WolfBiteDelight();
     public static final Feature BROODMOTHER_LAIR = new BroodmotherLair();
 
     public static Feature[] all() {
@@ -29,7 +28,6 @@ public class Features {
                 PROWLWOOD,
                 TUTORIAL_QUEST,
                 CANINE_CARNAGE,
-                WOLF_BITE_DELIGHT,
                 BROODMOTHER_LAIR,
                 new BetaDemo()
         };

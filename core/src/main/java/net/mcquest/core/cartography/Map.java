@@ -91,7 +91,10 @@ public class Map {
         Pos position = pc.getPosition();
         List<Quest> trackedQuests = pc.getQuestTracker().getTrackedQuests();
 
-        if (!(trackedQuests.contains(questMarker.getQuest()) && questMarker.shouldShow(pc))) {
+        if (!((trackedQuests.contains(questMarker.getQuest())
+                || (questMarker.getIcon() == QuestMarkerIcon.READY_TO_START
+                && questMarker.getQuest().isNotStarted(pc)))
+                && questMarker.shouldShow(pc))) {
             return;
         }
 

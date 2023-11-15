@@ -1,0 +1,26 @@
+{
+    "id": "dreadfangs_revenge",
+    "name": "Dreadfang's Revenge",
+    "level": 1,
+    "objectives": [
+        {
+            "description": "Talk to Dreadfang",
+            "goal": 1
+        },
+        {
+            "description": "Dreadfang defeated",
+            "goal": 1,
+            "prerequisites": [0]
+        },
+        {
+            "description": "Grimrot slain",
+            "goal": 1,
+            "prerequisites": [1]
+        },
+        {
+            "description": "Speak with ?",
+            "goal": 1,
+            "prerequisites": [1]
+        }
+    ]
+}

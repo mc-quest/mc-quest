@@ -15,6 +15,7 @@ public class Features {
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
     public static final Feature CANINE_CARNAGE = new CanineCarnage();
     public static final Feature BROODMOTHER_LAIR = new BroodmotherLair();
+    public static final Feature KINGS_DEATH_ROW = new KingsDeathRow();
 
     public static Feature[] all() {
         return new Feature[]{
@@ -29,6 +30,7 @@ public class Features {
                 TUTORIAL_QUEST,
                 CANINE_CARNAGE,
                 BROODMOTHER_LAIR,
+                KINGS_DEATH_ROW,
                 new BetaDemo()
         };
     }

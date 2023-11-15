@@ -21,10 +21,23 @@
             "level": 1,
             "icon": "backstab.png",
             "description": "Damages enemies when attacked from behind",
-            "skillTreeRow": 0,
+            "skillTreeRow": 4,
             "skillTreeColumn": 3,
             "manaCost": 5,
             "cooldown": 5
+        },
+        {
+            "type": "ACTIVE",
+            "id": "shadow_step",
+            "name": "Shadow Step",
+            "level": 1,
+            "icon": "backstab.png",
+            "description": "Teleports the player to the other side of the target (so long as the position is air)",
+            "skillTreeRow": 5,
+            "skillTreeColumn": 2,
+            "manaCost": 5,
+            "cooldown": 5,
+            "prequisiteid": "backstab"
         },
         {
             "type": "ACTIVE",

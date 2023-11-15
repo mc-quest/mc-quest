@@ -115,6 +115,19 @@
             "prerequisiteId": "charge"
         },
         {
+            "type": "PASSIVE",
+            "id": "devastating_charge",
+            "name": "Devastating Charge",
+            "level": 1,
+            "icon": "charge.png",
+            "description": "Doubles the knockback and damage of the charge",
+            "skillTreeRow": 4,
+            "skillTreeColumn": 3,
+            "manaCost": 0,
+            "cooldown": 0,
+            "prerequisiteId": "charge"
+        },
+        {
             "type": "ACTIVE",
             "id": "whirlwind",
             "name": "Whirlwind",

@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
@@ -9,11 +10,13 @@ import net.mcquest.core.instance.Instance;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.server.constants.PlayerClasses;
 import net.mcquest.server.constants.RogueSkills;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
@@ -60,7 +63,27 @@ public class RoguePlayerClass implements Feature {
                 .overlapBox(instance, hitboxCenter, hitboxSize);
 
         hits.forEach(Triggers.character(character -> {
-            if (!character.isDamageable(pc) || character.hasLineOfSight(pc, true)) {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+
+            if (pc.getSkillManager().isUnlocked(
+                    PlayerClasses.ROGUE.getSkill("shadow_step"))) {
+                // Get positon on other side of entity
+                Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(2));
+
+                // If there is air on the other side of the entity, teleport to the other side and
+                // look at it
+                if(instance.getBlock(position.add(0, 1, 0)) == Block.AIR
+                   && instance.getBlock(position.add(0, 2, 0)) == Block.AIR) {
+                    poof(pc);
+                    pc.setPosition(position);
+                    pc.setLookDirection(pc.getLookDirection().rotateAroundY(Math.PI));
+                    poof(pc);
+                }
+            }
+
+            if(character.hasLineOfSight(pc, true)) {
                 return;
             }
 
@@ -158,7 +181,7 @@ public class RoguePlayerClass implements Feature {
 
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
-        Vec hitboxSize = new Vec(1, 1, 0);
+        Vec hitboxSize = new Vec(1, 1, 1);
 
         // Gets collection of hit characters by hitbox.
         Collection<Collider> hits = mmorpg.getPhysicsManager()

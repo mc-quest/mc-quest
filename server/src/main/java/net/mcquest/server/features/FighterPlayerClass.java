@@ -266,13 +266,23 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useCharge(ActiveSkillUseEvent event) {
-        double damageAmount = 2.0;
+        double damageAmount;
+        double velocity;
 
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        if (pc.getSkillManager().isUnlocked(
+                PlayerClasses.FIGHTER.getSkill("devastating_charge"))) {
+            damageAmount = 4.0;
+            velocity = 40.0;
+        } else {
+            damageAmount = 2.0;
+            velocity = 20.0;
+        }
+
         // Charges player forward.
         Vec direction = pc.getLookDirection().withY(0);
-        pc.setVelocity(direction.mul(20.0).withY(0.0));
+        pc.setVelocity(direction.mul(velocity).withY(0.0));
 
         pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
 

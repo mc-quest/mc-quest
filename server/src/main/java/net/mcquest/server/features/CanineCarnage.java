@@ -3,6 +3,7 @@ package net.mcquest.server.features;
 import com.google.common.base.Predicates;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.event.PlayerCharacterLoginEvent;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.loot.ItemPoolEntry;
 import net.mcquest.core.loot.LootChest;
@@ -20,6 +21,7 @@ import net.mcquest.server.constants.*;
 import net.mcquest.server.npc.DirePacklord;
 import net.mcquest.server.npc.DireWolf;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.event.player.PlayerStartSneakingEvent;
 
 import java.time.Duration;
 
@@ -146,7 +148,7 @@ public class CanineCarnage implements Feature {
                 )
         );
         Maps.ELADRADOR.addQuestMarker(canineCarnageQuestMarker);
-
+      
         QuestMarker guardThomasMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
                 new Pos(3198, 117, 3646),

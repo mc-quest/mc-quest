@@ -2,6 +2,7 @@ package net.mcquest.core.character;
 
 import net.mcquest.core.instance.Instance;
 import net.minestom.server.coordinate.Pos;
+import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.Player;
 import net.minestom.server.entity.hologram.Hologram;
 
@@ -116,9 +117,9 @@ class Nameplate {
 
     private void remove(Hologram hologram) {
         // Workaround for Minestom bug.
-        Set<Player> viewers = new HashSet<>(hologram.getViewers());
-        viewers.forEach(hologram::removeViewer);
-
-        hologram.remove();
+        Entity entity = hologram.getEntity();
+        Set<Player> viewers = new HashSet<>(entity.getViewers());
+        viewers.forEach(entity::removeViewer);
+        entity.remove();
     }
 }

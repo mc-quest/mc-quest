@@ -12,9 +12,12 @@ import net.mcquest.server.constants.Skins;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.minestom.server.sound.SoundEvent;
+import net.mcquest.core.ui.Interactions;
 
 public class GuardThomas extends NonPlayerCharacter {
     private final InteractionSequence completeTutorialSequence;
+    private final InteractionSequence startCanineCarnageSequence;
+    private final InteractionSequence completeCanineCarnageSequence;
 
     public GuardThomas(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Skins.GUARD_MALE));
@@ -22,10 +25,6 @@ public class GuardThomas extends NonPlayerCharacter {
         setLevel(10);
 
         completeTutorialSequence = InteractionSequence.builder()
-<<<<<<< Updated upstream
-                .interaction(this::completeTutorialInteraction1)
-                .interaction(this::completeTutorialInteraction2)
-=======
                 .interaction(Interactions.speak(this, Component.text("Well done adventurer!")))
                 .interaction(Interactions.addProgress(Quests.TUTORIAL.getObjective(8)))
                 .build();
@@ -85,7 +84,6 @@ public class GuardThomas extends NonPlayerCharacter {
                         Component.text("You have my thanks for culling those nasty, demonic creatures!")
                 ))
                 .interaction(Interactions.addProgress(Quests.CANINE_CARNAGE.getObjective(2)))
->>>>>>> Stashed changes
                 .build();
     }
 
@@ -94,6 +92,15 @@ public class GuardThomas extends NonPlayerCharacter {
         if (Quests.TUTORIAL.getObjective(7).isComplete(pc)
                 && Quests.TUTORIAL.getStatus(pc) != QuestStatus.COMPLETED) {
             completeTutorialSequence.advance(pc);
+        } else if (Quests.TUTORIAL.getStatus(pc) == QuestStatus.COMPLETED
+                && Quests.CANINE_CARNAGE.getStatus(pc) == QuestStatus.NOT_STARTED) {
+            startCanineCarnageSequence.advance(pc);
+        } else if (Quests.CANINE_CARNAGE.getObjective(0).isComplete(pc)
+                && Quests.CANINE_CARNAGE.getObjective(1).isComplete(pc)
+                && Quests.CANINE_CARNAGE.getStatus(pc) != QuestStatus.COMPLETED) {
+            completeCanineCarnageSequence.advance(pc);
+        } else {
+            speak(pc, Component.text("Need something adventurer?"));
         }
     }
 
@@ -101,13 +108,5 @@ public class GuardThomas extends NonPlayerCharacter {
     public void onSpeak(PlayerCharacter pc) {
         Sound sound = Sound.sound(SoundEvent.ENTITY_VILLAGER_AMBIENT, Sound.Source.MASTER, 1f, 0.75f);
         pc.playSound(sound);
-    }
-
-    private void completeTutorialInteraction1(PlayerCharacter pc) {
-        speak(pc, Component.text("Well done adventurer!"));
-    }
-
-    private void completeTutorialInteraction2(PlayerCharacter pc) {
-        Quests.TUTORIAL.getObjective(8).addProgress(pc);
     }
 }

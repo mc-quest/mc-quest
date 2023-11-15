@@ -8,14 +8,11 @@ import net.mcquest.core.asset.Asset;
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
-    public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
-
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
-                ADVENTURERS_WAND,
-                WOLF_FLANK
+                ADVENTURERS_WAND
         };
     }
 
@@ -29,26 +26,6 @@ public class Items {
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         Asset icon = Assets.asset(iconPath);
         BasicItem.BuildStep builder = BasicItem.builder()
-                .id(id)
-                .name(name)
-                .quality(quality)
-                .icon(icon);
-        if (object.has("description")) {
-            builder.description(object.get("description").getAsString());
-        }
-        return builder.build();
-    }
-
-    private static QuestItem loadQuestItem(String fileName) {
-        String basePath = "items/quests/" + fileName;
-        String itemPath = basePath + ".json";
-        String iconPath = basePath + ".png";
-        JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();
-        String id = object.get("id").getAsString();
-        String name = object.get("name").getAsString();
-        ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
-        Asset icon = Assets.asset(iconPath);
-        QuestItem.BuildStep builder = QuestItem.builder()
                 .id(id)
                 .name(name)
                 .quality(quality)

@@ -2,6 +2,7 @@ package net.mcquest.core.loot;
 
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.item.Item;
+import net.mcquest.core.item.QuestItem;
 import net.mcquest.core.util.MathUtility;
 
 import java.util.function.Predicate;
@@ -48,7 +49,8 @@ public class ItemPoolEntry extends PoolEntry {
         }
 
         public Builder amount(int amount) {
-            if (amount < 0 || amount > item.getStackSize()) {
+            if (amount < 0 ||
+                    (!(item instanceof QuestItem) && amount > item.getStackSize())) {
                 throw new IllegalArgumentException();
             }
             return amount(() -> amount);

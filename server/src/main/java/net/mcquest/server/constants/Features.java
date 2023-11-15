@@ -10,6 +10,11 @@ public class Features {
     public static final Feature SWORDS = new Swords();
     public static final Feature WANDS = new Wands();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
+<<<<<<< Updated upstream
+=======
+    public static final Feature CANINE_CARNAGE = new CanineCarnage();
+    public static final Feature WOLF_BITE_DELIGHT = new WolfBiteDelight();
+>>>>>>> Stashed changes
     public static final Feature BROODMOTHER_LAIR = new BroodmotherLair();
 
     public static Feature[] all() {
@@ -20,7 +25,14 @@ public class Features {
                 SWORDS,
                 WANDS,
                 TUTORIAL_QUEST,
+<<<<<<< Updated upstream
                 BROODMOTHER_LAIR
+=======
+                CANINE_CARNAGE,
+                WOLF_BITE_DELIGHT,
+                BROODMOTHER_LAIR,
+                new BetaDemo()
+>>>>>>> Stashed changes
         };
     }
 }

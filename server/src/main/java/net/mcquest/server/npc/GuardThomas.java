@@ -22,8 +22,70 @@ public class GuardThomas extends NonPlayerCharacter {
         setLevel(10);
 
         completeTutorialSequence = InteractionSequence.builder()
+<<<<<<< Updated upstream
                 .interaction(this::completeTutorialInteraction1)
                 .interaction(this::completeTutorialInteraction2)
+=======
+                .interaction(Interactions.speak(this, Component.text("Well done adventurer!")))
+                .interaction(Interactions.addProgress(Quests.TUTORIAL.getObjective(8)))
+                .build();
+
+        startCanineCarnageSequence = InteractionSequence.builder()
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Now that you're all trained up, I'll let you in on a secret.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Have you ever heard of demons?")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("I doubted the existence of such things up until recently.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("'A story for the children' I thought.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Some wolves have been attacking our camp,"
+                                + " and killing all the animals in the forest.")))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("There's something off about them, I tell you!"
+                                + " They have red eyes,"
+                                + " and bite like they've never once eaten before!")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Always hungry, never fulfilled....")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Anyways, you seem strong and capable."
+                                + " I'd pay good money if you managed to kill their leader.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Before you go, consider seeking out Chef Marco in the village.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("He has been in search of a skilled hunter to tackle" +
+                                " the dire wolf menace lurking in our midst.")
+                ))
+                .interaction(Interactions.startQuest(Quests.CANINE_CARNAGE))
+                .build();
+
+        completeCanineCarnageSequence = InteractionSequence.builder()
+                .interaction(Interactions.speak(this, Component.text("Woah, you survived!")))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("You have my thanks for culling those nasty, demonic creatures!")
+                ))
+                .interaction(Interactions.addProgress(Quests.CANINE_CARNAGE.getObjective(2)))
+>>>>>>> Stashed changes
                 .build();
     }
 

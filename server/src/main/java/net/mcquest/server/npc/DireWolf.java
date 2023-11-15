@@ -5,6 +5,10 @@ import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
 import net.mcquest.core.character.Character;
 import net.mcquest.core.character.*;
+import net.mcquest.core.loot.*;
+import net.mcquest.core.object.ObjectSpawner;
+import net.mcquest.core.physics.Triggers;
+import net.mcquest.server.constants.Items;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Models;
@@ -26,6 +30,11 @@ public class DireWolf extends NonPlayerCharacter {
         setRespawnDuration(Duration.ofSeconds(60));
         setExperiencePoints(10);
         addSlayQuestObjective(Quests.CANINE_CARNAGE.getObjective(0));
+        setLootTable(LootTable.builder()
+                .pool(Pool.builder()
+                        .entry(ItemPoolEntry.builder(Items.WOLF_FLANK).amount(1).build())
+                        .build())
+                .build());
 
         setBrain(ActiveSelector.of(
                 Sequence.of(

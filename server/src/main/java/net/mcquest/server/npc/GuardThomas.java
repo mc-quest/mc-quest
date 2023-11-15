@@ -65,6 +65,15 @@ public class GuardThomas extends NonPlayerCharacter {
                         Component.text("Anyways, you seem strong and capable."
                                 + " I'd pay good money if you managed to kill their leader.")
                 ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("Before you go, consider seeking out Chef Marco in the village.")
+                ))
+                .interaction(Interactions.speak(
+                        this,
+                        Component.text("He has been in search of a skilled hunter to tackle" +
+                                " the dire wolf menace lurking in our midst.")
+                ))
                 .interaction(Interactions.startQuest(Quests.CANINE_CARNAGE))
                 .build();
 

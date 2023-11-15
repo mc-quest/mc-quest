@@ -257,6 +257,10 @@ public class NonPlayerCharacter extends Character {
         getSpawner().setActive(false);
         getHitbox().remove();
 
+        if (killer instanceof PlayerCharacter pc) {
+            lootTable.generate(pc).forEach(loot -> loot.drop(getInstance(), getPosition()));
+        }
+
         SchedulerManager scheduler = getMmorpg().getSchedulerManager();
         scheduler.buildTask(this::remove).delay(getRemovalDelay()).schedule();
 

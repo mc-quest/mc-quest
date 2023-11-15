@@ -22,6 +22,8 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RoguePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -63,6 +65,8 @@ public class RoguePlayerClass implements Feature {
                 .overlapBox(instance, hitboxCenter, hitboxSize);
 
         hits.forEach(Triggers.character(character -> {
+            double damageAmount = pc.getInventory().getWeapon().getPhysicalDamage();
+
             if (!character.isDamageable(pc)) {
                 return;
             }
@@ -74,8 +78,8 @@ public class RoguePlayerClass implements Feature {
 
                 // If there is air on the other side of the entity, teleport to the other side and
                 // look at it
-                if(instance.getBlock(position.add(0, 1, 0)) == Block.AIR
-                   && instance.getBlock(position.add(0, 2, 0)) == Block.AIR) {
+                if (instance.getBlock(position.add(0, 1, 0)) == Block.AIR
+                        && instance.getBlock(position.add(0, 2, 0)) == Block.AIR) {
                     poof(pc);
                     pc.setPosition(position);
                     pc.setLookDirection(pc.getLookDirection().rotateAroundY(Math.PI));
@@ -83,14 +87,22 @@ public class RoguePlayerClass implements Feature {
                 }
             }
 
-            if(character.hasLineOfSight(pc, true)) {
-                return;
+            int modifier;
+            if (pc.getSkillManager().isUnlocked(
+                    PlayerClasses.ROGUE.getSkill("go_for_the_jugular"))) {
+                modifier = 4;
+            } else {
+                modifier = 2;
             }
 
-            double damageAmount = pc.getInventory().getWeapon().getPhysicalDamage() * 2;
+            if (character.hasLineOfSight(pc, true)) {
+                character.damage(pc, damageAmount);
+            } else {
+                character.damage(pc, damageAmount * modifier);
+            }
+
             // Apply damage to creature hit within hitbox.
             ParticleEffects.particle(instance, hitboxCenter, Particle.SMOKE);
-            character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound, character.getPosition());
         }));
@@ -107,10 +119,18 @@ public class RoguePlayerClass implements Feature {
         poof(pc);
         pc.setInvisible(true);
 
+        int duration;
+        if (pc.getSkillManager().isUnlocked(
+                PlayerClasses.ROGUE.getSkill("one_with_shadows"))) {
+            duration = 10;
+        } else {
+            duration = 5;
+        }
+
         mmorpg.getSchedulerManager().buildTask(() -> {
             poof(pc);
             pc.setInvisible(false);
-        }).delay(Duration.ofSeconds(5)).schedule();
+        }).delay(Duration.ofSeconds(duration)).schedule();
     }
 
     private void poof(PlayerCharacter pc) {
@@ -131,14 +151,21 @@ public class RoguePlayerClass implements Feature {
         Instance instance = pc.getInstance();
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
-        Vec centerKnife = pc.getLookDirection();
-        Vec leftKnife = pc.getLookDirection().rotateAroundY(Math.PI / 4);
-        Vec rightKnife = pc.getLookDirection().rotateAroundY(-Math.PI / 4);
-        Vec[] velocities = {leftKnife, centerKnife, rightKnife};
+        // Number of knives = 1 + (knifeMultiplier*2)
+        int knifeMultiplier;
+        if (pc.getSkillManager().isUnlocked(
+                PlayerClasses.ROGUE.getSkill("knife_master"))) {
+            knifeMultiplier = 2;
+        } else {
+            knifeMultiplier = 1;
+        }
 
-        for (int i = 0; i < 3; i++) {
+        for (double i = -Math.PI / 4;
+             i <= Math.PI / 4;
+             i += Math.PI / (4 * knifeMultiplier)) {
+            Vec arrowVelocity = pc.getLookDirection().rotateAroundY(i).mul(arrowSpeed);
+
             Collider hitbox = new Collider(instance, startPosition, hitboxSize);
-            Vec arrowVelocity = velocities[i].mul(arrowSpeed);
             Entity arrowEntity = new Entity(EntityType.ARROW) {
                 @Override
                 public void tick(long time) {
@@ -174,7 +201,9 @@ public class RoguePlayerClass implements Feature {
             arrowEntity.setInstance(instance, startPosition);
             mmorpg.getPhysicsManager().addCollider(hitbox);
         }
+
     }
+
 
     private void useWoundingSlash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();

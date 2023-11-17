@@ -6,6 +6,7 @@ import net.mcquest.core.event.ItemConsumeEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.inventory.PlayerInventoryItemChangeEvent;
 import net.minestom.server.event.item.PickupItemEvent;
 import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
@@ -38,6 +39,7 @@ public class ItemManager {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
         eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
+        eventHandler.addListener(PlayerInventoryItemChangeEvent.class, this::handleChangeItemSlot);
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
     }
 
@@ -119,6 +121,30 @@ public class ItemManager {
             inventory.setItemStack(slot, ItemStack.AIR);
         } else {
             inventory.setItemStack(slot, itemStack.withAmount(itemStack.amount() - 1));
+        }
+    }
+
+    private void handleChangeItemSlot(PlayerInventoryItemChangeEvent event) {
+        int slot = event.getSlot();
+        if (slot < 41 || slot > 44) {
+            // Not an armor slot
+            return;
+        }
+
+        Player player = event.getPlayer();
+        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
+
+        if (!event.getPreviousItem().isAir()) {
+            // The player unequipped an item
+            ArmorItem prevItem = (ArmorItem) getItem(event.getPreviousItem());
+            assert prevItem != null;
+            prevItem.equip(pc);
+        }
+        if (!event.getNewItem().isAir()) {
+            // The player equipped an item
+            ArmorItem newItem = (ArmorItem) getItem(event.getNewItem());
+            assert newItem != null;
+            newItem.equip(pc);
         }
     }
 

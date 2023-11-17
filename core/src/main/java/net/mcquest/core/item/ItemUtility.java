@@ -1,6 +1,7 @@
 package net.mcquest.core.item;
 
 import net.mcquest.core.resourcepack.Namespaces;
+import net.mcquest.core.stat.modifier.CharacterStatModifier;
 import net.mcquest.core.text.WordWrap;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -21,6 +22,10 @@ class ItemUtility {
 
     static TextComponent levelText(int level) {
         return Component.text("Level " + level, NamedTextColor.GRAY);
+    }
+
+    static TextComponent modifierText(CharacterStatModifier modifier) {
+        return Component.text(modifier.toString(), NamedTextColor.YELLOW);
     }
 
     static TextComponent statText(String statName, double stat) {

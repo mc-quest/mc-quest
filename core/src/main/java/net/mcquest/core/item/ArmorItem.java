@@ -2,12 +2,15 @@ package net.mcquest.core.item;
 
 import com.google.common.collect.ListMultimap;
 import net.mcquest.core.asset.Asset;
+import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ArmorEquipEvent;
 import net.mcquest.core.event.ArmorUnequipEvent;
 import net.mcquest.core.event.EventEmitter;
 import net.mcquest.core.resourcepack.Materials;
 import net.mcquest.core.resourcepack.ResourcePackUtility;
 import net.mcquest.core.asset.AssetTypes;
+import net.mcquest.core.stat.modifier.AddedProtectionModifier;
+import net.mcquest.core.stat.modifier.CharacterStatModifier;
 import net.mcquest.core.util.ItemStackUtility;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -39,7 +42,7 @@ public class ArmorItem extends Item {
     private final Material materialModel;
     private final Color color;
     private final Asset bbmodel;
-    private final double protections;
+    private final List<CharacterStatModifier> modifiers;
     private final EventEmitter<ArmorEquipEvent> onEquip;
     private final EventEmitter<ArmorUnequipEvent> onUnequip;
     private int customModelData;
@@ -52,7 +55,8 @@ public class ArmorItem extends Item {
         materialModel = builder.materialModel;
         color = builder.color;
         bbmodel = builder.bbmodel;
-        protections = builder.protections;
+        modifiers = new ArrayList<>();
+        modifiers.add(new AddedProtectionModifier(builder.protection));
         onEquip = new EventEmitter<>();
         onUnequip = new EventEmitter<>();
     }
@@ -69,8 +73,18 @@ public class ArmorItem extends Item {
         return slot;
     }
 
-    public double getProtections() {
-        return protections;
+    public void equip(PlayerCharacter pc) {
+        for (CharacterStatModifier modifier : modifiers) {
+            modifier.activate(pc.stats);
+        }
+        onEquip.emit(new ArmorEquipEvent(pc, this));
+    }
+
+    public void unequip(PlayerCharacter pc) {
+        for (CharacterStatModifier modifier : modifiers) {
+            modifier.activate(pc.stats);
+        }
+        onUnequip.emit(new ArmorUnequipEvent(pc, this));
     }
 
     public EventEmitter<ArmorEquipEvent> onEquip() {
@@ -114,8 +128,8 @@ public class ArmorItem extends Item {
 
         lore.add(Component.empty());
 
-        if (protections != 0.0) {
-            lore.add(ItemUtility.statText("Protections", protections));
+        for (CharacterStatModifier modifier : modifiers) {
+            lore.add(ItemUtility.modifierText(modifier));
         }
 
         if (description != null) {
@@ -184,7 +198,7 @@ public class ArmorItem extends Item {
 
         BuildStep color(Color color);
 
-        BuildStep protections(double protections);
+        BuildStep protection(double protection);
 
         ArmorItem build();
     }
@@ -198,7 +212,7 @@ public class ArmorItem extends Item {
         private Material materialModel;
         private Color color;
         private Asset bbmodel;
-        private double protections;
+        private double protection;
 
         @Override
         public NameStep id(String id) {
@@ -284,8 +298,8 @@ public class ArmorItem extends Item {
         }
 
         @Override
-        public BuildStep protections(double protections) {
-            this.protections = protections;
+        public BuildStep protection(double protection) {
+            this.protection = protection;
             return this;
         }
 

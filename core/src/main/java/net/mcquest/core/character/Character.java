@@ -8,6 +8,7 @@ import net.mcquest.core.Mmorpg;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.object.Object;
 import net.mcquest.core.object.ObjectSpawner;
+import net.mcquest.core.stat.CharacterStats;
 import net.mcquest.core.util.MathUtility;
 import net.minestom.server.attribute.Attribute;
 import net.minestom.server.collision.BoundingBox;
@@ -25,12 +26,11 @@ import java.util.Collection;
  * PlayerCharacter and NonPlayerCharacter.
  */
 public abstract class Character extends Object implements DamageSource {
+    public CharacterStats stats;
     private final CharacterHitbox hitbox;
     private final Nameplate nameplate;
     private String name;
     private int level;
-    private double maxHealth;
-    private double health;
     private double mass;
     private boolean invisible;
     private BossHealthBar bossHealthBar;
@@ -41,7 +41,7 @@ public abstract class Character extends Object implements DamageSource {
         hitbox = new CharacterHitbox(this, getInstance(), Pos.ZERO, Vec.ZERO);
         name = "";
         level = 1;
-        maxHealth = 1.0;
+        stats = new CharacterStats();
         mass = 70;
         invisible = false;
     }
@@ -124,7 +124,7 @@ public abstract class Character extends Object implements DamageSource {
      * Returns the maximum health of this Character.
      */
     public final double getMaxHealth() {
-        return maxHealth;
+        return stats.maxHealth;
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class Character extends Object implements DamageSource {
             throw new IllegalArgumentException();
         }
 
-        this.maxHealth = maxHealth;
+        stats.maxHealth = maxHealth;
 
         nameplate.updateHealthBarText();
 
@@ -148,18 +148,18 @@ public abstract class Character extends Object implements DamageSource {
      * Returns the current health of this Character.
      */
     public final double getHealth() {
-        return health;
+        return stats.health;
     }
 
     /**
      * Sets the current health of this Character.
      */
     public void setHealth(double health) {
-        if (health < 0.0 || health > maxHealth) {
+        if (health < 0.0 || health > stats.maxHealth) {
             throw new IllegalArgumentException();
         }
 
-        this.health = health;
+        stats.health = health;
 
         nameplate.updateHealthBarText();
 
@@ -169,7 +169,7 @@ public abstract class Character extends Object implements DamageSource {
     }
 
     public final boolean isAlive() {
-        return health > 0.0;
+        return stats.health > 0.0;
     }
 
     public void damage(@NotNull DamageSource source, double amount) {
@@ -177,7 +177,7 @@ public abstract class Character extends Object implements DamageSource {
             throw new IllegalArgumentException();
         }
 
-        double newHealth = MathUtility.clamp(health - amount, 0.0, maxHealth);
+        double newHealth = MathUtility.clamp(stats.health - amount, 0.0, stats.maxHealth);
         setHealth(newHealth);
     }
 
@@ -186,7 +186,7 @@ public abstract class Character extends Object implements DamageSource {
             throw new IllegalArgumentException();
         }
 
-        double newHealth = MathUtility.clamp(health + amount, 0.0, maxHealth);
+        double newHealth = MathUtility.clamp(stats.health + amount, 0.0, stats.maxHealth);
         setHealth(newHealth);
     }
 
@@ -337,7 +337,7 @@ public abstract class Character extends Object implements DamageSource {
 
     TextComponent healthBarText() {
         int numBars = 20;
-        double ratio = health / maxHealth;
+        double ratio = stats.health / stats.maxHealth;
         int numRedBars = (int) Math.ceil(numBars * ratio);
         int numGrayBars = numBars - numRedBars;
         return Component.text("[", NamedTextColor.GRAY)

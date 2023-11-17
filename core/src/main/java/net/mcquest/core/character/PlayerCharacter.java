@@ -65,10 +65,6 @@ public final class PlayerCharacter extends Character {
     private Zone zone;
     private Instance respawnInstance;
     private Pos respawnPosition;
-    private double mana;
-    private double maxMana;
-    private double healthRegenRate;
-    private double manaRegenRate;
     private double experiencePoints;
     private Money money;
     private boolean canMount;
@@ -100,10 +96,6 @@ public final class PlayerCharacter extends Character {
         setLevel(levelForExperiencePoints(data.experiencePoints()));
         setMaxHealth(data.maxHealth());
         setHealth(data.health());
-        maxMana = data.maxMana();
-        mana = data.mana();
-        healthRegenRate = data.healthRegenRate();
-        manaRegenRate = data.manaRegenRate();
         zone = mmorpg.getZoneManager().getZone(data.zoneId());
         respawnInstance = mmorpg.getInstanceManager().getInstance(data.respawnInstanceId());
         respawnPosition = data.respawnPosition();
@@ -250,14 +242,14 @@ public final class PlayerCharacter extends Character {
     }
 
     public double getMana() {
-        return mana;
+        return stats.mana;
     }
 
     public void setMana(double mana) {
-        if (mana < 0.0 || mana > maxMana) {
+        if (mana < 0.0 || mana > stats.maxMana) {
             throw new IllegalArgumentException();
         }
-        this.mana = mana;
+        stats.mana = mana;
         updateManaBar();
         updateActionBar();
     }
@@ -266,7 +258,7 @@ public final class PlayerCharacter extends Character {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
-        double newMana = MathUtility.clamp(mana + amount, 0.0, maxMana);
+        double newMana = MathUtility.clamp(stats.mana + amount, 0.0, stats.maxMana);
         setMana(newMana);
     }
 
@@ -274,37 +266,37 @@ public final class PlayerCharacter extends Character {
         if (amount < 0.0) {
             throw new IllegalArgumentException();
         }
-        double newMana = MathUtility.clamp(mana - amount, 0.0, maxMana);
+        double newMana = MathUtility.clamp(stats.mana - amount, 0.0, stats.maxMana);
         setMana(newMana);
     }
 
     public double getMaxMana() {
-        return maxMana;
+        return stats.maxMana;
     }
 
     public void setMaxMana(double maxMana) {
         if (maxMana <= 0.0) {
             throw new IllegalArgumentException();
         }
-        this.maxMana = maxMana;
+        stats.maxMana = maxMana;
         updateManaBar();
         updateActionBar();
     }
 
     public double getHealthRegenRate() {
-        return healthRegenRate;
+        return stats.healthRegenRate;
     }
 
     public void setHealthRegenRate(double healthRegenRate) {
-        this.healthRegenRate = healthRegenRate;
+        stats.healthRegenRate = healthRegenRate;
     }
 
     public double getManaRegenRate() {
-        return manaRegenRate;
+        return stats.manaRegenRate;
     }
 
     public void setManaRegenRate(double manaRegenRate) {
-        this.manaRegenRate = manaRegenRate;
+        stats.manaRegenRate = manaRegenRate;
     }
 
     public static int levelForExperiencePoints(double experiencePoints) {
@@ -425,7 +417,7 @@ public final class PlayerCharacter extends Character {
     private void die() {
         setInstance(respawnInstance, respawnPosition);
         setHealth(getMaxHealth());
-        setMana(maxMana);
+        setMana(stats.maxMana);
         setInvisible(false);
 
         player.addEffect(new Potion(PotionEffect.BLINDNESS, (byte) 1, 60));

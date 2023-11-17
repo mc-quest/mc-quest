@@ -2,20 +2,32 @@ package net.mcquest.core.damage;
 
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.playerclass.ActiveSkill;
+import net.mcquest.core.stat.AttackStats;
+import net.mcquest.core.stat.CharacterStats;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 public class Damage {
-    public static double calculate(PlayerCharacter pc1, PlayerCharacter pc2, ActiveSkill skill) {
-        return 0.0;
+    public static double calculate(CharacterStats attackerStats, CharacterStats defenderStats, AttackStats attackStats) {
+        Builder builder = new Builder()
+                .type(attackStats.type)
+                .damageEffectiveness(attackStats.damageEffectiveness)
+                .protection(defenderStats.protection);
+        for (DamageType type : DamageType.values()) {
+            builder.baseDamage(type, attackerStats.baseDamage.get(type))
+                    .increasedDamage(type, attackerStats.increasedDamage.get(type));
+        }
+
+        return builder.calculate();
     }
 
     private static class Builder {
-        private double damageEffectiveness;
         private DamageType type;
+        private double damageEffectiveness;
         private Map<DamageType, Double> baseDamage;
         private Map<DamageType, Double> increasedDamage;
+        private double protection;
 
         public Builder() {
             baseDamage = new EnumMap<>(DamageType.class);
@@ -26,23 +38,28 @@ public class Damage {
             }
         }
 
-        public Builder damageEffectiveness(double damageEffectiveness) {
-            this.damageEffectiveness = damageEffectiveness;
-            return this;
-        }
-
         public Builder type(DamageType type) {
             this.type = type;
             return this;
         }
 
-        public Builder baseDamage(DamageType type, double amount) {
-            baseDamage.put(type, baseDamage.get(type) + amount);
+        public Builder damageEffectiveness(double value) {
+            this.damageEffectiveness = value;
             return this;
         }
 
-        public Builder increasedDamage(DamageType type, double amount) {
-            increasedDamage.put(type, increasedDamage.get(type) + amount);
+        public Builder baseDamage(DamageType type, double value) {
+            baseDamage.put(type, baseDamage.get(type) + value);
+            return this;
+        }
+
+        public Builder increasedDamage(DamageType type, double value) {
+            increasedDamage.put(type, increasedDamage.get(type) + value);
+            return this;
+        }
+
+        public Builder protection(double value) {
+            protection = value;
             return this;
         }
 
@@ -76,6 +93,13 @@ public class Damage {
                     double d = damage.get(type) * (i + 1.0);
                     damage.put(type, d);
                 }
+            }
+
+            // Calculate protection
+            {
+                double d = damage.get(DamageType.Physical);
+                d = (5 * d * d) / (protection + 5 * d);
+                damage.put(DamageType.Physical, d);
             }
 
             // Return damage amount

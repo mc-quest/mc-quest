@@ -90,7 +90,7 @@ public class Items {
             builder.description(object.get("description").getAsString());
         }
         if (object.has("protections")) {
-            builder.protections(object.get("protections").getAsDouble());
+            builder.protection(object.get("protections").getAsDouble());
         }
         return builder.build();
     }

@@ -65,7 +65,6 @@ public class MagePlayerClass implements Feature {
             }
 
             double damage = Damage.calculate(pc.stats, character.stats, attackStats);
-            System.out.println(damage);
             character.damage(pc, damage);
 
             fireballEntity.remove();
@@ -152,7 +151,6 @@ public class MagePlayerClass implements Feature {
                         );
 
                         double damage = Damage.calculate(pc.stats, character.stats, attackStats);
-                        System.out.println(damage);
                         character.damage(pc, damage);
 
                         character.applyImpulse(direction.mul(impulse));

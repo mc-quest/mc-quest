@@ -1,5 +1,6 @@
 package net.mcquest.core.persistence;
 
+import net.mcquest.core.cartography.Map;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.PlayerCharacterCreateEvent;
 import net.mcquest.core.music.Song;
@@ -27,6 +28,7 @@ public record PlayerCharacterData(
         PersistentQuestObjectiveData[] questObjectiveData,
         String[] completedQuestIds,
         String[] trackedQuestIds,
+        String mapId,
         String songId,
         boolean canMount,
         String[] ownedMountIds
@@ -42,12 +44,12 @@ public record PlayerCharacterData(
                 characterCreateResult.respawnInstance().getId(),
                 characterCreateResult.respawnPosition(),
                 characterCreateResult.zone().getId(),
-                1,
-                1,
-                1,
-                1,
-                0,
-                0,
+                characterCreateResult.maxHealth(),
+                characterCreateResult.maxHealth(),
+                characterCreateResult.maxMana(),
+                characterCreateResult.maxMana(),
+                characterCreateResult.healthRegenRate(),
+                characterCreateResult.manaRegenRate(),
                 0,
                 1,
                 0,
@@ -64,7 +66,8 @@ public record PlayerCharacterData(
                 new PersistentQuestObjectiveData[0],
                 new String[0],
                 new String[0],
-                null,
+                characterCreateResult.map().getId(),
+                characterCreateResult.song().getId(),
                 true,
                 new String[0]
         );
@@ -72,6 +75,7 @@ public record PlayerCharacterData(
 
     public static PlayerCharacterData save(PlayerCharacter pc) {
         Song song = pc.getMusicPlayer().getSong();
+        Map map = pc.getMapViewer().getMap();
 
         return new PlayerCharacterData(
                 pc.getPlayerClass().getId(),
@@ -93,6 +97,7 @@ public record PlayerCharacterData(
                 new PersistentQuestObjectiveData[0], // TODO
                 new String[0], // TODO
                 new String[0], // TODO
+                map == null ? null : map.getId(),
                 song == null ? null : song.getId(),
                 pc.canMount(),
                 new String[0] // TODO

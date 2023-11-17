@@ -28,13 +28,17 @@ public class Map {
     private final BufferedImage bufferedImage;
     private final Collection<QuestMarker> questMarkers;
 
-    public Map(String id, Pos origin, Asset image) {
+    private Map(String id, Pos origin, Asset image) {
         this.id = id;
         this.origin = origin;
         image.requireType(AssetTypes.PNG);
         this.image = image;
         this.bufferedImage = image.readImage();
         this.questMarkers = new ArrayList<>();
+    }
+
+    public static Map of(String id, Pos origin, Asset image) {
+        return new Map(id, origin, image);
     }
 
     public String getId() {
@@ -87,7 +91,10 @@ public class Map {
         Pos position = pc.getPosition();
         List<Quest> trackedQuests = pc.getQuestTracker().getTrackedQuests();
 
-        if (!(trackedQuests.contains(questMarker.getQuest()) && questMarker.shouldShow(pc))) {
+        if (!((trackedQuests.contains(questMarker.getQuest())
+                || (questMarker.getIcon() == QuestMarkerIcon.READY_TO_START
+                && questMarker.getQuest().isNotStarted(pc)))
+                && questMarker.shouldShow(pc))) {
             return;
         }
 

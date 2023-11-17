@@ -14,7 +14,9 @@ public class EventEmitter<E extends Event> {
     }
 
     public void emit(E event) {
-        for (Consumer<E> callback : callbacks) {
+        // Copy callbacks to prevent concurrent modification when a callback
+        // unsubscribes.
+        for (Consumer<E> callback : new ArrayList<>(callbacks)) {
             callback.accept(event);
         }
     }

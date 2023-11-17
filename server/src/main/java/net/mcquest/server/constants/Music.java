@@ -12,6 +12,8 @@ public class Music {
     public static final Song CREEPY = new Song("creepy", audio("creepy"));
     public static final Song CREEPY_2 = new Song("creepy_2", audio("creepy_2"));
     public static final Song VILLAGE = new Song("village", audio("village"));
+    public static final Song WOLF_DEN = new Song("wolf_den", audio("wolf_den"));
+    public static final Song ALPHA_WOLF_BATTLE = new Song("alpha_wolf_battle", audio("alpha_wolf_battle"));
 
     public static Song[] all() {
         return new Song[]{
@@ -21,7 +23,9 @@ public class Music {
                 BROODMOTHER_BATTLE,
                 CREEPY,
                 CREEPY_2,
-                VILLAGE
+                VILLAGE,
+                WOLF_DEN,
+                ALPHA_WOLF_BATTLE
         };
     }
 

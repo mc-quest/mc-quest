@@ -12,6 +12,8 @@ public class Models {
     public static final Model BROODMOTHER = loadModel("broodmother");
     public static final Model REDSTONE_MONSTROSITY = loadModel("redstone_monstrosity");
     public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
+    public static final Model DIRE_PACKLORD = loadModel("dire_packlord");
+    public static final Model DIRE_WOLF = loadModel("dire_wolf");
 
     public static Model[] all() {
         return new Model[]{
@@ -21,7 +23,9 @@ public class Models {
                 WOLF_SPIDER,
                 BROODMOTHER,
                 REDSTONE_MONSTROSITY,
-                UNDEAD_KNIGHT
+                UNDEAD_KNIGHT,
+                DIRE_PACKLORD,
+                DIRE_WOLF
         };
     }
 

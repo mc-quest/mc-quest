@@ -55,7 +55,7 @@ public class BroodmotherLair implements Feature {
         pc.setZone(Zones.BROODMOTHER_LAIR);
         pc.getMusicPlayer().setSong(Music.BROODMOTHER_LAIR);
         pc.setRespawnPoint(Instances.BROODMOTHER_LAIR, to);
-        pc.getMapViewer().setMap(Maps.MELCHER); // TODO: update map
+        pc.getMapViewer().setMap(Maps.ELADRADOR); // TODO: update map
     }
 
     private void exitMain(PlayerCharacter pc) {
@@ -71,7 +71,7 @@ public class BroodmotherLair implements Feature {
         pc.setZone(Zones.OAKSHIRE); // TODO: update zone
         pc.getMusicPlayer().setSong(Music.WILDERNESS);
         pc.setRespawnPoint(Instances.ELADRADOR, to);
-        pc.getMapViewer().setMap(Maps.MELCHER); // TODO: update map
+        pc.getMapViewer().setMap(Maps.ELADRADOR); // TODO: update map
     }
 
     private void npcs() {

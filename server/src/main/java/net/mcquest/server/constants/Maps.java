@@ -6,15 +6,15 @@ import net.mcquest.core.cartography.Map;
 import net.minestom.server.coordinate.Pos;
 
 public class Maps {
-    public static final Map MELCHER = new Map(
-            "melcher_tavern_basement",
-            new Pos(0, 0, 0),
-            image("melcher_tavern_basement")
+    public static final Map ELADRADOR = Map.of(
+            "eladrador",
+            new Pos(0, 0, -16),
+            image("eladrador")
     );
 
     public static Map[] all() {
         return new Map[]{
-                MELCHER
+                ELADRADOR
         };
     }
 

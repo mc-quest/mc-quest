@@ -5,4 +5,9 @@ import net.mcquest.core.playerclass.ActiveSkill;
 public class FighterSkills {
     public static final ActiveSkill BASH = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("bash");
     public static final ActiveSkill SELF_HEAL = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("self_heal");
+    public static final ActiveSkill OVERHEAD_STRIKE = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("overhead_strike");
+    public static final ActiveSkill TAUNT = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("taunt");
+    public static final ActiveSkill BERSERK = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("berserk");
+    public static final ActiveSkill WHIRLWIND = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("whirlwind");
+    public static final ActiveSkill CHARGE = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("charge");
 }

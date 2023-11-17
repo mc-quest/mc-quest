@@ -72,7 +72,7 @@ public class RoguePlayerClass implements Feature {
             }
 
             if (pc.getSkillManager().isUnlocked(
-                    PlayerClasses.ROGUE.getSkill("shadow_step"))) {
+                    RogueSkills.SHADOW_STEP)) {
                 // Get positon on other side of entity
                 Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(2));
 
@@ -87,13 +87,10 @@ public class RoguePlayerClass implements Feature {
                 }
             }
 
-            int modifier;
-            if (pc.getSkillManager().isUnlocked(
-                    PlayerClasses.ROGUE.getSkill("go_for_the_jugular"))) {
-                modifier = 4;
-            } else {
-                modifier = 2;
-            }
+            int modifier = pc.getSkillManager().isUnlocked(
+                    RogueSkills.GO_FOR_THE_JUGULAR)
+                ? 4
+                : 2;
 
             if (character.hasLineOfSight(pc, true)) {
                 character.damage(pc, damageAmount);
@@ -119,13 +116,10 @@ public class RoguePlayerClass implements Feature {
         poof(pc);
         pc.setInvisible(true);
 
-        int duration;
-        if (pc.getSkillManager().isUnlocked(
-                PlayerClasses.ROGUE.getSkill("one_with_shadows"))) {
-            duration = 10;
-        } else {
-            duration = 5;
-        }
+        int duration = pc.getSkillManager().isUnlocked(
+                RogueSkills.ONE_WITH_SHADOWS)
+            ? 10
+            : 5;
 
         mmorpg.getSchedulerManager().buildTask(() -> {
             poof(pc);
@@ -152,13 +146,11 @@ public class RoguePlayerClass implements Feature {
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
         // Number of knives = 1 + (knifeMultiplier*2)
-        int knifeMultiplier;
-        if (pc.getSkillManager().isUnlocked(
-                PlayerClasses.ROGUE.getSkill("knife_master"))) {
-            knifeMultiplier = 2;
-        } else {
-            knifeMultiplier = 1;
-        }
+        int knifeMultiplier = pc.getSkillManager().isUnlocked(
+                RogueSkills.KNIFE_MASTER)
+            ? 2
+            : 1;
+
 
         for (double i = -Math.PI / 4;
              i <= Math.PI / 4;

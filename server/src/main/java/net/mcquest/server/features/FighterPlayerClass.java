@@ -41,7 +41,6 @@ public class FighterPlayerClass implements Feature {
         FighterSkills.BERSERK.onUse().subscribe(this::useBerserk);
         FighterSkills.WHIRLWIND.onUse().subscribe(this::useWhirlwind);
         FighterSkills.CHARGE.onUse().subscribe(this::useCharge);
-
     }
 
     private void useBash(ActiveSkillUseEvent event) {
@@ -97,25 +96,20 @@ public class FighterPlayerClass implements Feature {
 
             Instance instance = pc.getInstance();
             Pos hitboxCenter = pc.getPosition();
-            Vec hitboxSize;
+            Vec hitboxSize = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
+                    FighterSkills.ENLARGED_OVERHEAD_STRIKE)
+               ? new Vec(5, 1, 5)
+               : new Vec(3, 1, 3);
 
-            if (pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
-                    PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike"))) {
-                hitboxSize = new Vec(5, 1, 5);
-            } else {
-                hitboxSize = new Vec(3, 1, 3);
-            }
 
             Collection<Collider> hits = mmorpg.getPhysicsManager()
                     .overlapBox(instance, hitboxCenter, hitboxSize);
 
-            double damageAmount;
-            if (pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
-                    PlayerClasses.FIGHTER.getSkill("enpowered_overhead_strike"))) {
-                damageAmount = 6;
-            } else {
-                damageAmount = 3;
-            }
+            double damageAmount = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
+                    FighterSkills.EMPOWERED_OVERHEAD_STRIKE)
+                ?  6
+                :  3;
+
 
             // Hits every character in a 5x5 range.
             hits.forEach(Triggers.character(character -> {
@@ -147,7 +141,6 @@ public class FighterPlayerClass implements Feature {
             subscriptions[0].unsubscribe();
         });
     }
-
 
     private void useTaunt(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
@@ -191,23 +184,19 @@ public class FighterPlayerClass implements Feature {
     private void useWhirlwind(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        int iterations;
         // Move up if player is holding space
-        if (pc.getSkillManager().isUnlocked(
-                PlayerClasses.FIGHTER.getSkill("agile_whirlwind"))) {
-            iterations = 16;
-        } else {
-            iterations = 8;
-        }
+        int iterations = pc.getSkillManager().isUnlocked(
+                FighterSkills.AGILE_WHIRLWIND)
+            ? 16
+            : 8;
 
         Vec direction = pc.getLookDirection();
-        int[] tick = {0};
+
         // Create a for loop for 8 iterations
         for (int i = 1; i <= iterations; i++) {
             boolean sound = i % 2 == 1;
             Vec horizontalDir = direction.rotateAroundY(i * Math.PI / 4);
             Vec verticalDir = direction.rotateAroundX(i * Math.PI / 4);
-            pc.sendMessage(Component.text(iterations));
             mmorpg.getSchedulerManager().buildTask(() -> {
                 if (sound) {
                     pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
@@ -239,7 +228,7 @@ public class FighterPlayerClass implements Feature {
 
 
                 if (pc.getSkillManager().isUnlocked(
-                        PlayerClasses.FIGHTER.getSkill("multi_slash"))) {
+                        FighterSkills.MULTI_SLASH)) {
 
                     Vec verticalHitboxSize = new Vec(1, 2, 2);
 
@@ -254,7 +243,6 @@ public class FighterPlayerClass implements Feature {
                         character.damage(pc, damageAmount);
                     }));
 
-                    //   pc.getPosition().add(0, 1.5, 0).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
                     ParticleEffects.particle(
                             instance,
                             pc.getPosition().add(1.5, 1.5, 0).add(verticalDir.withX(0).normalize().mul(5.0)),
@@ -267,22 +255,22 @@ public class FighterPlayerClass implements Feature {
 
     private void useCharge(ActiveSkillUseEvent event) {
         double damageAmount;
-        double velocity;
+        double speed;
 
         PlayerCharacter pc = event.getPlayerCharacter();
 
         if (pc.getSkillManager().isUnlocked(
-                PlayerClasses.FIGHTER.getSkill("devastating_charge"))) {
+                FighterSkills.DEVASTATING_CHARGE)) {
             damageAmount = 4.0;
-            velocity = 40.0;
+            speed = 40.0;
         } else {
             damageAmount = 2.0;
-            velocity = 20.0;
+            speed = 20.0;
         }
 
         // Charges player forward.
         Vec direction = pc.getLookDirection().withY(0);
-        pc.setVelocity(direction.mul(velocity).withY(0.0));
+        pc.setVelocity(direction.mul(speed).withY(0.0));
 
         pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
 
@@ -304,7 +292,7 @@ public class FighterPlayerClass implements Feature {
         }));
 
         if (pc.getSkillManager().isUnlocked(
-                PlayerClasses.FIGHTER.getSkill("hellish_charge"))) {
+                FighterSkills.HELLISH_CHARGE)) {
             for (int i = 0; i < 3; i++) {
                 Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(i));
                 if (instance.getBlock(position) == Block.AIR) {

@@ -96,6 +96,10 @@ public final class PlayerCharacter extends Character {
         setLevel(levelForExperiencePoints(data.experiencePoints()));
         setMaxHealth(data.maxHealth());
         setHealth(data.health());
+        setMaxMana(data.maxMana());
+        setMana(data.mana());
+        setHealthRegenRate(data.healthRegenRate());
+        setManaRegenRate(data.manaRegenRate());
         zone = mmorpg.getZoneManager().getZone(data.zoneId());
         respawnInstance = mmorpg.getInstanceManager().getInstance(data.respawnInstanceId());
         respawnPosition = data.respawnPosition();

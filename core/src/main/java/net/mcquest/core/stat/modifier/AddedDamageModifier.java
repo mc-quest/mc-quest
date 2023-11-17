@@ -26,6 +26,10 @@ public class AddedDamageModifier implements CharacterStatModifier{
 
     @Override
     public String toString() {
-        return "Adds " + value + " " + type.toString() + " Damage";
+        if (type == DamageType.Generic) {
+            return "Adds " + value + " Damage";
+        } else {
+            return "Adds " + value + " " + type.toString() + " Damage";
+        }
     }
 }

@@ -23,6 +23,6 @@ public class AddedHealthModifier implements CharacterStatModifier {
 
     @Override
     public String toString() {
-        return "Adds " + value + " maximum Health";
+        return "Adds " + value + " Health";
     }
 }

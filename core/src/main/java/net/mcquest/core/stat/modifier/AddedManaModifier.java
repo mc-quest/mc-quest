@@ -23,6 +23,6 @@ public class AddedManaModifier implements CharacterStatModifier {
 
     @Override
     public String toString() {
-        return "Adds " + value + " maximum Mana";
+        return "Adds " + value + " Mana";
     }
 }

@@ -8,6 +8,7 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Instances;
+import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Music;
 import net.mcquest.server.constants.Zones;
 import net.mcquest.server.npc.Adventurer;
@@ -68,6 +69,7 @@ public class ProwlwoodOutpost implements Feature {
     private void handleEnter(PlayerCharacter pc) {
         pc.setZone(Zones.PROWLWOOD_OUTPOST);
         pc.getMusicPlayer().setSong(Music.VILLAGE);
+        pc.getInventory().add(Items.ADVENTURERS_HELMET); // TODO: Remove
     }
 
     private void handleExit(PlayerCharacter pc) {

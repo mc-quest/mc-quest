@@ -2,6 +2,8 @@ package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.damage.Damage;
+import net.mcquest.core.damage.DamageType;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.instance.Instance;
@@ -9,6 +11,7 @@ import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.RaycastHit;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.core.stat.AttackStats;
 import net.mcquest.server.constants.MageSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -31,7 +34,7 @@ public class MagePlayerClass implements Feature {
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
-        double damageAmount = 6.0;
+        AttackStats attackStats = new AttackStats(DamageType.Fire, 1.0);
         double maxDistance = 20.0;
         double fireballSpeed = 20.0;
         Vec hitboxSize = new Vec(1f, 1f, 1f);
@@ -61,7 +64,9 @@ public class MagePlayerClass implements Feature {
                 return;
             }
 
-            character.damage(pc, damageAmount);
+            double damage = Damage.calculate(pc.stats, character.stats, attackStats);
+            System.out.println(damage);
+            character.damage(pc, damage);
 
             fireballEntity.remove();
             hitbox.remove();
@@ -90,8 +95,8 @@ public class MagePlayerClass implements Feature {
     }
 
     private void useIceBeam(ActiveSkillUseEvent event) {
+        AttackStats attackStats = new AttackStats(DamageType.Cold, 0.1);
         double maxDistance = 15.0;
-        double damagePerTick = 1.0;
         double impulse = 10.0;
         Particle particle = Particle.ITEM_SNOWBALL;
         double particleDensity = 3.0;
@@ -145,7 +150,11 @@ public class MagePlayerClass implements Feature {
                                 particle,
                                 particleDensity
                         );
-                        character.damage(pc, damagePerTick);
+
+                        double damage = Damage.calculate(pc.stats, character.stats, attackStats);
+                        System.out.println(damage);
+                        character.damage(pc, damage);
+
                         character.applyImpulse(direction.mul(impulse));
 
                         instance.playSound(Sound.sound(

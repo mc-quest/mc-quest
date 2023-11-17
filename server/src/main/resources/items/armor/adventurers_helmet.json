@@ -1,0 +1,9 @@
+{
+    "id": "adventurers_helmet",
+    "name": "Adventurer's Helmet",
+    "quality": "COMMON",
+    "level": 1,
+    "type": "CLOTH",
+    "slot": "HEAD",
+    "protection": 10
+}

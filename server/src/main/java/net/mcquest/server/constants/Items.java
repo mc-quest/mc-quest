@@ -1,18 +1,25 @@
 package net.mcquest.server.constants;
 
 import com.google.gson.JsonObject;
+import net.mcquest.core.damage.DamageType;
 import net.mcquest.core.item.*;
+import net.mcquest.core.stat.modifier.AddedDamageModifier;
+import net.mcquest.core.stat.modifier.AddedHealthModifier;
+import net.mcquest.core.stat.modifier.AddedManaModifier;
+import net.mcquest.core.stat.modifier.IncreasedDamageModifier;
 import net.mcquest.server.Assets;
 import net.mcquest.core.asset.Asset;
 
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
+    public static final ArmorItem ADVENTURERS_HELMET = loadArmor("adventurers_helmet");
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
-                ADVENTURERS_WAND
+                ADVENTURERS_WAND,
+                ADVENTURERS_HELMET
         };
     }
 
@@ -77,7 +84,7 @@ public class Items {
         int level = object.get("level").getAsInt();
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
-        Asset model = Assets.asset(modelPath);
+        Asset model = null;//Assets.asset(modelPath);
         ArmorItem.BuildStep builder = ArmorItem.builder()
                 .id(id)
                 .name(name)
@@ -89,10 +96,15 @@ public class Items {
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
-        if (object.has("protections")) {
-            builder.protection(object.get("protections").getAsDouble());
+        if (object.has("protection")) {
+            builder.protection(object.get("protection").getAsDouble());
         }
-        return builder.build();
+        ArmorItem item = builder.build();
+        item.modifiers.add(new AddedHealthModifier(10)); // TODO: Remove
+        item.modifiers.add(new AddedManaModifier(5)); // TODO: Remove
+        item.modifiers.add(new AddedDamageModifier(DamageType.Generic, 10)); // TODO: Remove
+        item.modifiers.add(new IncreasedDamageModifier(DamageType.Fire, 0.5)); // TODO: Remove
+        return item;
     }
 
     private static ConsumableItem loadConsumable(String fileName) {

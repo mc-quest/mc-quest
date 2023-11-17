@@ -27,9 +27,9 @@ public class IncreasedDamageModifier implements CharacterStatModifier{
     @Override
     public String toString() {
         if (type == DamageType.Generic) {
-            return value + " Increased Damage";
+            return 100 * value + "% Increased Damage";
         } else {
-            return value + " Increased " + type.toString() + " Damage";
+            return 100 * value + "% Increased " + type.toString() + " Damage";
         }
     }
 }

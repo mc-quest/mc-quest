@@ -126,24 +126,29 @@ public class ItemManager {
 
     private void handleChangeItemSlot(PlayerInventoryItemChangeEvent event) {
         int slot = event.getSlot();
-        if (slot < 41 || slot > 44) {
-            // Not an armor slot
-            return;
+        if (slot == 8) {
+            handleChangeWeaponSlot(event);
+        } else if (41 <= slot && slot <= 44) {
+            handleChangeArmorSlot(event);
         }
+    }
 
+    private void handleChangeWeaponSlot(PlayerInventoryItemChangeEvent event) {
+        // TODO
+    }
+
+    private void handleChangeArmorSlot(PlayerInventoryItemChangeEvent event) {
         Player player = event.getPlayer();
         PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
 
         if (!event.getPreviousItem().isAir()) {
             // The player unequipped an item
             ArmorItem prevItem = (ArmorItem) getItem(event.getPreviousItem());
-            assert prevItem != null;
-            prevItem.equip(pc);
+            prevItem.unequip(pc);
         }
         if (!event.getNewItem().isAir()) {
             // The player equipped an item
             ArmorItem newItem = (ArmorItem) getItem(event.getNewItem());
-            assert newItem != null;
             newItem.equip(pc);
         }
     }

@@ -98,8 +98,10 @@ public class Damage {
             // Calculate protection
             {
                 double d = damage.get(DamageType.Physical);
-                d = (5 * d * d) / (protection + 5 * d);
-                damage.put(DamageType.Physical, d);
+                if (d != 0) {
+                    d = (5 * d * d) / (protection + 5 * d);
+                    damage.put(DamageType.Physical, d);
+                }
             }
 
             // Return damage amount

@@ -42,7 +42,7 @@ public class ArmorItem extends Item {
     private final Material materialModel;
     private final Color color;
     private final Asset bbmodel;
-    private final List<CharacterStatModifier> modifiers;
+    public final List<CharacterStatModifier> modifiers; // public for testing purposes; CHANGE THIS
     private final EventEmitter<ArmorEquipEvent> onEquip;
     private final EventEmitter<ArmorUnequipEvent> onUnequip;
     private int customModelData;
@@ -82,7 +82,7 @@ public class ArmorItem extends Item {
 
     public void unequip(PlayerCharacter pc) {
         for (CharacterStatModifier modifier : modifiers) {
-            modifier.activate(pc.stats);
+            modifier.deactivate(pc.stats);
         }
         onUnequip.emit(new ArmorUnequipEvent(pc, this));
     }
@@ -256,7 +256,7 @@ public class ArmorItem extends Item {
                 throw new IllegalStateException();
             }
 
-            model.requireType(AssetTypes.BBMODEL);
+            //model.requireType(AssetTypes.BBMODEL);
             bbmodel = model;
             return this;
         }

@@ -27,7 +27,7 @@
             "cooldown": 5
         },
         {
-            "type": "ACTIVE",
+            "type": "PASSIVE",
             "id": "shadow_step",
             "name": "Shadow Step",
             "level": 1,
@@ -40,7 +40,7 @@
             "prequisiteid": "backstab"
         },
         {
-            "type": "ACTIVE",
+            "type": "PASSIVE",
             "id": "go_for_the_jugular",
             "name": "Go For The Jugular",
             "level": 1,
@@ -65,7 +65,7 @@
             "cooldown": 20
         },
         {
-            "type": "ACTIVE",
+            "type": "PASSIVE",
             "id": "one_with_shadows",
             "name": "One With Shadows",
             "level": 1,
@@ -89,7 +89,7 @@
             "cooldown": 10
         },
         {
-            "type": "ACTIVE",
+            "type": "PASSIVE",
             "id": "knife_master",
             "name": "Knife Master",
             "level": 1,

@@ -137,7 +137,6 @@ public class RoguePlayerClass implements Feature {
 
     private void useFanOfKnives(ActiveSkillUseEvent event) {
         double damageAmount = 3.0;
-        double maxDistance = 20.0;
         double arrowSpeed = 20.0;
         Vec hitboxSize = new Vec(1f, 1f, 1f);
 
@@ -155,16 +154,30 @@ public class RoguePlayerClass implements Feature {
         for (double i = -Math.PI / 4;
              i <= Math.PI / 4;
              i += Math.PI / (4 * knifeMultiplier)) {
-            Vec arrowVelocity = pc.getLookDirection().rotateAroundY(i).mul(arrowSpeed);
+            Vec[] arrowVelocity = new Vec[1];
+            arrowVelocity[0] = pc.getLookDirection().rotateAroundY(i).mul(arrowSpeed);
 
+            long startTime = System.currentTimeMillis();
             Collider hitbox = new Collider(instance, startPosition, hitboxSize);
             Entity arrowEntity = new Entity(EntityType.ARROW) {
                 @Override
                 public void tick(long time) {
                     super.tick(time);
                     hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
-                    setVelocity(arrowVelocity);
-                    if (getPosition().distanceSquared(startPosition) > maxDistance * maxDistance) {
+                    setVelocity(arrowVelocity[0]);
+
+
+                    if(pc.getSkillManager().isUnlocked(
+                            RogueSkills.BOUNCING_BLADES)) {
+
+                        // Checks 10% of a block ahead to see if it will collide in the next tick with an object
+                        if (instance.getBlock(getPosition().add(arrowVelocity[0].mul(0.1))) != Block.AIR) {
+                            arrowVelocity[0] = arrowVelocity[0].neg();
+                        }
+                    }
+
+                    // Destroy the arrows after 5 seconds
+                    if ((System.currentTimeMillis() - startTime) >= 5000) {
                         remove();
                         hitbox.remove();
                     }

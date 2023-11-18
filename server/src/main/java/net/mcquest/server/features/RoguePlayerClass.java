@@ -89,8 +89,8 @@ public class RoguePlayerClass implements Feature {
 
             int modifier = pc.getSkillManager().isUnlocked(
                     RogueSkills.GO_FOR_THE_JUGULAR)
-                ? 4
-                : 2;
+                    ? 4
+                    : 2;
 
             if (character.hasLineOfSight(pc, true)) {
                 character.damage(pc, damageAmount);
@@ -118,8 +118,8 @@ public class RoguePlayerClass implements Feature {
 
         int duration = pc.getSkillManager().isUnlocked(
                 RogueSkills.ONE_WITH_SHADOWS)
-            ? 10
-            : 5;
+                ? 10
+                : 5;
 
         mmorpg.getSchedulerManager().buildTask(() -> {
             poof(pc);
@@ -147,8 +147,8 @@ public class RoguePlayerClass implements Feature {
         // Number of knives = 1 + (knifeMultiplier*2)
         int knifeMultiplier = pc.getSkillManager().isUnlocked(
                 RogueSkills.KNIFE_MASTER)
-            ? 2
-            : 1;
+                ? 2
+                : 1;
 
 
         for (double i = -Math.PI / 4;
@@ -167,7 +167,7 @@ public class RoguePlayerClass implements Feature {
                     setVelocity(arrowVelocity[0]);
 
 
-                    if(pc.getSkillManager().isUnlocked(
+                    if (pc.getSkillManager().isUnlocked(
                             RogueSkills.BOUNCING_BLADES)) {
 
                         // Checks 10% of a block ahead to see if it will collide in the next tick with an object
@@ -242,7 +242,7 @@ public class RoguePlayerClass implements Feature {
             // Hurt the player over time (2 damage every 2 seconds for 10 seconds).
             for (int i = 0; i < damageOccurences; i++) {
                 mmorpg.getSchedulerManager().buildTask(() -> {
-                    if(character.isAlive()) {
+                    if (character.isAlive()) {
                         character.damage(pc, 2);
                         Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
                         instance.playSound(poisonSound, character.getPosition());

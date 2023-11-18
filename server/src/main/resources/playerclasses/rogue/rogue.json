@@ -37,7 +37,7 @@
             "skillTreeColumn": 2,
             "manaCost": 5,
             "cooldown": 5,
-            "prequisiteid": "backstab"
+            "prerequisiteId": "backstab"
         },
         {
             "type": "PASSIVE",
@@ -50,7 +50,7 @@
             "skillTreeColumn": 4,
             "manaCost": 5,
             "cooldown": 5,
-            "prequisiteid": "backstab"
+            "prerequisiteId": "backstab"
         },
         {
             "type": "ACTIVE",
@@ -74,7 +74,8 @@
             "skillTreeRow": 5,
             "skillTreeColumn": 6,
             "manaCost": 0,
-            "cooldown": 20
+            "cooldown": 20,
+            "prerequisiteId": "sneak"
         },
         {
             "type": "ACTIVE",
@@ -82,7 +83,7 @@
             "name": "Fan of Knives",
             "level": 1,
             "icon": "fan_of_knives.png",
-            "description": "Throws 3 daggers that deal damage",
+            "description": "Throws 3 daggers that deal damage. Travel in 5 seconds before being destroyed",
             "skillTreeRow": 0,
             "skillTreeColumn": 5,
             "manaCost": 10,
@@ -96,9 +97,23 @@
             "icon": "fan_of_knives.png",
             "description": "Throws an additional 2 daggers",
             "skillTreeRow": 1,
-            "skillTreeColumn": 6,
+            "skillTreeColumn": 5,
             "manaCost": 10,
-            "cooldown": 10
+            "cooldown": 10,
+            "prerequisiteId": "fan_of_knives"
+        },
+        {
+            "type": "PASSIVE",
+            "id": "bouncing_blades",
+            "name": "Bouncing Blades",
+            "level": 1,
+            "icon": "fan_of_knives.png",
+            "description": "Causes your daggers to bounce off of surfaces they collide with",
+            "skillTreeRow": 2,
+            "skillTreeColumn": 5,
+            "manaCost": 10,
+            "cooldown": 10,
+            "prerequisiteId": "knife_master"
         },
         {
             "type": "ACTIVE",

@@ -12,5 +12,6 @@ public class RogueSkills {
     public static final PassiveSkill ONE_WITH_SHADOWS = (PassiveSkill) PlayerClasses.ROGUE.getSkill("one_with_shadows");
     public static final ActiveSkill FAN_OF_KNIVES = (ActiveSkill) PlayerClasses.ROGUE.getSkill("fan_of_knives");
     public static final PassiveSkill KNIFE_MASTER = (PassiveSkill) PlayerClasses.ROGUE.getSkill("knife_master");
+    public static final PassiveSkill BOUNCING_BLADES = (PassiveSkill) PlayerClasses.ROGUE.getSkill("bouncing_blades");
     public static final ActiveSkill WOUNDING_SLASH = (ActiveSkill) PlayerClasses.ROGUE.getSkill("wounding_slash");
 }

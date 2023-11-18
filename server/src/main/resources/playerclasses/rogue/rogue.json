@@ -85,7 +85,7 @@
             "icon": "fan_of_knives.png",
             "description": "Throws 3 daggers that deal damage. Travel in 5 seconds before being destroyed",
             "skillTreeRow": 0,
-            "skillTreeColumn": 5,
+            "skillTreeColumn": 4,
             "manaCost": 10,
             "cooldown": 10
         },
@@ -97,7 +97,7 @@
             "icon": "fan_of_knives.png",
             "description": "Throws an additional 2 daggers",
             "skillTreeRow": 1,
-            "skillTreeColumn": 5,
+            "skillTreeColumn": 4,
             "manaCost": 10,
             "cooldown": 10,
             "prerequisiteId": "fan_of_knives"
@@ -110,7 +110,7 @@
             "icon": "fan_of_knives.png",
             "description": "Causes your daggers to bounce off of surfaces they collide with",
             "skillTreeRow": 2,
-            "skillTreeColumn": 5,
+            "skillTreeColumn": 4,
             "manaCost": 10,
             "cooldown": 10,
             "prerequisiteId": "knife_master"
@@ -123,9 +123,46 @@
             "icon": "wounding_slash.png",
             "description": "Causes enemies directly in front of you to bleed for 10 seconds",
             "skillTreeRow": 0,
-            "skillTreeColumn": 6,
+            "skillTreeColumn": 7,
             "manaCost": 15,
-            "cooldown": 20
+            "cooldown": 0
+        },
+        {
+            "type": "PASSIVE",
+            "id": "deep_cut",
+            "name": "Deep Cut",
+            "level": 1,
+            "icon": "wounding_slash.png",
+            "description": "Doubles the duration of Wounding Slashes DOT",
+            "skillTreeRow": 1,
+            "skillTreeColumn": 6,
+            "manaCost": 10,
+            "cooldown": 10,
+            "prerequisiteId": "wounding_slash"
+        },
+        {
+            "type": "PASSIVE",
+            "id": "anticoagulant_poison",
+            "name": "Anticoagulant Poison",
+            "level": 1,
+            "icon": "wounding_slash.png",
+            "description": "Doubles the rate at which wounding slash deals damage",
+            "skillTreeRow": 1,
+            "skillTreeColumn": 8,
+            "manaCost": 10,
+            "prerequisiteId": "wounding_slash"
+        },
+        {
+            "type": "PASSIVE",
+            "id": "explosive_poison",
+            "name": "Explosive Poison",
+            "level": 1,
+            "icon": "wounding_slash.png",
+            "description": "If a character inflicted by wounding slash dies while it is affecting them, they explode",
+            "skillTreeRow": 2,
+            "skillTreeColumn": 8,
+            "manaCost": 10,
+            "prerequisiteId": "anticoagulant_poison"
         }
     ]
 }

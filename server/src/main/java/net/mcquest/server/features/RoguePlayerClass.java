@@ -213,6 +213,16 @@ public class RoguePlayerClass implements Feature {
     private void useWoundingSlash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int damageOccurences = pc.getSkillManager().isUnlocked(
+                RogueSkills.DEEP_CUT)
+                ? 10
+                : 5;
+
+        int damageSpeed = pc.getSkillManager().isUnlocked(
+                RogueSkills.ANTICOAGULANT_POISON)
+                ? 1
+                : 2;
+
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(1, 1, 1);
@@ -230,14 +240,51 @@ public class RoguePlayerClass implements Feature {
             }
 
             // Hurt the player over time (2 damage every 2 seconds for 10 seconds).
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < damageOccurences; i++) {
                 mmorpg.getSchedulerManager().buildTask(() -> {
-                    character.damage(pc, 2);
-                    Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
-                    instance.playSound(poisonSound, character.getPosition());
-                    Pos creatureCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
-                    ParticleEffects.particle(instance, creatureCenter, Particle.DRIPPING_LAVA);
-                }).delay(Duration.ofSeconds(2 * i)).schedule();
+                    if(character.isAlive()) {
+                        character.damage(pc, 2);
+                        Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
+                        instance.playSound(poisonSound, character.getPosition());
+                        Pos creatureCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
+                        ParticleEffects.particle(instance, creatureCenter, Particle.DRIPPING_LAVA);
+
+                        if (pc.getSkillManager().isUnlocked(RogueSkills.EXPLOSIVE_POISON)) {
+                            if (!character.isAlive()) {
+                                Pos explosionCenter = character.getPosition();
+                                Vec explosionSize = new Vec(5, 5, 5);
+
+                                // Gets collection of hit characters by hitbox.
+                                Collection<Collider> explosionHits = mmorpg.getPhysicsManager()
+                                        .overlapBox(instance, explosionCenter, explosionSize);
+
+                                // For each character hit.
+                                explosionHits.forEach(Triggers.character(explosionCharacter -> {
+
+                                    // If the character isn't damageable do nothing.
+                                    if (!explosionCharacter.isDamageable(pc)) {
+                                        return;
+                                    }
+                                    explosionCharacter.damage(pc, 5);
+
+                                }));
+
+
+                                Sound hitSound = Sound.sound(SoundEvent.ENTITY_GENERIC_EXPLODE, Sound.Source.PLAYER, 1f, 1f);
+                                instance.playSound(hitSound, pc.getPosition());
+
+                                // Make the 5x5x5 explosion
+                                for (int j = (int) -(explosionSize.x() / 2); j < (explosionSize.x() / 2); j++) {
+                                    for (int k = (int) -(explosionSize.z() / 2); k < (explosionSize.z() / 2); k++) {
+                                        for (int l = (int) -(explosionSize.z() / 2); l < (explosionSize.z() / 2); l++) {
+                                            ParticleEffects.particle(instance, explosionCenter.add(j * 2, l * 2, k * 2), Particle.EXPLOSION);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }).delay(Duration.ofSeconds(damageSpeed * i)).schedule();
             }
 
             ParticleEffects.particle(instance, hitboxCenter, Particle.CRIT);

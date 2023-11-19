@@ -46,6 +46,11 @@ public class FighterPlayerClass implements Feature {
     private void useBash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int damageAmount = pc.getSkillManager().isUnlocked(
+                FighterSkills.STRONG_ARMED)
+                ? 10
+                : 5;
+
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(3.5, 3.5, 3.5);
@@ -57,7 +62,6 @@ public class FighterPlayerClass implements Feature {
             if (!character.isDamageable(pc)) {
                 return;
             }
-            double damageAmount = 5.0;
             character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound, character.getPosition());
@@ -72,9 +76,16 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useSelfHeal(ActiveSkillUseEvent event) {
+
         PlayerCharacter pc = event.getPlayerCharacter();
+        int healAmount = pc.getSkillManager().isUnlocked(
+                FighterSkills.STERNER_STUFF)
+                ? 20
+                : 10;
+
+
         pc.playSound(Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f));
-        pc.heal(pc, 10.0);
+        pc.heal(pc, healAmount);
     }
 
     private void useOverheadStrike(ActiveSkillUseEvent event) {

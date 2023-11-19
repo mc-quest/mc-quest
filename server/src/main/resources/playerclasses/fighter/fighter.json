@@ -9,10 +9,23 @@
             "level": 1,
             "icon": "bash.png",
             "description": "Damage enemies in front of you",
-            "skillTreeRow": 0,
-            "skillTreeColumn": 0,
+            "skillTreeRow": 3,
+            "skillTreeColumn": 7,
             "manaCost": 5,
             "cooldown": 4
+        },
+        {
+            "type": "PASSIVE",
+            "id": "strong_armed",
+            "name": "Strong Armed",
+            "level": 1,
+            "icon": "bash.png",
+            "description": "Bash deals double damage",
+            "skillTreeRow": 4,
+            "skillTreeColumn": 7,
+            "manaCost": 10,
+            "cooldown": 10,
+            "prerequisiteId": "bash"
         },
         {
             "type": "ACTIVE",
@@ -21,11 +34,23 @@
             "level": 1,
             "icon": "self_heal.png",
             "description": "Heal yourself",
-            "skillTreeRow": 0,
-            "skillTreeColumn": 2,
+            "skillTreeRow": 3,
+            "skillTreeColumn": 5,
             "manaCost": 5,
-            "cooldown": 20,
-            "prerequisiteId": 1
+            "cooldown": 20
+        },
+        {
+            "type": "PASSIVE",
+            "id": "sterner_stuff",
+            "name": "Sterner Stuff",
+            "level": 1,
+            "icon": "self_heal.png",
+            "description": "Doubles healing from self_heal",
+            "skillTreeRow": 4,
+            "skillTreeColumn": 5,
+            "manaCost": 10,
+            "cooldown": 10,
+            "prerequisiteId": "self_heal"
         },
         {
             "type": "ACTIVE",

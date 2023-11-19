@@ -5,7 +5,9 @@ import net.mcquest.core.playerclass.PassiveSkill;
 
 public class FighterSkills {
     public static final ActiveSkill BASH = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("bash");
+    public static final PassiveSkill STRONG_ARMED = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("strong_armed");
     public static final ActiveSkill SELF_HEAL = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("self_heal");
+    public static final PassiveSkill STERNER_STUFF = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("sterner_stuff");
     public static final ActiveSkill OVERHEAD_STRIKE = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("overhead_strike");
     public static final PassiveSkill ENLARGED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike");
     public static final PassiveSkill EMPOWERED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("empowered_overhead_strike");

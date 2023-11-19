@@ -5,6 +5,8 @@ import net.mcquest.core.playerclass.PassiveSkill;
 
 public class RogueSkills {
     public static final ActiveSkill DASH = (ActiveSkill) PlayerClasses.ROGUE.getSkill("dash");
+    public static final PassiveSkill SWIFT_OF_FOOT = (PassiveSkill) PlayerClasses.ROGUE.getSkill("swift_of_foot");
+    public static final PassiveSkill LIGHT_OF_FOOT = (PassiveSkill) PlayerClasses.ROGUE.getSkill("light_of_foot");
     public static final ActiveSkill BACKSTAB = (ActiveSkill) PlayerClasses.ROGUE.getSkill("backstab");
     public static final PassiveSkill SHADOW_STEP = (PassiveSkill) PlayerClasses.ROGUE.getSkill("shadow_step");
     public static final PassiveSkill GO_FOR_THE_JUGULAR = (PassiveSkill) PlayerClasses.ROGUE.getSkill("go_for_the_jugular");

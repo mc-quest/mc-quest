@@ -15,6 +15,32 @@
       "cooldown": 3
     },
     {
+      "type": "PASSIVE",
+      "id": "swift_of_foot",
+      "name": "Swift of Foot",
+      "level": 1,
+      "icon": "dodge.png",
+      "description": "Increases strength of the dash so go twice as far",
+      "skillTreeRow": 1,
+      "skillTreeColumn": 2,
+      "manaCost": 5,
+      "cooldown": 5,
+      "prerequisiteId": "dash"
+    },
+    {
+      "type": "PASSIVE",
+      "id": "light_of_foot",
+      "name": "Light of Foot",
+      "level": 1,
+      "icon": "dodge.png",
+      "description": "You are invisible for the duration of the dash",
+      "skillTreeRow": 2,
+      "skillTreeColumn": 2,
+      "manaCost": 5,
+      "cooldown": 5,
+      "prerequisiteId": "dash"
+    },
+    {
       "type": "ACTIVE",
       "id": "backstab",
       "name": "Backstab",

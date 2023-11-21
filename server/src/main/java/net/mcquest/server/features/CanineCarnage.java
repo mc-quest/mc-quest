@@ -136,6 +136,19 @@ public class CanineCarnage implements Feature {
         Maps.ELADRADOR.addQuestMarker(wolfDenMarker);
         System.out.println(wolfDenMarker);
 
+        // to show quest marker
+        QuestMarker canineCarnageQuestMarker = questManager.createQuestMarker(
+                Instances.ELADRADOR,
+                new Pos(3198, 117, 3646),
+                Quests.CANINE_CARNAGE,
+                QuestMarkerIcon.READY_TO_START,
+                Predicates.and(
+                        Quests.TUTORIAL::isComplete,
+                        Quests.CANINE_CARNAGE::isNotStarted
+                )
+        );
+        Maps.ELADRADOR.addQuestMarker(canineCarnageQuestMarker);
+      
         QuestMarker guardThomasMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
                 new Pos(3198, 117, 3646),

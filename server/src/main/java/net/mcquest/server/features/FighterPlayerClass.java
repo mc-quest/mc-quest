@@ -195,7 +195,6 @@ public class FighterPlayerClass implements Feature {
     private void useWhirlwind(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        // Move up if player is holding space
         int iterations = pc.getSkillManager().isUnlocked(
                 FighterSkills.AGILE_WHIRLWIND)
             ? 16
@@ -215,7 +214,7 @@ public class FighterPlayerClass implements Feature {
 
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition().withY(y -> y + 1.5);
-                Vec horizontalHitboxSize = new Vec(2, 1, 2);
+                Vec horizontalHitboxSize = new Vec(5, 3, 5);
 
                 Collection<Collider> hits = mmorpg.getPhysicsManager()
                         .overlapBox(instance, hitboxCenter, horizontalHitboxSize);
@@ -241,7 +240,7 @@ public class FighterPlayerClass implements Feature {
                 if (pc.getSkillManager().isUnlocked(
                         FighterSkills.MULTI_SLASH)) {
 
-                    Vec verticalHitboxSize = new Vec(1, 2, 2);
+                    Vec verticalHitboxSize = new Vec(1, 4, 4);
 
                     hits = mmorpg.getPhysicsManager()
                             .overlapBox(instance, hitboxCenter, verticalHitboxSize);

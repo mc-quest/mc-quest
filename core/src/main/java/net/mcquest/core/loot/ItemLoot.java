@@ -16,7 +16,7 @@ public class ItemLoot extends Loot {
         return (ItemPoolEntry) super.getEntry();
     }
 
-    void drop(Instance instance, Pos position) {
+    public void drop(Instance instance, Pos position) {
         getEntry().getItem().drop(instance, position, amount);
     }
 }

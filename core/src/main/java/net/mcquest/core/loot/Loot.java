@@ -14,5 +14,5 @@ public abstract class Loot {
         return entry;
     }
 
-    abstract void drop(Instance instance, Pos position);
+    public abstract void drop(Instance instance, Pos position);
 }

@@ -10,7 +10,6 @@ public class Items {
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
     public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
 
-
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,

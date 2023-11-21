@@ -18,8 +18,7 @@ public class ChefMarco extends NonPlayerCharacter {
     private final InteractionSequence completeWolfBiteDelightSequence;
 
     public ChefMarco(Mmorpg mmorpg, ObjectSpawner spawner) {
-        // may want to change skin
-        super(mmorpg, spawner, CharacterModel.of(Skins.RED_KNIGHT));
+        super(mmorpg, spawner, CharacterModel.of(Skins.CHEF_MARCO));
         setName("Chef Marco");
         setLevel(5);
 

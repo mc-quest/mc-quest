@@ -9,8 +9,6 @@ import net.mcquest.core.loot.*;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Items;
-import net.mcquest.core.object.ObjectSpawner;
-import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.Models;
 import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;

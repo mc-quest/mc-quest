@@ -26,7 +26,7 @@ public class WolfBiteDelight implements Feature {
     private void chefMarco() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(3223.783, 120, 3584.452, 180, 0),
+                new Pos(3223.783, 120, 3584.452),
                 ChefMarco::new
         ));
     }
@@ -37,7 +37,7 @@ public class WolfBiteDelight implements Feature {
         // to show quest marker
         QuestMarker wolfBiteDelightQuestMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(3223.783, 120, 3584.452, 180, 0),
+                new Pos(3223, 120, 3584),
                 Quests.WOLF_BITE_DELIGHT,
                 QuestMarkerIcon.READY_TO_START,
                 Predicates.and(
@@ -50,7 +50,7 @@ public class WolfBiteDelight implements Feature {
         // turn in marker
         QuestMarker chefMarcoMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(3223.783, 120, 3584.452, 180, 0),
+                new Pos(3223, 120, 3584),
                 Quests.WOLF_BITE_DELIGHT,
                 QuestMarkerIcon.READY_TO_TURN_IN,
                 Quests.WOLF_BITE_DELIGHT.getObjective(1)::isInProgress

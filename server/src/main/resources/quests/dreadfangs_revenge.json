@@ -1,7 +1,7 @@
 {
     "id": "dreadfangs_revenge",
     "name": "Dreadfang's Revenge",
-    "level": 1,
+    "level": 2,
     "objectives": [
         {
             "description": "Talk to Dreadfang",
@@ -18,9 +18,9 @@
             "prerequisites": [1]
         },
         {
-            "description": "Speak with ?",
+            "description": "Speak with Guard Anya",
             "goal": 1,
-            "prerequisites": [1]
+            "prerequisites": [2]
         }
     ]
 }

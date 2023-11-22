@@ -26,7 +26,7 @@ import net.minestom.server.event.player.PlayerStartSneakingEvent;
 
 import java.time.Duration;
 
-public class KingsDeathRow implements Feature {
+public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDERS
     private Mmorpg mmorpg;
 
     public void hook(Mmorpg mmorpg) {
@@ -37,7 +37,7 @@ public class KingsDeathRow implements Feature {
         createQuestMarkers();
     }
 
-private void createKingsDeathRowBounds() {
+    private void createKingsDeathRowBounds() {
         Collider bounds = new Collider(
                 Instances.ELADRADOR,
                 new Pos(2976, 73, 3632),
@@ -57,7 +57,7 @@ private void createKingsDeathRowBounds() {
 
     private void goblinMinions() {
         Pos[] positions = {
-                // new Pos(3044, 99.0, 3654, 175.2f, 17.5f)
+                new Pos(3044, 99.0, 3654)
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();
@@ -118,15 +118,14 @@ private void createKingsDeathRowBounds() {
         Maps.ELADRADOR.addQuestMarker(dreadfangMarker);
         System.out.println(dreadfangMarker);
 
-        // replace below with new quest giver
-        /* QuestMarker guardThomasMarker = questManager.createQuestMarker(
+        QuestMarker guardAnyaMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
                 new Pos(3198, 117, 3646),
                 Quests.DREADFANGS_REVENGE,
                 QuestMarkerIcon.READY_TO_TURN_IN,
-                Quests.DREADFANGS_REVENGE.getObjective(2)::isInProgress
+                Quests.DREADFANGS_REVENGE.getObjective(3)::isInProgress
         );
-        Maps.ELADRADOR.addQuestMarker(guardThomasMarker); */
+        Maps.ELADRADOR.addQuestMarker(guardAnyaMarker);
     }
 
     private void handleEnterKingsDeathRow(PlayerCharacter pc) {

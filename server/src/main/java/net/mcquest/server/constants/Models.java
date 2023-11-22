@@ -15,6 +15,7 @@ public class Models {
     public static final Model DIRE_PACKLORD = loadModel("dire_packlord");
     public static final Model DIRE_WOLF = loadModel("dire_wolf");
     public static final Model DREADFANG = loadModel("dreadfang");
+    public static final Model GRIMROT = loadModel("grimrot");
     public static final Model GOBLIN_MINION = loadModel("goblin_minion");
 
     public static Model[] all() {
@@ -29,6 +30,7 @@ public class Models {
                 DIRE_PACKLORD,
                 DIRE_WOLF,
                 DREADFANG,
+                GRIMROT,
                 GOBLIN_MINION
         };
     }

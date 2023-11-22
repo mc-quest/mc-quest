@@ -4,6 +4,7 @@ import net.kyori.adventure.sound.Sound;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.PlayerCharacterManager;
 import net.mcquest.core.character.*;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.particle.ParticleEffects;
@@ -20,16 +21,20 @@ import net.minestom.server.sound.SoundEvent;
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.ui.InteractionSequence;
 import net.mcquest.core.ui.Interactions;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
+import java.util.*;
 
 public class Dreadfang extends NonPlayerCharacter {
+    private final Mmorpg mmorpg;
     private final Collider bossBattleBounds;
     private final InteractionSequence offerFightSequence;
     private final InteractionSequence admitDefeatSequence;
 
     public Dreadfang(Mmorpg mmorpg, ObjectSpawner spawner) {
         super(mmorpg, spawner, CharacterModel.of(Models.DREADFANG));
+        this.mmorpg = mmorpg;
         setName("Dreadfang");
         setLevel(4);
         setMaxHealth(400);
@@ -113,6 +118,8 @@ public class Dreadfang extends NonPlayerCharacter {
                 ))
                 .interaction(Interactions.addProgress(Quests.DREADFANGS_REVENGE.getObjective(1)))
                 .build();
+
+        bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(25, 10, 25));
     }
 
     @Override
@@ -120,11 +127,14 @@ public class Dreadfang extends NonPlayerCharacter {
         super.damage(source, amount);
 
         if (source instanceof PlayerCharacter pc) {
-            attackers.add(pc);
+            getAttackers().add(pc);
         }
 
         if (getHealth() <= 250.0) {
-            admitDefeat();
+            Set<PlayerCharacter> attackers = getAttackers();
+            for (PlayerCharacter attacker : attackers) {
+                admitDefeat(attacker);
+            }
         } else if (getHealth() == 0.0) {
             die(source);
         } else {
@@ -221,7 +231,6 @@ public class Dreadfang extends NonPlayerCharacter {
                     )
             ));
 
-            bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(25, 10, 25));
             bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
             bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
         } else if (Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
@@ -303,7 +312,7 @@ public class Dreadfang extends NonPlayerCharacter {
         }
     }
 
-    private void admitDefeat() {
+    private void admitDefeat(PlayerCharacter pc) {
         setBrain(ActiveSelector.of());
         bossBattleBounds.remove();
         admitDefeatSequence.advance(pc);
@@ -311,6 +320,10 @@ public class Dreadfang extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
+        Collection<PlayerCharacter> pcs =
+                mmorpg.getPlayerCharacterManager().getNearbyPlayerCharacters(getInstance(),
+                                                                             getPosition(), 25.0);
+        PlayerCharacter pc = (PlayerCharacter)pcs.toArray()[0];
         if (!Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
                 return (other instanceof GoblinMinion
                         || other instanceof Grimrot
@@ -328,19 +341,19 @@ public class Dreadfang extends NonPlayerCharacter {
 
     @Override
     public boolean isDamageable(DamageSource source) {
-        if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
-                && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     @Override
     protected void onChangePosition(Pos position) {
-        if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
-                && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
-            bossBattleBounds.setCenter(position);
+        Collection<PlayerCharacter> pcs =
+                mmorpg.getPlayerCharacterManager().getNearbyPlayerCharacters(getInstance(),
+                                                                             getPosition(), 22.5);
+        for (PlayerCharacter pc : pcs) {
+                if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
+                        && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
+                bossBattleBounds.setCenter(position);
+                }
         }
     }
 

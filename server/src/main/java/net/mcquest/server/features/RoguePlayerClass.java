@@ -186,12 +186,12 @@ public class RoguePlayerClass implements Feature {
                     hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
                     setVelocity(arrowVelocity[0]);
 
-
                     if (pc.getSkillManager().isUnlocked(
                             RogueSkills.BOUNCING_BLADES)) {
 
                         // Checks 10% of a block ahead to see if it will collide in the next tick with an object
-                        if (instance.getBlock(getPosition().add(arrowVelocity[0].mul(0.1))) != Block.AIR) {
+                        Pos direction = getPosition().add(arrowVelocity[0].mul(0.1));
+                        if (instance.getBlock(direction) != Block.AIR) {
                             arrowVelocity[0] = arrowVelocity[0].neg();
                         }
                     }
@@ -297,7 +297,7 @@ public class RoguePlayerClass implements Feature {
                                 for (int j = (int) -(explosionSize.x() / 2); j < (explosionSize.x() / 2); j++) {
                                     for (int k = (int) -(explosionSize.z() / 2); k < (explosionSize.z() / 2); k++) {
                                         for (int l = (int) -(explosionSize.z() / 2); l < (explosionSize.z() / 2); l++) {
-                                            ParticleEffects.particle(instance, explosionCenter.add(j * 2, l * 2, k * 2), Particle.EXPLOSION);
+                                            ParticleEffects.particle(instance, explosionCenter.add(j, l, k), Particle.EXPLOSION);
                                         }
                                     }
                                 }

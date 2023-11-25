@@ -46,6 +46,11 @@ public class FighterPlayerClass implements Feature {
     private void useBash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int damageAmount = pc.getSkillManager().isUnlocked(
+                FighterSkills.STRONG_ARMED)
+                ? 10
+                : 5;
+
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(3.5, 3.5, 3.5);
@@ -57,7 +62,6 @@ public class FighterPlayerClass implements Feature {
             if (!character.isDamageable(pc)) {
                 return;
             }
-            double damageAmount = 5.0;
             character.damage(pc, damageAmount);
             Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
             instance.playSound(hitSound, character.getPosition());
@@ -72,9 +76,16 @@ public class FighterPlayerClass implements Feature {
     }
 
     private void useSelfHeal(ActiveSkillUseEvent event) {
+
         PlayerCharacter pc = event.getPlayerCharacter();
+        int healAmount = pc.getSkillManager().isUnlocked(
+                FighterSkills.STERNER_STUFF)
+                ? 20
+                : 10;
+
+
         pc.playSound(Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f));
-        pc.heal(pc, 10.0);
+        pc.heal(pc, healAmount);
     }
 
     private void useOverheadStrike(ActiveSkillUseEvent event) {
@@ -184,7 +195,6 @@ public class FighterPlayerClass implements Feature {
     private void useWhirlwind(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        // Move up if player is holding space
         int iterations = pc.getSkillManager().isUnlocked(
                 FighterSkills.AGILE_WHIRLWIND)
             ? 16
@@ -192,11 +202,12 @@ public class FighterPlayerClass implements Feature {
 
         Vec direction = pc.getLookDirection();
 
-        // Create a for loop for 8 iterations
+        // Create a for loop for 8/16 iterations
         for (int i = 1; i <= iterations; i++) {
             boolean sound = i % 2 == 1;
             Vec horizontalDir = direction.rotateAroundY(i * Math.PI / 4);
-            Vec verticalDir = direction.rotateAroundX(i * Math.PI / 4);
+            Vec verticalDirX = direction.rotateAroundX(i * Math.PI / 4);
+            Vec verticalDirZ = direction.rotateAroundZ(i * Math.PI / 4);
             mmorpg.getSchedulerManager().buildTask(() -> {
                 if (sound) {
                     pc.emitSound(Sound.sound(SoundEvent.ENTITY_WITHER_SHOOT, Sound.Source.PLAYER, 1f, 1f));
@@ -204,7 +215,7 @@ public class FighterPlayerClass implements Feature {
 
                 Instance instance = pc.getInstance();
                 Pos hitboxCenter = pc.getPosition().withY(y -> y + 1.5);
-                Vec horizontalHitboxSize = new Vec(2, 1, 2);
+                Vec horizontalHitboxSize = new Vec(5, 2, 5);
 
                 Collection<Collider> hits = mmorpg.getPhysicsManager()
                         .overlapBox(instance, hitboxCenter, horizontalHitboxSize);
@@ -226,11 +237,10 @@ public class FighterPlayerClass implements Feature {
                         Particle.EXPLOSION
                 );
 
-
                 if (pc.getSkillManager().isUnlocked(
                         FighterSkills.MULTI_SLASH)) {
 
-                    Vec verticalHitboxSize = new Vec(1, 2, 2);
+                    Vec verticalHitboxSize = new Vec(2, 5, 2);
 
                     hits = mmorpg.getPhysicsManager()
                             .overlapBox(instance, hitboxCenter, verticalHitboxSize);
@@ -245,7 +255,11 @@ public class FighterPlayerClass implements Feature {
 
                     ParticleEffects.particle(
                             instance,
-                            pc.getPosition().add(1.5, 1.5, 0).add(verticalDir.withX(0).normalize().mul(5.0)),
+                            pc.getPosition().add(1.5, 1.5, 0).add(verticalDirX.withX(0).normalize().mul(5.0)),
+                            Particle.EXPLOSION);
+                    ParticleEffects.particle(
+                            instance,
+                            pc.getPosition().add(0, 1.5, 1.5).add(verticalDirZ.withZ(0).normalize().mul(5.0)),
                             Particle.EXPLOSION);
                 }
 

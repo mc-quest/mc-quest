@@ -14,6 +14,7 @@ import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
 import net.mcquest.server.constants.PlayerClasses;
 import net.mcquest.server.constants.RogueSkills;
+import net.minestom.server.command.builder.arguments.minecraft.ArgumentBlockState;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
@@ -26,6 +27,8 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import static net.minestom.server.command.builder.arguments.ArgumentType.BlockState;
 
 public class RoguePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -43,21 +46,40 @@ public class RoguePlayerClass implements Feature {
 
     private void useDash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
 
-        int speed = pc.getSkillManager().isUnlocked(
-                RogueSkills.SWIFT_OF_FOOT)
-                ? 100
-                : 50;
+        int speed = pc.getSkillManager().isUnlocked(RogueSkills.SWIFT_OF_FOOT) ? 100 : 50;
 
         // Makes particle effects
         poof(pc);
+
+        // Leave explosive trail behind the dash
+        if (pc.getSkillManager().isUnlocked(RogueSkills.EXPLOSIVE_MINES)) {
+
+            int[] count = new int[1];
+            Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
+            subscriptions[0] = pc.onMove().subscribe((pcMoveEvent) -> {
+                Vec playerVelocity = pcMoveEvent.getPlayerCharacter().getVelocity();
+
+                if (count[0] >= 8) {
+                    createBoom(pc);
+                    count[0] = 0;
+                } else {
+                    count[0]++;
+                }
+
+                if (playerVelocity.x() != 0 && playerVelocity.z() != 0) {
+                    return;
+                }
+                subscriptions[0].unsubscribe();
+            });
+        }
 
         // Launches player in direction of vector
         Vec direction = pc.getLookDirection();
         pc.setVelocity(direction.withY(0).mul(speed));
 
-        if(pc.getSkillManager().isUnlocked(
-                RogueSkills.LIGHT_OF_FOOT)) {
+        if (pc.getSkillManager().isUnlocked(RogueSkills.LIGHT_OF_FOOT)) {
             // Set IInvisible for duration of sprint
             pc.setInvisible(true);
             Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
@@ -73,6 +95,41 @@ public class RoguePlayerClass implements Feature {
 
     }
 
+    // Creates a delayed explosion at the position of the player character (pc)
+    private void createBoom(PlayerCharacter pc) {
+        Instance instance = pc.getInstance();
+        Pos position = pc.getPosition();
+
+        Block explosive = Block.TNT;
+
+        if (instance.getBlock(position) == Block.AIR) {
+            instance.setBlock(position, explosive);
+            mmorpg.getSchedulerManager().buildTask(() -> {
+
+                Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
+                Vec hitboxSize = new Vec(3, 3, 3);
+
+                // Gets collection of hit characters by hitbox.
+                Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
+
+                // For each character hit.
+                hits.forEach(Triggers.character(character -> {
+                    if (!character.isDamageable(pc)) {
+                        return;
+                    }
+                    character.damage(pc, 2);
+                }));
+
+                ParticleEffects.particle(instance, position, Particle.EXPLOSION);
+
+                Sound hitSound = Sound.sound(SoundEvent.ENTITY_GENERIC_EXPLODE, Sound.Source.BLOCK, 1f, 1f);
+                instance.playSound(hitSound, position);
+
+                instance.setBlock(position, Block.AIR);
+            }).delay(Duration.ofSeconds(5)).schedule();
+        }
+    }
+
 
     private void useBackstab(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
@@ -81,8 +138,7 @@ public class RoguePlayerClass implements Feature {
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(1, 1, 1);
 
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
+        Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
 
         hits.forEach(Triggers.character(character -> {
             double damageAmount = pc.getInventory().getWeapon().getPhysicalDamage();
@@ -91,15 +147,13 @@ public class RoguePlayerClass implements Feature {
                 return;
             }
 
-            if (pc.getSkillManager().isUnlocked(
-                    RogueSkills.SHADOW_STEP)) {
+            if (pc.getSkillManager().isUnlocked(RogueSkills.SHADOW_STEP)) {
                 // Get positon on other side of entity
                 Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(2));
 
                 // If there is air on the other side of the entity, teleport to the other side and
                 // look at it
-                if (instance.getBlock(position.add(0, 1, 0)) == Block.AIR
-                        && instance.getBlock(position.add(0, 2, 0)) == Block.AIR) {
+                if (instance.getBlock(position.add(0, 1, 0)) == Block.AIR && instance.getBlock(position.add(0, 2, 0)) == Block.AIR) {
                     poof(pc);
                     pc.setPosition(position);
                     pc.setLookDirection(pc.getLookDirection().rotateAroundY(Math.PI));
@@ -107,10 +161,7 @@ public class RoguePlayerClass implements Feature {
                 }
             }
 
-            int modifier = pc.getSkillManager().isUnlocked(
-                    RogueSkills.GO_FOR_THE_JUGULAR)
-                    ? 4
-                    : 2;
+            int modifier = pc.getSkillManager().isUnlocked(RogueSkills.GO_FOR_THE_JUGULAR) ? 4 : 2;
 
             if (character.hasLineOfSight(pc, true)) {
                 character.damage(pc, damageAmount);
@@ -136,10 +187,7 @@ public class RoguePlayerClass implements Feature {
         poof(pc);
         pc.setInvisible(true);
 
-        int duration = pc.getSkillManager().isUnlocked(
-                RogueSkills.ONE_WITH_SHADOWS)
-                ? 10
-                : 5;
+        int duration = pc.getSkillManager().isUnlocked(RogueSkills.ONE_WITH_SHADOWS) ? 10 : 5;
 
         mmorpg.getSchedulerManager().buildTask(() -> {
             poof(pc);
@@ -156,7 +204,6 @@ public class RoguePlayerClass implements Feature {
     }
 
     private void useFanOfKnives(ActiveSkillUseEvent event) {
-        double damageAmount = 3.0;
         double arrowSpeed = 20.0;
         Vec hitboxSize = new Vec(1f, 1f, 1f);
 
@@ -165,15 +212,12 @@ public class RoguePlayerClass implements Feature {
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
         // Number of knives = 1 + (knifeMultiplier*2)
-        int knifeMultiplier = pc.getSkillManager().isUnlocked(
-                RogueSkills.KNIFE_MASTER)
-                ? 2
-                : 1;
+        int knifeMultiplier = pc.getSkillManager().isUnlocked(RogueSkills.KNIFE_MASTER) ? 2 : 1;
 
+        double damageAmount = pc.getSkillManager().isUnlocked(RogueSkills.SHARPENED_BLADES) ? 6 : 3;
 
-        for (double i = -Math.PI / 4;
-             i <= Math.PI / 4;
-             i += Math.PI / (4 * knifeMultiplier)) {
+        // Throw knives
+        for (double i = -Math.PI / 4; i <= Math.PI / 4; i += Math.PI / (4 * knifeMultiplier)) {
             Vec[] arrowVelocity = new Vec[1];
             arrowVelocity[0] = pc.getLookDirection().rotateAroundY(i).mul(arrowSpeed);
 
@@ -186,8 +230,7 @@ public class RoguePlayerClass implements Feature {
                     hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
                     setVelocity(arrowVelocity[0]);
 
-                    if (pc.getSkillManager().isUnlocked(
-                            RogueSkills.BOUNCING_BLADES)) {
+                    if (pc.getSkillManager().isUnlocked(RogueSkills.BOUNCING_BLADES)) {
 
                         // Checks 10% of a block ahead to see if it will collide in the next tick with an object
                         Pos direction = getPosition().add(arrowVelocity[0].mul(0.1));
@@ -214,12 +257,7 @@ public class RoguePlayerClass implements Feature {
                 hitbox.remove();
                 ParticleEffects.particle(instance, hitbox.getCenter(), Particle.EXPLOSION);
 
-                instance.playSound(Sound.sound(
-                        SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
-                        Sound.Source.PLAYER,
-                        1f,
-                        1f
-                ), character.getPosition());
+                instance.playSound(Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE, Sound.Source.PLAYER, 1f, 1f), character.getPosition());
             }));
 
             arrowEntity.setNoGravity(true);
@@ -233,23 +271,16 @@ public class RoguePlayerClass implements Feature {
     private void useWoundingSlash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        int damageOccurences = pc.getSkillManager().isUnlocked(
-                RogueSkills.DEEP_CUT)
-                ? 10
-                : 5;
+        int damageOccurences = pc.getSkillManager().isUnlocked(RogueSkills.DEEP_CUT) ? 10 : 5;
 
-        int damageSpeed = pc.getSkillManager().isUnlocked(
-                RogueSkills.ANTICOAGULANT_POISON)
-                ? 1
-                : 2;
+        int damageSpeed = pc.getSkillManager().isUnlocked(RogueSkills.ANTICOAGULANT_POISON) ? 1 : 2;
 
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(1, 1, 1);
 
         // Gets collection of hit characters by hitbox.
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
+        Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
 
         // For each character hit.
         hits.forEach(Triggers.character(character -> {
@@ -275,8 +306,7 @@ public class RoguePlayerClass implements Feature {
                                 Vec explosionSize = new Vec(5, 5, 5);
 
                                 // Gets collection of hit characters by hitbox.
-                                Collection<Collider> explosionHits = mmorpg.getPhysicsManager()
-                                        .overlapBox(instance, explosionCenter, explosionSize);
+                                Collection<Collider> explosionHits = mmorpg.getPhysicsManager().overlapBox(instance, explosionCenter, explosionSize);
 
                                 // For each character hit.
                                 explosionHits.forEach(Triggers.character(explosionCharacter -> {

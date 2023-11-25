@@ -5,6 +5,8 @@ import net.kyori.adventure.text.Component;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
+import net.mcquest.core.event.PlayerCharacterMoveEvent;
+import net.mcquest.core.event.Subscription;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.instance.Instance;
 import net.mcquest.core.particle.ParticleEffects;
@@ -42,15 +44,33 @@ public class RoguePlayerClass implements Feature {
     private void useDash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int speed = pc.getSkillManager().isUnlocked(
+                RogueSkills.SWIFT_OF_FOOT)
+                ? 100
+                : 50;
+
         // Makes particle effects
-        Instance instance = pc.getInstance();
-        Pos particlePosition = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
-        ParticleEffects.particle(instance, particlePosition, Particle.SMOKE);
-        ParticleEffects.particle(instance, particlePosition, Particle.FLASH);
+        poof(pc);
 
         // Launches player in direction of vector
         Vec direction = pc.getLookDirection();
-        pc.setVelocity(direction.withY(0).mul(50));
+        pc.setVelocity(direction.withY(0).mul(speed));
+
+        if(pc.getSkillManager().isUnlocked(
+                RogueSkills.LIGHT_OF_FOOT)) {
+            // Set IInvisible for duration of sprint
+            pc.setInvisible(true);
+            Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
+            subscriptions[0] = pc.onMove().subscribe((pcMoveEvent) -> {
+                Vec playerVelocity = pcMoveEvent.getPlayerCharacter().getVelocity();
+                if (playerVelocity.x() != 0 && playerVelocity.z() != 0) {
+                    return;
+                }
+                pcMoveEvent.getPlayerCharacter().setInvisible(false);
+                subscriptions[0].unsubscribe();
+            });
+        }
+
     }
 
 

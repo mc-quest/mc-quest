@@ -202,7 +202,7 @@ public class FighterPlayerClass implements Feature {
 
         Vec direction = pc.getLookDirection();
 
-        // Create a for loop for 8 iterations
+        // Create a for loop for 8/16 iterations
         for (int i = 1; i <= iterations; i++) {
             boolean sound = i % 2 == 1;
             Vec horizontalDir = direction.rotateAroundY(i * Math.PI / 4);

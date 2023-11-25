@@ -12,7 +12,9 @@ public class FighterSkills {
     public static final PassiveSkill ENLARGED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("enlarged_overhead_strike");
     public static final PassiveSkill EMPOWERED_OVERHEAD_STRIKE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("empowered_overhead_strike");
     public static final ActiveSkill TAUNT = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("taunt");
+    public static final PassiveSkill MASTERFUL_BLUSTER = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("masterful_bluster");
     public static final ActiveSkill BERSERK = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("berserk");
+    public static final PassiveSkill REPRESSED_RAGE = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("repressed_rage");
     public static final ActiveSkill WHIRLWIND = (ActiveSkill) PlayerClasses.FIGHTER.getSkill("whirlwind");
     public static final PassiveSkill AGILE_WHIRLWIND = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("agile_whirlwind");
     public static final PassiveSkill MULTI_SLASH = (PassiveSkill) PlayerClasses.FIGHTER.getSkill("multi_slash");

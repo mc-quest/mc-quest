@@ -157,15 +157,29 @@ public class FighterPlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition();
-        Vec hitboxSize = new Vec(20, 1, 20);
+        Vec hitboxSize = new Vec(20, 3, 20);
 
+        // Create Sound and Visual Effects
         Collection<Collider> hits = mmorpg.getPhysicsManager()
                 .overlapBox(instance, hitboxCenter, hitboxSize);
+        pc.emitSound(Sound.sound(SoundEvent.ENTITY_WARDEN_ROAR, Sound.Source.PLAYER, 1f, 1f));
+        ParticleEffects.particle(
+                instance,
+                pc.getPosition(),
+                Particle.ANGRY_VILLAGER
+        );
 
         // Hits every entity in a 20x1x20 range and sets target to player.
         hits.forEach(Triggers.character(character -> {
             if ((character instanceof NonPlayerCharacter npc) && (character.getAttitude(pc) == Attitude.HOSTILE)) {
                 npc.setTarget(pc);
+
+                // Pulls characters hit towards the taunt user
+                if(pc.getSkillManager().isUnlocked(
+                        FighterSkills.MASTERFUL_BLUSTER)) {
+                    Vec launchVector = hitboxCenter.sub(character.getPosition()).asVec().mul(4, 0, 4).withY(10);
+                    character.setVelocity(launchVector);
+                }
             }
         }));
     }
@@ -173,10 +187,15 @@ public class FighterPlayerClass implements Feature {
     private void useBerserk(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int duration = pc.getSkillManager().isUnlocked(
+                FighterSkills.MASTERFUL_BLUSTER)
+                ? 40
+                : 20;
+
         // Doubles health of player
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
-        pc.sendMessage(Component.text("Beginning Berserk!"));
+        pc.sendMessage(Component.text("Beginning Berserk! (for " + duration + " seconds)"));
 
         // After 20 seconds, the current health of the player is reduced by the amount originally gained.
         // If health would be set below 1, their health is just 1
@@ -187,9 +206,9 @@ public class FighterPlayerClass implements Feature {
             } else {
                 pc.setHealth(1);
             }
-            pc.sendMessage(Component.text("Berserk Ended... you are so tired"));
+            pc.sendMessage(Component.text("Berserk Ended. You are so tired..."));
             pc.setMaxHealth(damageAmount);
-        }).delay(Duration.ofSeconds(20)).schedule();
+        }).delay(Duration.ofSeconds(duration)).schedule();
     }
 
     private void useWhirlwind(ActiveSkillUseEvent event) {
@@ -237,6 +256,7 @@ public class FighterPlayerClass implements Feature {
                         Particle.EXPLOSION
                 );
 
+                // Adds an additonal vertical slash upwards
                 if (pc.getSkillManager().isUnlocked(
                         FighterSkills.MULTI_SLASH)) {
 
@@ -305,6 +325,7 @@ public class FighterPlayerClass implements Feature {
             character.applyImpulse(direction.mul(200));
         }));
 
+        // Leaves a trail of fire behind the charger for 3 blocks
         if (pc.getSkillManager().isUnlocked(
                 FighterSkills.HELLISH_CHARGE)) {
             for (int i = 0; i < 3; i++) {

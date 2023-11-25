@@ -103,6 +103,19 @@
       "cooldown": 20
     },
     {
+      "type": "PASSIVE",
+      "id": "masterful_bluster",
+      "name": "Masterful Bluster",
+      "level": 1,
+      "icon": "taunt.png",
+      "description": "Pulls taunted enemies towards you",
+      "skillTreeRow": 1,
+      "skillTreeColumn": 4,
+      "manaCost": 5,
+      "cooldown": 20,
+      "prerequisiteId": "taunt"
+    },
+    {
       "type": "ACTIVE",
       "id": "berserk",
       "name": "Berserk",
@@ -113,6 +126,19 @@
       "skillTreeColumn": 5,
       "manaCost": 10,
       "cooldown": 40
+    },
+    {
+      "type": "PASSIVE",
+      "id": "repressed_rage",
+      "name": "Repressed Rage",
+      "level": 1,
+      "icon": "berserk.png",
+      "description": "Your deeply repressed rage makes berserk last twice as long",
+      "skillTreeRow": 1,
+      "skillTreeColumn": 5,
+      "manaCost": 10,
+      "cooldown": 40,
+      "prerequisiteId": "berserk"
     },
     {
       "type": "ACTIVE",

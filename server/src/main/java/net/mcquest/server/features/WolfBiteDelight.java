@@ -1,4 +1,5 @@
 package net.mcquest.server.features;
+
 import com.google.common.base.Predicates;
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.feature.Feature;
@@ -26,7 +27,7 @@ public class WolfBiteDelight implements Feature {
     private void chefMarco() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(3223.783, 120, 3584.452),
+                new Pos(2057, 87, 2914),
                 ChefMarco::new
         ));
     }
@@ -34,10 +35,9 @@ public class WolfBiteDelight implements Feature {
     private void createQuestMarkers() {
         QuestManager questManager = mmorpg.getQuestManager();
 
-        // to show quest marker
-        QuestMarker wolfBiteDelightQuestMarker = questManager.createQuestMarker(
+        QuestMarker startMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(3223, 120, 3584),
+                new Pos(2057, 87, 2914),
                 Quests.WOLF_BITE_DELIGHT,
                 QuestMarkerIcon.READY_TO_START,
                 Predicates.and(
@@ -45,17 +45,15 @@ public class WolfBiteDelight implements Feature {
                         Quests.WOLF_BITE_DELIGHT::isNotStarted
                 )
         );
-        Maps.ELADRADOR.addQuestMarker(wolfBiteDelightQuestMarker);
+        Maps.ELADRADOR.addQuestMarker(startMarker);
 
-        // turn in marker
-        QuestMarker chefMarcoMarker = questManager.createQuestMarker(
+        QuestMarker turnInMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(3223, 120, 3584),
+                new Pos(2057, 87, 2914),
                 Quests.WOLF_BITE_DELIGHT,
                 QuestMarkerIcon.READY_TO_TURN_IN,
                 Quests.WOLF_BITE_DELIGHT.getObjective(1)::isInProgress
         );
-        Maps.ELADRADOR.addQuestMarker(chefMarcoMarker);
+        Maps.ELADRADOR.addQuestMarker(turnInMarker);
     }
-
 }

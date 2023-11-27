@@ -8,7 +8,7 @@ import net.minestom.server.coordinate.Pos;
 public class Maps {
     public static final Map ELADRADOR = Map.of(
             "eladrador",
-            new Pos(0, 0, -16),
+            new Pos(1728, 0, 2448),
             image("eladrador")
     );
 

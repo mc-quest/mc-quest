@@ -23,8 +23,6 @@
       "description": "Bash deals double damage",
       "skillTreeRow": 4,
       "skillTreeColumn": 7,
-      "manaCost": 10,
-      "cooldown": 10,
       "prerequisiteId": "bash"
     },
     {
@@ -48,8 +46,6 @@
       "description": "Doubles healing from Self Heal",
       "skillTreeRow": 4,
       "skillTreeColumn": 5,
-      "manaCost": 10,
-      "cooldown": 10,
       "prerequisiteId": "self_heal"
     },
     {
@@ -73,8 +69,6 @@
       "description": "Expands the radius of knockback and damage to be 5x5 instead of 3x3",
       "skillTreeRow": 1,
       "skillTreeColumn": 1,
-      "manaCost": 10,
-      "cooldown": 10,
       "prerequisiteId": "overhead_strike"
     },
     {
@@ -86,8 +80,6 @@
       "description": "Overhead Strike to deals double damage",
       "skillTreeRow": 1,
       "skillTreeColumn": 3,
-      "manaCost": 10,
-      "cooldown": 10,
       "prerequisiteId": "overhead_strike"
     },
     {
@@ -111,8 +103,6 @@
       "description": "Pulls taunted enemies towards you",
       "skillTreeRow": 1,
       "skillTreeColumn": 4,
-      "manaCost": 5,
-      "cooldown": 20,
       "prerequisiteId": "taunt"
     },
     {
@@ -136,8 +126,6 @@
       "description": "Your deeply repressed rage makes berserk last twice as long",
       "skillTreeRow": 1,
       "skillTreeColumn": 5,
-      "manaCost": 10,
-      "cooldown": 40,
       "prerequisiteId": "berserk"
     },
     {
@@ -161,8 +149,6 @@
       "description": "Leaves a 3 block trail of fire that enemies won't walk through",
       "skillTreeRow": 4,
       "skillTreeColumn": 1,
-      "manaCost": 0,
-      "cooldown": 0,
       "prerequisiteId": "charge"
     },
     {
@@ -174,8 +160,6 @@
       "description": "Doubles the knockback and damage of the charge",
       "skillTreeRow": 4,
       "skillTreeColumn": 3,
-      "manaCost": 0,
-      "cooldown": 0,
       "prerequisiteId": "charge"
     },
     {
@@ -199,8 +183,6 @@
       "description": "Whirlwind rotates you twice",
       "skillTreeRow": 1,
       "skillTreeColumn": 8,
-      "manaCost": 0,
-      "cooldown": 0,
       "prerequisiteId": "whirlwind"
     },
     {
@@ -212,8 +194,6 @@
       "description": "Whirlwind does a horizontal slash and a vertical one",
       "skillTreeRow": 1,
       "skillTreeColumn": 6,
-      "manaCost": 0,
-      "cooldown": 0,
       "prerequisiteId": "whirlwind"
     }
   ]

@@ -195,7 +195,6 @@ public class FighterPlayerClass implements Feature {
         // Doubles health of player
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
-        pc.sendMessage(Component.text("Beginning Berserk! (for " + duration + " seconds)"));
 
         // After 20 seconds, the current health of the player is reduced by the amount originally gained.
         // If health would be set below 1, their health is just 1
@@ -206,7 +205,6 @@ public class FighterPlayerClass implements Feature {
             } else {
                 pc.setHealth(1);
             }
-            pc.sendMessage(Component.text("Berserk Ended. You are so tired..."));
             pc.setMaxHealth(damageAmount);
         }).delay(Duration.ofSeconds(duration)).schedule();
     }

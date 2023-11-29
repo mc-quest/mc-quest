@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Character;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
@@ -19,6 +20,8 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MagePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -28,6 +31,7 @@ public class MagePlayerClass implements Feature {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
         MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
+        MageSkills.FLAME_WALL.onUse().subscribe(this::useFlameWall);
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
@@ -163,5 +167,78 @@ public class MagePlayerClass implements Feature {
         mmorpg.getSchedulerManager().buildTask(() -> pc.setCanAct(true))
                 .delay(Duration.ofMillis(tickPeriodMs * tickCount))
                 .schedule();
+    }
+
+    private void useFlameWall(ActiveSkillUseEvent event) {
+        double distance = 15.0;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+
+        RaycastHit hit = mmorpg.getPhysicsManager().raycast(
+                instance,
+                pc.getEyePosition(),
+                pc.getLookDirection(),
+                distance,
+                Triggers.raycastFilter(character -> character.isDamageable(pc))
+        );
+
+        if (hit != null) {
+            Triggers.character((character, hitPosition) -> {
+                flameWall(event, character.getPosition());
+            }).accept(hit);
+        } else {
+            Pos targetBlock = pc.getTargetBlockPosition(distance);
+            if (targetBlock != null) {
+                flameWall(event, targetBlock);
+            }
+        }
+
+    }
+
+    private void flameWall(ActiveSkillUseEvent event, Pos position) {
+        long duration = 5000;
+        int ticks = 10;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+
+        Vec hitboxSize = new Vec(5.0, 2.0, 1.0);
+        Pos hitboxCenter = position.add(0.0, hitboxSize.y() / 2, 0.0);
+        double yaw = -Math.toRadians(pc.getPosition().yaw());
+
+        Collider hitbox = new Collider(instance, hitboxCenter, hitboxSize);
+        Set<Character> charactersHit = new HashSet<>();
+        hitbox.onCollisionEnter(Triggers.character(character -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+            charactersHit.add(character);
+        }));
+        hitbox.onCollisionExit(Triggers.character(character -> {
+            charactersHit.remove(character);
+        }));
+        mmorpg.getPhysicsManager().addCollider(hitbox);
+
+        for (int tick = 0; tick < ticks; tick++) {
+            long delay = duration * tick / ticks;
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                ParticleEffects.fillBox(
+                        instance,
+                        hitboxCenter,
+                        hitboxSize,
+                        new Vec(0.0, yaw, 0.0),
+                        Particle.FLAME,
+                        3.0
+                );
+                for (Character character : charactersHit) {
+                    character.damage(pc, 2);
+                }
+            }).delay(Duration.ofMillis(delay)).schedule();
+        }
+
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            hitbox.remove();
+        }).delay(Duration.ofMillis(duration)).schedule();
     }
 }

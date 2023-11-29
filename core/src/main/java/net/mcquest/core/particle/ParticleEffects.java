@@ -51,6 +51,41 @@ public class ParticleEffects {
         );
     }
 
+    public static void fillBox(Instance instance, Pos center, Vec extents, Vec rotation,
+                               Particle particle, double density) {
+        Vec halfExtents = extents.mul(0.5);
+
+        int particleCountX = (int) (extents.x() * density) + 1;
+        int particleCountY = (int) (extents.y() * density) + 1;
+        int particleCountZ = (int) (extents.z() * density) + 1;
+
+        double space = 1.0 / density;
+        Vec incrementX = new Vec(space, 0.0, 0.0)
+                .rotate(0.0, rotation.y(), rotation.z());
+        Vec incrementY = new Vec(0.0, space, 0.0)
+                .rotate(rotation.x(), 0.0, rotation.z());
+        Vec incrementZ = new Vec(0.0, 0.0, space)
+                .rotate(rotation.x(), rotation.y(), 0.0);
+
+        Pos startPosition = Vec.ZERO
+                .sub(halfExtents)
+                .rotate(rotation.x(), rotation.y(), rotation.z())
+                .add(center)
+                .asPosition();
+
+        for (int i = 0; i < particleCountX; i++) {
+            for (int j = 0; j < particleCountY; j++) {
+                for (int k = 0; k < particleCountZ; k++) {
+                    Pos particlePosition = startPosition
+                            .add(incrementX.mul(i))
+                            .add(incrementY.mul(j))
+                            .add(incrementZ.mul(k));
+                    particle(instance, particlePosition, particle);
+                }
+            }
+        }
+    }
+
     public static void line(Instance instance, Pos start, Vec direction,
                             double length, Particle particle, double density) {
         if (!direction.isNormalized()) {

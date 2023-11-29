@@ -195,7 +195,7 @@ public class MagePlayerClass implements Feature {
                 for (int shard = 0; shard < shards; shard++) {
                     double angle = 2 * Math.PI * shard / shards;
                     Pos shardPosition = orbEntity.getPosition().add(0.0, 0.5, 0.0);
-                    Vec shardVelocity = orbVelocity.normalize().rotateAroundY(angle).mul(shardSpeed);
+                    Vec shardVelocity = orbVelocity.withY(0).normalize().rotateAroundY(angle).mul(shardSpeed);
 
                     Vec shardHitboxSize = new Vec(0.5, 0.5, 0.5);
                     Collider shardHitbox = new Collider(instance, shardPosition, shardHitboxSize);

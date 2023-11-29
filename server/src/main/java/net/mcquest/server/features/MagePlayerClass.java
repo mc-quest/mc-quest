@@ -15,6 +15,8 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
+import net.minestom.server.entity.metadata.other.FallingBlockMeta;
+import net.minestom.server.instance.block.Block;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
@@ -28,6 +30,7 @@ public class MagePlayerClass implements Feature {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
         MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
+        MageSkills.FROZEN_ORB.onUse().subscribe(this::useFrozenOrb);
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
@@ -163,5 +166,71 @@ public class MagePlayerClass implements Feature {
         mmorpg.getSchedulerManager().buildTask(() -> pc.setCanAct(true))
                 .delay(Duration.ofMillis(tickPeriodMs * tickCount))
                 .schedule();
+    }
+
+    private void useFrozenOrb(ActiveSkillUseEvent event) {
+        double orbSpeed = 10.0;
+        double shardSpeed = 15.0;
+        long orbDuration = 1000L;
+        long shardDuration = 300L;
+        int pulses = 5;
+        int shards = 8;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+
+        Pos orbPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
+        Vec orbVelocity = pc.getLookDirection().mul(orbSpeed);
+
+        Entity orbEntity = new Entity(EntityType.FALLING_BLOCK);
+        FallingBlockMeta orbMeta = (FallingBlockMeta) orbEntity.getEntityMeta();
+        orbMeta.setBlock(Block.ICE);
+        orbEntity.setVelocity(orbVelocity);
+        orbEntity.setNoGravity(true);
+        orbEntity.setInstance(instance, orbPosition);
+
+        for (int pulse = 0; pulse < pulses; pulse++) {
+            long delay = (long) (orbDuration * 0.9 * (pulse + 1.0) / pulses);
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                for (int shard = 0; shard < shards; shard++) {
+                    double angle = 2 * Math.PI * shard / shards;
+                    Pos shardPosition = orbEntity.getPosition().add(0.0, 0.5, 0.0);
+                    Vec shardVelocity = orbVelocity.normalize().rotateAroundY(angle).mul(shardSpeed);
+
+                    Vec shardHitboxSize = new Vec(0.5, 0.5, 0.5);
+                    Collider shardHitbox = new Collider(instance, shardPosition, shardHitboxSize);
+
+                    Entity shardEntity = new Entity(EntityType.SNOWBALL){
+                        @Override
+                        public void tick(long time) {
+                            super.tick(time);
+                            shardHitbox.setCenter(getPosition());
+                        }
+                    };
+                    shardEntity.setVelocity(shardVelocity);
+                    shardEntity.setNoGravity(true);
+                    shardEntity.setInstance(instance, shardPosition);
+
+                    shardHitbox.onCollisionEnter(Triggers.character(character -> {
+                        if (!character.isDamageable(pc)) {
+                            return;
+                        }
+                        character.damage(pc, 5.0);
+                        shardEntity.remove();
+                        shardHitbox.remove();
+                    }));
+                    mmorpg.getPhysicsManager().addCollider(shardHitbox);
+
+                    mmorpg.getSchedulerManager().buildTask(() -> {
+                        shardEntity.remove();
+                        shardHitbox.remove();
+                    }).delay(Duration.ofMillis(shardDuration)).schedule();
+                }
+            }).delay(Duration.ofMillis(delay)).schedule();
+        }
+
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            orbEntity.remove();
+        }).delay(Duration.ofMillis(orbDuration)).schedule();
     }
 }

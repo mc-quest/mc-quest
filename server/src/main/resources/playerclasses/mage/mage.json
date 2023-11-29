@@ -25,6 +25,18 @@
             "skillTreeColumn": 4,
             "manaCost": 8,
             "cooldown": 7
+        },
+        {
+            "type": "ACTIVE",
+            "id": "frozen_orb",
+            "name": "Frozen Orb",
+            "level": 1,
+            "icon": "frozen_orb.png",
+            "description": "TODO",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 6,
+            "manaCost": 1,
+            "cooldown": 1
         }
     ]
 }

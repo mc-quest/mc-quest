@@ -53,11 +53,71 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
         goblinMinions();
         dreadfang();
         grimrot();
+        gaurdAnya();
     }
 
     private void goblinMinions() {
         Pos[] positions = {
-                new Pos(3044, 99.0, 3654)
+                new Pos(2846, 78, 3181),
+                new Pos(2171, 80, 3182),
+                new Pos(2185, 84, 3192),
+                new Pos(2130, 84, 3200),
+                new Pos(2139, 84, 3203),
+                new Pos(2137, 84, 3220),
+                new Pos(2137, 84, 3250),
+                new Pos(2147, 84, 3251),
+                new Pos(2122, 85, 3264),
+                new Pos(2125, 70, 3282),
+                new Pos(2151, 69, 3293),
+                new Pos(2140, 72, 3319),
+                new Pos(2093, 74, 3322),
+                new Pos(2119, 74, 3296),
+                new Pos(2131, 71, 3272),
+                new Pos(2151, 76, 3311),
+                new Pos(2160, 74, 3330),
+                new Pos(2183, 74, 3354),
+                new Pos(2206, 106, 3380),
+                new Pos(2196, 69, 3289),
+                new Pos(2846, 78, 3181),
+                new Pos(2171, 80, 3182),
+                new Pos(2185, 84, 3192),
+                new Pos(2130, 84, 3200),
+                new Pos(2139, 84, 3203),
+                new Pos(2137, 84, 3220),
+                new Pos(2137, 84, 3250),
+                new Pos(2147, 84, 3251),
+                new Pos(2122, 85, 3264),
+                new Pos(2125, 70, 3282),
+                new Pos(2151, 69, 3293),
+                new Pos(2140, 72, 3319),
+                new Pos(2093, 74, 3322),
+                new Pos(2119, 74, 3296),
+                new Pos(2131, 71, 3272),
+                new Pos(2151, 76, 3311),
+                new Pos(2160, 74, 3330),
+                new Pos(2183, 74, 3354),
+                new Pos(2206, 106, 3380),
+                new Pos(2196, 69, 3289),
+                new Pos(2846, 78, 3181),
+                new Pos(2171, 80, 3182),
+                new Pos(2185, 84, 3192),
+                new Pos(2130, 84, 3200),
+                new Pos(2139, 84, 3203),
+                new Pos(2137, 84, 3220),
+                new Pos(2137, 84, 3250),
+                new Pos(2147, 84, 3251),
+                new Pos(2122, 85, 3264),
+                new Pos(2125, 70, 3282),
+                new Pos(2151, 69, 3293),
+                new Pos(2140, 72, 3319),
+                new Pos(2093, 74, 3322),
+                new Pos(2119, 74, 3296),
+                new Pos(2131, 71, 3272),
+                new Pos(2151, 76, 3311),
+                new Pos(2160, 74, 3330),
+                new Pos(2183, 74, 3354),
+                new Pos(2206, 106, 3380),
+                new Pos(2196, 69, 3289)
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();
@@ -69,7 +129,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
     private void dreadfang() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2990, 78, 3659),
+                new Pos(2136, 84, 3257),
                 Dreadfang::new
         ));
     }
@@ -77,8 +137,16 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
     private void grimrot() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2990, 78, 3659),
+                new Pos(2157, 78, 3324),
                 Grimrot::new
+        ));
+    }
+
+    private void gaurdAnya() {
+        mmorpg.getObjectManager().add(ObjectSpawner.of(
+                Instances.ELADRADOR,
+                new Pos(2123, 80, 3124),
+                GaurdAnya::new
         ));
     }
 
@@ -87,7 +155,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
 
         objectManager.add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2987, 75, 3691, 180f, 0.0f),
+                new Pos(2169, 75, 3339, 180f, 0.0f),
                 this::createLootChest1
         ));
     }
@@ -107,7 +175,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
 
         QuestMarker dreadfangMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(2993, 78, 3665),
+                new Pos(2136, 84, 3257),
                 Quests.DREADFANGS_REVENGE,
                 QuestMarkerIcon.OBJECTIVE,
                 Predicates.or(
@@ -120,7 +188,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
 
         QuestMarker guardAnyaMarker = questManager.createQuestMarker(
                 Instances.ELADRADOR,
-                new Pos(3198, 117, 3646),
+                new Pos(2123, 80, 3124),
                 Quests.DREADFANGS_REVENGE,
                 QuestMarkerIcon.READY_TO_TURN_IN,
                 Quests.DREADFANGS_REVENGE.getObjective(3)::isInProgress

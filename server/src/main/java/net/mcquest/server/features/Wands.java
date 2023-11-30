@@ -14,8 +14,13 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.utils.time.Cooldown;
+import net.minestom.server.utils.time.TimeUnit;
+
+import java.time.Duration;
 
 public class Wands implements Feature {
+    private final Cooldown cooldown = new Cooldown(Duration.of(5, TimeUnit.SERVER_TICK));
     private Mmorpg mmorpg;
 
     @Override
@@ -25,6 +30,10 @@ public class Wands implements Feature {
     }
 
     private void autoAttack(AutoAttackEvent event) {
+        if (!cooldown.isReady(System.currentTimeMillis())) {
+            return;
+        }
+        cooldown.refreshLastUpdate(System.currentTimeMillis());
         double maxDistance = 15.0;
         double impulse = 20.0;
 

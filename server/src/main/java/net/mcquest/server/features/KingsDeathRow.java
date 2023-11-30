@@ -21,6 +21,7 @@ import net.mcquest.server.constants.*;
 import net.mcquest.server.npc.Dreadfang;
 import net.mcquest.server.npc.Grimrot;
 import net.mcquest.server.npc.GoblinMinion;
+import net.mcquest.server.npc.GuardAnya;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.event.player.PlayerStartSneakingEvent;
 
@@ -53,7 +54,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
         goblinMinions();
         dreadfang();
         grimrot();
-        gaurdAnya();
+        guardAnya();
     }
 
     private void goblinMinions() {
@@ -142,11 +143,11 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
         ));
     }
 
-    private void gaurdAnya() {
+    private void guardAnya() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
                 new Pos(2123, 80, 3124),
-                GaurdAnya::new
+                GuardAnya::new
         ));
     }
 

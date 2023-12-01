@@ -9,6 +9,13 @@ public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
     public static final Weapon IRON_DAGGER = loadWeapon("iron_dagger");
+    public static final Weapon IRON_SWORD = loadWeapon("iron_sword");
+    public static final Weapon HARDENEDIRON_SWORD = loadWeapon("hardenediron_sword");
+    public static final Weapon HARDENEDIRON_DAGGER = loadWeapon("hardenediron_dagger");
+    public static final Weapon KNIGHT_DAGGER = loadWeapon("knight_dagger");
+    public static final Weapon KNIGHT_SWORD = loadWeapon("knight_sword");
+    public static final Weapon MOON_WAND = loadWeapon("moon_wand");
+    public static final Weapon LANTERN_WAND = loadWeapon("lantern_wand");
     public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
 
     public static Item[] all() {
@@ -16,6 +23,13 @@ public class Items {
                 ADVENTURERS_SWORD,
                 ADVENTURERS_WAND,
                 IRON_DAGGER,
+                IRON_SWORD,
+                HARDENEDIRON_SWORD,
+                HARDENEDIRON_DAGGER,
+                KNIGHT_DAGGER,
+                KNIGHT_SWORD,
+                MOON_WAND,
+                LANTERN_WAND,
                 WOLF_FLANK
         };
     }

@@ -23,6 +23,11 @@ public class MeleeWeapons implements Feature {
         this.mmorpg = mmorpg;
         Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::autoAttack);
         Items.IRON_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.IRON_SWORD.onAutoAttack().subscribe(this::autoAttack);
+        Items.HARDENEDIRON_SWORD.onAutoAttack().subscribe(this::autoAttack);
+        Items.HARDENEDIRON_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.KNIGHT_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.KNIGHT_SWORD.onAutoAttack().subscribe(this::autoAttack);
     }
 
     public void autoAttack(AutoAttackEvent event) {

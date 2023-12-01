@@ -8,7 +8,7 @@ public class Features {
     public static final Feature FIGHTER_PLAYER_CLASS = new FighterPlayerClass();
     public static final Feature MAGE_PLAYER_CLASS = new MagePlayerClass();
     public static final Feature ROGUE_PLAYER_CLASS = new RoguePlayerClass();
-    public static final Feature SWORDS = new Swords();
+    public static final Feature MELEE_WEAPONS = new MeleeWeapons();
     public static final Feature WANDS = new Wands();
     public static final Feature PROWLWOOD_OUTPOST = new ProwlwoodOutpost();
     public static final Feature PROWLWOOD = new Prowlwood();
@@ -23,7 +23,7 @@ public class Features {
                 FIGHTER_PLAYER_CLASS,
                 MAGE_PLAYER_CLASS,
                 ROGUE_PLAYER_CLASS,
-                SWORDS,
+                MELEE_WEAPONS,
                 WANDS,
                 PROWLWOOD_OUTPOST,
                 PROWLWOOD,

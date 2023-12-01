@@ -8,12 +8,14 @@ import net.mcquest.core.asset.Asset;
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
+    public static final Weapon IRON_DAGGER = loadWeapon("iron_dagger");
     public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
                 ADVENTURERS_WAND,
+                IRON_DAGGER,
                 WOLF_FLANK
         };
     }

@@ -1,7 +1,7 @@
 {
   "id": "minor_mana_potion",
   "name": "Minor Mana Potion",
-  "quality": "UNCOMMON",
+  "quality": "COMMON",
   "level": 1,
-  "description": "Recovers 2 globe of mana for the player"
+  "description": "Restores 25 mana"
 }

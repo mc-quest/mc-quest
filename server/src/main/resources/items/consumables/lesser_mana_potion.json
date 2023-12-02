@@ -1,7 +1,7 @@
 {
   "id": "lesser_mana_potion",
   "name": "Lesser Mana Potion",
-  "quality": "COMMON",
-  "level": 1,
-  "description": "Recovers 1 globe of mana for the player"
+  "quality": "UNCOMMON",
+  "level": 5,
+  "description": "Restores 50 mana"
 }

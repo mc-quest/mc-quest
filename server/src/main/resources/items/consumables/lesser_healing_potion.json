@@ -1,0 +1,7 @@
+{
+  "id": "lesser_healing_potion",
+  "name": "Lesser Healing Potion",
+  "quality": "COMMON",
+  "level": 1,
+  "description": "Heals the player for 1 heart"
+}

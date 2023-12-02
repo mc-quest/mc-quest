@@ -10,6 +10,7 @@ public class Features {
     public static final Feature ROGUE_PLAYER_CLASS = new RoguePlayerClass();
     public static final Feature SWORDS = new Swords();
     public static final Feature WANDS = new Wands();
+    public static final Feature CONSUMABLES = new Consumables();
     public static final Feature PROWLWOOD_OUTPOST = new ProwlwoodOutpost();
     public static final Feature PROWLWOOD = new Prowlwood();
     public static final Feature TUTORIAL_QUEST = new TutorialQuest();
@@ -25,6 +26,7 @@ public class Features {
                 ROGUE_PLAYER_CLASS,
                 SWORDS,
                 WANDS,
+                CONSUMABLES,
                 PROWLWOOD_OUTPOST,
                 PROWLWOOD,
                 TUTORIAL_QUEST,

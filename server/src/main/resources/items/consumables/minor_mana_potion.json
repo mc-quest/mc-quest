@@ -1,0 +1,7 @@
+{
+  "id": "minor_mana_potion",
+  "name": "Minor Mana Potion",
+  "quality": "UNCOMMON",
+  "level": 1,
+  "description": "Recovers 2 globe of mana for the player"
+}

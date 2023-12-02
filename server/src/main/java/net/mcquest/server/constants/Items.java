@@ -14,7 +14,13 @@ public class Items {
     public static final ConsumableItem MINOR_MANA_POTION = loadConsumable("minor_mana_potion");
 
     public static Item[] all() {
-        return new Item[]{ADVENTURERS_SWORD, ADVENTURERS_WAND, WOLF_FLANK, LESSER_HEALING_POTION, LESSER_MANA_POTION, MINOR_MANA_POTION};
+        return new Item[]{ADVENTURERS_SWORD,
+                ADVENTURERS_WAND,
+                WOLF_FLANK,
+                LESSER_HEALING_POTION,
+                LESSER_MANA_POTION,
+                MINOR_MANA_POTION
+        };
     }
 
     private static BasicItem loadBasicItem(String fileName) {
@@ -26,7 +32,11 @@ public class Items {
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         Asset icon = Assets.asset(iconPath);
-        BasicItem.BuildStep builder = BasicItem.builder().id(id).name(name).quality(quality).icon(icon);
+        BasicItem.BuildStep builder = BasicItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .icon(icon);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -42,7 +52,11 @@ public class Items {
         String name = object.get("name").getAsString();
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         Asset icon = Assets.asset(iconPath);
-        QuestItem.BuildStep builder = QuestItem.builder().id(id).name(name).quality(quality).icon(icon);
+        QuestItem.BuildStep builder = QuestItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .icon(icon);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -61,7 +75,14 @@ public class Items {
         WeaponType type = WeaponType.valueOf(object.get("type").getAsString());
         Asset model = Assets.asset(modelPath);
         double attackSpeed = object.get("attackSpeed").getAsDouble();
-        Weapon.BuildStep builder = Weapon.builder().id(id).name(name).quality(quality).level(level).type(type).model(model).attackSpeed(attackSpeed);
+        Weapon.BuildStep builder = Weapon.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .type(type)
+                .model(model)
+                .attackSpeed(attackSpeed);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -84,7 +105,14 @@ public class Items {
         ArmorType type = ArmorType.valueOf(object.get("type").getAsString());
         ArmorSlot slot = ArmorSlot.valueOf(object.get("slot").getAsString());
         Asset model = Assets.asset(modelPath);
-        ArmorItem.BuildStep builder = ArmorItem.builder().id(id).name(name).quality(quality).level(level).type(type).slot(slot).model(model);
+        ArmorItem.BuildStep builder = ArmorItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .type(type)
+                .slot(slot)
+                .model(model);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }
@@ -104,7 +132,12 @@ public class Items {
         ItemQuality quality = ItemQuality.valueOf(object.get("quality").getAsString());
         int level = object.get("level").getAsInt();
         Asset icon = Assets.asset(iconPath);
-        ConsumableItem.BuildStep builder = ConsumableItem.builder().id(id).name(name).quality(quality).level(level).icon(icon);
+        ConsumableItem.BuildStep builder = ConsumableItem.builder()
+                .id(id)
+                .name(name)
+                .quality(quality)
+                .level(level)
+                .icon(icon);
         if (object.has("description")) {
             builder.description(object.get("description").getAsString());
         }

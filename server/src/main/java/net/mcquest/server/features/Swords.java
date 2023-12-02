@@ -21,7 +21,6 @@ public class Swords implements Feature {
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
-
         Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::autoAttack);
     }
 

@@ -37,6 +37,8 @@ public class Consumables implements Feature {
         pc.heal(pc, 50);
     }
 
+    // Takes in a player character and makes a potion splash effect
+    // sound at their location
     private void potionUseSound(PlayerCharacter pc) {
         Instance instance = pc.getInstance();
         instance.playSound(Sound.sound(

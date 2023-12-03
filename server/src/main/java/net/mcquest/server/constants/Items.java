@@ -14,7 +14,8 @@ public class Items {
     public static final ConsumableItem MINOR_MANA_POTION = loadConsumable("minor_mana_potion");
 
     public static Item[] all() {
-        return new Item[]{ADVENTURERS_SWORD,
+        return new Item[]{
+                ADVENTURERS_SWORD,
                 ADVENTURERS_WAND,
                 WOLF_FLANK,
                 LESSER_HEALING_POTION,

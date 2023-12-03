@@ -41,6 +41,6 @@ class ItemUtility {
     }
 
     static Key resourcePackKey(ConsumableItem item, int cooldownTexture) {
-        return Key.key(Namespaces.ITEMS, String.format(item.getId() + "-%d", cooldownTexture));
+        return Key.key(Namespaces.ITEMS, String.format("%s-%d", item.getId(), cooldownTexture));
     }
 }

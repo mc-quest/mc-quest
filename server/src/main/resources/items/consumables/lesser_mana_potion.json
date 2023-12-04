@@ -1,0 +1,7 @@
+{
+  "id": "lesser_mana_potion",
+  "name": "Lesser Mana Potion",
+  "quality": "UNCOMMON",
+  "level": 5,
+  "description": "Restores 50 mana"
+}

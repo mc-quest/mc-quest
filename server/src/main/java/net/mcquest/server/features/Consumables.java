@@ -47,9 +47,9 @@ public class Consumables implements Feature {
     private void potionUseSound(PlayerCharacter pc) {
         Instance instance = pc.getInstance();
         instance.playSound(Sound.sound(
-                SoundEvent.ENTITY_SPLASH_POTION_BREAK,
+                SoundEvent.ENTITY_GENERIC_DRINK,
                 Sound.Source.PLAYER,
-                0.5f,
+                1f,
                 1f
         ), pc.getPosition());
     }

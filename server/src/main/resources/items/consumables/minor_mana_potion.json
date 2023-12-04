@@ -1,0 +1,7 @@
+{
+  "id": "minor_mana_potion",
+  "name": "Minor Mana Potion",
+  "quality": "COMMON",
+  "level": 1,
+  "description": "Restores 25 mana"
+}

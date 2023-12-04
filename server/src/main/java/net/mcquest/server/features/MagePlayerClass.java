@@ -214,31 +214,34 @@ public class MagePlayerClass implements Feature {
             character.damage(pc, 10);
 
             Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+            List<Character> hits = new ArrayList<>();
+            hits.add(character);
             mmorpg.getSchedulerManager().buildTask(() -> {
                 chainLightning(
                         event,
                         chains,
                         characterPos,
-                        chainRange
+                        chainRange,
+                        hits
                 );
             }).delay(Duration.ofMillis(200L)).schedule();
         }).accept(initialHit);
     }
 
-    private void chainLightning(ActiveSkillUseEvent event, int chains, Pos chainOrigin, double chainRange) {
+    private void chainLightning(ActiveSkillUseEvent event, int chains, Pos chainOrigin, double chainRange, List<Character> hits) {
         if (chains == 0) {
             return;
         }
 
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
-        Vec chainHitBoxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
+        Vec chainHitboxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
 
         Collection<Collider> chainHitbox = mmorpg.getPhysicsManager()
-                .overlapBox(instance, chainOrigin, chainHitBoxSize);
+                .overlapBox(instance, chainOrigin, chainHitboxSize);
         List<Character> targets = new ArrayList<>();
         chainHitbox.forEach(Triggers.character(character -> {
-            if (!character.isDamageable(pc)) {
+            if (!character.isDamageable(pc) || hits.contains(character)) {
                 return;
             }
             targets.add(character);
@@ -256,6 +259,7 @@ public class MagePlayerClass implements Feature {
                 shortestDistance = distance;
             }
         }
+        hits.add(character);
 
         Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
 
@@ -274,7 +278,8 @@ public class MagePlayerClass implements Feature {
                     event,
                     chains - 1,
                     characterPos,
-                    chainRange
+                    chainRange,
+                    hits
             );
         }).delay(Duration.ofMillis(200L)).schedule();
     }

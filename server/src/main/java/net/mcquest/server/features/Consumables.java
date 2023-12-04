@@ -10,35 +10,40 @@ import net.mcquest.server.constants.Items;
 import net.minestom.server.sound.SoundEvent;
 
 public class Consumables implements Feature {
-    private Mmorpg mmorpg;
-
     @Override
     public void hook(Mmorpg mmorpg) {
-        Items.LESSER_HEALING_POTION.onConsume().subscribe(this::useLesserHealing);
-        Items.LESSER_MANA_POTION.onConsume().subscribe(this::useLesserMana);
-        Items.MINOR_MANA_POTION.onConsume().subscribe(this::useMinorMana);
+        Items.MINOR_HEALING_POTION.onConsume().subscribe(this::useMinorHealingPotion);
+        Items.LESSER_HEALING_POTION.onConsume().subscribe(this::useLesserHealingPotion);
+        Items.MINOR_MANA_POTION.onConsume().subscribe(this::useMinorManaPotion);
+        Items.LESSER_MANA_POTION.onConsume().subscribe(this::useLesserManaPotion);
     }
 
-    private void useMinorMana(ItemConsumeEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
+    private void useMinorHealingPotion(ItemConsumeEvent event) {
+        useHealingPotion(event.getPlayerCharacter(), 25.0);
+    }
+
+    private void useLesserHealingPotion(ItemConsumeEvent event) {
+        useHealingPotion(event.getPlayerCharacter(), 50.0);
+    }
+
+    private void useMinorManaPotion(ItemConsumeEvent event) {
+        useManaPotion(event.getPlayerCharacter(), 25.0);
+    }
+
+    private void useLesserManaPotion(ItemConsumeEvent event) {
+        useManaPotion(event.getPlayerCharacter(), 50.0);
+    }
+
+    private void useHealingPotion(PlayerCharacter pc, double amount) {
         potionUseSound(pc);
-        pc.addMana(25);
+        pc.heal(pc, amount);
     }
 
-    private void useLesserMana(ItemConsumeEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
+    private void useManaPotion(PlayerCharacter pc, double amount) {
         potionUseSound(pc);
-        pc.addMana(50);
+        pc.addMana(amount);
     }
 
-    private void useLesserHealing(ItemConsumeEvent event) {
-        PlayerCharacter pc = event.getPlayerCharacter();
-        potionUseSound(pc);
-        pc.heal(pc, 50);
-    }
-
-    // Takes in a player character and makes a potion splash effect
-    // sound at their location
     private void potionUseSound(PlayerCharacter pc) {
         Instance instance = pc.getInstance();
         instance.playSound(Sound.sound(

@@ -9,12 +9,18 @@ public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
     public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
+    public static final ConsumableItem LESSER_HEALING_POTION = loadConsumable("lesser_healing_potion");
+    public static final ConsumableItem LESSER_MANA_POTION = loadConsumable("lesser_mana_potion");
+    public static final ConsumableItem MINOR_MANA_POTION = loadConsumable("minor_mana_potion");
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
                 ADVENTURERS_WAND,
-                WOLF_FLANK
+                WOLF_FLANK,
+                LESSER_HEALING_POTION,
+                LESSER_MANA_POTION,
+                MINOR_MANA_POTION
         };
     }
 
@@ -118,7 +124,7 @@ public class Items {
     }
 
     private static ConsumableItem loadConsumable(String fileName) {
-        String basePath = "items/weapons/" + fileName;
+        String basePath = "items/consumables/" + fileName;
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();

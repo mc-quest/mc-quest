@@ -25,8 +25,8 @@ public class ProwlwoodOutpost implements Feature {
     private void bounds() {
         Collider bounds = new Collider(
                 Instances.ELADRADOR,
-                new Pos(3169, 80, 3547),
-                new Pos(3361, 142, 3682)
+                new Pos(2004, 73, 2884),
+                new Pos(2186, 131, 3018)
         );
         bounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnter));
         bounds.onCollisionExit(Triggers.playerCharacter(this::handleExit));
@@ -35,28 +35,32 @@ public class ProwlwoodOutpost implements Feature {
 
     private void adventurers() {
         Pos[] positions = {
-                new Pos(3269, 121, 3605),
-                new Pos(3221, 116, 3642),
-                new Pos(3209, 117, 3650),
-                new Pos(3226, 117, 3654),
-                new Pos(3238, 118, 3643),
-                new Pos(3244, 122, 3625),
-                new Pos(3234, 120, 3602),
-                new Pos(3216, 118, 3597),
-                new Pos(3200, 114, 3607),
-                new Pos(3182, 111, 3618),
-                new Pos(3174, 114, 3583),
-                new Pos(3193, 119, 3571),
-                new Pos(3218, 120, 3566),
-                new Pos(3245, 122, 3569),
-                new Pos(3256, 122, 3602),
-                new Pos(3226, 117, 3642),
-                new Pos(3237, 118, 3640),
-                new Pos(3244, 119, 3633),
-                new Pos(3252, 122, 3620),
-                new Pos(3263, 121, 3622),
-                new Pos(3265, 121, 3639),
-                new Pos(3283, 121, 3641)
+                new Pos(2020, 79, 2942),
+                new Pos(2007, 83, 2895),
+                new Pos(2036, 87, 2886),
+                new Pos(2066, 89, 2888),
+                new Pos(2077, 88, 2928),
+                new Pos(2099, 89, 2926),
+                new Pos(2113, 88, 2924),
+                new Pos(2129, 88, 2929),
+                new Pos(2140, 88, 2914),
+                new Pos(2096, 89, 2953),
+                new Pos(2100, 88, 2970),
+                new Pos(2114, 89, 2967),
+                new Pos(2131, 89, 2957),
+                new Pos(2140, 88, 2973),
+                new Pos(2160, 89, 2972),
+                new Pos(2171, 89, 2962),
+                new Pos(2165, 88, 2943),
+                new Pos(2098, 89, 2981),
+                new Pos(2116, 87, 3004),
+                new Pos(2110, 87, 3010),
+                new Pos(2085, 83, 3004),
+                new Pos(2056, 84, 2974),
+                new Pos(2032, 84, 2964),
+                new Pos(2014, 78, 2947),
+                new Pos(2090, 88, 2933),
+                new Pos(2102, 89, 2926)
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();

@@ -52,6 +52,18 @@ public final class Quest {
         return pc.getQuestTracker().getStatus(this);
     }
 
+    public boolean isNotStarted(PlayerCharacter pc) {
+        return getStatus(pc) == QuestStatus.NOT_STARTED;
+    }
+
+    public boolean isInProgress(PlayerCharacter pc) {
+        return getStatus(pc) == QuestStatus.IN_PROGRESS;
+    }
+
+    public boolean isComplete(PlayerCharacter pc) {
+        return getStatus(pc) == QuestStatus.COMPLETED;
+    }
+
     public void start(PlayerCharacter pc) {
         pc.getQuestTracker().startQuest(this);
     }

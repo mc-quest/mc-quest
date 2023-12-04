@@ -192,6 +192,7 @@ public class SkillManager {
         unlockedSkills.add(skill);
         pc.sendMessage(skillUnlockedMessage(skill));
         SkillUnlockEvent event = new SkillUnlockEvent(pc, skill);
+        skill.onUnlock().emit(event);
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.call(event);
     }

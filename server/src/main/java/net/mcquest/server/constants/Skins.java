@@ -11,6 +11,7 @@ public class Skins {
     public static PlayerSkin RED_KNIGHT = loadSkin("red_knight");
     public static PlayerSkin VILLAGER_MALE = loadSkin("villager_male");
     public static PlayerSkin VILLAGER_FEMALE = loadSkin("villager_female");
+    public static PlayerSkin CHEF_MARCO = loadSkin("chef_male");
 
     private static PlayerSkin loadSkin(String fileName) {
         String path = String.format("skins/%s.json", fileName);

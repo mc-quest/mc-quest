@@ -16,12 +16,13 @@ public class PlayerCharacterInit implements Feature {
     }
 
     private void handleCreatePlayerCharacter(PlayerCharacterCreateEvent event) {
+        Pos spawnPosition = new Pos(2095, 89, 2943, 90, 0);
         Weapon weapon = event.getPlayerClass() == PlayerClasses.MAGE ? Items.ADVENTURERS_WAND : Items.ADVENTURERS_SWORD;
         event.setResult(new PlayerCharacterCreateEvent.Result(
                 Instances.ELADRADOR,
-                new Pos(3200, 117, 3635),
+                spawnPosition,
                 Instances.ELADRADOR,
-                new Pos(3200, 117, 3635),
+                spawnPosition,
                 Zones.PROWLWOOD_OUTPOST,
                 weapon,
                 Maps.ELADRADOR,

@@ -297,22 +297,23 @@ public class ResourcePackUtility {
 
     private static void parseTextures(JsonArray texturesJson, List<Texture> textures,
                                       Map<String, Key> textureMappings, Key key) {
-        for (JsonElement textureJson : texturesJson) {
-            parseTexture(textureJson.getAsJsonObject(), textures, textureMappings, key);
+        for (int i = 0; i < texturesJson.size(); i++) {
+            JsonElement textureJson = texturesJson.get(i);
+            parseTexture(i, textureJson.getAsJsonObject(), textures, textureMappings, key);
         }
     }
 
-    private static void parseTexture(JsonObject textureJson, List<Texture> textures,
+    private static void parseTexture(int textureIndex, JsonObject textureJson,
+                                     List<Texture> textures,
                                      Map<String, Key> textureMappings, Key key) {
-        int textureId = textureJson.get("id").getAsInt();
-        String path = key.value() + "/" + textureId;
+        String path = key.value() + "/" + textureIndex;
         Key textureKey = Key.key(Namespaces.ITEMS, path);
         String source = textureJson.get("source").getAsString();
         source = source.substring(TEXTURE_DATA_PREFIX.length());
         byte[] bytes = Base64.getDecoder().decode(source);
         Writable data = Writable.bytes(bytes);
         textures.add(Texture.of(textureKey, data));
-        textureMappings.put(String.valueOf(textureId), textureKey);
+        textureMappings.put(String.valueOf(textureIndex), textureKey);
     }
 
     private static List<Element> parseElements(JsonArray elementsJson, int textureWidth, int textureHeight) {

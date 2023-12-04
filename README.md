@@ -15,16 +15,16 @@ MCQuest is divided into the following subprojects:
 
 ## Running the Server
 
-1. Execute `gradlew run` to start the server.
+1. Execute `./gradlew run` to start the server.
 2. Connect to `localhost` through the Minecraft client to connect.
 
 ## Building Fat JAR
 
-Execute `gradlew build` to build the fat JAR.
+Execute `./gradlew build` to build the fat JAR.
 
 ## Running Tests
 
-Execute `gradlew test` to run tests.
+Execute `./gradlew test` to run tests.
 
 ## Operational Use Cases
 

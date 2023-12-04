@@ -28,13 +28,13 @@ The project contains the following directories:
 
 ## Building the Software
 
-Run `gradlew build` to create a fat JAR at `server/build/libs/server-all.jar`.
-Alternatively, one can simply run `gradlew run` to run the server without
+Run `./gradlew build` to create a fat JAR at `server/build/libs/server-all.jar`.
+Alternatively, one can simply run `./gradlew run` to run the server without
 building a JAR.
 
 ## Testing the Software
 
-Run `gradlew test`.
+Run `./gradlew test`.
 
 ## Adding Tests
 
@@ -50,4 +50,4 @@ lifting, after all).
 MCQuest uses [semantic versioning](https://semver.org/) to name releases. To
 create a release, tag the release commit with the release version. The version
 number must be updated within the README. One can attach a fat JAR created by
-`gradlew build` to the release.
+`./gradlew build` to the release.

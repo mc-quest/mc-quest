@@ -146,7 +146,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
     private void guardAnya() {
         mmorpg.getObjectManager().add(ObjectSpawner.of(
                 Instances.ELADRADOR,
-                new Pos(2123, 80, 3124),
+                new Pos(2123, 80, 3124, 180, 0),
                 GuardAnya::new
         ));
     }

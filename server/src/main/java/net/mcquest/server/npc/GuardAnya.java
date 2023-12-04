@@ -51,7 +51,7 @@ public class GuardAnya extends NonPlayerCharacter {
                 .interaction(Interactions.speak(
                         this,
                         Component.text(" I've killed many of his minions, but I can't seem to"
-                                + "get to Grimrot himself.")
+                                + " get to Grimrot himself.")
                 ))
                 .interaction(Interactions.speak(
                         this,

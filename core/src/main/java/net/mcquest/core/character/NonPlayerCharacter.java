@@ -157,7 +157,7 @@ public class NonPlayerCharacter extends Character {
     }
 
     @Override
-    public void damage(@NotNull DamageSource source, double amount) {
+    public final void damage(@NotNull DamageSource source, double amount) {
         super.damage(source, amount);
 
         if (source instanceof PlayerCharacter pc) {

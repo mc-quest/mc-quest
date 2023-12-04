@@ -123,22 +123,13 @@ public class Dreadfang extends NonPlayerCharacter {
     }
 
     @Override
-    public void damage(@NotNull DamageSource source, double amount) {
-        super.damage(source, amount);
-
-        if (source instanceof PlayerCharacter pc) {
-            getAttackers().add(pc);
-        }
-
+    public void onDamage(DamageSource source) {
+        emitSound(Sound.sound(SoundEvent.ENTITY_HOGLIN_HURT, Sound.Source.HOSTILE, 2f, 0.75f));
         if (getHealth() <= 250.0) {
             Set<PlayerCharacter> attackers = getAttackers();
             for (PlayerCharacter attacker : attackers) {
                 admitDefeat(attacker);
             }
-        } else if (getHealth() == 0.0) {
-            die(source);
-        } else {
-            takeDamage(source);
         }
     }
 

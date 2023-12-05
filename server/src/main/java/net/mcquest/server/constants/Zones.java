@@ -8,6 +8,7 @@ public class Zones {
     public static final Zone OAKSHIRE = new Zone("oakshire", "Oakshire", 1, ZoneType.SETTLEMENT);
     public static final Zone PROWLWOOD = new Zone("prowlwood", "Prowlwood", 1, ZoneType.WILDERNESS);
     public static final Zone PACKLORD_DEN = new Zone("packlord_den", "Packlord's Den", 2, ZoneType.DUNGEON);
+    public static final Zone ASHEN_TANGLE = new Zone("ashen_tangle", "Ashen Tangle", 4, ZoneType.WILDERNESS);
     public static final Zone BROODMOTHER_LAIR = new Zone("broodmother_lair", "Broodmother's Lair", 5, ZoneType.DUNGEON);
 
     public static Zone[] all() {
@@ -16,6 +17,7 @@ public class Zones {
                 OAKSHIRE,
                 PROWLWOOD,
                 PACKLORD_DEN,
+                ASHEN_TANGLE,
                 BROODMOTHER_LAIR
         };
     }

@@ -14,6 +14,7 @@ import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
 import net.mcquest.server.constants.Music;
 import net.kyori.adventure.sound.Sound;
+import net.mcquest.server.constants.Quests;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.sound.SoundEvent;
@@ -32,7 +33,8 @@ public class Broodmother extends NonPlayerCharacter {
         setMovementSpeed(10.0);
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(45));
-        setExperiencePoints(10);
+        setExperiencePoints(100);
+        addSlayQuestObjective(Quests.NOT_SO_ITSY_BITSY.getObjective(0));
         setLootTable(LootTable.builder()
                 .pool(Pool.builder()
                         .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
@@ -80,7 +82,8 @@ public class Broodmother extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
-        return (other instanceof Spider || other instanceof Broodmother)
+        return (other instanceof Spider || other instanceof Broodmother ||
+                other instanceof SpiderEgg || other instanceof SpiderEggCluster)
                 ? Attitude.FRIENDLY
                 : Attitude.HOSTILE;
     }
@@ -136,7 +139,7 @@ public class Broodmother extends NonPlayerCharacter {
 
     private void attackHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 100.0);
+            character.damage(this, 9.5);
             character.applyImpulse(getPosition().direction().mul(2000.0));
         }
     }

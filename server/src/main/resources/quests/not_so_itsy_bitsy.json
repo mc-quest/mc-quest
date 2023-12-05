@@ -1,0 +1,26 @@
+{
+  "id": "not_so_itsy_bitsy",
+  "name": "Not So Itsy Bitsy",
+  "level": 5,
+  "objectives": [
+    {
+      "description": "Defeat Broodmother",
+      "goal": 1
+    },
+    {
+      "description": "Leave Cave",
+      "goal": 1,
+      "prerequisites": [0]
+    },
+    {
+      "description": "Inform Outside Fishermen",
+      "goal": 1,
+      "prerequisites": [1]
+    },
+    {
+      "description": "Inform Captain Seraphina",
+      "goal": 1,
+      "prerequisites": [2]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.core.util.MathUtility;
 import net.mcquest.server.constants.Models;
 import net.mcquest.server.constants.Music;
 import net.mcquest.server.constants.Quests;
@@ -26,7 +27,7 @@ public class Grimrot extends NonPlayerCharacter {
         super(mmorpg, spawner, CharacterModel.of(Models.GRIMROT));
         setName("Grimrot");
         setLevel(4);
-        setMaxHealth(700);
+        setMaxHealth(400);
         setMass(200);
         setMovementSpeed(10.0);
         setRemovalDelay(Duration.ofMillis(2000));
@@ -34,7 +35,7 @@ public class Grimrot extends NonPlayerCharacter {
         setExperiencePoints(120);
         addSlayQuestObjective(Quests.DREADFANGS_REVENGE.getObjective(0));
 
-    setBrain(ActiveSelector.of(
+        setBrain(ActiveSelector.of(
                 Sequence.of(
                         TaskFindClosestTarget.of(25.0),
                         TaskPlayAnimation.of(CharacterAnimation.named("run")),
@@ -48,14 +49,15 @@ public class Grimrot extends NonPlayerCharacter {
                         ),
                         TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
-                                new int[]{1, 1, 1, 1},
+                                new int[]{2, 1, 2, 2},
                                 Sequence.of(
                                         TaskPlayAnimation.of(CharacterAnimation.named("slam")),
-                                        TaskWait.of(Duration.ofMillis(250)),
+                                        TaskWait.of(Duration.ofMillis(1300)),
+                                        TaskAction.of(this::groundSlamJump),
+                                        TaskWait.of(Duration.ofMillis(1500)),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
-                                        TaskWait.of(Duration.ofMillis(250)),
-                                        TaskAction.of(this::groundSlam),
+                                        TaskAction.of(this::groundSlamLand),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
@@ -146,12 +148,24 @@ public class Grimrot extends NonPlayerCharacter {
         pc.getMusicPlayer().setSong(Music.KINGS_DEATH_ROW);
     }
 
-    private boolean groundSlam(long time) {
-        Pos hitboxCenter = getPosition().add(getLookDirection().mul(3)).withY(y -> y + 1.5);
-        Vec extents = new Vec(3.25, 3, 3.25);
+    private boolean groundSlamJump(long time) {
+        setVelocity(new Vec(0.0, 20.0, 0.0));
+        return true;
+    }
+
+    private boolean groundSlamLand(long time) {
+        Pos hitboxCenter = getPosition().add(getLookDirection().mul(2.0)).withY(y -> y + 2);
+        Vec extents = new Vec(4, 4, 4);
         getMmorpg().getPhysicsManager()
                 .overlapBox(getInstance(), hitboxCenter, extents)
                 .forEach(Triggers.character(this::groundSlamHit));
+        for (int i = 0; i < 3; i++) {
+            ParticleEffects.particle(getInstance(), hitboxCenter.add(
+                    MathUtility.randomRange(-2, 2),
+                    MathUtility.randomRange(-2, 2),
+                    MathUtility.randomRange(-2, 2)
+            ), Particle.EXPLOSION);
+        }
         return true;
     }
 
@@ -163,7 +177,7 @@ public class Grimrot extends NonPlayerCharacter {
     }
 
     private boolean roadhogHeal(long time) {
-        heal(this, 25);
+        heal(this, 10);
         return true;
     }
 

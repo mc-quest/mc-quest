@@ -32,11 +32,11 @@
             "name": "Flame Wall",
             "level": 1,
             "icon": "flame_wall.png",
-            "description": "TODO",
+            "description": "Cast a wall of flames which burns enemies in its area.",
             "skillTreeRow": 0,
             "skillTreeColumn": 7,
-            "manaCost": 1,
-            "cooldown": 1
+            "manaCost": 5,
+            "cooldown": 5
         }
     ]
 }

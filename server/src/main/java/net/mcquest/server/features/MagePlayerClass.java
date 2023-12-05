@@ -1,7 +1,9 @@
 package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Attitude;
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
@@ -20,6 +22,7 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -207,19 +210,6 @@ public class MagePlayerClass implements Feature {
         Pos hitboxCenter = position.add(0.0, hitboxSize.y() / 2, 0.0);
         double yaw = -Math.toRadians(pc.getPosition().yaw());
 
-        Collider hitbox = new Collider(instance, hitboxCenter, hitboxSize);
-        Set<Character> charactersHit = new HashSet<>();
-        hitbox.onCollisionEnter(Triggers.character(character -> {
-            if (!character.isDamageable(pc)) {
-                return;
-            }
-            charactersHit.add(character);
-        }));
-        hitbox.onCollisionExit(Triggers.character(character -> {
-            charactersHit.remove(character);
-        }));
-        mmorpg.getPhysicsManager().addCollider(hitbox);
-
         for (int tick = 0; tick < ticks; tick++) {
             long delay = duration * tick / ticks;
             mmorpg.getSchedulerManager().buildTask(() -> {
@@ -231,14 +221,23 @@ public class MagePlayerClass implements Feature {
                         Particle.FLAME,
                         3.0
                 );
-                for (Character character : charactersHit) {
+
+                Collection<Collider> hits = mmorpg.getPhysicsManager()
+                        .overlapBox(instance, hitboxCenter, hitboxSize.add(0.0, 0.0, 4.0));
+                hits.forEach(Triggers.character(character -> {
+                    if (!character.isDamageable(pc)) {
+                        return;
+                    }
                     character.damage(pc, 2);
-                }
+                }));
+
+                instance.playSound(Sound.sound(
+                        SoundEvent.BLOCK_AZALEA_LEAVES_PLACE,
+                        Sound.Source.PLAYER,
+                        2f,
+                        1f
+                ), hitboxCenter);
             }).delay(Duration.ofMillis(delay)).schedule();
         }
-
-        mmorpg.getSchedulerManager().buildTask(() -> {
-            hitbox.remove();
-        }).delay(Duration.ofMillis(duration)).schedule();
     }
 }

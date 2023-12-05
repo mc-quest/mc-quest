@@ -26,12 +26,20 @@ Execute `./gradlew build` to build the fat JAR.
 
 Execute `./gradlew test` to run tests.
 
-## Operational Use Cases
+## Operational Use Cases (Completed Features)
 
+- Completing a fully functional tutorial
 - Playing with friends
-- Selecting a class to play as
+- Playing one of three completely unique classes
 - Fighting enemies
 - Completing quests
+- Reading one's quest journal
 - Using skills
-- Using the map
-- Exploring the world
+- Using the minimap
+- Exploring a massive world
+- Delving through multiple unique dungeons
+- Acquiring a myriad of unique loot items
+- Meeting custom NPCS with unique animations
+- Hosting a private version of MCQuest
+- Creating a new character and persistently saving that character's data
+- Leveling up through completing quests and slaying monsters

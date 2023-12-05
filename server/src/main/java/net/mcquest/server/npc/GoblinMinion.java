@@ -39,18 +39,13 @@ public class GoblinMinion extends NonPlayerCharacter {
                                 )
                         ),
                         TaskWait.of(Duration.ofMillis(100)),
-                        RandomSelector.of(
-                                new int[]{1, 1},
-                                Sequence.of(
-                                        TaskPlayAnimation.of(CharacterAnimation.named("attack")),
-                                        TaskWait.of(Duration.ofMillis(250)),
-                                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                Sound.Source.HOSTILE, 1f, 1f)),
-                                        TaskWait.of(Duration.ofMillis(250)),
-                                        TaskAction.of(this::attack),
-                                        TaskWait.of(Duration.ofMillis(800))
-                                )
-                        )
+                        TaskPlayAnimation.of(CharacterAnimation.named("attack")),
+                        TaskWait.of(Duration.ofMillis(250)),
+                        TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                Sound.Source.HOSTILE, 1f, 1f)),
+                        TaskWait.of(Duration.ofMillis(250)),
+                        TaskAction.of(this::attack),
+                        TaskWait.of(Duration.ofMillis(800))
                 ),
                 Sequence.of(
                         TaskPlayAnimation.of(CharacterAnimation.named("idle")),
@@ -72,12 +67,12 @@ public class GoblinMinion extends NonPlayerCharacter {
     @Override
     public Attitude getAttitude(Character other) {
         return other instanceof GoblinMinion || other instanceof Grimrot ||
-               other instanceof Dreadfang
+                other instanceof Dreadfang
                 ? Attitude.FRIENDLY
                 : Attitude.HOSTILE;
     }
 
-     @Override
+    @Override
     public boolean isDamageable(DamageSource source) {
         return true;
     }

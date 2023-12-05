@@ -13,7 +13,7 @@ MCQuest is divided into the following subprojects:
   abstractions for `server` to create MMORPG content.
 - `server`: Uses the `core` API to implement and serve an MMORPG.
 
-## Running the Server
+## Running the Server (For more Information see User and Developer Manuals)
 
 1. Execute `./gradlew run` to start the server.
 2. Connect to `localhost` through the Minecraft client to connect.

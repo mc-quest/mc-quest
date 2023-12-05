@@ -204,6 +204,8 @@ public class MagePlayerClass implements Feature {
             mmorpg.getSchedulerManager().buildTask(() -> {
                 Pos shardPosition = orbEntity.getPosition().add(0.0, 0.5, 0.0);
 
+                Set<Character> hits = new HashSet<>();
+
                 for (int shard = 0; shard < shards; shard++) {
                     double angle = 2 * Math.PI * shard / shards;
                     Vec shardVelocity = orbVelocity.withY(0).normalize().rotateAroundY(angle).mul(shardSpeed);
@@ -222,7 +224,6 @@ public class MagePlayerClass implements Feature {
                     shardEntity.setNoGravity(true);
                     shardEntity.setInstance(instance, shardPosition);
 
-                    Set<Character> hits = new HashSet<>();
                     shardHitbox.onCollisionEnter(Triggers.character(character -> {
                         if (!character.isDamageable(pc) || hits.contains(character)) {
                             return;

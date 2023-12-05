@@ -39,6 +39,18 @@
           "cooldown": 5
         },
         {
+            "type": "ACTIVE",
+            "id": "frozen_orb",
+            "name": "Frozen Orb",
+            "level": 1,
+            "icon": "frozen_orb.png",
+            "description": "Cast an icy projectile which releases shards as it travels.",
+            "skillTreeRow": 0,
+            "skillTreeColumn": 6,
+            "manaCost": 5,
+            "cooldown": 5
+        },
+        {
           "type": "ACTIVE",
           "id": "flame_wall",
           "name": "Flame Wall",

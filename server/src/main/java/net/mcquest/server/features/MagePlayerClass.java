@@ -1,6 +1,7 @@
 package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Character;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
@@ -21,6 +22,8 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MagePlayerClass implements Feature {
     private Mmorpg mmorpg;
@@ -219,10 +222,12 @@ public class MagePlayerClass implements Feature {
                     shardEntity.setNoGravity(true);
                     shardEntity.setInstance(instance, shardPosition);
 
+                    Set<Character> hits = new HashSet<>();
                     shardHitbox.onCollisionEnter(Triggers.character(character -> {
-                        if (!character.isDamageable(pc)) {
+                        if (!character.isDamageable(pc) || hits.contains(character)) {
                             return;
                         }
+                        hits.add(character);
                         character.damage(pc, 5.0);
                         shardEntity.remove();
                         shardHitbox.remove();

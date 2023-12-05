@@ -22,6 +22,8 @@ public class Wands implements Feature {
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
         Items.ADVENTURERS_WAND.onAutoAttack().subscribe(this::autoAttack);
+        Items.MOON_WAND.onAutoAttack().subscribe(this::autoAttack);
+        Items.LANTERN_WAND.onAutoAttack().subscribe(this::autoAttack);
     }
 
     private void autoAttack(AutoAttackEvent event) {

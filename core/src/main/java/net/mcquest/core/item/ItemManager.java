@@ -2,14 +2,11 @@ package net.mcquest.core.item;
 
 import net.mcquest.core.Mmorpg;
 import net.mcquest.core.character.PlayerCharacter;
-import net.mcquest.core.event.ItemConsumeEvent;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.event.item.PickupItemEvent;
-import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.event.player.PlayerLoginEvent;
-import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.timer.SchedulerManager;
 import net.minestom.server.timer.TaskSchedule;
@@ -37,7 +34,6 @@ public class ItemManager {
 
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         eventHandler.addListener(PlayerLoginEvent.class, this::handleLogin);
-        eventHandler.addListener(PlayerChangeHeldSlotEvent.class, this::handleChangeHeldSlot);
         eventHandler.addListener(PickupItemEvent.class, this::handlePickupItem);
     }
 
@@ -77,49 +73,6 @@ public class ItemManager {
         scheduler.buildTask(() -> player.setHeldItemSlot((byte) PlayerCharacterInventory.WEAPON_SLOT))
                 .delay(TaskSchedule.nextTick())
                 .schedule();
-    }
-
-    private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
-        // TODO: sound
-
-        Player player = event.getPlayer();
-        PlayerCharacter pc = mmorpg.getPlayerCharacterManager().getPlayerCharacter(player);
-
-        if (pc == null) {
-            return;
-        }
-
-        int slot = event.getSlot();
-        if (!(slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_1 ||
-                slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_2)) {
-            return;
-        }
-
-        event.setCancelled(true);
-
-        if (!pc.canAct()) {
-            return;
-        }
-
-        ItemStack itemStack = player.getInventory().getItemStack(slot);
-        ConsumableItem item = (ConsumableItem) getItem(itemStack);
-        if (item == null) {
-            return;
-        }
-
-        pc.sendMessage(ItemUtility.useItemText(item));
-
-        ItemConsumeEvent consumeEvent = new ItemConsumeEvent(pc, item);
-        item.onConsume().emit(consumeEvent);
-        MinecraftServer.getGlobalEventHandler().call(consumeEvent);
-
-        PlayerInventory inventory = player.getInventory();
-        if (itemStack.amount() == 1) {
-            // TODO: set placeholder
-            inventory.setItemStack(slot, ItemStack.AIR);
-        } else {
-            inventory.setItemStack(slot, itemStack.withAmount(itemStack.amount() - 1));
-        }
     }
 
     private void handlePickupItem(PickupItemEvent event) {

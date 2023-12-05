@@ -22,7 +22,9 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +36,7 @@ public class MagePlayerClass implements Feature {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
         MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
+        MageSkills.CHAIN_LIGHTNING.onUse().subscribe(this::useChainLightning);
         MageSkills.FLAME_WALL.onUse().subscribe(this::useFlameWall);
     }
 
@@ -172,7 +175,139 @@ public class MagePlayerClass implements Feature {
                 .schedule();
     }
 
-    private void useFlameWall(ActiveSkillUseEvent event) {
+    private void useChainLightning(ActiveSkillUseEvent event) {
+        int chains = 3;
+        double chainRange = 10.0;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Pos origin = pc.getWeaponPosition();
+        Vec direction = pc.getEyePosition()
+                .add(pc.getLookDirection().mul(chainRange))
+                .sub(origin)
+                .asVec()
+                .normalize();
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), origin);
+
+        RaycastHit initialHit = mmorpg.getPhysicsManager().raycast(
+                instance,
+                origin,
+                direction,
+                chainRange,
+                Triggers.raycastFilter(character -> character.isDamageable(pc))
+        );
+
+        if (initialHit == null) {
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    origin.add(direction.mul(chainRange)),
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+            return;
+        }
+
+        Triggers.character((character, hitPosition) -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    hitPosition,
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+
+            character.damage(pc, 10);
+
+            Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+            List<Character> hits = new ArrayList<>();
+            hits.add(character);
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                chainLightning(
+                        event,
+                        chains,
+                        characterPos,
+                        chainRange,
+                        hits
+                );
+            }).delay(Duration.ofMillis(200L)).schedule();
+        }).accept(initialHit);
+    }
+
+    private void chainLightning(ActiveSkillUseEvent event, int chains, Pos chainOrigin, double chainRange, List<Character> hits) {
+        if (chains == 0) {
+            return;
+        }
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Vec chainHitboxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), chainOrigin);
+
+        Collection<Collider> chainHitbox = mmorpg.getPhysicsManager()
+                .overlapBox(instance, chainOrigin, chainHitboxSize);
+        List<Character> targets = new ArrayList<>();
+        chainHitbox.forEach(Triggers.character(character -> {
+            if (!character.isDamageable(pc) || hits.contains(character)) {
+                return;
+            }
+            targets.add(character);
+        }));
+        if (targets.isEmpty()) {
+            return;
+        }
+
+        Character character = targets.get(0);
+        double shortestDistance = chainOrigin.distance(character.getPosition());
+        for (Character target : targets) {
+            double distance = chainOrigin.distance(target.getPosition());
+            if (distance < shortestDistance) {
+                character = target;
+                shortestDistance = distance;
+            }
+        }
+        hits.add(character);
+
+        Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+
+        ParticleEffects.line(
+                instance,
+                chainOrigin,
+                characterPos,
+                Particle.DRAGON_BREATH,
+                3.0
+        );
+
+        character.damage(pc, 10);
+
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            chainLightning(
+                    event,
+                    chains - 1,
+                    characterPos,
+                    chainRange,
+                    hits
+            );
+        }).delay(Duration.ofMillis(200L)).schedule();
+    }
+
+        private void useFlameWall(ActiveSkillUseEvent event) {
         double distance = 15.0;
 
         PlayerCharacter pc = event.getPlayerCharacter();

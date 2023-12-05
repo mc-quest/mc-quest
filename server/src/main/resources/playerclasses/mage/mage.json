@@ -27,6 +27,18 @@
             "cooldown": 7
         },
         {
+          "type": "ACTIVE",
+          "id": "chain_lightning",
+          "name": "Chain Lightning",
+          "level": 1,
+          "icon": "chain_lightning.png",
+          "description": "Cast an arc of lightning which chains to nearby enemies.",
+          "skillTreeRow": 0,
+          "skillTreeColumn": 5,
+          "manaCost": 5,
+          "cooldown": 5
+        },
+        {
             "type": "ACTIVE",
             "id": "frozen_orb",
             "name": "Frozen Orb",
@@ -37,6 +49,18 @@
             "skillTreeColumn": 6,
             "manaCost": 5,
             "cooldown": 5
+        },
+        {
+          "type": "ACTIVE",
+          "id": "flame_wall",
+          "name": "Flame Wall",
+          "level": 1,
+          "icon": "flame_wall.png",
+          "description": "Cast a wall of flames which burns enemies in its area.",
+          "skillTreeRow": 0,
+          "skillTreeColumn": 7,
+          "manaCost": 5,
+          "cooldown": 5
         }
     ]
 }

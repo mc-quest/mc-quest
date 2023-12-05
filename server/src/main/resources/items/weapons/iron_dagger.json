@@ -1,0 +1,9 @@
+{
+    "id": "iron_dagger",
+    "name": "Iron Dagger",
+    "quality": "COMMON",
+    "level": 1,
+    "type": "DAGGER",
+    "attackSpeed": 0,
+    "physicalDamage": 1.5
+}

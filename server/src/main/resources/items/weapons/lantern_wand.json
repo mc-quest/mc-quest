@@ -1,0 +1,9 @@
+{
+  "id": "lantern_wand",
+  "name": "Lantern Wand",
+  "quality": "UNCOMMON",
+  "level": 1,
+  "type": "WAND",
+  "attackSpeed": 1,
+  "physicalDamage": 6
+}

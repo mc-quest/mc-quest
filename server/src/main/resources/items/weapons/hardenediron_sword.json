@@ -1,0 +1,9 @@
+{
+  "id": "hardenediron_sword",
+  "name": "Hardened-Iron Sword",
+  "quality": "UNCOMMON",
+  "level": 1,
+  "type": "SWORD",
+  "attackSpeed": 1,
+  "physicalDamage": 9
+}

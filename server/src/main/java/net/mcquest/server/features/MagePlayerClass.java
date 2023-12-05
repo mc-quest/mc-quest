@@ -1,7 +1,9 @@
 package net.mcquest.server.features;
 
 import net.mcquest.core.Mmorpg;
+import net.mcquest.core.character.Attitude;
 import net.mcquest.core.character.Character;
+import net.mcquest.core.character.NonPlayerCharacter;
 import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
@@ -22,6 +24,9 @@ import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,7 +38,9 @@ public class MagePlayerClass implements Feature {
         this.mmorpg = mmorpg;
         MageSkills.FIREBALL.onUse().subscribe(this::useFireball);
         MageSkills.ICE_BEAM.onUse().subscribe(this::useIceBeam);
+        MageSkills.CHAIN_LIGHTNING.onUse().subscribe(this::useChainLightning);
         MageSkills.FROZEN_ORB.onUse().subscribe(this::useFrozenOrb);
+        MageSkills.FLAME_WALL.onUse().subscribe(this::useFlameWall);
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
@@ -171,6 +178,138 @@ public class MagePlayerClass implements Feature {
                 .schedule();
     }
 
+    private void useChainLightning(ActiveSkillUseEvent event) {
+        int chains = 3;
+        double chainRange = 10.0;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Pos origin = pc.getWeaponPosition();
+        Vec direction = pc.getEyePosition()
+                .add(pc.getLookDirection().mul(chainRange))
+                .sub(origin)
+                .asVec()
+                .normalize();
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), origin);
+
+        RaycastHit initialHit = mmorpg.getPhysicsManager().raycast(
+                instance,
+                origin,
+                direction,
+                chainRange,
+                Triggers.raycastFilter(character -> character.isDamageable(pc))
+        );
+
+        if (initialHit == null) {
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    origin.add(direction.mul(chainRange)),
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+            return;
+        }
+
+        Triggers.character((character, hitPosition) -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+
+            ParticleEffects.line(
+                    instance,
+                    pc.getWeaponPosition(),
+                    hitPosition,
+                    Particle.DRAGON_BREATH,
+                    3.0
+            );
+
+            character.damage(pc, 10);
+
+            Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+            List<Character> hits = new ArrayList<>();
+            hits.add(character);
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                chainLightning(
+                        event,
+                        chains,
+                        characterPos,
+                        chainRange,
+                        hits
+                );
+            }).delay(Duration.ofMillis(200L)).schedule();
+        }).accept(initialHit);
+    }
+
+    private void chainLightning(ActiveSkillUseEvent event, int chains, Pos chainOrigin, double chainRange, List<Character> hits) {
+        if (chains == 0) {
+            return;
+        }
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+        Vec chainHitboxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), chainOrigin);
+
+        Collection<Collider> chainHitbox = mmorpg.getPhysicsManager()
+                .overlapBox(instance, chainOrigin, chainHitboxSize);
+        List<Character> targets = new ArrayList<>();
+        chainHitbox.forEach(Triggers.character(character -> {
+            if (!character.isDamageable(pc) || hits.contains(character)) {
+                return;
+            }
+            targets.add(character);
+        }));
+        if (targets.isEmpty()) {
+            return;
+        }
+
+        Character character = targets.get(0);
+        double shortestDistance = chainOrigin.distance(character.getPosition());
+        for (Character target : targets) {
+            double distance = chainOrigin.distance(target.getPosition());
+            if (distance < shortestDistance) {
+                character = target;
+                shortestDistance = distance;
+            }
+        }
+        hits.add(character);
+
+        Pos characterPos = character.getPosition().add(0.0, 1.0, 0.0);
+
+        ParticleEffects.line(
+                instance,
+                chainOrigin,
+                characterPos,
+                Particle.DRAGON_BREATH,
+                3.0
+        );
+
+        character.damage(pc, 10);
+
+        mmorpg.getSchedulerManager().buildTask(() -> {
+            chainLightning(
+                    event,
+                    chains - 1,
+                    characterPos,
+                    chainRange,
+                    hits
+            );
+        }).delay(Duration.ofMillis(200L)).schedule();
+    }
+  
     private void useFrozenOrb(ActiveSkillUseEvent event) {
         double orbSpeed = 10.0;
         double shardSpeed = 15.0;
@@ -252,5 +391,73 @@ public class MagePlayerClass implements Feature {
 
         mmorpg.getSchedulerManager().buildTask(orbEntity::remove)
                 .delay(Duration.ofMillis(orbDuration)).schedule();
+    }
+
+    private void useFlameWall(ActiveSkillUseEvent event) {
+        double distance = 15.0;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+
+        RaycastHit hit = mmorpg.getPhysicsManager().raycast(
+                instance,
+                pc.getEyePosition(),
+                pc.getLookDirection(),
+                distance,
+                Triggers.raycastFilter(character -> character.isDamageable(pc))
+        );
+
+        if (hit != null) {
+            Triggers.character((character, hitPosition) -> {
+                flameWall(event, character.getPosition());
+            }).accept(hit);
+        } else {
+            Pos targetBlock = pc.getTargetBlockPosition(distance);
+            if (targetBlock != null) {
+                flameWall(event, targetBlock);
+            }
+        }
+    }
+
+    private void flameWall(ActiveSkillUseEvent event, Pos position) {
+        long duration = 5000;
+        int ticks = 10;
+
+        PlayerCharacter pc = event.getPlayerCharacter();
+        Instance instance = pc.getInstance();
+
+        Vec hitboxSize = new Vec(5.0, 2.0, 1.0);
+        Pos hitboxCenter = position.add(0.0, hitboxSize.y() / 2, 0.0);
+        double yaw = -Math.toRadians(pc.getPosition().yaw());
+
+        for (int tick = 0; tick < ticks; tick++) {
+            long delay = duration * tick / ticks;
+            mmorpg.getSchedulerManager().buildTask(() -> {
+                ParticleEffects.fillBox(
+                        instance,
+                        hitboxCenter,
+                        hitboxSize,
+                        new Vec(0.0, yaw, 0.0),
+                        Particle.FLAME,
+                        3.0
+                );
+
+                Collection<Collider> hits = mmorpg.getPhysicsManager()
+                        .overlapBox(instance, hitboxCenter, hitboxSize.add(0.0, 0.0, 4.0));
+                hits.forEach(Triggers.character(character -> {
+                    if (!character.isDamageable(pc)) {
+                        return;
+                    }
+                    character.damage(pc, 2);
+                }));
+
+                instance.playSound(Sound.sound(
+                        SoundEvent.BLOCK_AZALEA_LEAVES_PLACE,
+                        Sound.Source.PLAYER,
+                        2f,
+                        1f
+                ), hitboxCenter);
+            }).delay(Duration.ofMillis(delay)).schedule();
+        }
     }
 }

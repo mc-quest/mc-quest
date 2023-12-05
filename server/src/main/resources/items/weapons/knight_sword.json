@@ -1,0 +1,9 @@
+{
+  "id": "knight_sword",
+  "name": "Knight's Sword",
+  "quality": "RARE",
+  "level": 1,
+  "type": "SWORD",
+  "attackSpeed": 0,
+  "physicalDamage": 12
+}

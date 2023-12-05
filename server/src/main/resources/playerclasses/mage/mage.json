@@ -32,11 +32,11 @@
             "name": "Chain Lightning",
             "level": 1,
             "icon": "chain_lightning.png",
-            "description": "TODO",
+            "description": "Cast an arc of lightning which chains to nearby enemies.",
             "skillTreeRow": 0,
             "skillTreeColumn": 5,
-            "manaCost": 8,
-            "cooldown": 1
+            "manaCost": 5,
+            "cooldown": 5
         }
     ]
 }

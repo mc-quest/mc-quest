@@ -176,8 +176,19 @@ public class MagePlayerClass implements Feature {
 
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
-        Pos origin = pc.getEyePosition();
-        Vec direction = pc.getLookDirection();
+        Pos origin = pc.getWeaponPosition();
+        Vec direction = pc.getEyePosition()
+                .add(pc.getLookDirection().mul(chainRange))
+                .sub(origin)
+                .asVec()
+                .normalize();
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), origin);
 
         RaycastHit initialHit = mmorpg.getPhysicsManager().raycast(
                 instance,
@@ -236,6 +247,13 @@ public class MagePlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Vec chainHitboxSize = new Vec(2 * chainRange, 2 * chainRange, 2 * chainRange);
+
+        instance.playSound(Sound.sound(
+                SoundEvent.ITEM_TRIDENT_RIPTIDE_3,
+                Sound.Source.PLAYER,
+                2f,
+                2f
+        ), chainOrigin);
 
         Collection<Collider> chainHitbox = mmorpg.getPhysicsManager()
                 .overlapBox(instance, chainOrigin, chainHitboxSize);

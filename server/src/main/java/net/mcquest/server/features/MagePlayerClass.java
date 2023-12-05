@@ -192,9 +192,10 @@ public class MagePlayerClass implements Feature {
         for (int pulse = 0; pulse < pulses; pulse++) {
             long delay = (long) (orbDuration * 0.9 * (pulse + 1.0) / pulses);
             mmorpg.getSchedulerManager().buildTask(() -> {
+                Pos shardPosition = orbEntity.getPosition().add(0.0, 0.5, 0.0);
+
                 for (int shard = 0; shard < shards; shard++) {
                     double angle = 2 * Math.PI * shard / shards;
-                    Pos shardPosition = orbEntity.getPosition().add(0.0, 0.5, 0.0);
                     Vec shardVelocity = orbVelocity.withY(0).normalize().rotateAroundY(angle).mul(shardSpeed);
 
                     Vec shardHitboxSize = new Vec(0.5, 0.5, 0.5);
@@ -226,11 +227,17 @@ public class MagePlayerClass implements Feature {
                         shardHitbox.remove();
                     }).delay(Duration.ofMillis(shardDuration)).schedule();
                 }
+
+                instance.playSound(Sound.sound(
+                        SoundEvent.BLOCK_SOUL_SAND_STEP,
+                        Sound.Source.PLAYER,
+                        1f,
+                        1f
+                ), shardPosition);
             }).delay(Duration.ofMillis(delay)).schedule();
         }
 
-        mmorpg.getSchedulerManager().buildTask(() -> {
-            orbEntity.remove();
-        }).delay(Duration.ofMillis(orbDuration)).schedule();
+        mmorpg.getSchedulerManager().buildTask(orbEntity::remove)
+                .delay(Duration.ofMillis(orbDuration)).schedule();
     }
 }

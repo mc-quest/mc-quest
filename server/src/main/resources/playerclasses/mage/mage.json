@@ -32,11 +32,11 @@
             "name": "Frozen Orb",
             "level": 1,
             "icon": "frozen_orb.png",
-            "description": "TODO",
+            "description": "Cast an icy projectile which releases shards as it travels.",
             "skillTreeRow": 0,
             "skillTreeColumn": 6,
-            "manaCost": 1,
-            "cooldown": 1
+            "manaCost": 5,
+            "cooldown": 5
         }
     ]
 }

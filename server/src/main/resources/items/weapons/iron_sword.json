@@ -1,0 +1,9 @@
+{
+  "id": "iron_sword",
+  "name": "Iron Sword",
+  "quality": "COMMON",
+  "level": 1,
+  "type": "SWORD",
+  "attackSpeed": 1,
+  "physicalDamage": 6
+}

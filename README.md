@@ -5,11 +5,11 @@ quests, explore an open world, delve through dungeons, level their character,
 acquire items and gear, and slay powerful foes with others in a medieval fantasy
 setting.
 
-## Project Structure
+## Project Structure (For more Information see Developer Manual)
 
 MCQuest is divided into the following subprojects:
 
-- `core`: The core APIs for building and managing MMORPGs. Creates high level
+- `core`: The core APIs for building and managing MMORPGs. Creates high-level
   abstractions for `server` to create MMORPG content.
 - `server`: Uses the `core` API to implement and serve an MMORPG.
 

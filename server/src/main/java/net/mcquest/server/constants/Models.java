@@ -14,6 +14,9 @@ public class Models {
     public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
     public static final Model DIRE_PACKLORD = loadModel("dire_packlord");
     public static final Model DIRE_WOLF = loadModel("dire_wolf");
+    // public static final Model DREADFANG = loadModel("dreadfang");
+    public static final Model GRIMROT = loadModel("grimrot");
+    public static final Model GOBLIN_MINION = loadModel("goblin_minion");
 
     public static Model[] all() {
         return new Model[]{
@@ -25,7 +28,10 @@ public class Models {
                 REDSTONE_MONSTROSITY,
                 UNDEAD_KNIGHT,
                 DIRE_PACKLORD,
-                DIRE_WOLF
+                DIRE_WOLF,
+                // DREADFANG,
+                GRIMROT,
+                GOBLIN_MINION
         };
     }
 

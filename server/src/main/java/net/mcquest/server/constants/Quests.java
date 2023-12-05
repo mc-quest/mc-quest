@@ -12,12 +12,14 @@ public class Quests {
     public static final Quest CANINE_CARNAGE = loadQuest("canine_carnage");
     public static final Quest THWARTING_THE_THIEVES = loadQuest("thwarting_the_thieves");
     public static final Quest WOLF_BITE_DELIGHT = loadQuest("wolf_bite_delight");
+    public static final Quest DREADFANGS_REVENGE = loadQuest("dreadfangs_revenge");
 
     public static Quest[] all() {
         return new Quest[]{
                 TUTORIAL,
                 CANINE_CARNAGE,
                 THWARTING_THE_THIEVES,
+                DREADFANGS_REVENGE,
                 WOLF_BITE_DELIGHT
         };
     }

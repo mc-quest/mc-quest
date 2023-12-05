@@ -189,6 +189,13 @@ public class MagePlayerClass implements Feature {
         orbEntity.setNoGravity(true);
         orbEntity.setInstance(instance, orbPosition);
 
+        instance.playSound(Sound.sound(
+                SoundEvent.BLOCK_FIRE_EXTINGUISH,
+                Sound.Source.PLAYER,
+                1f,
+                1f
+        ), orbPosition);
+
         for (int pulse = 0; pulse < pulses; pulse++) {
             long delay = (long) (orbDuration * 0.9 * (pulse + 1.0) / pulses);
             mmorpg.getSchedulerManager().buildTask(() -> {
@@ -231,7 +238,7 @@ public class MagePlayerClass implements Feature {
                 instance.playSound(Sound.sound(
                         SoundEvent.BLOCK_SOUL_SAND_STEP,
                         Sound.Source.PLAYER,
-                        1f,
+                        2f,
                         1f
                 ), shardPosition);
             }).delay(Duration.ofMillis(delay)).schedule();

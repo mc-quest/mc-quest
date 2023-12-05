@@ -32,7 +32,7 @@ public class Grimrot extends NonPlayerCharacter {
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(60));
         setExperiencePoints(120);
-        addSlayQuestObjective(Quests.DREADFANGS_REVENGE.getObjective(2));
+        addSlayQuestObjective(Quests.DREADFANGS_REVENGE.getObjective(0));
 
     setBrain(ActiveSelector.of(
                 Sequence.of(
@@ -48,9 +48,9 @@ public class Grimrot extends NonPlayerCharacter {
                         ),
                         TaskWait.of(Duration.ofMillis(100)),
                         RandomSelector.of(
-                                new int[]{1, 1, 1},
+                                new int[]{1, 1, 1, 1},
                                 Sequence.of(
-                                        TaskPlayAnimation.of(CharacterAnimation.named("ground slam")),
+                                        TaskPlayAnimation.of(CharacterAnimation.named("slam")),
                                         TaskWait.of(Duration.ofMillis(250)),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
                                                 Sound.Source.HOSTILE, 1f, 1f)),
@@ -59,14 +59,14 @@ public class Grimrot extends NonPlayerCharacter {
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
-                                        TaskPlayAnimation.of(CharacterAnimation.named("roadhog heal")),
+                                        TaskPlayAnimation.of(CharacterAnimation.named("heal")),
                                         TaskWait.of(Duration.ofMillis(300)),
                                         TaskWait.of(Duration.ofMillis(250)),
                                         TaskAction.of(this::roadhogHeal),
                                         TaskWait.of(Duration.ofMillis(800))
                                 ),
                                 Sequence.of(
-                                        TaskPlayAnimation.of(CharacterAnimation.named("swing")),
+                                        TaskPlayAnimation.of(CharacterAnimation.named("attack")),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_PLAYER_ATTACK_SWEEP,
                                                 Sound.Source.HOSTILE, 1.5f, 0.75f)),
                                         TaskWait.of(Duration.ofMillis(900)),
@@ -74,7 +74,7 @@ public class Grimrot extends NonPlayerCharacter {
                                         TaskWait.of(Duration.ofMillis(1000))
                                 ),
                                 Sequence.of(
-                                        TaskPlayAnimation.of(CharacterAnimation.named("ground hop")),
+                                        TaskPlayAnimation.of(CharacterAnimation.named("attack")),
                                         TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
                                                 Sound.Source.HOSTILE, 1.5f, 0.75f)),
                                         TaskWait.of(Duration.ofMillis(900)),

@@ -30,7 +30,7 @@ public class GuardAnya extends NonPlayerCharacter {
                 .interaction(Interactions.speak(this, Component.text("Well, you have my thanks!"
                         + " and my respect!")
                 ))
-                .interaction(Interactions.addProgress(Quests.DREADFANGS_REVENGE.getObjective(3)))
+                .interaction(Interactions.addProgress(Quests.DREADFANGS_REVENGE.getObjective(1)))
                 .build();
 
         startDreadfangsRevengeSequence = InteractionSequence.builder()
@@ -70,7 +70,7 @@ public class GuardAnya extends NonPlayerCharacter {
         if (Quests.DREADFANGS_REVENGE.getStatus(pc) == QuestStatus.NOT_STARTED) {
             startDreadfangsRevengeSequence.advance(pc);
         } else if (Quests.DREADFANGS_REVENGE.getStatus(pc) != QuestStatus.COMPLETED
-                && !Quests.DREADFANGS_REVENGE.getObjective(3).isComplete(pc)) {
+                && Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)) {
             completeDreadfangsRevengeSequence.advance(pc);
         } else {
             speak(pc, Component.text("Need something adventurer?"));

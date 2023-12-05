@@ -31,7 +31,7 @@ public class ResourcePackManager {
             server.start();
 
             // TODO: URL must be updated in production.
-            String resourcePackUrl = String.format("http://%s:%d#%s", address, port, resourcePack.hash());
+            String resourcePackUrl = String.format("http://%s:%d#%s", "attu7.cs.washington.edu", port, resourcePack.hash());
             playerResourcePack = net.minestom.server.resourcepack.ResourcePack.forced(
                     resourcePackUrl,
                     resourcePack.hash()

@@ -3,24 +3,15 @@
     "name": "Dreadfang's Revenge",
     "level": 2,
     "objectives": [
-        {
-            "description": "Talk to Dreadfang",
-            "goal": 1
-        },
-        {
-            "description": "Dreadfang defeated",
-            "goal": 1,
-            "prerequisites": [0]
-        },
+
         {
             "description": "Grimrot slain",
-            "goal": 1,
-            "prerequisites": [1]
+            "goal": 1
         },
         {
             "description": "Speak with Guard Anya",
             "goal": 1,
-            "prerequisites": [2]
+            "prerequisites": [0]
         }
     ]
 }

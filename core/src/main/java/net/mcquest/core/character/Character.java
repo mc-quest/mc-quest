@@ -313,7 +313,7 @@ public abstract class Character extends Object implements DamageSource {
         return getEntity().isOnGround();
     }
 
-    final CharacterHitbox getHitbox() {
+    public final CharacterHitbox getHitbox() {
         return hitbox;
     }
 

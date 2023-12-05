@@ -10,6 +10,7 @@ import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.server.constants.*;
 import net.mcquest.server.constants.Models;
 import net.mcquest.server.constants.Music;
 import net.mcquest.server.constants.Quests;
@@ -18,6 +19,7 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.timer.SchedulerManager;
 import net.kyori.adventure.text.Component;
 import net.mcquest.core.ui.InteractionSequence;
 import net.mcquest.core.ui.Interactions;
@@ -26,15 +28,27 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Duration;
 import java.util.*;
 
+class Vars {
+    public static boolean friendlyToPlayer = true;
+    public static boolean fought = false;
+}
+
 public class Dreadfang extends NonPlayerCharacter {
     private final Mmorpg mmorpg;
+    private final ObjectSpawner spawner;
+    // private boolean friendlyToPlayer;
+    // private boolean fought;
     private final Collider bossBattleBounds;
     private final InteractionSequence offerFightSequence;
     private final InteractionSequence admitDefeatSequence;
 
     public Dreadfang(Mmorpg mmorpg, ObjectSpawner spawner) {
-        super(mmorpg, spawner, CharacterModel.of(Models.DREADFANG));
+        super(mmorpg, spawner, CharacterModel.of(Models.GRIMROT));
         this.mmorpg = mmorpg;
+        this.spawner = spawner;
+        // this.friendlyToPlayer = true;
+        // this.fought = false;
+
         setName("Dreadfang");
         setLevel(4);
         setMaxHealth(400);
@@ -120,112 +134,9 @@ public class Dreadfang extends NonPlayerCharacter {
                 .build();
 
         bossBattleBounds = new Collider(getInstance(), getPosition(), new Vec(25, 10, 25));
-    }
 
-    @Override
-    public void onDamage(DamageSource source) {
-        emitSound(Sound.sound(SoundEvent.ENTITY_HOGLIN_HURT, Sound.Source.HOSTILE, 2f, 0.75f));
-        if (getHealth() <= 250.0) {
-            Set<PlayerCharacter> attackers = getAttackers();
-            for (PlayerCharacter attacker : attackers) {
-                admitDefeat(attacker);
-            }
-        }
-    }
-
-    @Override
-    protected void onInteract(PlayerCharacter pc) {
-        if (Quests.DREADFANGS_REVENGE.getStatus(pc) == QuestStatus.COMPLETED) {
-            speak(pc, Component.text("Thanks again for your help, Adventurer!"
-                + " My husband made a pleasing feast! HEHE!"));
-        } else if ((Quests.DREADFANGS_REVENGE.getStatus(pc) != QuestStatus.NOT_STARTED)
-                && !Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)) {
-            offerFightSequence.advance(pc);
-        } else if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
-                && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
-
-            speak(pc, Component.text("FIGHT MEEEE!!!!!!"));
-            getMmorpg().getPhysicsManager().addCollider(bossBattleBounds);
-            Triggers.playerCharacter(this::enterBossBattle);
-
-            setBrain(ActiveSelector.of(
-                    Sequence.of(
-                            TaskFindClosestTarget.of(25.0),
-                            TaskPlayAnimation.of(CharacterAnimation.named("walk")),
-                            SimpleParallel.of(
-                                    TaskFollowTarget.of(4.0, 15.0),
-                                    Sequence.of(
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_STEP,
-                                                    Sound.Source.HOSTILE, 0.75f, 1.5f)),
-                                            TaskWait.of(Duration.ofMillis(500))
-                                    )
-                            ),
-                            TaskWait.of(Duration.ofMillis(100)),
-                            RandomSelector.of(
-                                    new int[]{1, 1, 1},
-                                    Sequence.of(
-                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 1")),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                    Sound.Source.HOSTILE, 1f, 1f)),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskAction.of(this::attack1),
-                                            TaskWait.of(Duration.ofMillis(800))
-                                    ),
-                                    Sequence.of(
-                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 2")),
-                                            TaskWait.of(Duration.ofMillis(300)),
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                    Sound.Source.HOSTILE, 1f, 1f)),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskAction.of(this::attack2),
-                                            TaskWait.of(Duration.ofMillis(800))
-                                    ),
-                                    Sequence.of(
-                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 3")),
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskAction.of(this::attack3),
-                                            TaskWait.of(Duration.ofMillis(800))
-                                    ),
-                                    Sequence.of(
-                                            TaskPlayAnimation.of(CharacterAnimation.named("kick 1")),
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskAction.of(this::attack3),
-                                            TaskWait.of(Duration.ofMillis(800))
-                                    ),
-                                    Sequence.of(
-                                            TaskPlayAnimation.of(CharacterAnimation.named("kick 2")),
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
-                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
-                                            TaskWait.of(Duration.ofMillis(250)),
-                                            TaskAction.of(this::attack3),
-                                            TaskWait.of(Duration.ofMillis(800))
-                                    )
-                            )
-                    ),
-                    Sequence.of(
-                            TaskPlayAnimation.of(CharacterAnimation.named("idle")),
-                            TaskWait.of(Duration.ofSeconds(2)),
-                            TaskPlayAnimation.of(CharacterAnimation.named("walk")),
-                            SimpleParallel.of(
-                                    TaskGoToRandomPosition.of(10),
-                                    Sequence.of(
-                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_STEP,
-                                                    Sound.Source.HOSTILE, 0.75f, 1.5f)),
-                                            TaskWait.of(Duration.ofMillis(500))
-                                    )
-                            )
-                    )
-            ));
-
-            bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
-            bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
-        } else if (Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
-            setBrain(ActiveSelector.of(
+        if (Vars.friendlyToPlayer && Vars.fought) {  // already had fight, ready to kill Grimrot
+                setBrain(ActiveSelector.of(
                     Sequence.of(
                             TaskFindClosestTarget.of(200.0), // Target is now Grimrot
                             TaskPlayAnimation.of(CharacterAnimation.named("walk")),
@@ -298,6 +209,130 @@ public class Dreadfang extends NonPlayerCharacter {
                             )
                     )
             ));
+        } else if (!Vars.friendlyToPlayer) {
+                setBrain(ActiveSelector.of(
+                    Sequence.of(
+                            TaskFindClosestTarget.of(25.0),
+                            TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                            SimpleParallel.of(
+                                    TaskFollowTarget.of(4.0, 15.0),
+                                    Sequence.of(
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_STEP,
+                                                    Sound.Source.HOSTILE, 0.75f, 1.5f)),
+                                            TaskWait.of(Duration.ofMillis(500))
+                                    )
+                            ),
+                            TaskWait.of(Duration.ofMillis(100)),
+                            RandomSelector.of(
+                                    new int[]{1, 1, 1},
+                                    Sequence.of(
+                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 1")),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                                    Sound.Source.HOSTILE, 1f, 1f)),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskAction.of(this::attack1),
+                                            TaskWait.of(Duration.ofMillis(800))
+                                    ),
+                                    Sequence.of(
+                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 2")),
+                                            TaskWait.of(Duration.ofMillis(300)),
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                                    Sound.Source.HOSTILE, 1f, 1f)),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskAction.of(this::attack2),
+                                            TaskWait.of(Duration.ofMillis(800))
+                                    ),
+                                    Sequence.of(
+                                            TaskPlayAnimation.of(CharacterAnimation.named("attack 3")),
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskAction.of(this::attack3),
+                                            TaskWait.of(Duration.ofMillis(800))
+                                    ),
+                                    Sequence.of(
+                                            TaskPlayAnimation.of(CharacterAnimation.named("kick 1")),
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskAction.of(this::attack3),
+                                            TaskWait.of(Duration.ofMillis(800))
+                                    ),
+                                    Sequence.of(
+                                            TaskPlayAnimation.of(CharacterAnimation.named("kick 2")),
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_ATTACK,
+                                                    Sound.Source.HOSTILE, 1.5f, 0.75f)),
+                                            TaskWait.of(Duration.ofMillis(250)),
+                                            TaskAction.of(this::attack3),
+                                            TaskWait.of(Duration.ofMillis(800))
+                                    )
+                            )
+                    ),
+                    Sequence.of(
+                            TaskPlayAnimation.of(CharacterAnimation.named("idle")),
+                            TaskWait.of(Duration.ofSeconds(2)),
+                            TaskPlayAnimation.of(CharacterAnimation.named("walk")),
+                            SimpleParallel.of(
+                                    TaskGoToRandomPosition.of(10),
+                                    Sequence.of(
+                                            TaskEmitSound.of(Sound.sound(SoundEvent.ENTITY_HOGLIN_STEP,
+                                                    Sound.Source.HOSTILE, 0.75f, 1.5f)),
+                                            TaskWait.of(Duration.ofMillis(500))
+                                    )
+                            )
+                    )
+            ));
+        }
+
+        bossBattleBounds.onCollisionEnter(Triggers.playerCharacter(this::enterBossBattle));
+        bossBattleBounds.onCollisionExit(Triggers.playerCharacter(this::exitBossBattle));
+    }
+
+    @Override
+    public void onDamage(DamageSource source) {
+        emitSound(Sound.sound(SoundEvent.ENTITY_HOGLIN_HURT, Sound.Source.HOSTILE, 2f, 0.75f));
+        if (getHealth() <= 250.0) {
+            Set<PlayerCharacter> attackers = getAttackers();
+            for (PlayerCharacter attacker : attackers) {
+                admitDefeat(attacker);
+            }
+        }
+    }
+
+    @Override
+    protected void onInteract(PlayerCharacter pc) {
+        if (Quests.DREADFANGS_REVENGE.getStatus(pc) == QuestStatus.COMPLETED) {
+            speak(pc, Component.text("Thanks again for your help, Adventurer!"
+                + " My husband made a pleasing feast! HEHE!"));
+        } else if ((Quests.DREADFANGS_REVENGE.getStatus(pc) != QuestStatus.NOT_STARTED)
+                && !Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)) {
+            offerFightSequence.advance(pc);
+        } else if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
+                && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
+
+            speak(pc, Component.text("FIGHT MEEEE!!!!!!"));
+            Triggers.playerCharacter(this::enterBossBattle);
+            Vars.friendlyToPlayer = false;
+            setRespawnDuration(Duration.ofMinutes(0));
+            die(null);
+
+            /* mmorpg.getObjectManager().add(ObjectSpawner.of(
+                Instances.ELADRADOR,
+                new Pos(2136, 84, 3257),
+                Dreadfang::new
+            )); */
+        } else if (Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
+            getSpawner().setActive(false);
+            getHitbox().remove();
+
+            Vars.friendlyToPlayer = true;
+            Vars.fought = true;
+            mmorpg.getObjectManager().add(ObjectSpawner.of(
+                Instances.ELADRADOR,
+                new Pos(2136, 84, 3257),
+                Dreadfang::new
+            ));
         } else {
             speak(pc, Component.text("HEHE!"));
         }
@@ -311,16 +346,42 @@ public class Dreadfang extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
-        Collection<PlayerCharacter> pcs =
+        /* Collection<PlayerCharacter> pcs =
                 mmorpg.getPlayerCharacterManager().getNearbyPlayerCharacters(getInstance(),
                                                                              getPosition(), 25.0);
-        PlayerCharacter pc = (PlayerCharacter)pcs.toArray()[0];
-        if (!Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
+        PlayerCharacter pc;
+        if (pcs.toArray().length > 0) {
+                pc = (PlayerCharacter)pcs.toArray()[0];
+        } else {
+                return (other instanceof GoblinMinion
+                        || other instanceof PlayerCharacter
+                        || other instanceof Grimrot
+                        || other instanceof Dreadfang)
+                        ? Attitude.FRIENDLY
+                        : Attitude.HOSTILE;
+        } */
+        if (other instanceof PlayerCharacter pc) {
+        if (!Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)) {
+                return (other instanceof GoblinMinion
+                        || other instanceof PlayerCharacter
+                        || other instanceof Grimrot
+                        || other instanceof Dreadfang)
+                        ? Attitude.FRIENDLY
+                        : Attitude.HOSTILE;
+        } else if (Quests.DREADFANGS_REVENGE.getObjective(0).isComplete(pc)
+                        && !Quests.DREADFANGS_REVENGE.getObjective(1).isComplete(pc)) {
                 return (other instanceof GoblinMinion
                         || other instanceof Grimrot
                         || other instanceof Dreadfang)
                         ? Attitude.FRIENDLY
                         : Attitude.HOSTILE;
+        } else {
+                return (other instanceof GoblinMinion
+                        || other instanceof PlayerCharacter
+                        || other instanceof Dreadfang)
+                        ? Attitude.FRIENDLY
+                        : Attitude.HOSTILE;
+        }
         } else {
                 return (other instanceof GoblinMinion
                         || other instanceof PlayerCharacter

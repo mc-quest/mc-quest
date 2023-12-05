@@ -41,8 +41,8 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
     private void createKingsDeathRowBounds() {
         Collider bounds = new Collider(
                 Instances.ELADRADOR,
-                new Pos(2976, 73, 3632),
-                new Pos(3020, 90, 3695)
+                new Pos(2056, 60, 3115),
+                new Pos(2265, 131, 3417)
         );
         Debug.showCollider(bounds);
         bounds.onCollisionEnter(Triggers.playerCharacter(this::handleEnterKingsDeathRow));
@@ -52,7 +52,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
 
     private void npcs() {
         goblinMinions();
-        dreadfang();
+        // dreadfang();
         grimrot();
         guardAnya();
     }
@@ -88,37 +88,37 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
                 new Pos(2137, 84, 3250),
                 new Pos(2147, 84, 3251),
                 new Pos(2122, 85, 3264),
-                new Pos(2125, 70, 3282),
-                new Pos(2151, 69, 3293),
-                new Pos(2140, 72, 3319),
-                new Pos(2093, 74, 3322),
-                new Pos(2119, 74, 3296),
-                new Pos(2131, 71, 3272),
-                new Pos(2151, 76, 3311),
-                new Pos(2160, 74, 3330),
-                new Pos(2183, 74, 3354),
-                new Pos(2206, 106, 3380),
-                new Pos(2196, 69, 3289),
-                new Pos(2846, 78, 3181),
-                new Pos(2171, 80, 3182),
-                new Pos(2185, 84, 3192),
-                new Pos(2130, 84, 3200),
-                new Pos(2139, 84, 3203),
-                new Pos(2137, 84, 3220),
-                new Pos(2137, 84, 3250),
-                new Pos(2147, 84, 3251),
-                new Pos(2122, 85, 3264),
-                new Pos(2125, 70, 3282),
-                new Pos(2151, 69, 3293),
-                new Pos(2140, 72, 3319),
-                new Pos(2093, 74, 3322),
-                new Pos(2119, 74, 3296),
-                new Pos(2131, 71, 3272),
-                new Pos(2151, 76, 3311),
-                new Pos(2160, 74, 3330),
-                new Pos(2183, 74, 3354),
-                new Pos(2206, 106, 3380),
-                new Pos(2196, 69, 3289)
+                // new Pos(2125, 70, 3282),
+                // new Pos(2151, 69, 3293),
+                // new Pos(2140, 72, 3319),
+                // new Pos(2093, 74, 3322),
+                // new Pos(2119, 74, 3296),
+                // new Pos(2131, 71, 3272),
+                // new Pos(2151, 76, 3311),
+                // new Pos(2160, 74, 3330),
+                // new Pos(2183, 74, 3354),
+                // new Pos(2206, 106, 3380),
+                // new Pos(2196, 69, 3289),
+                // new Pos(2846, 78, 3181),
+                // new Pos(2171, 80, 3182),
+                // new Pos(2185, 84, 3192),
+                // new Pos(2130, 84, 3200),
+                // new Pos(2139, 84, 3203),
+                // new Pos(2137, 84, 3220),
+                // new Pos(2137, 84, 3250),
+                // new Pos(2147, 84, 3251),
+                // new Pos(2122, 85, 3264),
+                // new Pos(2125, 70, 3282),
+                // new Pos(2151, 69, 3293),
+                // new Pos(2140, 72, 3319),
+                // new Pos(2093, 74, 3322),
+                // new Pos(2119, 74, 3296),
+                // new Pos(2131, 71, 3272),
+                // new Pos(2151, 76, 3311),
+                // new Pos(2160, 74, 3330),
+                // new Pos(2183, 74, 3354),
+                // new Pos(2206, 106, 3380),
+                // new Pos(2196, 69, 3289)
         };
 
         ObjectManager objectManager = mmorpg.getObjectManager();
@@ -180,8 +180,8 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
                 Quests.DREADFANGS_REVENGE,
                 QuestMarkerIcon.OBJECTIVE,
                 Predicates.or(
-                        Quests.DREADFANGS_REVENGE.getObjective(0)::isInProgress,
-                        Quests.DREADFANGS_REVENGE.getObjective(1)::isInProgress
+                        Quests.DREADFANGS_REVENGE.getObjective(0)::isInProgress
+                        // Quests.DREADFANGS_REVENGE.getObjective(1)::isInProgress
                 )
         );
         Maps.ELADRADOR.addQuestMarker(dreadfangMarker);
@@ -192,7 +192,7 @@ public class KingsDeathRow implements Feature {  // ALL POSITIONS ARE PLACEHOLDE
                 new Pos(2123, 80, 3124),
                 Quests.DREADFANGS_REVENGE,
                 QuestMarkerIcon.READY_TO_TURN_IN,
-                Quests.DREADFANGS_REVENGE.getObjective(3)::isInProgress
+                Quests.DREADFANGS_REVENGE.getObjective(1)::isInProgress
         );
         Maps.ELADRADOR.addQuestMarker(guardAnyaMarker);
     }

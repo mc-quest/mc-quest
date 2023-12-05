@@ -1,0 +1,9 @@
+{
+  "id": "knight_dagger",
+  "name": "Knight's Dagger",
+  "quality": "RARE",
+  "level": 1,
+  "type": "DAGGER",
+  "attackSpeed": 0,
+  "physicalDamage": 4.5
+}

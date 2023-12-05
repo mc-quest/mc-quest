@@ -15,13 +15,19 @@ import net.minestom.server.sound.SoundEvent;
 
 import java.util.Collection;
 
-public class Swords implements Feature {
+public class MeleeWeapons implements Feature {
     private Mmorpg mmorpg;
 
     @Override
     public void hook(Mmorpg mmorpg) {
         this.mmorpg = mmorpg;
         Items.ADVENTURERS_SWORD.onAutoAttack().subscribe(this::autoAttack);
+        Items.IRON_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.IRON_SWORD.onAutoAttack().subscribe(this::autoAttack);
+        Items.HARDENEDIRON_SWORD.onAutoAttack().subscribe(this::autoAttack);
+        Items.HARDENEDIRON_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.KNIGHT_DAGGER.onAutoAttack().subscribe(this::autoAttack);
+        Items.KNIGHT_SWORD.onAutoAttack().subscribe(this::autoAttack);
     }
 
     public void autoAttack(AutoAttackEvent event) {

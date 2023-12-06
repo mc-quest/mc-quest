@@ -42,28 +42,65 @@ public class MagePlayerClass implements Feature {
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
-        double maxDistance = 20.0;
-        double fireballSpeed = 20.0;
-        Vec hitboxSize = new Vec(1f, 1f, 1f);
-
         PlayerCharacter pc = event.getPlayerCharacter();
-        Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
 
         mmorpg.getObjectManager().spawn(ObjectSpawner.of(
                 pc.getInstance(),
                 pc.getPosition(),
-                ((mmorpg, spawner) -> new MageFireball(mmorpg, spawner, EntityType.FIREBALL, pc, fireballVelocity, maxDistance, hitboxSize))
+                ((mmorpg, spawner) -> createMageFireball(mmorpg, spawner, EntityType.FIREBALL, pc))
         ));
+    }
 
-        // TODO: what was this supposed to do?
-        /*
-        instance.playSound(Sound.sound(
+    private Projectile createMageFireball(Mmorpg mmorpg, ObjectSpawner spawner, EntityType type, PlayerCharacter pc) {
+        double damageAmount = 6.0;
+        double maxDistance = 20.0;
+        double fireballSpeed = 20.0;
+        Instance instance = spawner.getInstance();
+        Vec hitboxSize = new Vec(1f, 1f, 1f);
+        Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
+        Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
+
+        Projectile fireball = new Projectile(mmorpg, spawner, type, startPosition, maxDistance);
+        fireball.setVelocity(fireballVelocity);
+        fireball.setHitboxSize(hitboxSize);
+        fireball.onHit(Triggers.character(character -> {
+            if (!character.isDamageable(pc)) {
+                return;
+            }
+
+            character.damage(pc, damageAmount);
+
+            ParticleEffects.particle(spawner.getInstance(), startPosition, Particle.EXPLOSION);
+
+            instance.playSound(Sound.sound(
+                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
+                    Sound.Source.PLAYER,
+                    1f,
+                    1f
+            ), startPosition);
+
+            fireball.remove();
+        }));
+        fireball.onStuck(() -> {
+            instance.playSound(Sound.sound(
+                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
+                    Sound.Source.PLAYER,
+                    1f,
+                    1f
+            ), startPosition);
+
+            fireball.remove();
+        });
+
+        pc.getInstance().playSound(Sound.sound(
                 SoundEvent.BLOCK_FIRE_EXTINGUISH,
                 Sound.Source.PLAYER,
                 1f,
                 1f
         ), startPosition);
-         */
+
+
+        return fireball;
     }
 
     private void useIceBeam(ActiveSkillUseEvent event) {
@@ -140,48 +177,5 @@ public class MagePlayerClass implements Feature {
         mmorpg.getSchedulerManager().buildTask(() -> pc.setCanAct(true))
                 .delay(Duration.ofMillis(tickPeriodMs * tickCount))
                 .schedule();
-    }
-
-    private static final class MageFireball extends Projectile {
-        double damageAmount = 6.0;
-        public MageFireball(Mmorpg mmorpg, ObjectSpawner spawner, EntityType entityType, PlayerCharacter shooter, Vec velocity, double distance, Vec hitboxSize) {
-            super(mmorpg, spawner, entityType, shooter, velocity, distance, hitboxSize);
-        }
-
-        public MageFireball(Mmorpg mmorpg, ObjectSpawner spawner, Model model, PlayerCharacter shooter, Vec velocity, double distance, Vec hitboxSize) {
-            super(mmorpg, spawner, model, shooter, velocity, distance, hitboxSize);
-        }
-
-        @Override
-        protected void onHit(Character hitCharacter) {
-            if (!hitCharacter.isDamageable(this.shooter)) {
-                return;
-            }
-
-            hitCharacter.damage(this.shooter, damageAmount);
-
-            ParticleEffects.particle(getInstance(), getPosition(), Particle.EXPLOSION);
-
-            getInstance().playSound(Sound.sound(
-                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
-                    Sound.Source.PLAYER,
-                    1f,
-                    1f
-            ), this.shooter.getPosition());
-
-            this.remove();
-        }
-
-        @Override
-        protected void onStuck() {
-            getInstance().playSound(Sound.sound(
-                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
-                    Sound.Source.PLAYER,
-                    1f,
-                    1f
-            ), this.shooter.getPosition());
-
-            this.remove();
-        }
     }
 }

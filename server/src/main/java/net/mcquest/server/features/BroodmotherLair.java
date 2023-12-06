@@ -41,20 +41,23 @@ public class BroodmotherLair implements Feature {
         PhysicsManager physicsManager = mmorpg.getPhysicsManager();
 
         // entrance to broodmother lair
-        Collider enter = new Collider(Instances.ELADRADOR, new Pos(2860, 74, 3610), new Pos(2867, 78, 3610));
+        Collider enter = new Collider(Instances.ELADRADOR, new Pos(2860, 74, 3610),
+                                                            new Pos(2867, 78, 3610));
         enter.onCollisionEnter(Triggers.playerCharacter(this::enter));
         physicsManager.addCollider(enter);
-        Debug.showCollider(enter);
+        // Debug.showCollider(enter);
 
-        Collider exit = new Collider(Instances.BROODMOTHER_LAIR, new Pos(135, 121, 198), new Pos(138, 124, 198));
+        Collider exit = new Collider(Instances.BROODMOTHER_LAIR, new Pos(135, 121, 198),
+                                                                    new Pos(138, 124, 198));
         exit.onCollisionEnter(Triggers.playerCharacter(this::exitMain));
         physicsManager.addCollider(exit);
-        Debug.showCollider(exit);
+        // Debug.showCollider(exit);
 
-        Collider bossExit = new Collider(Instances.BROODMOTHER_LAIR, new Pos(83, 5, 0), new Pos(86, 8, 0));
+        Collider bossExit = new Collider(Instances.BROODMOTHER_LAIR, new Pos(83, 5, 0),
+                                                                        new Pos(86, 8, 0));
         bossExit.onCollisionEnter(Triggers.playerCharacter(this::exitBoss));
         physicsManager.addCollider(bossExit);
-        Debug.showCollider(bossExit);
+        // Debug.showCollider(bossExit);
     }
 
     private void enter(PlayerCharacter pc) {

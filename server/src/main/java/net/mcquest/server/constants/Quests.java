@@ -24,8 +24,7 @@ public class Quests {
                 WOLF_BITE_DELIGHT,
                 ITSY_BITSY_SPIDER,
                 NOT_SO_ITSY_BITSY,
-                DREADFANGS_REVENGE,
-                WOLF_BITE_DELIGHT
+                DREADFANGS_REVENGE
         };
     }
 

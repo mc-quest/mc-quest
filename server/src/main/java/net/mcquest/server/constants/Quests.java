@@ -13,14 +13,18 @@ public class Quests {
     public static final Quest THWARTING_THE_THIEVES = loadQuest("thwarting_the_thieves");
     public static final Quest WOLF_BITE_DELIGHT = loadQuest("wolf_bite_delight");
     public static final Quest DREADFANGS_REVENGE = loadQuest("dreadfangs_revenge");
+    public static final Quest ITSY_BITSY_SPIDER = loadQuest("itsy_bitsy_spider");
+    public static final Quest NOT_SO_ITSY_BITSY = loadQuest("not_so_itsy_bitsy");
 
     public static Quest[] all() {
         return new Quest[]{
                 TUTORIAL,
                 CANINE_CARNAGE,
                 THWARTING_THE_THIEVES,
-                DREADFANGS_REVENGE,
-                WOLF_BITE_DELIGHT
+                WOLF_BITE_DELIGHT,
+                ITSY_BITSY_SPIDER,
+                NOT_SO_ITSY_BITSY,
+                DREADFANGS_REVENGE
         };
     }
 

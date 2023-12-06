@@ -5,12 +5,8 @@ import net.mcquest.core.Mmorpg;
 import net.mcquest.core.ai.*;
 import net.mcquest.core.character.Character;
 import net.mcquest.core.character.*;
-import net.mcquest.core.loot.ItemPoolEntry;
-import net.mcquest.core.loot.LootTable;
-import net.mcquest.core.loot.Pool;
 import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.physics.Triggers;
-import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.Models;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
@@ -28,11 +24,6 @@ public class Spider extends NonPlayerCharacter {
         setRemovalDelay(Duration.ofMillis(2000));
         setRespawnDuration(Duration.ofSeconds(45));
         setExperiencePoints(10);
-        setLootTable(LootTable.builder()
-                .pool(Pool.builder()
-                        .entry(ItemPoolEntry.builder(Items.ADVENTURERS_SWORD).build())
-                        .build())
-                .build());
 
         setBrain(ActiveSelector.of(
                 Sequence.of(
@@ -71,7 +62,10 @@ public class Spider extends NonPlayerCharacter {
 
     @Override
     public Attitude getAttitude(Character other) {
-        return other instanceof Spider ? Attitude.FRIENDLY : Attitude.HOSTILE;
+        return (other instanceof Spider || other instanceof Broodmother ||
+                other instanceof SpiderEgg || other instanceof SpiderEggCluster)
+                ? Attitude.FRIENDLY
+                : Attitude.HOSTILE;
     }
 
     @Override
@@ -100,7 +94,7 @@ public class Spider extends NonPlayerCharacter {
 
     private void attackHit(Character character) {
         if (getAttitude(character) == Attitude.HOSTILE && character.isDamageable(this)) {
-            character.damage(this, 20);
+            character.damage(this, 5);
         }
     }
 }

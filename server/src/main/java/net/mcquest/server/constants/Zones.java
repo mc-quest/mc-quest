@@ -9,6 +9,7 @@ public class Zones {
     public static final Zone PROWLWOOD = new Zone("prowlwood", "Prowlwood", 1, ZoneType.WILDERNESS);
     public static final Zone PACKLORD_DEN = new Zone("packlord_den", "Packlord's Den", 2, ZoneType.DUNGEON);
     public static final Zone KINGS_DEATH_ROW = new Zone("kings_death_row", "King's Death Row", 3, ZoneType.DUNGEON);
+    public static final Zone ASHEN_TANGLE = new Zone("ashen_tangle", "Ashen Tangle", 4, ZoneType.WILDERNESS);
     public static final Zone BROODMOTHER_LAIR = new Zone("broodmother_lair", "Broodmother's Lair", 5, ZoneType.DUNGEON);
 
 
@@ -19,6 +20,7 @@ public class Zones {
                 PROWLWOOD,
                 PACKLORD_DEN,
                 KINGS_DEATH_ROW,
+                ASHEN_TANGLE,
                 BROODMOTHER_LAIR
         };
     }

@@ -8,13 +8,37 @@ import net.mcquest.core.asset.Asset;
 public class Items {
     public static final Weapon ADVENTURERS_SWORD = loadWeapon("adventurers_sword");
     public static final Weapon ADVENTURERS_WAND = loadWeapon("adventurers_wand");
+    public static final Weapon IRON_DAGGER = loadWeapon("iron_dagger");
+    public static final Weapon IRON_SWORD = loadWeapon("iron_sword");
+    public static final Weapon HARDENEDIRON_SWORD = loadWeapon("hardenediron_sword");
+    public static final Weapon HARDENEDIRON_DAGGER = loadWeapon("hardenediron_dagger");
+    public static final Weapon KNIGHT_DAGGER = loadWeapon("knight_dagger");
+    public static final Weapon KNIGHT_SWORD = loadWeapon("knight_sword");
+    public static final Weapon MOON_WAND = loadWeapon("moon_wand");
+    public static final Weapon LANTERN_WAND = loadWeapon("lantern_wand");
     public static final QuestItem WOLF_FLANK = loadQuestItem("wolf_flank");
+    public static final ConsumableItem MINOR_HEALING_POTION = loadConsumable("minor_healing_potion");
+    public static final ConsumableItem LESSER_HEALING_POTION = loadConsumable("lesser_healing_potion");
+    public static final ConsumableItem MINOR_MANA_POTION = loadConsumable("minor_mana_potion");
+    public static final ConsumableItem LESSER_MANA_POTION = loadConsumable("lesser_mana_potion");
 
     public static Item[] all() {
         return new Item[]{
                 ADVENTURERS_SWORD,
                 ADVENTURERS_WAND,
-                WOLF_FLANK
+                IRON_DAGGER,
+                IRON_SWORD,
+                HARDENEDIRON_SWORD,
+                HARDENEDIRON_DAGGER,
+                KNIGHT_DAGGER,
+                KNIGHT_SWORD,
+                MOON_WAND,
+                LANTERN_WAND,
+                WOLF_FLANK,
+                MINOR_HEALING_POTION,
+                LESSER_HEALING_POTION,
+                MINOR_MANA_POTION,
+                LESSER_MANA_POTION
         };
     }
 
@@ -118,7 +142,7 @@ public class Items {
     }
 
     private static ConsumableItem loadConsumable(String fileName) {
-        String basePath = "items/weapons/" + fileName;
+        String basePath = "items/consumables/" + fileName;
         String itemPath = basePath + ".json";
         String iconPath = basePath + ".png";
         JsonObject object = Assets.asset(itemPath).readJson().getAsJsonObject();

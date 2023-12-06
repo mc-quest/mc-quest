@@ -1,0 +1,9 @@
+{
+  "id": "hardenediron_dagger",
+  "name": "Hardened-Iron Dagger",
+  "quality": "UNCOMMON",
+  "level": 1,
+  "type": "DAGGER",
+  "attackSpeed": 0,
+  "physicalDamage": 3
+}

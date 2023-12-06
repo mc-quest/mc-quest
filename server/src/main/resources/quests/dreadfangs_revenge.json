@@ -1,0 +1,17 @@
+{
+    "id": "dreadfangs_revenge",
+    "name": "Dreadfang's Revenge",
+    "level": 2,
+    "objectives": [
+
+        {
+            "description": "Grimrot slain",
+            "goal": 1
+        },
+        {
+            "description": "Speak with Guard Anya",
+            "goal": 1,
+            "prerequisites": [0]
+        }
+    ]
+}

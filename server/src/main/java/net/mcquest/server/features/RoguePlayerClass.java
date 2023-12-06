@@ -266,8 +266,7 @@ public class RoguePlayerClass implements Feature {
                         character.damage(pc, 2);
                         Sound poisonSound = Sound.sound(SoundEvent.BLOCK_GRAVEL_FALL, Sound.Source.PLAYER, 1f, 1f);
                         instance.playSound(poisonSound, character.getPosition());
-                        Pos creatureCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
-                        ParticleEffects.particle(instance, creatureCenter, Particle.DRIPPING_LAVA);
+                        ParticleEffects.particle(instance, character.getPosition(), Particle.DRIPPING_LAVA);
 
                         if (pc.getSkillManager().isUnlocked(RogueSkills.EXPLOSIVE_POISON)) {
                             if (!character.isAlive()) {

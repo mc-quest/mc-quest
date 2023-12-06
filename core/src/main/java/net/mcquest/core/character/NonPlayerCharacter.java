@@ -236,12 +236,12 @@ public class NonPlayerCharacter extends Character {
     protected void onSpeak(PlayerCharacter pc) {
     }
 
-    private void takeDamage(DamageSource source) {
+    public void takeDamage(DamageSource source) {
         damageEffect();
         onDamage(source);
     }
 
-    private void die(DamageSource killer) {
+    public void die(DamageSource killer) {
         navigator.setPathTo(null);
 
         deathEffect();

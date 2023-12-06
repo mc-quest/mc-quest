@@ -1,0 +1,7 @@
+{
+  "id": "minor_healing_potion",
+  "name": "Minor Healing Potion",
+  "quality": "COMMON",
+  "level": 1,
+  "description": "Restores 25 health"
+}

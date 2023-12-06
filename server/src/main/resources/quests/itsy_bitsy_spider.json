@@ -1,0 +1,21 @@
+{
+  "id": "itsy_bitsy_spider",
+  "name": "Itsy Bitsy Spider",
+  "level": 5,
+  "objectives": [
+    {
+      "description": "Locate Orion's Group",
+      "goal": 1
+    },
+    {
+      "description": "Enter Cave",
+      "goal": 1,
+      "prerequisites": [0]
+    },
+    {
+      "description": "Speak with Orion",
+      "goal": 1,
+      "prerequisites": [1]
+    }
+  ]
+}

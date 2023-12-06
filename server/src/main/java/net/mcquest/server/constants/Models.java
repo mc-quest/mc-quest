@@ -10,10 +10,15 @@ public class Models {
     public static final Model CROW = loadModel("crow");
     public static final Model WOLF_SPIDER = loadModel("wolf_spider");
     public static final Model BROODMOTHER = loadModel("broodmother");
+    public static final Model WOLF_SPIDER_EGG = loadModel("spider_egg");
+    public static final Model WOLF_SPIDER_EGG_CLUSTER = loadModel("spider_egg_cluster");
     public static final Model REDSTONE_MONSTROSITY = loadModel("redstone_monstrosity");
     public static final Model UNDEAD_KNIGHT = loadModel("undead_knight");
     public static final Model DIRE_PACKLORD = loadModel("dire_packlord");
     public static final Model DIRE_WOLF = loadModel("dire_wolf");
+    // public static final Model DREADFANG = loadModel("dreadfang");
+    public static final Model GRIMROT = loadModel("grimrot");
+    public static final Model GOBLIN_MINION = loadModel("goblin_minion");
 
     public static Model[] all() {
         return new Model[]{
@@ -22,10 +27,15 @@ public class Models {
                 CROW,
                 WOLF_SPIDER,
                 BROODMOTHER,
+                WOLF_SPIDER_EGG,
+                WOLF_SPIDER_EGG_CLUSTER,
                 REDSTONE_MONSTROSITY,
                 UNDEAD_KNIGHT,
                 DIRE_PACKLORD,
-                DIRE_WOLF
+                DIRE_WOLF,
+                // DREADFANG,
+                GRIMROT,
+                GOBLIN_MINION
         };
     }
 

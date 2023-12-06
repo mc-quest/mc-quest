@@ -1,0 +1,9 @@
+{
+  "id": "moon_wand",
+  "name": "Moon Wand",
+  "quality": "RARE",
+  "level": 1,
+  "type": "WAND",
+  "attackSpeed": 1,
+  "physicalDamage": 9
+}

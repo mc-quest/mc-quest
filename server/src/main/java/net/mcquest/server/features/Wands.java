@@ -14,6 +14,10 @@ import net.minestom.server.coordinate.Pos;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+import net.minestom.server.utils.time.Cooldown;
+import net.minestom.server.utils.time.TimeUnit;
+
+import java.time.Duration;
 
 public class Wands implements Feature {
     private Mmorpg mmorpg;

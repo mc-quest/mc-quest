@@ -38,6 +38,8 @@ import net.minestom.server.scoreboard.TeamBuilder;
 import net.minestom.server.sound.SoundEvent;
 import net.minestom.server.timer.Task;
 import net.minestom.server.timer.TaskSchedule;
+import net.minestom.server.utils.time.Cooldown;
+import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,6 +80,7 @@ public final class PlayerCharacter extends Character {
     private long undisarmTime;
     private boolean teleporting;
     private final EventEmitter<PlayerCharacterMoveEvent> onMove;
+    private Cooldown cooldown;
 
     PlayerCharacter(
             Mmorpg mmorpg,
@@ -111,6 +114,7 @@ public final class PlayerCharacter extends Character {
         undisarmTask = null;
         undisarmTime = 0;
         canMount = data.canMount();
+        cooldown = new Cooldown(Duration.of(5, TimeUnit.SERVER_TICK));
         // TODO
         canAct = true;
         teleporting = false;
@@ -475,6 +479,11 @@ public final class PlayerCharacter extends Character {
     public void setMoney(Money money) {
         this.money = money;
     }
+
+
+    public Cooldown getCooldown() { return cooldown; }
+
+    public void setCooldown(Cooldown cooldown) { this.cooldown = cooldown; }
 
     /**
      * Returns the mount currently being ridden, or null if there is none.

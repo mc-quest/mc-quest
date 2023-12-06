@@ -1,0 +1,7 @@
+{
+  "id": "lesser_healing_potion",
+  "name": "Lesser Healing Potion",
+  "quality": "UNCOMMON",
+  "level": 5,
+  "description": "Restores 50 health"
+}

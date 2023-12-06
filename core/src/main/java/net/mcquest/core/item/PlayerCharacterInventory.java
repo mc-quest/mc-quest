@@ -5,6 +5,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mcquest.core.character.PlayerCharacter;
+import net.mcquest.core.event.ItemConsumeEvent;
+import net.mcquest.core.event.WeaponEquipEvent;
+import net.mcquest.core.event.WeaponUnequipEvent;
 import net.mcquest.core.persistence.PersistentInventory;
 import net.mcquest.core.persistence.PersistentItem;
 import net.mcquest.core.persistence.PlayerCharacterData;
@@ -12,7 +15,12 @@ import net.mcquest.core.quest.QuestObjective;
 import net.mcquest.core.resourcepack.CustomModelData;
 import net.mcquest.core.resourcepack.Materials;
 import net.mcquest.core.util.ItemStackUtility;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.entity.Player;
+import net.minestom.server.event.player.PlayerChangeHeldSlotEvent;
 import net.minestom.server.inventory.PlayerInventory;
+import net.minestom.server.inventory.click.ClickType;
+import net.minestom.server.inventory.condition.InventoryConditionResult;
 import net.minestom.server.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PlayerCharacterInventory {
-    // TODO: should probably be private
     public static final int WEAPON_SLOT = 8;
     static final int HOTBAR_CONSUMABLE_SLOT_1 = 6;
     static final int HOTBAR_CONSUMABLE_SLOT_2 = 7;
@@ -41,8 +48,11 @@ public class PlayerCharacterInventory {
         this.itemManager = itemManager;
         savedWeapon = null;
         loadInventory(data.inventory());
-
-        // TODO: inventory conditions
+        inventory().addInventoryCondition(this::handleInventoryClick);
+        pc.getEntity().eventNode().addListener(
+                PlayerChangeHeldSlotEvent.class,
+                this::handleChangeHeldSlot
+        );
     }
 
     public @NotNull Weapon getWeapon() {
@@ -313,6 +323,84 @@ public class PlayerCharacterInventory {
         }
 
         return itemManager.getItem(itemStack);
+    }
+
+    private ItemStack cursorItemStack() {
+        return inventory().getCursorItem();
+    }
+
+    private Item cursorItem() {
+        ItemStack itemStack = cursorItemStack();
+        if (itemStack.isAir()) {
+            return null;
+        }
+
+        return itemManager.getItem(itemStack);
+    }
+
+    private void handleInventoryClick(
+            Player player,
+            int slot,
+            ClickType clickType,
+            InventoryConditionResult result
+    ) {
+        if (slot == WEAPON_SLOT) {
+            // TODO: check that player has proficiency in new weapon
+            if (!(cursorItem() instanceof Weapon newWeapon)) {
+                result.setCancel(true);
+                return;
+            }
+            Weapon oldWeapon = getWeapon();
+            oldWeapon.onUnequip().emit(new WeaponUnequipEvent(pc, oldWeapon));
+            newWeapon.onEquip().emit(new WeaponEquipEvent(pc, newWeapon));
+            return;
+        }
+
+        if (slot == HOTBAR_CONSUMABLE_SLOT_1 || slot == HOTBAR_CONSUMABLE_SLOT_2) {
+            if (cursorItemStack().isAir() && getItem(slot) != null) {
+                result.setCursorItem(hotbarConsumablePlaceholder(slot - 6, false));
+            } else {
+                if (!(cursorItem() instanceof ConsumableItem)) {
+                    result.setCancel(true);
+                    return;
+                }
+                result.setClickedItem(ItemStack.AIR);
+            }
+        }
+    }
+
+    private void handleChangeHeldSlot(PlayerChangeHeldSlotEvent event) {
+        // TODO: sound
+
+        int slot = event.getSlot();
+        if (!(slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_1 ||
+                slot == PlayerCharacterInventory.HOTBAR_CONSUMABLE_SLOT_2)) {
+            return;
+        }
+
+        event.setCancelled(true);
+
+        if (!pc.canAct()) {
+            return;
+        }
+
+        ConsumableItem item = (ConsumableItem) getItem(slot);
+        if (item == null) {
+            return;
+        }
+
+        pc.sendMessage(ItemUtility.useItemText(item));
+
+        ItemConsumeEvent consumeEvent = new ItemConsumeEvent(pc, item);
+        item.onConsume().emit(consumeEvent);
+        MinecraftServer.getGlobalEventHandler().call(consumeEvent);
+
+        ItemStack itemStack = inventory().getItemStack(slot);
+        if (itemStack.amount() == 1) {
+            inventory().setItemStack(slot, hotbarConsumablePlaceholder(slot - 6, false));
+        } else {
+            inventory().setItemStack(slot, itemStack.withAmount(itemStack.amount() - 1));
+        }
     }
 
     @ApiStatus.Internal

@@ -46,17 +46,13 @@ public class FighterPlayerClass implements Feature {
     private void useBash(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        int damageAmount = pc.getSkillManager().isUnlocked(
-                FighterSkills.STRONG_ARMED)
-                ? 10
-                : 5;
+        int damageAmount = pc.getSkillManager().isUnlocked(FighterSkills.STRONG_ARMED) ? 10 : 5;
 
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getEyePosition().add(pc.getLookDirection().mul(1.75));
         Vec hitboxSize = new Vec(3.5, 3.5, 3.5);
 
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
+        Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
 
         hits.forEach(Triggers.character(character -> {
             if (!character.isDamageable(pc)) {
@@ -78,10 +74,7 @@ public class FighterPlayerClass implements Feature {
     private void useSelfHeal(ActiveSkillUseEvent event) {
 
         PlayerCharacter pc = event.getPlayerCharacter();
-        int healAmount = pc.getSkillManager().isUnlocked(
-                FighterSkills.STERNER_STUFF)
-                ? 20
-                : 10;
+        int healAmount = pc.getSkillManager().isUnlocked(FighterSkills.STERNER_STUFF) ? 20 : 10;
 
 
         pc.playSound(Sound.sound(SoundEvent.BLOCK_FIRE_EXTINGUISH, Sound.Source.PLAYER, 1f, 1f));
@@ -99,27 +92,19 @@ public class FighterPlayerClass implements Feature {
         // Set up an event for when the player hits the ground.
         Subscription<PlayerCharacterMoveEvent>[] subscriptions = new Subscription[1];
         subscriptions[0] = pc.onMove().subscribe((pcMoveEvent) -> {
-            if (!pcMoveEvent.isOnGround()
-                    || pcMoveEvent.getOldPosition().y() <= pcMoveEvent.getNewPosition().y()) {
+            if (!pcMoveEvent.isOnGround() || pcMoveEvent.getOldPosition().y() <= pcMoveEvent.getNewPosition().y()) {
                 // Return if player is in air or going up.
                 return;
             }
 
             Instance instance = pc.getInstance();
             Pos hitboxCenter = pc.getPosition();
-            Vec hitboxSize = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
-                    FighterSkills.ENLARGED_OVERHEAD_STRIKE)
-               ? new Vec(5, 1, 5)
-               : new Vec(3, 1, 3);
+            Vec hitboxSize = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(FighterSkills.ENLARGED_OVERHEAD_STRIKE) ? new Vec(5, 1, 5) : new Vec(3, 1, 3);
 
 
-            Collection<Collider> hits = mmorpg.getPhysicsManager()
-                    .overlapBox(instance, hitboxCenter, hitboxSize);
+            Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
 
-            double damageAmount = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(
-                    FighterSkills.EMPOWERED_OVERHEAD_STRIKE)
-                ?  6
-                :  3;
+            double damageAmount = pcMoveEvent.getPlayerCharacter().getSkillManager().isUnlocked(FighterSkills.EMPOWERED_OVERHEAD_STRIKE) ? 6 : 3;
 
 
             // Hits every character in a 5x5 range.
@@ -128,12 +113,7 @@ public class FighterPlayerClass implements Feature {
                     return;
                 }
                 character.damage(pc, damageAmount);
-                Sound hitSound = Sound.sound(
-                        SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR,
-                        Sound.Source.PLAYER,
-                        1f,
-                        1f
-                );
+                Sound hitSound = Sound.sound(SoundEvent.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, Sound.Source.PLAYER, 1f, 1f);
                 instance.playSound(hitSound, character.getPosition());
                 Vec launchVector = character.getPosition().sub(hitboxCenter).asVec().normalize().withY(150);
                 character.applyImpulse(launchVector);
@@ -157,15 +137,23 @@ public class FighterPlayerClass implements Feature {
         PlayerCharacter pc = event.getPlayerCharacter();
         Instance instance = pc.getInstance();
         Pos hitboxCenter = pc.getPosition();
-        Vec hitboxSize = new Vec(20, 1, 20);
+        Vec hitboxSize = new Vec(20, 3, 20);
 
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
+        // Create Sound and Visual Effects
+        Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
+        pc.emitSound(Sound.sound(SoundEvent.ENTITY_WARDEN_ROAR, Sound.Source.PLAYER, 1f, 1f));
+        ParticleEffects.particle(instance, pc.getPosition(), Particle.ANGRY_VILLAGER);
 
         // Hits every entity in a 20x1x20 range and sets target to player.
         hits.forEach(Triggers.character(character -> {
             if ((character instanceof NonPlayerCharacter npc) && (character.getAttitude(pc) == Attitude.HOSTILE)) {
                 npc.setTarget(pc);
+
+                // Pulls characters hit towards the taunt user
+                if (pc.getSkillManager().isUnlocked(FighterSkills.MASTERFUL_BLUSTER)) {
+                    Vec launchVector = hitboxCenter.sub(character.getPosition()).asVec().mul(4, 0, 4).withY(10);
+                    character.setVelocity(launchVector);
+                }
             }
         }));
     }
@@ -173,10 +161,12 @@ public class FighterPlayerClass implements Feature {
     private void useBerserk(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
+        int duration = pc.getSkillManager().isUnlocked(FighterSkills.MASTERFUL_BLUSTER) ? 40 : 20;
+
         // Doubles health of player
         pc.setMaxHealth(pc.getMaxHealth() * 2);
         pc.heal(pc, pc.getMaxHealth() * 2);
-        pc.sendMessage(Component.text("Beginning Berserk!"));
+        pc.sendMessage(Component.text("Beginning Berserk! (for " + duration + " seconds)"));
 
         // After 20 seconds, the current health of the player is reduced by the amount originally gained.
         // If health would be set below 1, their health is just 1
@@ -187,18 +177,15 @@ public class FighterPlayerClass implements Feature {
             } else {
                 pc.setHealth(1);
             }
-            pc.sendMessage(Component.text("Berserk Ended... you are so tired"));
+            pc.sendMessage(Component.text("Berserk Ended. You are so tired..."));
             pc.setMaxHealth(damageAmount);
-        }).delay(Duration.ofSeconds(20)).schedule();
+        }).delay(Duration.ofSeconds(duration)).schedule();
     }
 
     private void useWhirlwind(ActiveSkillUseEvent event) {
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        int iterations = pc.getSkillManager().isUnlocked(
-                FighterSkills.AGILE_WHIRLWIND)
-            ? 16
-            : 8;
+        int iterations = pc.getSkillManager().isUnlocked(FighterSkills.AGILE_WHIRLWIND) ? 16 : 8;
 
         Vec direction = pc.getLookDirection();
 
@@ -217,8 +204,7 @@ public class FighterPlayerClass implements Feature {
                 Pos hitboxCenter = pc.getPosition().withY(y -> y + 1.5);
                 Vec horizontalHitboxSize = new Vec(5, 2, 5);
 
-                Collection<Collider> hits = mmorpg.getPhysicsManager()
-                        .overlapBox(instance, hitboxCenter, horizontalHitboxSize);
+                Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, horizontalHitboxSize);
 
                 //Hits every entity in a 2x2 range
                 hits.forEach(Triggers.character(character -> {
@@ -231,19 +217,14 @@ public class FighterPlayerClass implements Feature {
 
                 pc.setLookDirection(horizontalDir);
 
-                ParticleEffects.particle(
-                        instance,
-                        pc.getPosition().add(0, 1.5, 0).add(pc.getLookDirection().withY(0).normalize().mul(3.0)),
-                        Particle.EXPLOSION
-                );
+                ParticleEffects.particle(instance, pc.getPosition().add(0, 1.5, 0).add(pc.getLookDirection().withY(0).normalize().mul(3.0)), Particle.EXPLOSION);
 
-                if (pc.getSkillManager().isUnlocked(
-                        FighterSkills.MULTI_SLASH)) {
+                // Adds an additonal vertical slash upwards
+                if (pc.getSkillManager().isUnlocked(FighterSkills.MULTI_SLASH)) {
 
                     Vec verticalHitboxSize = new Vec(2, 5, 2);
 
-                    hits = mmorpg.getPhysicsManager()
-                            .overlapBox(instance, hitboxCenter, verticalHitboxSize);
+                    hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, verticalHitboxSize);
 
                     hits.forEach(Triggers.character(character -> {
                         if (!character.isDamageable(pc)) {
@@ -253,14 +234,8 @@ public class FighterPlayerClass implements Feature {
                         character.damage(pc, damageAmount);
                     }));
 
-                    ParticleEffects.particle(
-                            instance,
-                            pc.getPosition().add(1.5, 1.5, 0).add(verticalDirX.withX(0).normalize().mul(5.0)),
-                            Particle.EXPLOSION);
-                    ParticleEffects.particle(
-                            instance,
-                            pc.getPosition().add(0, 1.5, 1.5).add(verticalDirZ.withZ(0).normalize().mul(5.0)),
-                            Particle.EXPLOSION);
+                    ParticleEffects.particle(instance, pc.getPosition().add(1.5, 1.5, 0).add(verticalDirX.withX(0).normalize().mul(5.0)), Particle.EXPLOSION);
+                    ParticleEffects.particle(instance, pc.getPosition().add(0, 1.5, 1.5).add(verticalDirZ.withZ(0).normalize().mul(5.0)), Particle.EXPLOSION);
                 }
 
             }).delay(Duration.ofMillis((400 / iterations) * i)).schedule();
@@ -273,8 +248,7 @@ public class FighterPlayerClass implements Feature {
 
         PlayerCharacter pc = event.getPlayerCharacter();
 
-        if (pc.getSkillManager().isUnlocked(
-                FighterSkills.DEVASTATING_CHARGE)) {
+        if (pc.getSkillManager().isUnlocked(FighterSkills.DEVASTATING_CHARGE)) {
             damageAmount = 4.0;
             speed = 40.0;
         } else {
@@ -294,8 +268,7 @@ public class FighterPlayerClass implements Feature {
 
         Vec hitboxSize = new Vec(3.0, 3.0, 3.0);
 
-        Collection<Collider> hits = mmorpg.getPhysicsManager()
-                .overlapBox(instance, hitboxCenter, hitboxSize);
+        Collection<Collider> hits = mmorpg.getPhysicsManager().overlapBox(instance, hitboxCenter, hitboxSize);
 
         hits.forEach(Triggers.character(character -> {
             if (!character.isDamageable(pc)) {
@@ -305,8 +278,8 @@ public class FighterPlayerClass implements Feature {
             character.applyImpulse(direction.mul(200));
         }));
 
-        if (pc.getSkillManager().isUnlocked(
-                FighterSkills.HELLISH_CHARGE)) {
+        // Leaves a trail of fire behind the charger for 3 blocks
+        if (pc.getSkillManager().isUnlocked(FighterSkills.HELLISH_CHARGE)) {
             for (int i = 0; i < 3; i++) {
                 Pos position = pc.getPosition().add(pc.getLookDirection().withY(0.0).mul(i));
                 if (instance.getBlock(position) == Block.AIR) {

@@ -4,6 +4,6 @@
     "quality": "COMMON",
     "level": 1,
     "type": "WAND",
-    "attackSpeed": 1,
+    "attackSpeed": 5,
     "physicalDamage": 3
 }

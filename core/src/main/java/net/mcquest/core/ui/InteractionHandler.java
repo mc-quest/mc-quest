@@ -35,8 +35,11 @@ import net.minestom.server.inventory.InventoryType;
 import net.minestom.server.inventory.PlayerInventory;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.item.Material;
+import net.minestom.server.utils.time.Cooldown;
+import net.minestom.server.utils.time.TimeUnit;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.time.Duration;
 import java.util.List;
 
 @ApiStatus.Internal
@@ -162,7 +165,11 @@ public class InteractionHandler {
             mapManager.close();
         }
 
+        if (!pc.getCooldown().isReady(System.currentTimeMillis())) {
+            return;
+        }
         Weapon weapon = pc.getInventory().getWeapon();
+        pc.setCooldown(new Cooldown(Duration.of((long) weapon.getAttackSpeed(), TimeUnit.SERVER_TICK)));
         AutoAttackEvent basicAttackEvent = new AutoAttackEvent(pc, weapon);
         weapon.onAutoAttack().emit(basicAttackEvent);
         MinecraftServer.getGlobalEventHandler().call(basicAttackEvent);

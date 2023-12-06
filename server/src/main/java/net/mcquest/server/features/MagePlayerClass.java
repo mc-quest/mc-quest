@@ -8,10 +8,19 @@ import net.mcquest.core.character.PlayerCharacter;
 import net.mcquest.core.event.ActiveSkillUseEvent;
 import net.mcquest.core.feature.Feature;
 import net.mcquest.core.instance.Instance;
+import net.mcquest.core.loot.ItemPoolEntry;
+import net.mcquest.core.loot.LootChest;
+import net.mcquest.core.loot.LootTable;
+import net.mcquest.core.loot.Pool;
+import net.mcquest.core.model.CoreModels;
+import net.mcquest.core.object.ObjectSpawner;
 import net.mcquest.core.particle.ParticleEffects;
 import net.mcquest.core.physics.Collider;
+import net.mcquest.core.physics.Projectile;
 import net.mcquest.core.physics.RaycastHit;
 import net.mcquest.core.physics.Triggers;
+import net.mcquest.server.constants.Instances;
+import net.mcquest.server.constants.Items;
 import net.mcquest.server.constants.MageSkills;
 import net.kyori.adventure.sound.Sound;
 import net.minestom.server.coordinate.Pos;
@@ -22,6 +31,7 @@ import net.minestom.server.entity.metadata.other.FallingBlockMeta;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.particle.Particle;
 import net.minestom.server.sound.SoundEvent;
+import team.unnamed.hephaestus.Model;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -44,62 +54,65 @@ public class MagePlayerClass implements Feature {
     }
 
     public void useFireball(ActiveSkillUseEvent event) {
+        PlayerCharacter pc = event.getPlayerCharacter();
+
+        mmorpg.getObjectManager().spawn(ObjectSpawner.of(
+                pc.getInstance(),
+                pc.getPosition(),
+                ((mmorpg, spawner) -> createMageFireball(mmorpg, spawner, EntityType.FIREBALL, pc))
+        ));
+    }
+
+    private Projectile createMageFireball(Mmorpg mmorpg, ObjectSpawner spawner, EntityType type, PlayerCharacter pc) {
         double damageAmount = 6.0;
         double maxDistance = 20.0;
         double fireballSpeed = 20.0;
+        Instance instance = spawner.getInstance();
         Vec hitboxSize = new Vec(1f, 1f, 1f);
-
-        PlayerCharacter pc = event.getPlayerCharacter();
-        Instance instance = pc.getInstance();
+        Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
         Pos startPosition = pc.getWeaponPosition().add(pc.getLookDirection().mul(1f));
 
-        Collider hitbox = new Collider(instance, startPosition, hitboxSize);
-
-        Vec fireballVelocity = pc.getLookDirection().mul(fireballSpeed);
-        Entity fireballEntity = new Entity(EntityType.FIREBALL) {
-            @Override
-            public void tick(long time) {
-                super.tick(time);
-                hitbox.setCenter(this.getPosition().add(0, 0.5, 0));
-                setVelocity(fireballVelocity);
-                if (getPosition().distanceSquared(startPosition) > maxDistance * maxDistance) {
-                    remove();
-                    hitbox.remove();
-                }
-            }
-        };
-
-        hitbox.onCollisionEnter(Triggers.character(character -> {
+        Projectile fireball = new Projectile(mmorpg, spawner, type, startPosition, maxDistance);
+        fireball.setVelocity(fireballVelocity);
+        fireball.setHitboxSize(hitboxSize);
+        fireball.onHit(Triggers.character(character -> {
             if (!character.isDamageable(pc)) {
                 return;
             }
 
             character.damage(pc, damageAmount);
 
-            fireballEntity.remove();
-            hitbox.remove();
-
-            ParticleEffects.particle(instance, hitbox.getCenter(), Particle.EXPLOSION);
+            ParticleEffects.particle(spawner.getInstance(), startPosition, Particle.EXPLOSION);
 
             instance.playSound(Sound.sound(
                     SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
                     Sound.Source.PLAYER,
                     1f,
                     1f
-            ), character.getPosition());
+            ), startPosition);
+
+            fireball.remove();
         }));
+        fireball.onStuck(() -> {
+            instance.playSound(Sound.sound(
+                    SoundEvent.ENTITY_DRAGON_FIREBALL_EXPLODE,
+                    Sound.Source.PLAYER,
+                    1f,
+                    1f
+            ), startPosition);
 
-        fireballEntity.setNoGravity(true);
-        fireballEntity.setInstance(instance, startPosition);
+            fireball.remove();
+        });
 
-        mmorpg.getPhysicsManager().addCollider(hitbox);
-
-        instance.playSound(Sound.sound(
+        pc.getInstance().playSound(Sound.sound(
                 SoundEvent.BLOCK_FIRE_EXTINGUISH,
                 Sound.Source.PLAYER,
                 1f,
                 1f
         ), startPosition);
+
+
+        return fireball;
     }
 
     private void useIceBeam(ActiveSkillUseEvent event) {
